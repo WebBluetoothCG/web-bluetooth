@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <title>Web Bluetooth</title>
+    <meta charset='utf-8'>
+    <script src='http://www.w3.org/Tools/respec/respec-w3c-common'
+            async class='remove'></script>
+    <script class='remove'>
+      var respecConfig = {
+          specStatus: "ED",
+          shortName:  "web-bluetooth",
+          editors: [
+                {   name:       "Jeffrey Yasskin",
+                    company:    "Google, Inc." },
+                {   name:       "Chris Wilson",
+                    company:    "Google, Inc." },
+          ],
+          edDraftURI:   "https://rawgit.com/jyasskin/web-bluetooth/master/index.html",
+          wg:           "Web Bluetooth Community Group",
+          wgURI:        "http://www.w3.org/2014/web-bluetooth/",
+          wgPublicList: "public-web-bluetooth",
+          wgPatentURI:  "http://www.w3.org/2004/01/pp-impl/???/status",
+
+          localBiblio: {
+            "BLUETOOTH-40": {
+              url: "https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=229737",
+              title: "BLUETOOTH SPECIFICATION Version 4.0",
+              publisher: "Bluetooth SIG",
+            },
+            "BLUETOOTH-GATT-REST": {
+              url: "https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=285910",
+              title: "GATT REST API",
+              publisher: "Bluetooth Internet WG",
+            },
+          },
+      };
+    </script>
+  </head>
+  <body>
+    <section id='abstract'>
+      <p>
+        This document describes an API to discover and communicate with devices over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT).
+      </p>
+    </section>
+
+    <section id='sotd'>
+      <p>
+        Changes to this document may be tracked at <a href="https://github.com/jyasskin/web-bluetooth">https://github.com/jyasskin/web-bluetooth</a>.
+      </p>
+    </section>
+
+    <section class='informative'>
+      <h2>Introduction</h2>
+      <p>
+        <a href="https://developer.bluetooth.org/">Bluetooth</a> is a standard for short-range wireless communication between devices.
+        Bluetooth "Classic", in versions of the spec up to 2.1, defines a set of binary protocols based around always-on connections.
+        [[!BLUETOOTH-40]], also known as "Low Energy" or <abbr title="Bluetooth Low Energy">BTLE</abbr>, allows devices to leave their transmitters off most of the time, and provides most of its functionality through a single key/value protocol known as the Generic Attribute Profile (<abbr title="Generic Attribute Profile">GATT</abbr>).
+
+      <p>
+        GATT allows device makers to advertise that they support particular Services.
+        Each <dfn>Service</dfn> is identified by a UUID and exposes a collection of included Services and Characteristics.
+        Each <dfn>Characteristic</dfn> is identified by a UUID exposes a typed value, some properties to describe how the value can be used, and a collection of Descriptors.
+        Each <dfn>Descriptor</dfn> is identified by a UUID and contains related information about the Characteristic Value.
+
+      <p>
+        Bluetooth 4.0 also defines multiple roles that devices can play. The <dfn>Broadcaster</dfn> and <dfn>Observer</dfn> roles are for transmitter- and receiver-only applications, respectively. The <dfn>Peripheral</dfn> role is able to receive a single connection. The <dfn>Central</dfn> role supports multiple connections, and is responsible for creating any connections to <a>Peripheral</a> devices. GATT further defines <dfn>Client</dfn> and <dfn>Server</dfn> roles, which are orthogonal to the <a>Peripheral</a> and <a>Central</a> roles.
+
+      <p>
+        The first version of this specification focuses on the Bluetooth 4 GATT protocol in the <a>Central</a> and <a>Client</a> roles, for the following reasons:
+
+      <ul>
+        <li>The key/value structure of GATT is believed to reduce the risk of device exploits compared to the unstructured byte-stream of other protocols.
+        When the <i>Characteristic Aggregate Format</i> and <i>Characteristic Presentation Format</i> <a title="Descriptor">Descriptors</a> are provided for a <a>Characteristic</a>, the UA can further validate any data passed to the device.
+        <li>Energy usage is becoming more important, especially on mobile devices, and the BTLE spec is significantly more optimized for this concern.
+        <li>Future devices are increasingly likely to support BTLE, so supporting that in the first version of the web API provides more long-term reach than supporting Bluetooth Classic first.
+        The disadvantage of this choice is that fewer current devices and operating systems support BTLE.
+        <li>While devices that run web browsers can benefit from <a>Peripheral</a> support, more use cases require <a>Central</a> support.
+        <li>While the <a>Server</a> role can work in a <a>Central</a> device, <a>Client</a> is more natural and is required for more use cases.
+      </ul>
+
+    </section>
+
+    <section>
+      <h2>Security and privacy considerations</h2>
+    </section>
+
+    <section>
+      <h2>Device Discovery</h2>
+
+      <p class="issue">
+      TBD.
+      Needs to support users choosing a device rather than allowing the site to enumerate all connected devices.
+      Needs to support both "user clicks a button on website, which opens a chooser" and "website receives event when an interesting device comes within range."
+    </section>
+
+    <section>
+      <h2>GATT Interaction</h2>
+
+      <p class="issue">
+        TBD.
+        The <a href="https://developer.chrome.com/apps/app_bluetooth#low-energy">chrome.bluetoothLowEnergy</a> API is a good starting point,
+        but we need to be sure Mozilla and other stakeholders are on board before adding it to the spec.
+
+    </section>
+
+    <section>
+      <h2>Interface Wiring</h2>
+
+      <div title="Navigator implements NavigatorBluetooth" class="idl"></div>
+
+      <dl title="[NoInterfaceObject] interface NavigatorBluetooth" class="idl">
+        <dt>readonly attribute Bluetooth bluetooth</dt>
+        <dl>Provides access to Bluetooth APIs.</dl>
+      </dl>
+    </section>
+
+  </body>
+</html>
