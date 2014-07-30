@@ -12,4 +12,4 @@ Documents in this repository
 Communication
 -------------
 
-* [Support the proposed W3C Community Group](http://www.w3.org/community/groups/proposed/#web-bluetooth)
+* [Support the proposed W3C Community Group](http://www.w3.org/community/blog/2014/07/30/proposed-group-web-bluetooth-community-group/)
