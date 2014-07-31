@@ -1,7 +1,9 @@
 web-bluetooth
 =============
 
-Toward Bluetooth support for the Open Web
+Toward Bluetooth support for the Open Web.
+
+This is a project of the [Web Bluetooth Community Group](http://www.w3.org/community/web-bluetooth/).
 
 Documents in this repository
 ----------------------------
@@ -12,4 +14,3 @@ Documents in this repository
 Communication
 -------------
 
-* [Support the proposed W3C Community Group](http://www.w3.org/community/blog/2014/07/30/proposed-group-web-bluetooth-community-group/)
