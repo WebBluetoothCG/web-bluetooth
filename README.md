@@ -14,3 +14,6 @@ Documents in this repository
 Communication
 -------------
 
+* [W3C Community Group: web-bluetooth](http://www.w3.org/community/web-bluetooth/)
+  * [public-web-bluetooth](http://lists.w3.org/Archives/Public/public-web-bluetooth/) email list.
+* [Github Issue Tracker](https://github.com/jyasskin/web-bluetooth/issues)
