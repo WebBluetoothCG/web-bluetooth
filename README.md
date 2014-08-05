@@ -9,6 +9,7 @@ Documents in this repository
 ----------------------------
 
 * [Use Cases and Security Requirements](https://jyasskin.github.io/web-bluetooth/use-cases.html)
+* [Explainer](https://github.com/jyasskin/web-bluetooth/blob/gh-pages/explainer.md), showing how a site might use this API to satisfy the use cases
 * [Specification](https://jyasskin.github.io/web-bluetooth/index.html)
 
 Communication
