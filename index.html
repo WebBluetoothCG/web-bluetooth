@@ -34,6 +34,18 @@
               publisher: "Bluetooth Internet WG",
               date: "7 April 2014",
             },
+            "BLUETOOTH-ASSIGNED": {
+              href: "https://www.bluetooth.org/en-us/specification/assigned-numbers",
+              title: "Assigned Numbers",
+              status: "Living Standard",
+              publisher: "Bluetooth SIG",
+            },
+            "BLUETOOTH-ASSIGNED-BASEBAND": {
+              href: "https://www.bluetooth.org/en-us/specification/assigned-numbers/baseband",
+              title: "Assigned Numbers for Baseband",
+              status: "Living Standard",
+              publisher: "Bluetooth SIG",
+            },
           },
       };
     </script>
@@ -93,16 +105,398 @@
       TBD.
       Needs to support users choosing a device rather than allowing the site to enumerate all connected devices.
       Needs to support both "user clicks a button on website, which opens a chooser" and "website receives event when an interesting device comes within range."
+
+
+      <section>
+        <h2>Helper enumerations</h2>
+
+        <p>Allocation authorities for Vendor IDs.</p>
+        <dl title="enum VendorIdSource" class="idl">
+          <dt>bluetooth</dt><dd>
+          <dt>usb</dt><dd>
+        </dl>
+
+        <p>Common device types</p>
+        <dl title="enum DeviceType" class="idl">
+          <dt>computer</dt><dd>
+          <dt>phone</dt><dd>
+          <dt>modem</dt><dd>
+          <dt>audio</dt><dd>
+          <dt>carAudio</dt><dd>
+          <dt>video</dt><dd>
+          <dt>peripheral</dt><dd>
+          <dt>joystick</dt><dd>
+          <dt>gamepad</dt><dd>
+          <dt>keyboard</dt><dd>
+          <dt>mouse</dt><dd>
+          <dt>tablet</dt><dd>
+          <dt>keyboardMouseCombo</dt><dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Bluetooth Devices</h2>
+
+        <p>Information about the state of a known Bluetooth device.
+        <dl title="dictionary Device" class="idl">
+          <dt>DOMString address</dt>
+          <dd>The address of the device, in the format '<code>XX:XX:XX:XX:XX:XX</code>'.</dd>
+
+          <dt>DOMString? name</dt>
+          <dd>The human-readable name of the device.</dd>
+
+          <dt>long? deviceClass</dt>
+          <dd>The class of the device, a bit-field defined by [[!BLUETOOTH-ASSIGNED-BASEBAND]].</dd>
+
+          <dt>VendorIdSource? vendorIdSource</dt>
+          <dd>Part of the Device ID record of the device, where available.</dd>
+          <dt>long? vendorId</dt>
+          <dd>Part of the Device ID record of the device, where available.</dd>
+          <dt>long? productId</dt>
+          <dd>Part of the Device ID record of the device, where available.</dd>
+          <dt>long? deviceId</dt>
+          <dd>Part of the Device ID record of the device, where available.</dd>
+
+          <dt>DeviceType? type</dt>
+          <dd>
+            The type of the device, if recognized by the <abbr title="User Agent">UA</abbr>.
+            This is obtained from the <code>deviceClass</code> field and only represents a small fraction of the possible device types.
+            When in doubt you should use the <code>deviceClass</code> field directly.
+          </dd>
+
+          <dt>boolean? paired</dt>
+          <dd>Indicates whether or not the device is paired with the system.</dd>
+
+          <dt>boolean? connected</dt>
+          <dd>Indicates whether the device is currently connected to the system.</dd>
+
+          <dt>DOMString[]? uuids</dt>
+          <dd>
+            UUIDs of protocols, profiles and services advertised by the device.
+            For Low Energy devices, this list is obtained from AD and GATT primary services.
+          </dd>
+        </dl>
+      </section>
+      <p class="issue">
+        Define UUID as a Javascript type?
     </section>
 
     <section>
       <h2>GATT Interaction</h2>
 
-      <p class="issue">
-        TBD.
-        The <a href="https://developer.chrome.com/apps/app_bluetooth#low-energy">chrome.bluetoothLowEnergy</a> API is a good starting point,
-        but we need to be sure Mozilla and other stakeholders are on board before adding it to the spec.
+      <section>
+        <h2>GATT Services</h2>
 
+        <p><a>Service</a> represents a peripheral's Bluetooth GATT Service, a collection of characteristics and relationships to other services that encapsulate the behavior of part of a device.</p>
+        <dl title="dictionary Service" class="idl">
+
+          <dt>DOMString uuid</dt>
+          <dd>The UUID of the service, e.g. 0000180d-0000-1000-8000-00805f9b34fb.</dd>
+
+          <dt>boolean isPrimary</dt>
+          <dd>Indicates whether the type of this service is primary or secondary.</dd>
+
+          <dt>DOMString? instanceId</dt>
+          <dd>
+            Returns the identifier assigned to this service.
+            Use the instance ID to distinguish between services from a peripheral with the same UUID
+            and to make function calls that take in a service identifier.
+            Present, if this instance represents a remote service.
+          </dd>
+
+          <dt>DOMString? deviceAddress</dt>
+          <dd>
+            The device address of the remote peripheral that the GATT service belongs to.
+            Present, if this instance represents a remote service.
+          </dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>GATT Characteristics</h2>
+
+        <p><a>Characteristic</a> represents a GATT characteristic, which is a basic data element that provides further information about a peripheral's service.</p>
+        <dl title="dictionary Characteristic" class="idl">
+
+          <dt>DOMString uuid</dt>
+          <dd>The UUID of the characteristic, e.g. 00002a37-0000-1000-8000-00805f9b34fb.</dd>
+
+          <dt>Service service</dt>
+          <dd>The GATT service this characteristic belongs to.</dd>
+
+          <dt>CharacteristicProperty[] properties</dt>
+          <dd>The properties of this characteristic.</dd>
+
+          <dt>DOMString? instanceId</dt>
+          <dd>
+            Returns the identifier assigned to this characteristic.
+            Use the instance ID to distinguish between characteristics from a peripheral with the same UUID
+            and to make function calls that take in a characteristic identifier.
+            Present, if this instance represents a remote characteristic.
+          </dd>
+
+          <dt>ArrayBuffer? value</dt>
+          <dd>
+            The currently cached characteristic value.
+            This value gets updated when the value of the characteristic is read or updated via a notification or indication.
+          </dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>GATT Characteristic Descriptors</h2>
+
+        <p><a>Descriptor</a> represents a GATT characteristic descriptor, which provides further information about a characteristic's value.</p>
+        <dl title="dictionary Descriptor" class="idl">
+
+          <dt>DOMString uuid</dt>
+          <dd>The UUID of the characteristic descriptor, e.g. 00002902-0000-1000-8000-00805f9b34fb.</dd>
+
+          <dt>Characteristic characteristic</dt>
+          <dd>The GATT characteristic this descriptor belongs to.</dd>
+
+          <dt>DOMString? instanceId</dt>
+          <dd>
+            Returns the identifier assigned to this descriptor.
+            Use the instance ID to distinguish between descriptors from a peripheral with the same UUID and
+            to make function calls that take in a descriptor identifier.
+            Present, if this instance represents a remote characteristic.
+          </dd>
+
+          <dt>ArrayBuffer? value</dt>
+          <dd>
+            The currently cached descriptor value.
+            This value gets updated when the value of the descriptor is read.
+          </dd>
+        </dl>
+      </section>
+
+      <section>
+        <h2>Free functions and events on <code>navigator.bluetooth</code></h2>
+
+        <p class="issue">
+          Consider moving interface functions taking <code>instanceID</code> onto the appropriate dictionary.
+
+        <dl title="interface Bluetooth : EventTarget" class="idl">
+          <dt>Promise&lt;void> connect()</dt>
+          <dd>
+            Establishes a connection between the application and the device with the given address.
+            A device may be already connected and its GATT services available without calling <code>connect</code>,
+            however, an app that wants to access GATT services of a device should call this function to make sure that a connection to the device is maintained.
+            If the device is not connected, all GATT services of the device will be discovered after a successful call to <code>connect</code>.
+            <dl class="parameters">
+              <dt>DOMString deviceAddress</dt>
+              <dd>The Bluetooth address of the remote device to which a GATT connection should be opened.</dd>
+              <dt>optional ConnectProperties properties</dt>
+              <dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;void> disconnect()</dt>
+          <dd>
+            Closes the app's connection to the device with the given address.
+            Note that this will not always destroy the physical link itself,
+            since there may be other apps with open connections.
+            <dl class="parameters">
+              <dt>DOMString deviceAddress</dt>
+              <dd>The Bluetooth address of the remote device.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Service> getService()</dt>
+          <dd>
+            Get the GATT service with the given instance ID.
+            <dl class="parameters">
+              <dt>DOMString serviceId</dt>
+              <dd>The instance ID of the requested GATT service.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Service[]> getServices()</dt>
+          <dd>
+            Get all the GATT services that were discovered on the remote device with the given device address.
+            <dl class="parameters">
+              <dt>DOMString deviceAddress</dt>
+              <dd>The Bluetooth address of the remote device whose GATT services should be returned.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Characteristic> getCharacteristic()</dt>
+          <dd>
+            Get the GATT characteristic with the given instance ID that belongs to the given GATT service, if the characteristic exists.
+            <dl class="parameters">
+              <dt>DOMString characteristicId</dt>
+              <dd>The instance ID of the requested GATT characteristic.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Characteristic[]> getCharacteristics()</dt>
+          <dd>
+            Get a list of all discovered GATT characteristics that belong to the given service.
+            <dl class="parameters">
+            <dt>DOMString serviceId</dt>
+            <dd>The instance ID of the GATT service whose characteristics should be returned.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Service[]> getIncludedServices()</dt>
+          <dd>
+            Get a list of GATT services that are included by the given service.
+            <dl class="parameters">
+              <dt>DOMString serviceId</dt>
+              <dd>The instance ID of the GATT service whose included services should be returned.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Descriptor> getDescriptor()</dt>
+          <dd>
+            Get the GATT characteristic descriptor with the given instance ID.
+            <dl class="parameters">
+              <dt>DOMString descriptorId</dt>
+              <dd>The instance ID of the requested GATT characteristic descriptor.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Descriptor[]> getDescriptors()</dt>
+          <dd>
+            Get a list of GATT characteristic descriptors that belong to the given characteristic.
+            <dl class="parameters">
+              <dt>DOMString characteristicId</dt>
+              <dd>The instance ID of the GATT characteristic whose descriptors should be returned.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Characteristic> readCharacteristicValue()</dt>
+          <dd>
+            Retrieve the value of a specified characteristic from a remote peripheral.
+            When the <a>Promise</a> resolves, the <a>Characteristic</a>'s <code>value</code> field contains the result of the read request.
+            <dl class="parameters">
+              <dt>DOMString characteristicId</dt>
+              <dd>The instance ID of the GATT characteristic whose value should be read from the remote device.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;void> writeCharacteristicValue()</dt>
+          <dd>
+            Write the value of a specified characteristic from a remote peripheral.
+            <dl class="parameters">
+              <dt>DOMString characteristicId</dt>
+              <dd>The instance ID of the GATT characteristic whose value should be written to.</dd>
+              <dt>ArrayBuffer value</dt>
+              <dd>The value that should be sent to the remote characteristic as
+              part of the write request.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;void> startCharacteristicNotifications()</dt>
+          <dd>
+            Enable value notifications/indications from the specified characteristic.
+            Once enabled, an application can listen to notifications using the <a>onCharacteristicValueChanged</a> event.
+            <dl class="parameters">
+              <dt>DOMString characteristicId</dt>
+              <dd>The instance ID of the GATT characteristic that notifications should be enabled on.</dd>
+              <dt>optional NotificationProperties properties</dt>
+              <dd>Notification session properties (optional).</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;void> stopCharacteristicNotifications()</dt>
+          <dd>
+            Disable value notifications/indications from the specified characteristic.
+            After a successful call, the application will stop receiving notifications/indications from this characteristic.
+            <dl class="parameters">
+              <dt>DOMString characteristicId</dt>
+              <dd>The instance ID of the GATT characteristic on which this app's notification session should be stopped.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;Descriptor> readDescriptorValue()</dt>
+          <dd>
+            Retrieve the value of a specified characteristic descriptor from a remote peripheral.
+            When the <a>Promise</a> resolves, the <a>Descriptor</a>'s <code>value</code> field contains the result of the read request.
+            <dl class="parameters">
+              <dt>DOMString descriptorId</dt>
+              <dd>The instance ID of the GATT characteristic descriptor whose value should be read from the remote device.</dd>
+            </dl>
+          </dd>
+
+          <dt>Promise&lt;void> writeDescriptorValue()</dt>
+          <dd>
+            Write the value of a specified characteristic descriptor from a remote peripheral.
+            <dl class="parameters">
+              <dt>DOMString descriptorId</dt>
+              <dd>The instance ID of the GATT characteristic descriptor whose value should be written to.</dd>
+              <dt>ArrayBuffer value</dt>
+              <dd>The value that should be sent to the remote descriptor as part of the write request.</dd>
+            </dl>
+          </dd>
+
+          <dt>attribute EventHandler onServiceAdded</dt>
+          <dd>
+            Fired whan a new GATT service has been discovered on a remote device.
+            Receives a <a>ServiceEvent</a> whose <code>service</code> attribute represents the GATT service that was added.
+          </dd>
+
+          <dt>attribute EventHandler onServiceChanged</dt>
+          <dd>
+            Fired when the state of a remote GATT service changes.
+            This involves any characteristics and/or descriptors that get added or removed from the service,
+            as well as "ServiceChanged" notifications from the remote device.
+            Receives a <a>ServiceEvent</a> whose <code>service</code> attribute represents the GATT service whose state has changed.
+          </dd>
+
+          <dt>attribute EventHandler onServiceRemoved</dt>
+          <dd>
+            Fired when a GATT service that was previously discovered on a remote device has been removed.
+            Receives a <a>ServiceEvent</a> whose <code>service</code> attribute represents the GATT service that was removed.
+          </dd>
+
+          <dt>attribute EventHandler onCharacteristicValueChanged</dt>
+          <dd>
+            Fired when the value of a remote GATT characteristic changes,
+            either as a result of a read request, or a value change notification/indication.
+            This event will only be sent if the app has enabled notifications by calling <a>startCharacteristicNotifications</a>.
+            Receives a <a>CharacteristicEvent</a> whose <code>characteristic</code> attribute represents the GATT characteristic whose value has changed.
+          </dd>
+
+          <dt>attribute EventHandler onDescriptorValueChanged</dt>
+          <dd>
+            Fired when the value of a remote GATT characteristic descriptor changes, usually as a result of a read request.
+            This event exists mostly for convenience and will always be sent after a successful call to <a>readDescriptorValue</a>.
+            Receives a <a>DescriptorEvent</a> whose <code>descriptor</code> attribute represents the GATT characteristic descriptor whose value has changed.
+          </dd>
+        </dl>
+
+        <p class="issue">
+          Should these events be fired against the appropriate <a>Service</a>, <a>Characteristic</a>, or <a>Descriptor</a> and use their <code>target</code> attribute to identify the object?
+          Or is the specialized attribute described here better?
+      <p class="issue">
+        Specify event propagation.
+
+        <section>
+          <h2>Events reporting changes to Services</h2>
+          <dl title="interface ServiceEvent : Event" class="idl">
+            <dt>readonly attribute Service service</dt>
+            <dd>Returns the <a>Service</a> object to which the event relates. <a>eventtarget</a></dd>
+          </dl>
+        </section>
+
+        <section>
+          <h2>Events reporting changes to Characteristics</h2>
+          <dl title="interface CharacteristicEvent : Event" class="idl">
+            <dt>readonly attribute Characteristic characteristic</dt>
+            <dd>Returns the <a>Characteristic</a> object to which the event relates.</dd>
+          </dl>
+        </section>
+
+        <section>
+          <h2>Events reporting changes to Descriptors</h2>
+          <dl title="interface DescriptorEvent : Event" class="idl">
+            <dt>readonly attribute Descriptor descriptor</dt>
+            <dd>Returns the <a>Descriptor</a> object to which the event relates.</dd>
+          </dl>
+        </section>
+      </section>
     </section>
 
     <section>
