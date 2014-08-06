@@ -251,17 +251,9 @@
         </dd>
       </dl>
 
-      <div title="callback CharacteristicCallback = void(Characteristic result)" class="idl"></div>
-      <div title="callback CharacteristicsCallback = void(Characteristic[] result)" class="idl"></div>
-      <div title="callback DescriptorCallback = void(Descriptor result)" class="idl"></div>
-      <div title="callback DescriptorsCallback = void(Descriptor[] result)" class="idl"></div>
-      <div title="callback ResultCallback = void()" class="idl"></div>
-      <div title="callback ServiceCallback = void(Service result)" class="idl"></div>
-      <div title="callback ServicesCallback = void(Service[] result)" class="idl"></div>
-
       <dl title="interface ServiceEvent : Event" class="idl">
         <dt>readonly attribute Service service</dt>
-        <dd>Returns the <a>Service</a> object to which the event relates.</dd>
+        <dd>Returns the <a>Service</a> object to which the event relates. <a>eventtarget</a></dd>
       </dl>
 
       <dl title="interface CharacteristicEvent : Event" class="idl">
@@ -275,7 +267,7 @@
       </dl>
 
       <dl title="interface Bluetooth : EventTarget" class="idl">
-        <dt>void connect()</dt>
+        <dt>Promise&lt;void> connect()</dt>
         <dd>
           Establishes a connection between the application and the device with the given address.
           A device may be already connected and its GATT services available without calling <code>connect</code>,
@@ -286,12 +278,10 @@
             <dd>The Bluetooth address of the remote device to which a GATT connection should be opened.</dd>
             <dt>optional ConnectProperties properties</dt>
             <dd>
-            <dt>ResultCallback callback</dt>
-            <dd>Called when the connect request has completed.</dd>
           </dl>
         </dd>
 
-        <dt>void disconnect()</dt>
+        <dt>Promise&lt;void> disconnect()</dt>
         <dd>
           Closes the app's connection to the device with the given address.
           Note that this will not always destroy the physical link itself,
@@ -299,100 +289,83 @@
           <dl class="parameters">
             <dt>DOMString deviceAddress</dt>
             <dd>The Bluetooth address of the remote device.</dd>
-            <dt>optional ResultCallback callback</dt>
-            <dd>Called when the disconnect request has completed.</dd>
           </dl>
         </dd>
 
-        <dt>void getService()</dt>
+        <dt>Promise&lt;Service> getService()</dt>
         <dd>
           Get the GATT service with the given instance ID.
           <dl class="parameters">
             <dt>DOMString serviceId</dt>
             <dd>The instance ID of the requested GATT service.</dd>
-            <dt>ServiceCallback callback</dt>
-            <dd>Called with the requested Service object.</dd>
           </dl>
         </dd>
 
-        <dt>void getServices()</dt>
+        <dt>Promise&lt;Service[]> getServices()</dt>
         <dd>
           Get all the GATT services that were discovered on the remote device with the given device address.
           <dl class="parameters">
             <dt>DOMString deviceAddress</dt>
             <dd>The Bluetooth address of the remote device whose GATT services should be returned.</dd>
-            <dt>ServicesCallback callback</dt>
-            <dd>Called with the list of requested Service objects.</dd>
           </dl>
         </dd>
 
-        <dt>void getCharacteristic()</dt>
+        <dt>Promise&lt;Characteristic> getCharacteristic()</dt>
         <dd>
           Get the GATT characteristic with the given instance ID that belongs to the given GATT service, if the characteristic exists.
           <dl class="parameters">
             <dt>DOMString characteristicId</dt>
             <dd>The instance ID of the requested GATT characteristic.</dd>
-            <dt>CharacteristicCallback callback</dt>
-            <dd>Called with the requested Characteristic object.</dd>
           </dl>
         </dd>
 
-        <dt>void getCharacteristics()</dt>
+        <dt>Promise&lt;Characteristic[]> getCharacteristics()</dt>
         <dd>
           Get a list of all discovered GATT characteristics that belong to the given service.
           <dl class="parameters">
           <dt>DOMString serviceId</dt>
           <dd>The instance ID of the GATT service whose characteristics should be returned.</dd>
-          <dt>CharacteristicsCallback callback</dt>
-          <dd>Called with the list of characteristics that belong to the given service.</dd>
           </dl>
         </dd>
 
-        <dt>void getIncludedServices()</dt>
+        <dt>Promise&lt;Service[]> getIncludedServices()</dt>
         <dd>
           Get a list of GATT services that are included by the given service.
           <dl class="parameters">
             <dt>DOMString serviceId</dt>
             <dd>The instance ID of the GATT service whose included services should be returned.</dd>
-            <dt>ServicesCallback callback</dt>
-            <dd>Called with the list of GATT services included from the given service.</dd>
           </dl>
         </dd>
 
-        <dt>void getDescriptor()</dt>
+        <dt>Promise&lt;Descriptor> getDescriptor()</dt>
         <dd>
           Get the GATT characteristic descriptor with the given instance ID.
           <dl class="parameters">
             <dt>DOMString descriptorId</dt>
             <dd>The instance ID of the requested GATT characteristic descriptor.</dd>
-            <dt>DescriptorCallback callback</dt>
-            <dd>Called with the requested Descriptor object.</dd>
           </dl>
         </dd>
 
-        <dt>void getDescriptors()</dt>
+        <dt>Promise&lt;Descriptor[]> getDescriptors()</dt>
         <dd>
           Get a list of GATT characteristic descriptors that belong to the given characteristic.
           <dl class="parameters">
             <dt>DOMString characteristicId</dt>
             <dd>The instance ID of the GATT characteristic whose descriptors should be returned.</dd>
-            <dt>DescriptorsCallback callback</dt>
-            <dd>Called with the list of descriptors that belong to the given characteristic.</dd>
           </dl>
         </dd>
 
-        <dt>void readCharacteristicValue()</dt>
+        <dt>Promise&lt;Characteristic> readCharacteristicValue()</dt>
         <dd>
           Retrieve the value of a specified characteristic from a remote peripheral.
+          When the <a>Promise</a> resolves, the <a>Characteristic</a>'s <code>value</code> field contains the result of the read request.
           <dl class="parameters">
             <dt>DOMString characteristicId</dt>
             <dd>The instance ID of the GATT characteristic whose value should be read from the remote device.</dd>
-            <dt>CharacteristicCallback callback</dt>
-            <dd>Called with the Characteristic object whose value was requested. The <code>value</code> field of the returned Characteristic object contains the result of the read request.</dd>
           </dl>
         </dd>
 
-        <dt>void writeCharacteristicValue()</dt>
+        <dt>Promise&lt;void> writeCharacteristicValue()</dt>
         <dd>
           Write the value of a specified characteristic from a remote peripheral.
           <dl class="parameters">
@@ -401,12 +374,10 @@
             <dt>ArrayBuffer value</dt>
             <dd>The value that should be sent to the remote characteristic as
             part of the write request.</dd>
-            <dt>ResultCallback callback</dt>
-            <dd>Called when the write request has completed.</dd>
           </dl>
         </dd>
 
-        <dt>void startCharacteristicNotifications()</dt>
+        <dt>Promise&lt;void> startCharacteristicNotifications()</dt>
         <dd>
           Enable value notifications/indications from the specified characteristic.
           Once enabled, an application can listen to notifications using the <a>onCharacteristicValueChanged</a> event.
@@ -415,39 +386,30 @@
             <dd>The instance ID of the GATT characteristic that notifications should be enabled on.</dd>
             <dt>optional NotificationProperties properties</dt>
             <dd>Notification session properties (optional).</dd>
-            <dt>ResultCallback callback</dt>
-            <dd>Called when the request has completed.</dd>
           </dl>
         </dd>
 
-        <dt>void stopCharacteristicNotifications()</dt>
+        <dt>Promise&lt;void> stopCharacteristicNotifications()</dt>
         <dd>
           Disable value notifications/indications from the specified characteristic.
           After a successful call, the application will stop receiving notifications/indications from this characteristic.
           <dl class="parameters">
             <dt>DOMString characteristicId</dt>
             <dd>The instance ID of the GATT characteristic on which this app's notification session should be stopped.</dd>
-            <dt>optional ResultCallback callback</dt>
-            <dd>Called when the request has completed (optional).</dd>
           </dl>
         </dd>
 
-        <dt>void readDescriptorValue()</dt>
+        <dt>Promise&lt;Descriptor> readDescriptorValue()</dt>
         <dd>
           Retrieve the value of a specified characteristic descriptor from a remote peripheral.
+          When the <a>Promise</a> resolves, the <a>Descriptor</a>'s <code>value</code> field contains the result of the read request.
           <dl class="parameters">
             <dt>DOMString descriptorId</dt>
             <dd>The instance ID of the GATT characteristic descriptor whose value should be read from the remote device.</dd>
-            <dt>DescriptorCallback callback</dt>
-            <dd>
-              Called with the Descriptor object whose value was requested.
-              The <code>value</code> field of the returned Descriptor object contains
-              the result of the read request.
-            </dd>
           </dl>
         </dd>
 
-        <dt>void writeDescriptorValue()</dt>
+        <dt>Promise&lt;void> writeDescriptorValue()</dt>
         <dd>
           Write the value of a specified characteristic descriptor from a remote peripheral.
           <dl class="parameters">
@@ -455,8 +417,6 @@
             <dd>The instance ID of the GATT characteristic descriptor whose value should be written to.</dd>
             <dt>ArrayBuffer value</dt>
             <dd>The value that should be sent to the remote descriptor as part of the write request.</dd>
-            <dt>ResultCallback callback</dt>
-            <dd>Called when the write request has completed.</dd>
           </dl>
         </dd>
 
@@ -496,8 +456,6 @@
         </dd>
       </dl>
 
-      <p class="issue">
-        Convert Callbacks to Promises.
       <p class="issue">
         Specify event propagation.
       <p class="issue">
