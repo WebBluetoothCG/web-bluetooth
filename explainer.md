@@ -1,10 +1,10 @@
 # Connecting web sites to Bluetooth devices
 
-This document explores how a web developer might perform various [use cases](https://jyasskin.github.io/web-bluetooth/use-cases.html) using the Web Bluetooth API.
-As the Web Bluetooth API isn't fully [specified](https://jyasskin.github.io/web-bluetooth/index.html),
+This document explores how a web developer might perform various [use cases](http://webbluetoothcg.github.io/web-bluetooth/use-cases.html) using the Web Bluetooth API.
+As the Web Bluetooth API isn't fully [specified](http://webbluetoothcg.github.io/web-bluetooth/),
 this document invents some function calls and behavior in order to give readers a feeling for what the final code will look like.
 Hopefully the intended meaning and behavior are clear enough from context.
-If not, please file [issues](https://github.com/jyasskin/web-bluetooth/issues).
+If not, please file [issues](https://github.com/WebBluetoothCG/web-bluetooth/issues).
 
 ## Discovering and manipulating a Heart Rate Monitor
 
