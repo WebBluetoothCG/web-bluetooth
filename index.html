@@ -131,10 +131,63 @@
     <section>
       <h2>Device Discovery</h2>
 
+      <dl title="[NoInterfaceObject] interface BluetoothDiscovery" class="idl" data-merge="BluetoothScanFilter">
+        <dt id="BluetoothDiscovery.requestDevice">Promise&lt;Device> requestDevice(sequence&lt;BluetoothScanFilter> filters)</dt>
+        <dd>
+          When this method is invoked, the UA MUST run the following steps:
+          <ol>
+            <li>Return a new <a>Promise</a>, but continue running these steps asynchronously.</li>
+            <li>
+              If the current document's origin is an <a href="https://w3c.github.io/webappsec/specs/mixedcontent/#insecure-origin">insecure origin</a>,
+              reject the <a>Promise</a> with a <a>SecurityError</a> and abort these steps.
+              <p class="issue">
+                Follow <a href="https://github.com/slightlyoff/ServiceWorker/issues/385">slightlyoff/ServiceWorker#385</a> for the right term to use here.
+            </li>
+            <li>
+              If the algorithm is not <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#allowed-to-show-a-popup">allowed to show a popup</a>,
+              reject the <a>Promise</a> with a <a>SecurityError</a> and abort these steps.
+            </li>
+            <li>
+              <a>Perform a scan for devices</a> matching <var>filters</var>.
+            </li>
+            <li>
+              Display a prompt to the user requesting that the user specify some devices from the result of the scan.
+              The UA SHOULD show the user the human-readable name of each device.
+              If this name is not available because the UA's Bluetooth system doesn't support privacy-enabled scans,
+              the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
+            </li>
+            <li>
+              Wait for the user to have made their selection.
+            </li>
+            <li>
+              Resolve the <a>Promise</a> with a <a>Device</a> instance representing the selected device.
+            </li>
+          </ol>
+        </dd>
+      </dl>
+
+      <dl title="dictionary BluetoothScanFilter" class="idl">
+        <dt>UUID[] services</dt>
+        <dd>A list of <a>Service</a> UUIDs that a device must support to match this filter.</dd>
+      </dl>
+
+      <p>
+        A device <dfn>matches a filter</dfn> <var>filter</var> if
+      <ul>
+        <li><code><var>filter</var>.services</code> is not empty and</li>
+        <li>the device supports each of the <a>Service</a> UUIDs included in <code><var>filter</var>.services</code> as a primary (vs included) service.</li>
+      </ul>
+
+      <p>
+        To <dfn>perform a scan for devices</dfn> matching a sequence of <a>BluetoothScanFilter</a>s,
+        the UA MUST put its Bluetooth subsystem into either passive scanning or privacy-enabled active scanning mode
+        and wait a UA-determined time for nearby devices to advertise themselves.
+        The result of the scan is the sequence of devices that <a title="matches a filter">match any filter</a> in the sequence of <a>BluetoothScanFilter</a>s.
+        When determining the list of <a>Service</a> UUIDs a device supports, the UA MUST include <a>Service</a>s advertised by the device,
+        and MAY include <a>Service</a>s previously discovered through the Bluetooth Service Discovery Protocol (<abbr title="Service Discovery Protocol">SDP</abbr>).
+
       <p class="issue">
-      TBD.
-      Needs to support users choosing a device rather than allowing the site to enumerate all connected devices.
-      Needs to support both "user clicks a button on website, which opens a chooser" and "website receives event when an interesting device comes within range."
+        Needs to support "website receives event when an interesting device comes within range."
 
 
       <section>
@@ -305,7 +358,7 @@
         <p class="issue">
           Consider moving interface functions taking <code>instanceID</code> onto the appropriate dictionary.
 
-        <dl title="[NoInterfaceObject] interface Bluetooth : EventTarget" class="idl">
+        <dl title="[NoInterfaceObject] interface BluetoothInteraction : EventTarget" class="idl">
           <dt>readonly attribute BluetoothUuids uuids</dt>
           <dd></dd>
 
@@ -860,6 +913,11 @@
         <dt>readonly attribute Bluetooth bluetooth</dt>
         <dl>Provides access to Bluetooth APIs.</dl>
       </dl>
+
+      <dl title="[NoInterfaceObject] interface Bluetooth" class="idl">
+      </dl>
+      <div title="Bluetooth implements BluetoothDiscovery" class="idl"></div>
+      <div title="Bluetooth implements BluetoothInteraction" class="idl"></div>
     </section>
 
   </body>
