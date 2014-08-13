@@ -11,18 +11,16 @@ If not, please file [issues](https://github.com/WebBluetoothCG/web-bluetooth/iss
 Imagine we're writing a web site to gather data from a user's heart rate monitor over a Bluetooth Low Energy wireless channel,
 using the [org.bluetooth.service.heart_rate](https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml) service on the device.
 
-First the site needs to get a handle to the device the user wants it to communicate with
+First the site needs to get a handle to the device the user wants it to communicate with.
 Each service defined by the Bluetooth standard is given an [assigned number](https://www.bluetooth.org/en-us/specification/assigned-numbers),
-and the Web Bluetooth API provides symbolic names for these numbers in the `navigator.bluetooth.uuids` namespace.
-`navigator.bluetooth.uuids.service.heart_rate` identifies the heart_rate service.
+and the Web Bluetooth API provides [an enumeration for these numbers](http://webbluetoothcg.github.io/web-bluetooth/#idl-def-BluetoothServiceName) that can be used in methods expecting services.
 
 To ask the user for an appropriate device via a filtered device selection dialog UI,
 related to the dialog shown by `<input type="file" accept="...">`, we run the following code:
 
 ```javascript
-var bt = navigator.bluetooth;
-var device_promise = bt.requestDevice([{
-    services: [bt.uuids.service.heart_rate],
+var device_promise = navigator.bluetooth.requestDevice([{
+    services: ['heart_rate'],
 }]);
 ```
 
@@ -37,20 +35,20 @@ describes the currently-measured heart rate, as one might expect.
 
 ```javascript
 var heart_rate_service_promise = device_promise.then(
-    device => device.findServices(bt.uuids.service.heart_rate));
+    device => device.getService('heart_rate'));
 var heart_rate_measurement_promise =
     heart_rate_service_promise.then(service =>
-        service[0].findCharacteristics(bt.uuids.characteristic.heart_rate_measurement);
+        service.getCharacteristic('heart_rate_measurement');
 heart_rate_measurement_promise.then(characteristic => {
-    window.characteristic = characteristic[0];
-    return characteristic[0].startNotifications();
+    window.characteristic = characteristic;
+    return characteristic.startNotifications();
 }).then(() => update_ui_that_listening_has_started());
 ```
 
 To do anything with these notifications, we need to listen to an event on `navigator.bluetooth`:
 
 ```javascript
-bt.addEventListener('characteristicvaluechanged', e => {
+navigator.bluetooth.addEventListener('characteristicvaluechanged', e => {
     if (e.characteristic === window.characteristic) {
         report_heart_rate(parse_heart_rate(e.characteristic.value));
     }
@@ -74,6 +72,9 @@ function parse_heart_rate(buffer) {
 
 
 ## TODO
+* Add a device using a non-standard UUID to show off the non-string interface.
+* Show how to get all instances of a given service UUID, for example to support multiple battery services in a device.
+* Show an example of querying a service's UUID to motivate the bluetooth.uuids namespace.
 * Register to get notified when a particular device comes in range.
   UA would present user with a dialog asking "which app do you want to handle this device?"
 * Handle writing characteristics
