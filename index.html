@@ -252,10 +252,17 @@
             since there may be other sites with open connections.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTServiceSequence> getServices()</dt>
-          <dd>
-            Get all the GATT services that were discovered on the remote device with the given device address.
-          </dd>
+          <dt>Promise&lt;BluetoothGATTService> getService(BluetoothServiceId service)</dt>
+          <dd>Returns a promise that is asynchronously resolved with the first primary GATT service on the remote device whose UUID is <var>service</var>.</dd>
+
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices()</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the primary GATT services on the remote device.</dd>
+
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(BluetoothServiceId service)</dt>
+          <dd>Returns <code>this.getAllServices([service])</code></dd>
+
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(sequence&lt;BluetoothServiceId> services)</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the primary GATT services on the remote device with UUIDs in <var>services</var>.</dd>
         </dl>
 
         <p>Allocation authorities for Vendor IDs.</p>
@@ -295,15 +302,30 @@
             Present, if this instance represents a remote service.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getCharacteristics()</dt>
-          <dd>
-            Get a list of all discovered GATT characteristics that belong to the given service.
-          </dd>
+          <dt>Promise&lt;BluetoothGATTCharacteristic> getCharacteristic(BluetoothCharacteristicId characteristic)</dt>
+          <dd>Returns a promise that is asynchronously resolved with the first GATT characteristic within this Service whose UUID is <var>characteristic</var>.</dd>
 
-          <dt>Promise&lt;BluetoothGATTServiceSequence> getIncludedServices()</dt>
+          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics()</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service.</dd>
+          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics(BluetoothCharacteristicId characteristic)</dt>
+          <dd>Returns <code>this.getAllCharacteristics([characteristic])</code></dd>
+          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics(sequence&lt;BluetoothCharacteristicId> characteristics)</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service with UUIDs in <var>characteristics</var>.</dd>
+
+          <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceId service)</dt>
+          <dd>Returns a promise that is asynchronously resolved with the first GATT included service within this Service whose UUID is <var>service</var>.</dd>
+
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices()</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service.</dd>
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices(BluetoothServiceId service)</dt>
           <dd>
-            Get a list of GATT services that are included by the given service.
+            Returns <code>this.getAllIncludedServices([service])</code>
+            <p class="note">
+              Bluetooth's procedure for finding included services (3.G.4.5) doesn't include a way to optimize for a single UUID.
+              Maybe we should omit this and the next overloads to avoid implying that they're more efficient than the no-argument version.
           </dd>
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices(sequence&lt;BluetoothServiceId> services)</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service with UUIDs in <var>services</var>.</dd>
         </dl>
         <div title="typedef sequence<BluetoothGATTService> BluetoothGATTServiceSequence" class="idl"></div>
       </section>
@@ -337,10 +359,15 @@
             This value gets updated when the value of the characteristic is read or updated via a notification or indication.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getDescriptors()</dt>
-          <dd>
-            Get a list of GATT characteristic descriptors that belong to the given characteristic.
-          </dd>
+          <dt>Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorId descriptor)</dt>
+          <dd>Returns a promise that is asynchronously resolved with the first GATT descriptor within this Characteristic whose UUID is <var>descriptor</var>.</dd>
+
+          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors()</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic.</dd>
+          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors(BluetoothDescriptorId descriptor)</dt>
+          <dd>Returns <code>this.getAllDescriptors([descriptor])</code></dd>
+          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors(sequence&lt;BluetoothDescriptorId> descriptors)</dt>
+          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic with UUIDs in <var>descriptors</var>.</dd>
 
           <dt>Promise&lt;ArrayBuffer> readValue()</dt>
           <dd>
@@ -713,6 +740,39 @@
           <dt>readonly attribute UUID tx_power</dt><dd><code>registeredUUID(0x1804)</code></dd>
           <dt>readonly attribute UUID user_data</dt><dd><code>registeredUUID(0x181C)</code></dd>
         </dl>
+
+        <p>
+          The <a>BluetoothServiceName</a> enumeration allows users to pass the standardized services by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.service</code>.
+          When used as a parameter to a function in this specification that accepts a <a>BluetoothServiceId</a> parameter,
+          these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
+
+        <dl title="enum BluetoothServiceName" class="idl">
+          <dt>alert_notification</dt><dd>refers to the 16-bit UUID 0x1811</dd>
+          <dt>battery_service</dt><dd>refers to the 16-bit UUID 0x180F</dd>
+          <dt>blood_pressure</dt><dd>refers to the 16-bit UUID 0x1810</dd>
+          <dt>current_time</dt><dd>refers to the 16-bit UUID 0x1805</dd>
+          <dt>cycling_power</dt><dd>refers to the 16-bit UUID 0x1818</dd>
+          <dt>cycling_speed_and_cadence</dt><dd>refers to the 16-bit UUID 0x1816</dd>
+          <dt>device_information</dt><dd>refers to the 16-bit UUID 0x180A</dd>
+          <dt>generic_access</dt><dd>refers to the 16-bit UUID 0x1800</dd>
+          <dt>generic_attribute</dt><dd>refers to the 16-bit UUID 0x1801</dd>
+          <dt>glucose</dt><dd>refers to the 16-bit UUID 0x1808</dd>
+          <dt>health_thermometer</dt><dd>refers to the 16-bit UUID 0x1809</dd>
+          <dt>heart_rate</dt><dd>refers to the 16-bit UUID 0x180D</dd>
+          <dt>human_interface_device</dt><dd>refers to the 16-bit UUID 0x1812</dd>
+          <dt>immediate_alert</dt><dd>refers to the 16-bit UUID 0x1802</dd>
+          <dt>link_loss</dt><dd>refers to the 16-bit UUID 0x1803 </dd>
+          <dt>location_and_navigation</dt><dd>refers to the 16-bit UUID 0x1819</dd>
+          <dt>next_dst_change</dt><dd>refers to the 16-bit UUID 0x1807</dd>
+          <dt>phone_alert_status</dt><dd>refers to the 16-bit UUID 0x180E</dd>
+          <dt>reference_time_update</dt><dd>refers to the 16-bit UUID 0x1806</dd>
+          <dt>running_speed_and_cadence</dt><dd>refers to the 16-bit UUID 0x1814</dd>
+          <dt>scan_parameters</dt><dd>refers to the 16-bit UUID 0x1813</dd>
+          <dt>tx_power</dt><dd>refers to the 16-bit UUID 0x1804</dd>
+          <dt>user_data</dt><dd>refers to the 16-bit UUID 0x181C</dd>
+        </dl>
+
+        <div title="typedef (BluetoothServiceName or UUID) BluetoothServiceId" class="idl"></div>
       </section>
 
       <section>
@@ -822,6 +882,116 @@
           <dt>readonly attribute UUID time_accuracy</dt><dd><code>registeredUUID(0x2A12)</code></dd>
           <dt>readonly attribute UUID time_source</dt><dd><code>registeredUUID(0x2A13)</code></dd>
         </dl>
+
+        <p>
+          The <a>BluetoothCharacteristicName</a> enumeration allows users to pass the standardized characteristics by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.characteristic</code>.
+          When used as a parameter to a function in this specification that accepts a <a>BluetoothCharacteristicId</a> parameter,
+          these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
+
+        <dl title="enum BluetoothCharacteristicName" class="idl">
+          <dt>aerobic_heart_rate_lower_limit</dt><dd>refers to the 16-bit UUID 0x2A7E</dd>
+          <dt>aerobic_heart_rate_upper_limit</dt><dd>refers to the 16-bit UUID 0x2A84</dd>
+          <dt>aerobic_threshold</dt><dd>refers to the 16-bit UUID 0x2A7F</dd>
+          <dt>age</dt><dd>refers to the 16-bit UUID 0x2A80</dd>
+          <dt>alert_category_id</dt><dd>refers to the 16-bit UUID 0x2A43</dd>
+          <dt>alert_category_id_bit_mask</dt><dd>refers to the 16-bit UUID 0x2A42</dd>
+          <dt>alert_level</dt><dd>refers to the 16-bit UUID 0x2A06</dd>
+          <dt>alert_notification_control_point</dt><dd>refers to the 16-bit UUID 0x2A44</dd>
+          <dt>alert_status</dt><dd>refers to the 16-bit UUID 0x2A3F</dd>
+          <dt>anaerobic_heart_rate_lower_limit</dt><dd>refers to the 16-bit UUID 0x2A81</dd>
+          <dt>anaerobic_heart_rate_upper_limit</dt><dd>refers to the 16-bit UUID 0x2A82</dd>
+          <dt>anaerobic_threshold</dt><dd>refers to the 16-bit UUID 0x2A83</dd>
+          <dt>gap.appearance</dt><dd>refers to the 16-bit UUID 0x2A01</dd>
+          <dt>battery_level</dt><dd>refers to the 16-bit UUID 0x2A19</dd>
+          <dt>blood_pressure_feature</dt><dd>refers to the 16-bit UUID 0x2A49</dd>
+          <dt>blood_pressure_measurement</dt><dd>refers to the 16-bit UUID 0x2A35</dd>
+          <dt>body_sensor_location</dt><dd>refers to the 16-bit UUID 0x2A38</dd>
+          <dt>boot_keyboard_input_report</dt><dd>refers to the 16-bit UUID 0x2A22</dd>
+          <dt>boot_keyboard_output_report</dt><dd>refers to the 16-bit UUID 0x2A32</dd>
+          <dt>boot_mouse_input_report</dt><dd>refers to the 16-bit UUID 0x2A33</dd>
+          <dt>csc_feature</dt><dd>refers to the 16-bit UUID 0x2A5C</dd>
+          <dt>csc_measurement</dt><dd>refers to the 16-bit UUID 0x2A5B</dd>
+          <dt>current_time</dt><dd>refers to the 16-bit UUID 0x2A2B</dd>
+          <dt>cycling_power_control_point</dt><dd>refers to the 16-bit UUID 0x2A66</dd>
+          <dt>cycling_power_feature</dt><dd>refers to the 16-bit UUID 0x2A65</dd>
+          <dt>cycling_power_measurement</dt><dd>refers to the 16-bit UUID 0x2A63</dd>
+          <dt>cycling_power_vector</dt><dd>refers to the 16-bit UUID 0x2A64</dd>
+          <dt>database_change_increment</dt><dd>refers to the 16-bit UUID 0x2A99</dd>
+          <dt>date_of_birth</dt><dd>refers to the 16-bit UUID 0x2A85</dd>
+          <dt>date_of_threshold_assessment</dt><dd>refers to the 16-bit UUID 0x2A86</dd>
+          <dt>date_time</dt><dd>refers to the 16-bit UUID 0x2A08</dd>
+          <dt>day_date_time</dt><dd>refers to the 16-bit UUID 0x2A0A</dd>
+          <dt>day_of_week</dt><dd>refers to the 16-bit UUID 0x2A09</dd>
+          <dt>gap.device_name</dt><dd>refers to the 16-bit UUID 0x2A00</dd>
+          <dt>dst_offset</dt><dd>refers to the 16-bit UUID 0x2A0D</dd>
+          <dt>email_address</dt><dd>refers to the 16-bit UUID 0x2A87</dd>
+          <dt>exact_time_256</dt><dd>refers to the 16-bit UUID 0x2A0C</dd>
+          <dt>fat_burn_heart_rate_lower_limit</dt><dd>refers to the 16-bit UUID 0x2A88</dd>
+          <dt>fat_burn_heart_rate_upper_limit</dt><dd>refers to the 16-bit UUID 0x2A89</dd>
+          <dt>firmware_revision_string</dt><dd>refers to the 16-bit UUID 0x2A26</dd>
+          <dt>first_name</dt><dd>refers to the 16-bit UUID 0x2A8A</dd>
+          <dt>five_zone_heart_rate_limits</dt><dd>refers to the 16-bit UUID 0x2A8B</dd>
+          <dt>gender</dt><dd>refers to the 16-bit UUID 0x2A8C</dd>
+          <dt>glucose_feature</dt><dd>refers to the 16-bit UUID 0x2A51</dd>
+          <dt>glucose_measurement</dt><dd>refers to the 16-bit UUID 0x2A18</dd>
+          <dt>glucose_measurement_context</dt><dd>refers to the 16-bit UUID 0x2A34</dd>
+          <dt>hardware_revision_string</dt><dd>refers to the 16-bit UUID 0x2A27</dd>
+          <dt>heart_rate_control_point</dt><dd>refers to the 16-bit UUID 0x2A39</dd>
+          <dt>heart_rate_max</dt><dd>refers to the 16-bit UUID 0x2A8D</dd>
+          <dt>heart_rate_measurement</dt><dd>refers to the 16-bit UUID 0x2A37</dd>
+          <dt>height</dt><dd>refers to the 16-bit UUID 0x2A8E</dd>
+          <dt>hid_control_point</dt><dd>refers to the 16-bit UUID 0x2A4C</dd>
+          <dt>hid_information</dt><dd>refers to the 16-bit UUID 0x2A4A</dd>
+          <dt>hip_circumference</dt><dd>refers to the 16-bit UUID 0x2A8F</dd>
+          <dt>ieee_11073-20601_regulatory_certification_data_list</dt><dd>refers to the 16-bit UUID 0x2A2A</dd>
+          <dt>intermediate_blood_pressure</dt><dd>refers to the 16-bit UUID 0x2A36</dd>
+          <dt>intermediate_temperature</dt><dd>refers to the 16-bit UUID 0x2A1E</dd>
+          <dt>language</dt><dd>refers to the 16-bit UUID 0x2AA2</dd>
+          <dt>last_name</dt><dd>refers to the 16-bit UUID 0x2A90</dd>
+          <dt>ln_control_point</dt><dd>refers to the 16-bit UUID 0x2A6B</dd>
+          <dt>ln_feature</dt><dd>refers to the 16-bit UUID 0x2A6A</dd>
+          <dt>local_time_information</dt><dd>refers to the 16-bit UUID 0x2A0F</dd>
+          <dt>location_and_speed</dt><dd>refers to the 16-bit UUID 0x2A67</dd>
+          <dt>manufacturer_name_string</dt><dd>refers to the 16-bit UUID 0x2A29</dd>
+          <dt>maximum_recommended_heart_rate</dt><dd>refers to the 16-bit UUID 0x2A91</dd>
+          <dt>measurement_interval</dt><dd>refers to the 16-bit UUID 0x2A21</dd>
+          <dt>model_number_string</dt><dd>refers to the 16-bit UUID 0x2A24</dd>
+          <dt>navigation</dt><dd>refers to the 16-bit UUID 0x2A68</dd>
+          <dt>new_alert</dt><dd>refers to the 16-bit UUID 0x2A46</dd>
+          <dt>gap.peripheral_preferred_connection_parameters</dt><dd>refers to the 16-bit UUID 0x2A04</dd>
+          <dt>gap.peripheral_privacy_flag</dt><dd>refers to the 16-bit UUID 0x2A02</dd>
+          <dt>pnp_id</dt><dd>refers to the 16-bit UUID 0x2A50</dd>
+          <dt>position_quality</dt><dd>refers to the 16-bit UUID 0x2A69</dd>
+          <dt>protocol_mode</dt><dd>refers to the 16-bit UUID 0x2A4E</dd>
+          <dt>gap.reconnection_address</dt><dd>refers to the 16-bit UUID 0x2A03</dd>
+          <dt>record_access_control_point</dt><dd>refers to the 16-bit UUID 0x2A52</dd>
+          <dt>reference_time_information</dt><dd>refers to the 16-bit UUID 0x2A14</dd>
+          <dt>report</dt><dd>refers to the 16-bit UUID 0x2A4D</dd>
+          <dt>report_map</dt><dd>refers to the 16-bit UUID 0x2A4B</dd>
+          <dt>resting_heart_rate</dt><dd>refers to the 16-bit UUID 0x2A92</dd>
+          <dt>ringer_control_point</dt><dd>refers to the 16-bit UUID 0x2A40</dd>
+          <dt>ringer_setting</dt><dd>refers to the 16-bit UUID 0x2A41</dd>
+          <dt>rsc_feature</dt><dd>refers to the 16-bit UUID 0x2A54</dd>
+          <dt>rsc_measurement</dt><dd>refers to the 16-bit UUID 0x2A53</dd>
+          <dt>sc_control_point</dt><dd>refers to the 16-bit UUID 0x2A55</dd>
+          <dt>scan_interval_window</dt><dd>refers to the 16-bit UUID 0x2A4F</dd>
+          <dt>scan_refresh</dt><dd>refers to the 16-bit UUID 0x2A31</dd>
+          <dt>sensor_location</dt><dd>refers to the 16-bit UUID 0x2A5D</dd>
+          <dt>serial_number_string</dt><dd>refers to the 16-bit UUID 0x2A25</dd>
+          <dt>gatt.service_changed</dt><dd>refers to the 16-bit UUID 0x2A05</dd>
+          <dt>software_revision_string</dt><dd>refers to the 16-bit UUID 0x2A28</dd>
+          <dt>sport_type_for_aerobic_and_anaerobic_thresholds</dt><dd>refers to the 16-bit UUID 0x2A93</dd>
+          <dt>supported_new_alert_category</dt><dd>refers to the 16-bit UUID 0x2A47</dd>
+          <dt>supported_unread_alert_category</dt><dd>refers to the 16-bit UUID 0x2A48</dd>
+          <dt>system_id</dt><dd>refers to the 16-bit UUID 0x2A23</dd>
+          <dt>temperature_measurement</dt><dd>refers to the 16-bit UUID 0x2A1C</dd>
+          <dt>temperature_type</dt><dd>refers to the 16-bit UUID 0x2A1D</dd>
+          <dt>three_zone_heart_rate_limits</dt><dd>refers to the 16-bit UUID 0x2A94</dd>
+          <dt>time_accuracy</dt><dd>refers to the 16-bit UUID 0x2A12</dd>
+          <dt>time_source</dt><dd>refers to the 16-bit UUID 0x2A13</dd>
+        </dl>
+
+        <div title="typedef (BluetoothCharacteristicName or UUID) BluetoothCharacteristicId" class="idl"></div>
       </section>
 
       <section>
@@ -840,6 +1010,25 @@
           <dt>readonly attribute UUID external_report_reference</dt><dd><code>registeredUUID(0x2907)</code></dd>
           <dt>readonly attribute UUID report_reference</dt><dd><code>registeredUUID(0x2908)</code></dd>
         </dl>
+
+        <p>
+          The <a>BluetoothDescriptorName</a> enumeration allows users to pass the standardized descriptors by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.descriptor</code>.
+          When used as a parameter to a function in this specification that accepts a <a>BluetoothDescriptorId</a> parameter,
+          these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
+
+        <dl title="enum BluetoothDescriptorName" class="idl">
+          <dt>gatt.characteristic_extended_properties</dt><dd>refers to the 16-bit UUID 0x2900</dd>
+          <dt>gatt.characteristic_user_description</dt><dd>refers to the 16-bit UUID 0x2901</dd>
+          <dt>gatt.client_characteristic_configuration</dt><dd>refers to the 16-bit UUID 0x2902</dd>
+          <dt>gatt.server_characteristic_configuration</dt><dd>refers to the 16-bit UUID 0x2903</dd>
+          <dt>gatt.characteristic_presentation_format</dt><dd>refers to the 16-bit UUID 0x2904</dd>
+          <dt>gatt.characteristic_aggregate_format</dt><dd>refers to the 16-bit UUID 0x2905</dd>
+          <dt>valid_range</dt><dd>refers to the 16-bit UUID 0x2906</dd>
+          <dt>external_report_reference</dt><dd>refers to the 16-bit UUID 0x2907</dd>
+          <dt>report_reference</dt><dd>refers to the 16-bit UUID 0x2908</dd>
+        </dl>
+
+        <div title="typedef (BluetoothDescriptorName or UUID) BluetoothDescriptorId" class="idl"></div>
       </section>
     </section>
 
