@@ -196,7 +196,7 @@
       </dl>
 
       <dl title="dictionary BluetoothScanFilter" class="idl">
-        <dt>sequence&lt;BluetoothServiceId> services</dt>
+        <dt>sequence&lt;BluetoothServiceUuid> services</dt>
         <dd>A list of <a>Service</a> UUIDs that a device must support to match this filter.</dd>
       </dl>
 
@@ -265,7 +265,7 @@
           <dt>readonly attribute boolean? connected</dt>
           <dd>Indicates whether the device is currently connected to the system.</dd>
 
-          <dt>readonly attribute DOMString[]? uuids</dt>
+          <dt>readonly attribute sequence&lt;UUID>? uuids</dt>
           <dd>
             UUIDs of protocols, profiles and services advertised by the device.
             For Low Energy devices, this list is obtained from AD and GATT primary services.
@@ -283,16 +283,16 @@
             since there may be other sites with open connections.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTService> getService(BluetoothServiceId service)</dt>
+          <dt>Promise&lt;BluetoothGATTService> getService(BluetoothServiceUuid service)</dt>
           <dd>Returns a promise that is asynchronously resolved with the first primary GATT service on the remote device whose UUID is <var>service</var>.</dd>
 
           <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the primary GATT services on the remote device.</dd>
 
-          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(BluetoothServiceId service)</dt>
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(BluetoothServiceUuid service)</dt>
           <dd>Returns <code>this.getAllServices([service])</code></dd>
 
-          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(sequence&lt;BluetoothServiceId> services)</dt>
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(sequence&lt;BluetoothServiceUuid> services)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the primary GATT services on the remote device with UUIDs in <var>services</var>.</dd>
         </dl>
 
@@ -313,18 +313,22 @@
         <p><a>BluetoothGATTService</a> represents a GATT <a>Service</a> within a Bluetooth <a>Peripheral</a>, a collection of characteristics and relationships to other services that encapsulate the behavior of part of a device.</p>
         <dl title="interface BluetoothGATTService" class="idl">
 
-          <dt>readonly attribute DOMString uuid</dt>
-          <dd>The UUID of the service, e.g. 0000180d-0000-1000-8000-00805f9b34fb.</dd>
+          <dt>readonly attribute UUID uuid</dt>
+          <dd>The UUID of the service, e.g. <code><a>UUID</a>.parse('0000180d-0000-1000-8000-00805f9b34fb')</code>.</dd>
 
           <dt>readonly attribute boolean isPrimary</dt>
           <dd>Indicates whether the type of this service is primary or secondary.</dd>
 
-          <dt>readonly attribute DOMString? instanceId</dt>
+          <dt>readonly attribute DOMString instanceId</dt>
           <dd>
-            Returns the identifier assigned to this service.
-            Use the instance ID to distinguish between services from a peripheral with the same UUID
-            and to make function calls that take in a service identifier.
-            Present, if this instance represents a remote service.
+            Returns the opaque identifier assigned to this service,
+            which can be used distinguish between
+            multiple primary services with the same UUID in a single device or
+            multiple included services with the same UUID in a single primary service.
+            This identifier MUST be unique among all services accessible by this website.
+            This identifier MUST continue referring to the same <a>Service</a> until either
+            an <code>onServiceRemoved</code> event is delivered referring to this <a>BluetoothGATTService</a> or
+            if this service's device is not <code>paired</code>, it is disconnected.
           </dd>
 
           <dt>readonly attribute DOMString? deviceAddress</dt>
@@ -333,29 +337,29 @@
             Present, if this instance represents a remote service.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTCharacteristic> getCharacteristic(BluetoothCharacteristicId characteristic)</dt>
+          <dt>Promise&lt;BluetoothGATTCharacteristic> getCharacteristic(BluetoothCharacteristicUuid characteristic)</dt>
           <dd>Returns a promise that is asynchronously resolved with the first GATT characteristic within this Service whose UUID is <var>characteristic</var>.</dd>
 
           <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service.</dd>
-          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics(BluetoothCharacteristicId characteristic)</dt>
+          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics(BluetoothCharacteristicUuid characteristic)</dt>
           <dd>Returns <code>this.getAllCharacteristics([characteristic])</code></dd>
-          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics(sequence&lt;BluetoothCharacteristicId> characteristics)</dt>
+          <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics(sequence&lt;BluetoothCharacteristicUuid> characteristics)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service with UUIDs in <var>characteristics</var>.</dd>
 
-          <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceId service)</dt>
+          <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceUuid service)</dt>
           <dd>Returns a promise that is asynchronously resolved with the first GATT included service within this Service whose UUID is <var>service</var>.</dd>
 
           <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service.</dd>
-          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices(BluetoothServiceId service)</dt>
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices(BluetoothServiceUuid service)</dt>
           <dd>
             Returns <code>this.getAllIncludedServices([service])</code>
             <p class="note">
               Bluetooth's procedure for finding included services (3.G.4.5) doesn't include a way to optimize for a single UUID.
               Maybe we should omit this and the next overloads to avoid implying that they're more efficient than the no-argument version.
           </dd>
-          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices(sequence&lt;BluetoothServiceId> services)</dt>
+          <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices(sequence&lt;BluetoothServiceUuid> services)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service with UUIDs in <var>services</var>.</dd>
         </dl>
         <div title="typedef sequence<BluetoothGATTService> BluetoothGATTServiceSequence" class="idl"></div>
@@ -367,8 +371,8 @@
         <p><a>BluetoothGATTCharacteristic</a> represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
         <dl title="interface BluetoothGATTCharacteristic" class="idl">
 
-          <dt>readonly attribute DOMString uuid</dt>
-          <dd>The UUID of the characteristic, e.g. 00002a37-0000-1000-8000-00805f9b34fb.</dd>
+          <dt>readonly attribute UUID uuid</dt>
+          <dd>The UUID of the characteristic, e.g. <code><a>UUID</a>.parse('00002a37-0000-1000-8000-00805f9b34fb')</code>.</dd>
 
           <dt>readonly attribute BluetoothGATTService service</dt>
           <dd>The GATT service this characteristic belongs to.</dd>
@@ -376,12 +380,16 @@
           <dt>readonly attribute CharacteristicProperty[] properties</dt>
           <dd>The properties of this characteristic.</dd>
 
-          <dt>readonly attribute DOMString? instanceId</dt>
+          <dt>readonly attribute DOMString instanceId</dt>
           <dd>
-            Returns the identifier assigned to this characteristic.
-            Use the instance ID to distinguish between characteristics from a peripheral with the same UUID
-            and to make function calls that take in a characteristic identifier.
-            Present, if this instance represents a remote characteristic.
+            Returns the opaque identifier assigned to this characteristic,
+            which can be used distinguish between multiple characteristics
+            with the same UUID in a single service.
+            This identifier MUST be unique among all characteristics accessible by this website.
+            This identifier MUST continue referring to the same <a>Characteristic</a> until either
+            an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
+            referring to the <a>BluetoothGATTService</a> of this characteristic or
+            if this characteristic's <a>BluetoothDevice</a> is not <code>paired</code>, it is disconnected.
           </dd>
 
           <dt>readonly attribute ArrayBuffer? value</dt>
@@ -390,14 +398,14 @@
             This value gets updated when the value of the characteristic is read or updated via a notification or indication.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorId descriptor)</dt>
+          <dt>Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUuid descriptor)</dt>
           <dd>Returns a promise that is asynchronously resolved with the first GATT descriptor within this Characteristic whose UUID is <var>descriptor</var>.</dd>
 
           <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic.</dd>
-          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors(BluetoothDescriptorId descriptor)</dt>
+          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors(BluetoothDescriptorUuid descriptor)</dt>
           <dd>Returns <code>this.getAllDescriptors([descriptor])</code></dd>
-          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors(sequence&lt;BluetoothDescriptorId> descriptors)</dt>
+          <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors(sequence&lt;BluetoothDescriptorUuid> descriptors)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic with UUIDs in <var>descriptors</var>.</dd>
 
           <dt>Promise&lt;ArrayBuffer> readValue()</dt>
@@ -437,15 +445,22 @@
         <p><a>BluetoothGATTDescriptor</a> represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
         <dl title="interface BluetoothGATTDescriptor" class="idl">
 
-          <dt>readonly attribute DOMString uuid</dt>
-          <dd>The UUID of the characteristic descriptor, e.g. 00002902-0000-1000-8000-00805f9b34fb.</dd>
+          <dt>readonly attribute UUID uuid</dt>
+          <dd>The UUID of the characteristic descriptor, e.g. <code><a>UUID</a>.parse('00002902-0000-1000-8000-00805f9b34fb')</code>.</dd>
 
           <dt>readonly attribute BluetoothGATTCharacteristic characteristic</dt>
           <dd>The GATT characteristic this descriptor belongs to.</dd>
 
-          <dt>readonly attribute DOMString? instanceId</dt>
+          <dt>readonly attribute DOMString instanceId</dt>
           <dd>
-            Returns the identifier assigned to this descriptor.
+            Returns the opaque identifier assigned to this descriptor,
+            which can be used distinguish between multiple descriptors
+            with the same UUID in a single characteristic.
+            This identifier MUST be unique among all descriptors accessible by this website.
+            This identifier MUST continue referring to the same <a>Descriptor</a> until either
+            an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
+            referring to the <a>BluetoothGATTService</a> of this descriptor or
+            if this descriptor's device is not <code>paired</code>, it is disconnected.
             Use the instance ID to distinguish between descriptors from a peripheral with the same UUID and
             to make function calls that take in a descriptor identifier.
             Present, if this instance represents a remote characteristic.
@@ -486,7 +501,7 @@
           <dd>
             Get the GATT service with the given instance ID.
             <dl class="parameters">
-              <dt>DOMString serviceId</dt>
+              <dt>DOMString serviceInstanceId</dt>
               <dd>The instance ID of the requested GATT service.</dd>
             </dl>
           </dd>
@@ -495,7 +510,7 @@
           <dd>
             Get the GATT characteristic with the given instance ID that belongs to the given GATT service, if the characteristic exists.
             <dl class="parameters">
-              <dt>DOMString characteristicId</dt>
+              <dt>DOMString characteristicInstanceId</dt>
               <dd>The instance ID of the requested GATT characteristic.</dd>
             </dl>
           </dd>
@@ -504,7 +519,7 @@
           <dd>
             Get the GATT characteristic descriptor with the given instance ID.
             <dl class="parameters">
-              <dt>DOMString descriptorId</dt>
+              <dt>DOMString descriptorInstanceId</dt>
               <dd>The instance ID of the requested GATT characteristic descriptor.</dd>
             </dl>
           </dd>
@@ -771,7 +786,7 @@
 
         <p>
           The <a>BluetoothServiceName</a> enumeration allows users to pass the standardized services by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.service</code>.
-          When used as a parameter to a function in this specification that accepts a <a>BluetoothServiceId</a> parameter,
+          When used as a parameter to a function in this specification that accepts a <a>BluetoothServiceUuid</a> parameter,
           these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
 
         <dl title="enum BluetoothServiceName" class="idl">
@@ -800,7 +815,7 @@
           <dt>user_data</dt><dd>refers to the 16-bit UUID 0x181C</dd>
         </dl>
 
-        <div title="typedef (BluetoothServiceName or UUID) BluetoothServiceId" class="idl"></div>
+        <div title="typedef (BluetoothServiceName or UUID) BluetoothServiceUuid" class="idl"></div>
       </section>
 
       <section>
@@ -913,7 +928,7 @@
 
         <p>
           The <a>BluetoothCharacteristicName</a> enumeration allows users to pass the standardized characteristics by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.characteristic</code>.
-          When used as a parameter to a function in this specification that accepts a <a>BluetoothCharacteristicId</a> parameter,
+          When used as a parameter to a function in this specification that accepts a <a>BluetoothCharacteristicUuid</a> parameter,
           these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
 
         <dl title="enum BluetoothCharacteristicName" class="idl">
@@ -1019,7 +1034,7 @@
           <dt>time_source</dt><dd>refers to the 16-bit UUID 0x2A13</dd>
         </dl>
 
-        <div title="typedef (BluetoothCharacteristicName or UUID) BluetoothCharacteristicId" class="idl"></div>
+        <div title="typedef (BluetoothCharacteristicName or UUID) BluetoothCharacteristicUuid" class="idl"></div>
       </section>
 
       <section>
@@ -1041,7 +1056,7 @@
 
         <p>
           The <a>BluetoothDescriptorName</a> enumeration allows users to pass the standardized descriptors by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.descriptor</code>.
-          When used as a parameter to a function in this specification that accepts a <a>BluetoothDescriptorId</a> parameter,
+          When used as a parameter to a function in this specification that accepts a <a>BluetoothDescriptorUuid</a> parameter,
           these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
 
         <dl title="enum BluetoothDescriptorName" class="idl">
@@ -1056,7 +1071,7 @@
           <dt>report_reference</dt><dd>refers to the 16-bit UUID 0x2908</dd>
         </dl>
 
-        <div title="typedef (BluetoothDescriptorName or UUID) BluetoothDescriptorId" class="idl"></div>
+        <div title="typedef (BluetoothDescriptorName or UUID) BluetoothDescriptorUuid" class="idl"></div>
       </section>
     </section>
 
