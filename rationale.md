@@ -24,3 +24,39 @@ This document attempts to explain why various decisions were made the way they w
 * While the <a>Server</a> role can work in a <a>Central</a> device,
   <a>Client</a> is more natural and is required for more use cases.
 
+## Why so many `Get{,All}{Service,Characteristic,Descriptor}()` overloads?
+
+GATT provides two ways of finding primary services:
+_Discover All Primary Services_ and _Discover Primary Service by Service UUID_.
+Each can be stopped early if the desired service is found.
+_Discover All Primary Services_ encodes the result more efficiently:
+each response packet can include multiple services,
+while the _by Service UUID_ variant only returns one service per packet.
+Although we don't want to require UAs to do anything
+beyond discovering all services on connection,
+we'd like to allow them to optimize their use of the radio.
+
+* The fact that the procedures can stop early means
+  it could help to declare that a call only needs one result.
+* The _by Service UUID_ variant means it could help to accept a single UUID argument.
+* Developers also need to be able to get access to all instances of a single UUID,
+  for example to retrieve the services describing several batteries in a device.
+
+This covers `Promise<Service> getService(UUID)`,
+`Promise<Service> getAnyService(sequence<UUID>)`,
+`Promise<sequence<Service>> getAllServices(UUID)`, and
+`Promise<sequence<Service>> getAllServices()`.
+(We currently omit `Promise<Service> getAnyService(sequence<UUID>)`
+to keep the API a bit smaller.)
+
+If a developer wants to interact with a set of services,
+the above set of functions makes them choose between calling `getService(UUID)` several times,
+or calling `getAllServices()` and filtering out the results they're not interested in.
+Calling `getService(UUID)` several times may cause the UA to waste round trips
+given the less efficient encoding of the response to _Discover Primary Service by Service UUID_.
+So we offer `Promise<sequence<Service>> getAllServices(sequence<UUID>)`
+to let the developer express their goals up front, so the UA can optimize appropriately.
+
+Only services and characteristics offer the _by UUID_ procedure,
+but we offer the full set of overloads for included services and descriptors as well
+so that the API doesn't have unexpected gaps.
