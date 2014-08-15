@@ -60,3 +60,12 @@ to let the developer express their goals up front, so the UA can optimize approp
 Only services and characteristics offer the _by UUID_ procedure,
 but we offer the full set of overloads for included services and descriptors as well
 so that the API doesn't have unexpected gaps.
+
+## Why does `getAllServices()` return only primary services?
+
+GATT allows a service to be either "primary" or "secondary" and
+allows the _Read By Group Type Request_ to ask for an enumeration of either (3.G.2.5.3).
+However, all secondary services are also included services in some primary service (1.A.6.5.1),
+and having `getAllServices()` include them would cost an extra request sequence.
+
+The current API does give UAs the freedom to scan for secondary services eagerly.
