@@ -124,8 +124,8 @@
         <abbr title="Bluetooth Low Energy">BTLE</abbr>, or just <abbr title="Low Energy">LE</abbr>
         which is limited to about 1Mbps but
         allows devices to leave their transmitters off most of the time.
-        BTLE provides most of its functionality through a single key/value protocol
-        known as the Generic Attribute Profile (<abbr title="Generic Attribute Profile">GATT</abbr>).
+        BTLE provides most of its functionality through key/value pairs provided by
+        the <a title="GATT">Generic Attribute Profile (<abbr title="Generic Attribute Profile">GATT</abbr>)</a>.
 
       <p>
         BTLE defines multiple roles that devices can play.
@@ -136,7 +136,7 @@
         and is responsible for creating any connections to <a>Peripheral</a> devices.
 
       <p>
-        GATT further defines <dfn>Client</dfn> and <dfn>Server</dfn> roles,
+        <dfn title="GATT">GATT</dfn> further defines <dfn>Client</dfn> and <dfn>Server</dfn> roles,
         which are orthogonal to the <a>Peripheral</a> and <a>Central</a> BTLE roles.
         GATT allows <a>Server</a>s to expose <a>Service</a>s, whose type is identified by
         a <abbr title="Universally Unique Identifier">UUID</abbr> ([[!RFC4122]]).
@@ -186,7 +186,7 @@
             </li>
             <li>
               <a>Scan for devices</a> with
-              the union of all <var>services</var> sequences in <var>filters</var>
+              the union of all <code>services</code> sequences in <code><var>filters</var></code>
               as the <var>set of <a>Service</a> UUIDs</var>
             </li>
             <li>
@@ -226,8 +226,21 @@
         A device <dfn>matches a filter</dfn> <var>filter</var> if
       <ul>
         <li><code><var>filter</var>.services</code> is not empty and</li>
-        <li>the device supports each of the <a>Service</a> UUIDs included in <code><var>filter</var>.services</code> as a primary (vs included) service.</li>
+        <li>
+          the UA has received advertising data, an <a>extended inquiry response</a>,
+          or a service discovery response indicating that
+          the device supports each of the <a>Service</a> UUIDs
+          included in <code><var>filter</var>.services</code> as a primary (vs included) service.
       </ul>
+
+      <p class="note">
+        The list of Service UUIDs that a device advertises
+        might not include all the UUIDs the device supports.
+        The advertising data does specify whether this list is complete.
+        If a website filters for a UUID that a nearby device supports but doesn't advertise,
+        that device might not be included in the list of devices presented to the user.
+        The UA would need to connect to the device to discover the full list of supported services,
+        which can impair radio performance and cause delays, so this spec doesn't require it.
 
       <p>
         To <dfn>scan for devices</dfn> with
@@ -284,14 +297,23 @@
               If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
 
-              <p class="issue">
-                This "MAY" may become a debugging problem.
-                If there's a Service that a device supports but does not advertise,
-                and a developer connects to a device once,
-                this may cause the UA to include that device for the developer's future queries
-                even though the device would be excluded for most users.
-                Should we require that
-                only devices advertising an interesting Service are included?
+              <div class="note" id="note-extra-discovery">
+                <p>
+                  Connecting to every nearby device to discover services costs power and
+                  can slow down other use of the Bluetooth radio.
+                  UAs should only discover extra services on a device if
+                  they have some reason to expect that device to be interesting.
+
+                <p>
+                  UAs should also help developers avoid relying on this extra discovery behavior.
+                  For example, say a developer has previously connected to a device,
+                  so the UA knows the device's full set of supported services.
+                  If this developer then filters using a non-advertised UUID,
+                  the dialog they see may include this device,
+                  even if the filter would likely exclude the device on users' machines.
+                  The UA could provide a developer option to warn when this happens or
+                  to include only advertised services in matching filters.
+              </div>
           </ol>
         <li>If the UA supports the BR/EDR transport:
           <ol>
@@ -305,9 +327,17 @@
             <li>
               For each <dfn>discovered BR/EDR device</dfn> ([[BLUETOOTH41]] 3.C.6.4.3),
               if the Service UUIDs ([[BLUETOOTH-SUPPLEMENT4]], A.1.1)
-              in the Extended Inquiry Response
+              in the <dfn>Extended Inquiry Response</dfn> ([[BLUETOOTH41]] 1.A.4.2.1.1.1)
               have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
+
+              <p class="note">
+                There is no way to distinguish GATT from non-GATT services
+                in the <a>Extended Inquiry Response</a>.
+                If a site filters to the UUID of a non-GATT service,
+                the user may be able to select a device
+                for the result of <code>requestDevice</code>
+                that this API provides no way to interact with.
 
             <li>
               For each <a>discovered BR/EDR device</a>,
@@ -328,6 +358,9 @@
               </ul>
               If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
+
+              <p class="note">
+                See the <a href="#note-extra-discovery">note for discovered LE devices</a>.
           </ol>
         <li>Return <var>result</var> from the scan.
       </ol>
