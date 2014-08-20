@@ -90,6 +90,12 @@
               status: "Living Standard",
               publisher: "Bluetooth SIG",
             },
+            "BLUETOOTH-SUPPLEMENT4": {
+              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=282152",
+              title: "Supplement to the Bluetooth Core Specification Version 4",
+              date: "3 December 2013",
+              publisher: "Bluetooth SIG",
+            },
           },
       };
     </script>
@@ -114,31 +120,42 @@
         a standard for short-range wireless communication between devices.
         Bluetooth "Classic" (<abbr title="Basic Rate">BR</abbr>/<abbr title="Enhanced Data Rate">EDR</abbr>)
         defines a set of binary protocols and supports speeds up to about 24Mbps.
-        Bluetooth 4.0 introduced a new "Low Energy" mode known as "Smart" or
-        <abbr title="Bluetooth Low Energy">BTLE</abbr> which is limited to about 1Mbps but
-        allows devices to leave their transmitters off most of the time,
-        and provides most of its functionality through a single key/value protocol
-        known as the Generic Attribute Profile (<abbr title="Generic Attribute Profile">GATT</abbr>).
+        Bluetooth 4.0 introduced a new "Low Energy" mode known as "Smart",
+        <abbr title="Bluetooth Low Energy">BTLE</abbr>, or just <abbr title="Low Energy">LE</abbr>
+        which is limited to about 1Mbps but
+        allows devices to leave their transmitters off most of the time.
+        BTLE provides most of its functionality through key/value pairs provided by
+        the <a title="GATT">Generic Attribute Profile (<abbr title="Generic Attribute Profile">GATT</abbr>)</a>.
 
       <p>
-        GATT allows device makers to advertise that they support particular Services.
-        Each <dfn>Service</dfn> is identified by a <abbr title="Universally Unique Identifier">UUID</abbr> ([[!RFC4122]]) and exposes a collection of included Services and Characteristics.
-        Each <dfn>Characteristic</dfn> is identified by a UUID exposes a typed value, some properties to describe how the value can be used, and a collection of Descriptors.
-        Each <dfn>Descriptor</dfn> is identified by a UUID and contains related information about the Characteristic Value.
-
-      <p>
-        BTLE also defines multiple roles that devices can play.
+        BTLE defines multiple roles that devices can play.
         The <dfn>Broadcaster</dfn> and <dfn>Observer</dfn> roles are
         for transmitter- and receiver-only applications, respectively.
         The <dfn>Peripheral</dfn> role is able to receive a single connection.
         The <dfn>Central</dfn> role supports multiple connections,
         and is responsible for creating any connections to <a>Peripheral</a> devices.
-        GATT further defines <dfn>Client</dfn> and <dfn>Server</dfn> roles,
-        which are orthogonal to the <a>Peripheral</a> and <a>Central</a> roles.
+
+      <p>
+        <dfn title="GATT">GATT</dfn> further defines <dfn>Client</dfn> and <dfn>Server</dfn> roles,
+        which are orthogonal to the <a>Peripheral</a> and <a>Central</a> BTLE roles.
+        GATT allows <a>Server</a>s to expose <a>Service</a>s, whose type is identified by
+        a <abbr title="Universally Unique Identifier">UUID</abbr> ([[!RFC4122]]).
+        A <dfn>Service</dfn> exposes a collection of included Services and Characteristics.
+        Each <dfn>Characteristic</dfn> has a type named by a UUID and
+        exposes a value as an array of bytes,
+        some properties to describe how the value can be used, and a collection of Descriptors.
+        Each <dfn>Descriptor</dfn> has a type named by a UUID and
+        contains related information about the Characteristic Value.
+
+      <p>
+        Despite being designed to support BTLE transport,
+        the GATT protocol can also run over BR/EDR transport.
+        Both support advertising GATT services without a connection:
+        BTLE through advertising packets, and BR/EDR through the extended inquiry response.
 
       <p>
         The first version of this specification focuses on the Bluetooth 4 GATT protocol
-        in the <a>Central</a> and <a>Client</a> roles.
+        in the <a>Central</a> and <a>Client</a> roles, over either a BR/EDR or LE connection.
         While this specification cites the [[BLUETOOTH41]] specification,
         it intends to also support communication with devices that only implement Bluetooth 4.0.
 
@@ -168,8 +185,13 @@
               reject the <a>Promise</a> with a <a>SecurityError</a> and abort these steps.
             </li>
             <li>
-              <a>Perform a scan for devices</a> matching <var>filters</var>.
+              <a>Scan for devices</a> with
+              the union of all <code>services</code> sequences in <code><var>filters</var></code>
+              as the <var>set of <a>Service</a> UUIDs</var>
             </li>
+            <li>
+              Remove devices from the result of the scan if
+              they do not <a title="matches a filter">match a filter</a> in <var>filters</var>.
             <li>
               Display a prompt to the user requesting that the user specify some devices from the result of the scan.
               The UA SHOULD show the user the human-readable name of each device.
@@ -204,30 +226,148 @@
         A device <dfn>matches a filter</dfn> <var>filter</var> if
       <ul>
         <li><code><var>filter</var>.services</code> is not empty and</li>
-        <li>the device supports each of the <a>Service</a> UUIDs included in <code><var>filter</var>.services</code> as a primary (vs included) service.</li>
+        <li>
+          the UA has received advertising data, an <a>extended inquiry response</a>,
+          or a service discovery response indicating that
+          the device supports each of the <a>Service</a> UUIDs
+          included in <code><var>filter</var>.services</code> as a primary (vs included) service.
       </ul>
 
-      <p>
-        To <dfn>perform a scan for devices</dfn> matching a sequence of <a>BluetoothScanFilter</a>s,
-        the UA MUST put its Bluetooth subsystem into either passive scanning or privacy-enabled active scanning mode
-        and wait a UA-determined time for nearby devices to advertise themselves.
-        The result of the scan is the sequence of devices that <a title="matches a filter">match any filter</a> in the sequence of <a>BluetoothScanFilter</a>s.
-        When determining the list of <a>Service</a> UUIDs a device supports, the UA MUST include <a>Service</a>s advertised by the device,
-        and MAY include GATT <a>Service</a>s previously discovered through
-        the Attribute Protocol (<abbr title="Attribute Protocol">ATT</abbr>)
-        ([[BLUETOOTH41]] 3.G.4.4) and/or
-        the Service Discovery Protocol (<abbr title="Service Discovery Protocol">SDP</abbr>).
-
       <p class="note">
-        The SDP is only used in BR/EDR mode,
-        and GATT services can always be discovered over ATT,
-        but [[!BLUETOOTH41]] 3.C.15.4 says
-        "If a BR/EDR or BR/EDR/LE device supports a GATT-based service on the BR/ EDR transport,
-        the service shall exist in the SDP server and the GATT server.",
-        so the UA might learn of a GATT Service on a BR/EDR/LE device through its SDP server.
+        The list of Service UUIDs that a device advertises
+        might not include all the UUIDs the device supports.
+        The advertising data does specify whether this list is complete.
+        If a website filters for a UUID that a nearby device supports but doesn't advertise,
+        that device might not be included in the list of devices presented to the user.
+        The UA would need to connect to the device to discover the full list of supported services,
+        which can impair radio performance and cause delays, so this spec doesn't require it.
+
+      <p>
+        To <dfn>scan for devices</dfn> with
+        an optional <var>set of <a>Service</a> UUIDs</var>, defaulting to the set of all UUIDs,
+        the UA MUST perform the following steps:
+
+      <ol>
+        <li>
+          If the UA has scanned for devices recently
+          <span class="issue">TODO: Nail down the amount of time.</span>
+          with a set of UUIDs that was a superset of the UUIDs for the current scan,
+          then the UA MAY return the result of that scan and abort these steps.
+        <li>Let <var>result</var> be a set of Bluetooth devices, initially empty.
+        <li>If the UA supports the LE transport:
+          <ol>
+            <li>
+              The UA MUST perform the <dfn>General Discovery Procedure</dfn> ([[BLUETOOTH41]] 3.C.9.2.6).
+              The UA SHOULD enable the <dfn>Privacy Feature</dfn> ([[BLUETOOTH41]] 3.C.10.7).
+
+              <p class="issue">
+                Both <dfn>passive scanning</dfn> ([[!BLUETOOTH41]] 6.B.4.4.3.1) and
+                the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
+                We ought to require UAs to use either one,
+                but none of the OS APIs appear to expose either.
+                Bluetooth also makes it hard to use <a>passive scanning</a> since
+                it doesn't require <a>Central</a> devices to support the
+                <dfn>Observation Procedure</dfn> ([[!BLUETOOTH41]] 3.C.9.1.2).
+
+            <li>
+              For each <dfn>discovered LE device</dfn> ([[BLUETOOTH41]] 3.C.9.2.6),
+              if the complete device name was not acquired during the <a>General Discovery Procedure</a>,
+              the UA SHOULD perform the <dfn>Name Discovery Procedure</dfn> ([[BLUETOOTH41]] 3.C.9.2.7).
+
+            <li>
+              For each <a>discovered LE device</a>,
+              if the advertised Service UUIDs ([[BLUETOOTH-SUPPLEMENT4]], A.1.1)
+              have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
+              add the device to <var>result</var>.
+
+            <li>
+              For each <a>discovered LE device</a>,
+              the UA MAY connect to the device and
+              <ul>
+                <li>
+                  Use <dfn>Attribute Caching</dfn> ([[BLUETOOTH41]] 3.G.2.5.2) and
+                  the <dfn>Service Changed characteristic</dfn> ([[BLUETOOTH41]] 3.G.7.1) to
+                  recall and validate the supported Service UUIDs from a previous connection,
+                <li>
+                  <dfn>Discover Primary Service by Service UUID</dfn> ([[BLUETOOTH41]] 3.G.4.4.2)
+                  for each UUID in the <var>set of <a>Service</a> UUIDs</var>, or
+                <li>
+                  <dfn>Discover All Primary Services</dfn> ([[BLUETOOTH41]] 3.G.4.4.1).
+              </ul>
+              If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
+              add the device to <var>result</var>.
+
+              <div class="note" id="note-extra-discovery">
+                <p>
+                  Connecting to every nearby device to discover services costs power and
+                  can slow down other use of the Bluetooth radio.
+                  UAs should only discover extra services on a device if
+                  they have some reason to expect that device to be interesting.
+
+                <p>
+                  UAs should also help developers avoid relying on this extra discovery behavior.
+                  For example, say a developer has previously connected to a device,
+                  so the UA knows the device's full set of supported services.
+                  If this developer then filters using a non-advertised UUID,
+                  the dialog they see may include this device,
+                  even if the filter would likely exclude the device on users' machines.
+                  The UA could provide a developer option to warn when this happens or
+                  to include only advertised services in matching filters.
+              </div>
+          </ol>
+        <li>If the UA supports the BR/EDR transport:
+          <ol>
+            <li>
+              The UA MUST perform the <dfn>Device Discovery</dfn> procedure ([[BLUETOOTH41]] 3.C.6.4).
+
+              <p class="issue">
+                All forms of BR/EDR inquiry/discovery
+                appear to leak the unique, immutable device address.
+
+            <li>
+              For each <dfn>discovered BR/EDR device</dfn> ([[BLUETOOTH41]] 3.C.6.4.3),
+              if the Service UUIDs ([[BLUETOOTH-SUPPLEMENT4]], A.1.1)
+              in the <dfn>Extended Inquiry Response</dfn> ([[BLUETOOTH41]] 1.A.4.2.1.1.1)
+              have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
+              add the device to <var>result</var>.
+
+              <p class="note">
+                There is no way to distinguish GATT from non-GATT services
+                in the <a>Extended Inquiry Response</a>.
+                If a site filters to the UUID of a non-GATT service,
+                the user may be able to select a device
+                for the result of <code>requestDevice</code>
+                that this API provides no way to interact with.
+
+            <li>
+              For each <a>discovered BR/EDR device</a>,
+              the UA MAY connect to the device and
+              <ul>
+                <li>
+                  Use <a>Attribute Caching</a> and the <a>Service Changed characteristic</a> to
+                  recall and validate the supported Service UUIDs from a previous connection,
+                <li>
+                  <a>Discover Primary Service by Service UUID</a>
+                  for each UUID in the <var>set of <a>Service</a> UUIDs</var>,
+                <li>
+                  <a>Discover All Primary Services</a>, or
+                <li>
+                  use the Service Discovery Protocol (<abbr title="Service Discovery Protocol">SDP</abbr>)
+                  to find GATT Services with UUIDs in the <var>set of <a>Service</a> UUIDs</var>.
+                  ([[BLUETOOTH41]] 3.B.2.5)
+              </ul>
+              If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
+              add the device to <var>result</var>.
+
+              <p class="note">
+                See the <a href="#note-extra-discovery">note for discovered LE devices</a>.
+          </ol>
+        <li>Return <var>result</var> from the scan.
+      </ol>
 
       <p class="issue">
-        Needs to support "website receives event when an interesting device comes within range."
+        We need a way for a site to register to receive an event
+        when an interesting device comes within range.
 
 
       <section>
