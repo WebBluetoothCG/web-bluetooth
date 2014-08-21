@@ -163,6 +163,71 @@
 
     <section>
       <h2>Security and privacy considerations</h2>
+
+      <section class="informative">
+        <h2>Bluetooth device identifiers</h2>
+
+        <p>
+          Each Bluetooth BR/EDR device has a unique 48-bit MAC address
+          known as the <dfn>BD_ADDR</dfn> ([[!BLUETOOTH41]] 3.C.15).
+          Each Bluetooth LE device has at least one of a <a>Public Device Address</a>
+          and a <a>Static Random Address</a>.
+          The <dfn>Public Device Address</dfn> is a MAC address ([[!BLUETOOTH41]] 6.B.1.3).
+          The <dfn>Static Random Address</dfn> may be regenerated
+          on each restart ([[!BLUETOOTH41]] 3.C.10.8).
+          A BR/EDR/LE device will use the same value
+          for the <a>BD_ADDR</a> and the <a>Public Device Address</a> ([[!BLUETOOTH41]] 2.E.7.4.6).
+
+        <p>
+          An LE device may also have a unique, 128-bit
+          <dfn title="IRK">Identity Resolving Key (<abbr title="Identity Resolving Key">IRK</abbr>)</dfn>
+          ([[!BLUETOOTH41]] 3.H.2.4.2.1),
+          which is sent to trusted devices during the bonding process.
+          To avoid leaking a persistent identifier, an LE device may scan and advertise using
+          a random <dfn>Resolvable Private Address</dfn> or <dfn>Non-Resolvable Private Address</dfn>
+          instead of its Static or Public Address.
+          These are regenerated periodically (approximately every 15 minutes),
+          but a bonded device can check whether one of its stored <a>IRK</a>s matches
+          any given Resolvable Private Address ([[!BLUETOOTH41]] 3.C.10.8.2.3).
+
+        <p>
+          Each Bluetooth device also has a human-readable <dfn>Device Name</dfn>
+          (([[!BLUETOOTH41]] 3.C.3.2.2).
+          These aren't guaranteed to be unique, but may well be, depending on the device type.
+
+        <section class="informative">
+          <h2>Identifiers for remote Bluetooth devices</h2>
+
+          <p>
+            If a website can retrieve any of the persistent device IDs,
+            these can be used, in combination with a large effort to catalog ambient devices,
+            to discover a user's location.
+            A device ID can also be used to identify that a user who
+            pairs two different websites with the same Bluetooth device
+            is a single user.
+            On the other hand, many GATT services are available
+            that could be used to fingerprint a device,
+            and a device can easily expose a custom GATT service to make this easier.
+
+          <p>
+            Because it would be so easy to work around an attempt to block device identification,
+            this spec doesn't try to do so.
+        </section>
+
+        <section class="informative">
+          <h2>The UA's Bluetooth address</h2>
+
+          <p>
+            In BR/EDR mode, or in LE mode during active scanning with the <a>Privacy Feature</a>,
+            the UA broadcasts its persistent ID to any nearby Bluetooth radio.
+            This makes it easy to scatter hostile devices in an area and track the UA.
+            As of 2014-08, few or no platforms document that they implement the <a>Privacy Feature</a>,
+            so despite this spec recommending it, few UAs are likely to use it.
+            This spec does <a href="#requestDevice-user-gesture">require a user gesture</a>
+            for a website to trigger a scan, which reduces the frequency of scans some,
+            but it would still be better for more platforms to expose the <a>Privacy Feature</a>.
+        </section>
+      </section>
     </section>
 
     <section>
@@ -180,7 +245,7 @@
               <p class="issue">
                 Follow <a href="https://github.com/slightlyoff/ServiceWorker/issues/385">slightlyoff/ServiceWorker#385</a> for the right term to use here.
             </li>
-            <li>
+            <li id="requestDevice-user-gesture">
               If the algorithm is not <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#allowed-to-show-a-popup">allowed to show a popup</a>,
               reject the <a>Promise</a> with a <a>SecurityError</a> and abort these steps.
             </li>
