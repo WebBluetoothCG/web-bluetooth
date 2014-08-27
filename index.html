@@ -165,6 +165,75 @@
     <section>
       <h2>Security and privacy considerations</h2>
 
+      <section>
+        <h2>Device access is powerful</h2>
+
+        <p>
+          When a website requests access to devices using
+          <code><a href="#widl-BluetoothDiscovery-requestDevice-Promise-BluetoothDevice--sequence-BluetoothScanFilter--filters">requestDevice</a></code>,
+          it gets the ability to access all GATT services on the device.
+          This gives it as complete control of the device as is possible over a Bluetooth connection.
+          Therefore, the UA MUST inform the user of this risk
+          before asking which devices to entrust to a web site.
+          The UA MUST also allow the user to inspect what sites have access to what devices
+          and revoke these pairings.
+
+        <p>
+          The UA MUST NOT allow the user to pair entire classes of devices with a website.
+          It is possible to construct a class of devices
+          for which each individual device sends the same Bluetooth-level identifying information.
+          UAs are not required to attempt to detect this sort of forgery
+          and MAY let a user pair this pseudo-device with a website.
+
+        <p>
+          To help ensure that only the entity the user approved for access actually has access,
+          this specification requires that only
+          <a href="#requestDevice-secure-origin">secure origins</a> can access Bluetooth devices.
+      </section>
+
+      <section class="informative">
+        <h2>Attacks on devices</h2>
+
+        <p>
+          We expect that many devices are vulnerable to unexpected data delivered to their radio.
+          In the past, these devices had to be exploited one-by-one,
+          but this API makes it plausible to conduct large-scale attacks.
+          This specification takes several approaches to make such attacks more difficult:
+
+        <ul>
+          <li>
+            Pairing individual devices instead of device classes
+            requires at least a user action before a device can be exploited.
+
+          <li>
+            Constraining access to <a>GATT</a>, as opposed to generic byte-stream access,
+            denies malicious websites access to most parsers on the device.
+
+            <p>
+              On the other hand,
+              GATT's <a>Characteristic</a> and <a>Descriptor</a> values are still byte arrays,
+              which may be set to lengths and formats the device doesn't expect.
+              UAs are encouraged to validate these values when they can.
+
+          <li>
+            This API never exposes Bluetooth signing or encryption keys to websites.
+            This makes it more difficult for a website to predict the bits that will be sent over the radio,
+            which blocks <a href="https://www.usenix.org/legacy/events/woot11/tech/final_files/Goodspeed.pdf">packet-in-packet injection attacks</a>.
+            Unfortunately, this only works over encrypted links,
+            which not all BTLE devices are required to support.
+        </ul>
+
+        <p>
+          UAs can also take further steps to protect their users:
+
+        <ul>
+          <li>
+            A web service may collect lists of malicious websites and vulnerable devices.
+            UAs can deny malicious websites access to any device
+            and any website access to vulnerable devices.
+        </ul>
+      </section>
+
       <section class="informative">
         <h2>Bluetooth device identifiers</h2>
 
@@ -236,12 +305,12 @@
       <h2>Device Discovery</h2>
 
       <dl title="[NoInterfaceObject] interface BluetoothDiscovery" class="idl" data-merge="BluetoothScanFilter">
-        <dt id="BluetoothDiscovery.requestDevice">Promise&lt;BluetoothDevice> requestDevice(sequence&lt;BluetoothScanFilter> filters)</dt>
+        <dt>Promise&lt;BluetoothDevice> requestDevice(sequence&lt;BluetoothScanFilter> filters)</dt>
         <dd>
           When this method is invoked, the UA MUST run the following steps:
           <ol>
             <li>Return a new <a>Promise</a>, but continue running these steps asynchronously.</li>
-            <li>
+            <li id="requestDevice-secure-origin">
               If the current document's origin is an <a href="https://w3c.github.io/webappsec/specs/mixedcontent/#insecure-origin">insecure origin</a>,
               reject the <a>Promise</a> with a <a>SecurityError</a> and abort these steps.
               <p class="issue">
