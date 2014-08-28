@@ -187,8 +187,10 @@
 
         <p>
           To help ensure that only the entity the user approved for access actually has access,
-          this specification requires that only secure origins can access Bluetooth devices
-          (<a href="#requestDevice-secure-origin">requestDevice</a>).
+          this specification requires that only
+          <a href="https://w3c.github.io/webappsec/specs/mixedcontent/#authenticated-environment">authenticated environments</a>
+          can access Bluetooth devices
+          (<a href="#requestDevice-authenticated-environment">requestDevice</a>).
       </section>
 
       <section class="informative">
@@ -310,11 +312,10 @@
           When this method is invoked, the UA MUST run the following steps:
           <ol>
             <li>Return a new <a>Promise</a>, but continue running these steps asynchronously.</li>
-            <li id="requestDevice-secure-origin">
-              If the current document's origin is an <a href="https://w3c.github.io/webappsec/specs/mixedcontent/#insecure-origin">insecure origin</a>,
+            <li id="requestDevice-authenticated-environment">
+              If the <a href="http://www.whatwg.org/html/infrastructure.html#javascript-global-environment">global environment</a> is not an
+              <a href="https://w3c.github.io/webappsec/specs/mixedcontent/#authenticated-environment">authenticated environment</a>,
               reject the <a>Promise</a> with a <a>SecurityError</a> and abort these steps.
-              <p class="issue">
-                Follow <a href="https://github.com/slightlyoff/ServiceWorker/issues/385">slightlyoff/ServiceWorker#385</a> for the right term to use here.
             </li>
             <li id="requestDevice-user-gesture">
               If the algorithm is not <a href="http://www.whatwg.org/specs/web-apps/current-work/multipage/browsers.html#allowed-to-show-a-popup">allowed to show a popup</a>,
