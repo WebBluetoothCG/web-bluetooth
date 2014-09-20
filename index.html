@@ -512,8 +512,21 @@
 
         <p>Represents a known Bluetooth device.
         <dl title="interface BluetoothDevice" class="idl" data-merge="VendorIdSource">
-          <dt>readonly attribute DOMString address</dt>
-          <dd>The address of the device, in the format '<code>XX:XX:XX:XX:XX:XX</code>'.</dd>
+          <dt>readonly attribute DOMString instanceId</dt>
+          <dd>
+            Returns the opaque identifier assigned to this device.
+            This identifier MUST uniquely identify a device to the extent that
+            the UA can determine that two Bluetooth connections are to the same device.
+            For example, a paired device MUST keep the same <code>instanceId</code>
+            across a change to its <a>Resolvable Private Address</a>.
+            On the other hand, a device using <a>Non-Resolvable Private Address</a>es
+            might not keep the same <code>instanceId</code>.
+            The UA MAY use different identifiers for the same device on two different origins.
+            The UA MAY create a new identifier for a known device on an origin
+            if the user revokes and re-grants access to that device.
+            The UA MAY re-use identifiers for existing devices on an origin
+            if the user clears the origin's data.
+          </dd>
 
           <dt>readonly attribute DOMString? name</dt>
           <dd>The human-readable name of the device.</dd>
@@ -561,7 +574,7 @@
 
           <dt>Promise&lt;void> disconnect()</dt>
           <dd>
-            Closes the app's connection to the device with the given address.
+            Closes the site's connection to the device.
             Note that this will not always destroy the physical link itself,
             since there may be other sites with open connections.
           </dd>
@@ -614,10 +627,10 @@
             if this service's device is not <code>paired</code>, it is disconnected.
           </dd>
 
-          <dt>readonly attribute DOMString? deviceAddress</dt>
+          <dt>readonly attribute BluetoothDevice device</dt>
           <dd>
-            The device address of the remote peripheral that the GATT service belongs to.
-            Present, if this instance represents a remote service.
+            The <a>BluetoothDevice</a> representing
+            the remote peripheral that the GATT service belongs to.
           </dd>
 
           <dt>Promise&lt;BluetoothGATTCharacteristic> getCharacteristic(BluetoothCharacteristicUuid characteristic)</dt>
