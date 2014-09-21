@@ -171,10 +171,12 @@
         <p>
           When a website requests access to devices using
           <code><a href="#widl-BluetoothDiscovery-requestDevice-Promise-BluetoothDevice--sequence-BluetoothScanFilter--filters">requestDevice</a></code>,
-          it gets the ability to access all GATT services on the device.
-          This gives it as complete control of the device as is possible over a Bluetooth connection.
-          Therefore, the UA MUST inform the user of this risk
-          before asking which devices to entrust to a web site.
+          it gets the ability to access all GATT services mentioned in the call.
+          The UA MUST inform the user what capabilities these services give the website
+          before asking which devices to entrust to it.
+          If any services in the list aren't known to the UA,
+          the UA MUST assume they give the site complete control over the device
+          and inform the user of this risk.
           The UA MUST also allow the user to inspect what sites have access to what devices
           and revoke these pairings.
 
@@ -306,8 +308,24 @@
     <section>
       <h2>Device Discovery</h2>
 
-      <dl title="[NoInterfaceObject] interface BluetoothDiscovery" class="idl" data-merge="BluetoothScanFilter">
-        <dt>Promise&lt;BluetoothDevice> requestDevice(sequence&lt;BluetoothScanFilter> filters)</dt>
+      <p>
+        The UA MUST maintain an <dfn>allowed devices list</dfn> for each origin,
+        storing a set of Bluetooth devices the origin is allowed to access.
+        For each device in the <a>allowed devices list</a> for an origin,
+        the UA MUST maintain an <dfn>allowed services list</dfn> consisting of
+        UUIDs for GATT Primary <a>Service</a>s the origin is allowed to access on the device.
+        The UA MAY remove devices from the <a>allowed devices list</a> at any time
+        based on signals from the user.
+        For example, if the user chooses not to remember access,
+        the UA might remove a device when the tab that was granted access to it is closed.
+        Or the UA might provide a revocation UI that allows the user
+        to explicitly remove a device even while a tab is actively using that device.
+        If a device is removed from this list while
+        a <a>Promise</a> is pending to do something with the device,
+        it MUST be treated the same as if the device moved out of Bluetooth range.
+
+      <dl title="[NoInterfaceObject] interface BluetoothDiscovery" class="idl" data-merge="BluetoothScanFilter RequestDeviceOptions">
+        <dt>Promise&lt;BluetoothDevice> requestDevice(sequence&lt;BluetoothScanFilter> filters, optional RequestDeviceOptions options)</dt>
         <dd>
           When this method is invoked, the UA MUST run the following steps:
           <ol>
@@ -344,6 +362,12 @@
               If the user cancels the prompt, reject the Promise with a <a>NotFoundError</a> and abort these steps.
             </li>
             <li>
+              Record the selected device in the origin's <a>allowed devices list</a>
+              and the union of the service UUIDs from <code>filters</code>
+              and <code>options.optionalServices</code>
+              in the device and origin's <a>allowed services list</a>.
+            </li>
+            <li>
               Connect to the device. ([[BLUETOOTH41]] 3.G.6.2.1)
               If the connection fails, reject the Promise with a <a>NetworkError</a> and abort these steps.
             </li>
@@ -357,6 +381,14 @@
       <dl title="dictionary BluetoothScanFilter" class="idl">
         <dt>sequence&lt;BluetoothServiceUuid> services</dt>
         <dd>A list of <a>Service</a> UUIDs that a device must support to match this filter.</dd>
+      </dl>
+
+      <dl title="dictionary RequestDeviceOptions" class="idl">
+        <dt>sequence&lt;BluetoothServiceUuid> optionalServices = []</dt>
+        <dd>
+          A list of <a>Service</a> UUIDs that aren't required for the website to use a device,
+          but that the website can take advantage of if they're present.
+        </dd>
       </dl>
 
       <p>
@@ -580,16 +612,30 @@
           </dd>
 
           <dt>Promise&lt;BluetoothGATTService> getService(BluetoothServiceUuid service)</dt>
-          <dd>Returns a promise that is asynchronously resolved with the first primary GATT service on the remote device whose UUID is <var>service</var>.</dd>
+          <dd>
+            Returns a promise that is asynchronously resolved with
+            the first primary GATT service on the remote device
+            whose UUID is <var>service</var> and
+            whose UUID is in the <a>allowed services list</a> for this device and origin.
+            If there is no such service, resolves the promise with <code>null</code>.
+          </dd>
 
           <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices()</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the primary GATT services on the remote device.</dd>
+          <dd>
+            Returns a promise that is asynchronously resolved with
+            a sequence of all the primary GATT services on the remote device
+            whose UUIDs are in the <a>allowed services list</a> for this device and origin.
+          </dd>
 
           <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(BluetoothServiceUuid service)</dt>
           <dd>Returns <code>this.getAllServices([service])</code></dd>
 
           <dt>Promise&lt;BluetoothGATTServiceSequence> getAllServices(sequence&lt;BluetoothServiceUuid> services)</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the primary GATT services on the remote device with UUIDs in <var>services</var>.</dd>
+          <dd>
+            Returns a promise that is asynchronously resolved with
+            a sequence of all the primary GATT services on the remote device with UUIDs in
+            both <var>services</var> and the <a>allowed services list</a> for this device and origin.
+          </dd>
         </dl>
 
         <p>Allocation authorities for Vendor IDs.</p>
