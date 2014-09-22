@@ -543,7 +543,7 @@
         <h2><a>BluetoothDevice</a></h2>
 
         <p>Represents a known Bluetooth device.
-        <dl title="interface BluetoothDevice" class="idl" data-merge="VendorIdSource">
+        <dl title="interface BluetoothDevice : ServiceEventHandlers" class="idl" data-merge="VendorIdSource">
           <dt>readonly attribute DOMString instanceId</dt>
           <dd>
             Returns the opaque identifier assigned to this device.
@@ -653,7 +653,7 @@
         <h2><a>BluetoothGATTService</a></h2>
 
         <p><a>BluetoothGATTService</a> represents a GATT <a>Service</a> within a Bluetooth <a>Peripheral</a>, a collection of characteristics and relationships to other services that encapsulate the behavior of part of a device.</p>
-        <dl title="interface BluetoothGATTService" class="idl">
+        <dl title="interface BluetoothGATTService : ServiceEventHandlers" class="idl">
 
           <dt>readonly attribute UUID uuid</dt>
           <dd>The UUID of the service, e.g. <code><a>UUID</a>.parse('0000180d-0000-1000-8000-00805f9b34fb')</code>.</dd>
@@ -711,7 +711,7 @@
         <h2><a>BluetoothGATTCharacteristic</a></h2>
 
         <p><a>BluetoothGATTCharacteristic</a> represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
-        <dl title="interface BluetoothGATTCharacteristic" class="idl">
+        <dl title="interface BluetoothGATTCharacteristic : CharacteristicEventHandlers" class="idl">
 
           <dt>readonly attribute UUID uuid</dt>
           <dd>The UUID of the characteristic, e.g. <code><a>UUID</a>.parse('00002a37-0000-1000-8000-00805f9b34fb')</code>.</dd>
@@ -754,6 +754,7 @@
           <dd>
             Retrieve the value of this characteristic from a remote peripheral.
             Updates the characteristic's <code>value</code> field to hold the result of the read request and resolves the promise with the same <a>ArrayBuffer</a>.
+            <span class="issue">Fire the <a><code>characteristicvaluechanged</code></a> event.</span>
           </dd>
 
           <dt>Promise&lt;void> writeValue()</dt>
@@ -834,9 +835,9 @@
       </section>
 
       <section>
-        <h2>Free functions and events on <code>navigator.bluetooth</code></h2>
+        <h2>Object and UUID lookup on <code>navigator.bluetooth</code></h2>
 
-        <dl title="[NoInterfaceObject] interface BluetoothInteraction : EventTarget" class="idl">
+        <dl title="[NoInterfaceObject] interface BluetoothInteraction : ServiceEventHandlers" class="idl">
           <dt>readonly attribute BluetoothUuids uuids</dt>
           <dd></dd>
 
@@ -866,64 +867,127 @@
               <dd>The instance ID of the requested GATT characteristic descriptor.</dd>
             </dl>
           </dd>
-
-          <dt>attribute EventHandler onServiceAdded</dt>
-          <dd>
-            Fired whan a new GATT service has been discovered on a remote device.
-            Receives a <a>ServiceEvent</a> whose <code>service</code> attribute represents the GATT service that was added.
-          </dd>
-
-          <dt>attribute EventHandler onServiceChanged</dt>
-          <dd>
-            Fired when the state of a remote GATT service changes.
-            This involves any characteristics and/or descriptors that get added or removed from the service,
-            as well as "ServiceChanged" notifications from the remote device.
-            Receives a <a>ServiceEvent</a> whose <code>service</code> attribute represents the GATT service whose state has changed.
-          </dd>
-
-          <dt>attribute EventHandler onServiceRemoved</dt>
-          <dd>
-            Fired when a GATT service that was previously discovered on a remote device has been removed.
-            Receives a <a>ServiceEvent</a> whose <code>service</code> attribute represents the GATT service that was removed.
-          </dd>
-
-          <dt>attribute EventHandler onCharacteristicValueChanged</dt>
-          <dd>
-            Fired when the value of a remote GATT characteristic changes,
-            either as a result of a read request, or a value change notification/indication.
-            This event will only be sent if the app has
-            enabled notifications/indications by calling <a>startNotifications</a>.
-            Receives a <a>CharacteristicEvent</a> whose <code>characteristic</code> attribute represents the GATT characteristic whose value has changed.
-          </dd>
         </dl>
+      </section>
 
-        <p class="issue">
-          Should these events be fired against the appropriate <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>, or <a>BluetoothGATTDescriptor</a> and use their <code>target</code> attribute to identify the object?
-          Or is the specialized attribute described here better?
-      <p class="issue">
-        Specify event propagation.
+      <section>
+        <h2>Events</h2>
 
         <section>
-          <h2>Events reporting changes to Services</h2>
-          <dl title="interface ServiceEvent : Event" class="idl">
-            <dt>readonly attribute BluetoothGATTService service</dt>
-            <dd>Returns the <a>BluetoothGATTService</a> object to which the event relates.</dd>
+          <h2>Bluetooth Tree</h2>
+
+          <p>
+            <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a> and
+            objects implementing the <a>BluetoothDevice</a>, <a>BluetoothGATTService</a>,
+            <a>BluetoothGATTCharacteristic</a>, or <a>BluetoothGATTDescriptor</a> interface
+            <a href="https://dom.spec.whatwg.org/#concept-tree-participate">participate in a tree</a>,
+            simply named the <dfn>Bluetooth tree</dfn>.
+
+          <ul>
+            <li>
+              The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
+              of <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
+              are the <a>BluetoothDevice</a> objects representing
+              devices on the origin's <a>allowed devices list</a>,
+              in an unspecified order.
+            </li>
+            <li>
+              The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
+              of a <a>BluetoothDevice</a> are the <a>BluetoothGATTService</a> objects representing
+              <a>Service</a>s on its GATT <a>Server</a>
+              whose UUIDs are on the origin and device's <a>allowed services list</a>.
+              The order of these services MUST be consistent with the order returned by
+              the Discover Primary Service by Service UUID procedure ([[!BLUETOOTH41]] 3.G.4.4.2),
+              but services with different UUIDs may be in any order.
+            </li>
+            <li>
+              The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
+              of a <a>BluetoothGATTService</a> are
+              the <a>BluetoothGATTService</a> objects representing its Included Services followed by
+              the <a>BluetoothGATTCharacteristic</a> objects representing its Characteristics.
+              The Included Services MUST be in the order returned by
+              the Find Included Services procedure ([[!BLUETOOTH41]] 3.G.4.5.1).
+              The order of the characteristics MUST be consistent with the order returned by
+              the Discover Characteristics by UUID procedure ([[!BLUETOOTH41]] 3.G.4.6.2),
+              but characteristics with different UUIDs may be in any order.
+            </li>
+            <li>
+              The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
+              of a <a>BluetoothGATTCharacteristic</a> are
+              the <a>BluetoothGATTDescriptor</a> objects representing its Descriptors
+              in the order returned by the Discover All Characteristic Descriptors procedure ([[!BLUETOOTH41]] 3.G.4.7.1)
+            </li>
+          </ul>
+        </section>
+
+        <section id="event-types">
+          <h2>Event types</h2>
+
+          <dl>
+            <dt><dfn><code>characteristicvaluechanged</code></dfn></dt>
+            <dd>
+              Fired on a <a>BluetoothGATTCharacteristic</a> when its value changes,
+              either as a result of
+              a <a href="#widl-BluetoothGATTCharacteristic-readValue-Promise-ArrayBuffer">read request</a>,
+              or a value change notification/indication.
+            </dd>
+
+            <dt><dfn><code>serviceadded</code></dfn></dt>
+            <dd>
+              Fired on a new <a>BluetoothGATTService</a>
+              when it has been discovered on a remote device,
+              just after it is added to the <a>Bluetooth tree</a>.
+              <span class="issue">Specify this.</span>
+            </dd>
+
+            <dt><dfn><code>servicechanged</code></dfn></dt>
+            <dd>
+              Fired on a <a>BluetoothGATTService</a> when its state changes.
+              This involves any characteristics and/or descriptors
+              that get added or removed from the service,
+              as well as "ServiceChanged" notifications from the remote device.
+              <span class="issue">Specify this.</span>
+            </dd>
+
+            <dt><dfn><code>serviceremoved</code></dfn></dt>
+            <dd>
+              Fired on a <a>BluetoothGATTService</a> when it has been removed from its device,
+              just before it is removed from the <a>Bluetooth tree</a>.
+              <span class="issue">Specify this.</span>
+            </dd>
+
           </dl>
         </section>
 
         <section>
-          <h2>Events reporting changes to Characteristics</h2>
-          <dl title="interface CharacteristicEvent : Event" class="idl">
-            <dt>readonly attribute BluetoothGATTCharacteristic characteristic</dt>
-            <dd>Returns the <a>BluetoothGATTCharacteristic</a> object to which the event relates.</dd>
-          </dl>
-        </section>
+          <h2>IDL event handlers</h2>
 
-        <section>
-          <h2>Events reporting changes to Descriptors</h2>
-          <dl title="interface DescriptorEvent : Event" class="idl">
-            <dt>readonly attribute BluetoothGATTDescriptor descriptor</dt>
-            <dd>Returns the <a>BluetoothGATTDescriptor</a> object to which the event relates.</dd>
+          <dl title="[NoInterfaceObject] interface CharacteristicEventHandlers : EventTarget" class="idl">
+            <dt>attribute EventHandler oncharacteristicvaluechanged</dt>
+            <dd>
+              <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a>
+              for the <a><code>characteristicvaluechanged</code></a> event type.
+            </dd>
+          </dl>
+
+          <dl title="[NoInterfaceObject] interface ServiceEventHandlers : CharacteristicEventHandlers" class="idl">
+            <dt>attribute EventHandler onserviceadded</dt>
+            <dd>
+              <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a>
+              for the <a><code>serviceadded</code></a> event type.
+            </dd>
+
+            <dt>attribute EventHandler onservicechanged</dt>
+            <dd>
+              <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a>
+              for the <a><code>servicechanged</code></a> event type.
+            </dd>
+
+            <dt>attribute EventHandler onserviceremoved</dt>
+            <dd>
+              <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a>
+              for the <a><code>serviceremoved</code></a> event type.
+            </dd>
           </dl>
         </section>
       </section>
