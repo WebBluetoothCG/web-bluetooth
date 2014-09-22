@@ -69,3 +69,12 @@ However, all secondary services are also included services in some primary servi
 and having `getAllServices()` include them would cost an extra request sequence.
 
 The current API does give UAs the freedom to scan for secondary services eagerly.
+
+## When a device supports both Notification and Indication, why not give the site control of which to use?
+
+The [Mac API](https://developer.apple.com/library/ios/documentation/CoreBluetooth/Reference/CBPeripheral_Class/index.html#//apple_ref/doc/uid/TP40011289-CH1-SW6)
+defaults to Notification,
+and the [Android API](https://developer.android.com/reference/android/bluetooth/BluetoothGatt.html#setCharacteristicNotification%28android.bluetooth.BluetoothGattCharacteristic, boolean%29)
+doesn't document which it prefers when both are available.
+Neither gives enough control to
+implement a web standard that gives the web page the ability to choose.

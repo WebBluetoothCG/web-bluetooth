@@ -769,18 +769,103 @@
 
           <dt>Promise&lt;void> startNotifications()</dt>
           <dd>
-            Enable value notifications/indications from the specified characteristic.
-            Once enabled, an application can listen to notifications/indications
-            using the <a>onCharacteristicValueChanged</a> event.
+            The UA must return a new Promise and asynchronously
+            <a>enable notifications</a> on this characteristic resolving the promise.
+            See <a href="#notification-events"></a> for details of receiving notifications.
           </dd>
 
           <dt>Promise&lt;void> stopNotifications()</dt>
           <dd>
-            Disable value notifications/indications from the specified characteristic.
-            After a successful call, the application will stop receiving notifications/indications from this characteristic.
+            The UA must return a new Promise and asynchronously
+            <a>disable notifications</a> on this characteristic resolving the promise.
           </dd>
         </dl>
         <div title="typedef sequence<BluetoothGATTCharacteristic> BluetoothGATTCharacteristicSequence" class="idl"></div>
+
+        <p>
+          For each known GATT <a>Characteristic</a>, the UA MUST maintain
+          an <dfn>active notification context set</dfn> of <a>BluetoothInteraction</a> objects.
+          This is a single set for the whole UA,
+          pointing to the <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a> object
+          for each separate script execution environment that has registered for notifications.
+
+        <p>
+          To <dfn>enable notifications</dfn> on
+          a <a>BluetoothGATTCharacteristic</a> resolving a promise, the UA MUST:
+
+        <ol>
+          <li>
+            Let <var>characteristic</var> be
+            the GATT <a>Characteristic</a> that the <a>BluetoothGATTCharacteristic</a> represents.
+          </li>
+          <li>
+            If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
+            in <var>characteristic</var>'s properties ([[!BLUETOOTH41]] 3.G.3.3.1.1),
+            reject the promise with a <a>NotSupportedError</a> and abort these steps.
+          </li>
+          <li>
+            If the <a>active notification context set</a> contains
+            <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
+            resolve the promise and abort these steps.
+          </li>
+          <li>
+            Ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
+            <var>characteristic</var>'s Client Characteristic Configuration descriptor ([[!BLUETOOTH41]] 3.G.3.3.3.3)
+            is set, matching the constraints in <var>characteristic</var>'s properties.
+            The UA SHOULD avoid setting both bits,
+            and MUST deduplicate <a href="#notification-events">value-change events</a>
+            if both bits are set.
+          </li>
+          <li>
+            If the write to the Client Characteristic Configuration descriptor fails,
+            reject the promise with a <a>NetworkError</a> and abort these steps.
+          </li>
+          <li>
+            Add <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
+            to the <a>active notification context set</a>.
+          </li>
+          <li>
+            Resolve the promise.
+          </li>
+        </ol>
+
+        <p class="note">
+          After notifications are enabled,
+          the resulting <a href="#notification-events">value-change events</a> won't be delivered
+          until after the current
+          <a href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint">microtask checkpoint</a>.
+          This allows a developer to set up handlers
+          in the <code>.then</code> handler of the result promise.
+
+        <p>
+          To <dfn>disable notifications</dfn> on
+          a <a>BluetoothGATTCharacteristic</a> resolving a promise, the UA MUST:
+
+        <ol>
+          <li>
+            Let <var>characteristic</var> be
+            the GATT <a>Characteristic</a> that the <a>BluetoothGATTCharacteristic</a> represents.
+          </li>
+          <li>
+            If the <a>active notification context set</a> contains
+            <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
+            remove it.
+          </li>
+          <li>
+            If the <a>active notification context set</a> became empty,
+            the UA SHOULD clear the <code>Notification</code> and <code>Indication</code> bits in
+            <var>characteristic</var>'s Client Characteristic Configuration descriptor ([[!BLUETOOTH41]] 3.G.3.3.3.3).
+          </li>
+          <li>
+            <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a>
+            to resolve the promise.
+          </li>
+        </ol>
+
+        <p class="note">
+          Queuing a task to resolve the promise ensures that
+          no <a href="#notification-events">value change events</a> due to notifications
+          arrive after the promise resolves.
       </section>
 
       <section>
@@ -929,7 +1014,7 @@
               Fired on a <a>BluetoothGATTCharacteristic</a> when its value changes,
               either as a result of
               a <a href="#widl-BluetoothGATTCharacteristic-readValue-Promise-ArrayBuffer">read request</a>,
-              or a value change notification/indication.
+              or a <a href="#notification-events">value change notification/indication</a>.
             </dd>
 
             <dt><dfn><code>serviceadded</code></dfn></dt>
@@ -957,6 +1042,43 @@
             </dd>
 
           </dl>
+        </section>
+
+        <section id="notification-events">
+          <h2>Responding to Notifications and Indications</h2>
+
+          <p>
+            When the UA receives a Bluetooth Notification ([[!BLUETOOTH41]] 3.G.4.10)
+            or Indication ([[!BLUETOOTH41]] 3.G.4.11) for a <a>Characteristic</a>,
+            it must perform the following steps:
+
+          <ol>
+            <li>
+              For each <var>bluetoothGlobal</var> in
+              the <a>active notification context set</a> for the Characteristic,
+              <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a>
+              on the event loop of the script settings object of <var>bluetoothGlobal</var>
+              to do the following steps:
+
+              <ol>
+                <li>
+                  Let <var>characteristicObject</var> be the <a>BluetoothGATTCharacteristic</a> in
+                  the <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var>
+                  that represents the <a>Characteristic</a>.
+                </li>
+                <li>
+                  Set <code><var>characteristicObject</var>.value</code> to
+                  a new <code>ArrayBuffer</code> holding the new value of the <a>Characteristic</a>.
+                </li>
+                <li>
+                  <a href="https://dom.spec.whatwg.org/#concept-event-fire">Fire an event</a>
+                  named <a><code>characteristicvaluechanged</code></a>
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at <var>characteristicObject</var>.
+                </li>
+              </ol>
+            </li>
+          </ol>
         </section>
 
         <section>
