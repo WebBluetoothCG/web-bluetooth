@@ -815,10 +815,8 @@
             The UA SHOULD avoid setting both bits,
             and MUST deduplicate <a href="#notification-events">value-change events</a>
             if both bits are set.
-          </li>
-          <li>
-            If the write to the Client Characteristic Configuration descriptor fails,
-            reject the promise with a <a>NetworkError</a> and abort these steps.
+            <a>Use the Bluetooth error recovery procedure</a> with the promise.
+            If this fails, abort these steps.
           </li>
           <li>
             Add <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
@@ -1112,6 +1110,103 @@
             </dd>
           </dl>
         </section>
+      </section>
+
+      <section>
+        <h2>Error handling</h2>
+
+        <p class="note">
+          This section primarily defines the mapping from system errors to Javascript error names
+          and allows UAs to retry certain operations.
+          The retry logic and possible error distinctions
+          are highly constrained by the operating system,
+          so places these requirements don't reflect reality
+          are likely spec bugs instead of browser bugs.
+
+        <p>
+          When a step in an algorithm that uses a Bluetooth GATT procedure ([[!BLUETOOTH41]] 3.G.4)
+          says to "<dfn>Use the Bluetooth error recovery procedure</dfn>" with a promise,
+          the UA MUST perform the following steps:
+
+        <ol>
+          <li>
+            If the Bluetooth procedure completes with anything other than
+            an <code>Error Response</code> ([[!BLUETOOTH41]] 3.F.3.4.1.1),
+            the recovery procedure succeeds.
+            Abort these steps.
+          </li>
+          <li>
+            If the procedure times out ([[!BLUETOOTH41]] 3.G.4.14) or
+            the ATT Bearer ([[!BLUETOOTH41]] 3.G.2.4) is terminated for any reason,
+            reject the promise with a <a>NetworkError</a> and abort these steps.
+            The recovery procedure fails.
+          </li>
+          <li>
+            Take the following actions depending on the <code>Error Code</code>:
+            <dl>
+              <dt><code>Invalid Handle</code></dt>
+              <dt><code>Invalid PDU</code></dt>
+              <dt><code>Invalid Offset</code></dt>
+              <dt><code>Attribute Not Found</code></dt>
+              <dt><code>Unsupported Group Type</code></dt>
+              <dd>
+                These error codes indicate that something unexpected happened at the protocol layer,
+                likely either due to a UA or device bug.
+                Reject the promise with a <a>NotSupportedError</a>.
+                The recovery procedure fails.
+              </dd>
+
+              <dt><code>Invalid Attribute Value Length</code></dt>
+              <dd>
+                Reject the promise with an <a>InvalidModificationError</a>.
+                The recovery procedure fails.
+              </dd>
+
+              <dt><code>Attribute Not Long</code></dt>
+              <dd>
+                If this error code is received without having used a "Long" sub-procedure,
+                this may indicate a device bug.
+                Reject the promise with a <a>NotSupportedError</a>,
+                and the recovery procedure fails.
+
+                <p>
+                  Otherwise, retry the GATT procedure without using a "Long" sub-procedure.
+                  If this is impossible due to the length of the value being written,
+                  reject the promise with an <a>InvalidModificationError</a>,
+                  and the recovery procedure fails.
+              </dd>
+
+              <dt><code>Insufficient Authentication</code></dt>
+              <dt><code>Insufficient Encryption</code></dt>
+              <dt><code>Insufficient Encryption Key Size</code></dt>
+              <dd>
+                The UA SHOULD attempt to increase the security level of the connection.
+                If this attempt fails or the UA doesn't support any higher security,
+                reject the promise with a <a>SecurityError</a>,
+                and the recovery procedure fails.
+                Otherwise, retry the GATT procedure at the new higher security level.
+              </dd>
+
+              <dt><code>Insufficient Authorization</code></dt>
+              <dd>
+                Reject the promise with a <a>SecurityError</a>,
+                and the recovery procedure fails.
+              </dd>
+
+              <dt><code>Read Not Permitted</code></dt>
+              <dt><code>Write Not Permitted</code></dt>
+              <dt><code>Request Not Supported</code></dt>
+              <dt><code>Prepare Queue Full</code></dt>
+              <dt><code>Insufficient Resources</code></dt>
+              <dt><code>Unlikely Error</code></dt>
+              <dt>Anything else</dt>
+              <dd>
+                Reject the promise with a <a>NotSupportedError</a>.
+                The recovery procedure fails.
+              </dd>
+            </dl>
+          </li>
+        </ol>
       </section>
     </section>
 
