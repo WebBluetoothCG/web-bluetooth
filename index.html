@@ -752,9 +752,9 @@
 
           <dt>Promise&lt;ArrayBuffer> readValue()</dt>
           <dd>
-            Retrieve the value of this characteristic from a remote peripheral.
-            Updates the characteristic's <code>value</code> field to hold the result of the read request and resolves the promise with the same <a>ArrayBuffer</a>.
-            <span class="issue">Fire the <a><code>characteristicvaluechanged</code></a> event.</span>
+            The UA MUST return a new promise and asynchronously
+            <a title="read the value of a BluetoothGATTCharacteristic">read the value of this characteristic</a>
+            resolving the promise.
           </dd>
 
           <dt>Promise&lt;void> writeValue()</dt>
@@ -769,18 +769,50 @@
 
           <dt>Promise&lt;void> startNotifications()</dt>
           <dd>
-            The UA must return a new Promise and asynchronously
+            The UA MUST return a new Promise and asynchronously
             <a>enable notifications</a> on this characteristic resolving the promise.
             See <a href="#notification-events"></a> for details of receiving notifications.
           </dd>
 
           <dt>Promise&lt;void> stopNotifications()</dt>
           <dd>
-            The UA must return a new Promise and asynchronously
+            The UA MUST return a new Promise and asynchronously
             <a>disable notifications</a> on this characteristic resolving the promise.
           </dd>
         </dl>
         <div title="typedef sequence<BluetoothGATTCharacteristic> BluetoothGATTCharacteristicSequence" class="idl"></div>
+
+        <p>
+          To <dfn>read the value of a <a>BluetoothGATTCharacteristic</a></dfn> resolving a promise, the UA MUST:
+
+        <ol>
+          <li>
+            Let <var>characteristic</var> be the <a>Characteristic</a>
+            that the <a>BluetoothGATTCharacteristic</a> represents.
+          </li>
+          <li>
+            If the <code>Read</code> bit is not set
+            in <var>characteristic</var>'s properties ([[!BLUETOOTH41]] 3.G.3.3.1.1),
+            reject the promise with a <a>NotSupportedError</a> and abort these steps.
+          </li>
+          <li>
+            Use any combination of the sub-procedures in
+            the Characteristic Value Read procedure ([[!BLUETOOTH41]] 3.G.4.8)
+            to retrieve the value of <var>characteristic</var>.
+            <a>Use the Bluetooth error recovery procedure</a> with the promise.
+            If this fails, abort these steps.
+          </li>
+          <li>
+            Create an <code>ArrayBuffer</code> holding the retrieved value,
+            and assign it to the <a>BluetoothGATTCharacteristic</a>'s <code>value</code> field.
+          </li>
+          <li>
+            <a href="https://dom.spec.whatwg.org/#concept-event-fire">Fire an event</a>
+            named <a><code>characteristicvaluechanged</code></a>
+            with its <code>bubbles</code> attribute initialized to <code>true</code>
+            at the <a>BluetoothGATTCharacteristic</a>.
+          </li>
+        </ol>
 
         <p>
           For each known GATT <a>Characteristic</a>, the UA MUST maintain
