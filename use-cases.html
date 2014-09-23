@@ -219,6 +219,44 @@
       <section id="risks">
         <h2>Risks</h2>
 
+        <section id="kernel_attack_surface">
+          <h2>Exposes a larger kernel attack surface</h2>
+
+          <p>Bluetooth drivers are complex. Unless a very narrow, well-defined API is exposed to
+          websites through Web Bluetooth, this has the potential to expose a large kernel attack
+          surface to users. For sandboxed user agents, this attack surface would essentially be
+          exposed to the untrusted content, as arbitrary bytes would be controllable by the
+          renderer, unless a very narrow and well defined API is used and can be audited
+          carefully.</p>
+
+          <p>For example, compared to the
+          <a href="http://webaudio.github.io/web-audio-api/#AudioDestinationNode">WebAudio</a>
+          API, Bluetooth drivers are probably handle data in a much more complex way and with more
+          complicated abstractions. This leads to a much larger kernel surface area for
+          attackers.</p>
+        </section>
+
+        <section id="device_management_attacks">
+          <h2>XSS and CSRF attacks on a device</h2>
+
+          <p>Even if a user only exposes a device to the correct origin, if that origin is not
+          correctly protected, they are exposing the device to XSS and CSRF attacks, where an
+          attacker could modify, delete, or read data from the device, not just the origin.
+          Expressing these risks to users will be a difficult task. This potentially could be
+          mitigated by requiring a user interaction for any explicit code to be executed, so in that
+          way it couldn't at least happen silently.</p>
+
+          <p>Currently, the Same Origin Policy basically makes it so even if a site is compromised,
+          the damage is limited to that origin (that is to say, your local browsing instance and the
+          server you're communicating with).  With the addition of Bluetooth or similar permissions,
+          all of a sudden, an XSS or CSRF potentially affects devices as well. In some ways, you can
+          think of this as an entirely new and privileged domain. Or, alternatively, you could view
+          the device as being added to the origin. In either case, communicating that to the user in
+          a meaningful way is going to be tough/impossible. This changes the promise user agents
+          have been making to users.</p>
+
+        </section>
+
         <section id="risk_vulnerable_device">
           <h2>A malicious website could exploit a vulnerable device</h2>
 
