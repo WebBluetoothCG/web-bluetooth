@@ -1050,25 +1050,24 @@
             <dt><dfn><code>serviceadded</code></dfn></dt>
             <dd>
               Fired on a new <a>BluetoothGATTService</a>
-              when it has been discovered on a remote device,
+              <a href="#service-change-events">when it has been discovered on a remote device</a>,
               just after it is added to the <a>Bluetooth tree</a>.
-              <span class="issue">Specify this.</span>
             </dd>
 
             <dt><dfn><code>servicechanged</code></dfn></dt>
             <dd>
-              Fired on a <a>BluetoothGATTService</a> when its state changes.
+              Fired on a <a>BluetoothGATTService</a>
+              <a href="#service-change-events">when its state changes</a>.
               This involves any characteristics and/or descriptors
               that get added or removed from the service,
               as well as "ServiceChanged" notifications from the remote device.
-              <span class="issue">Specify this.</span>
             </dd>
 
             <dt><dfn><code>serviceremoved</code></dfn></dt>
             <dd>
-              Fired on a <a>BluetoothGATTService</a> when it has been removed from its device,
+              Fired on a <a>BluetoothGATTService</a>
+              <a href="#service-change-events">when it has been removed from its device</a>,
               just before it is removed from the <a>Bluetooth tree</a>.
-              <span class="issue">Specify this.</span>
             </dd>
 
           </dl>
@@ -1105,6 +1104,105 @@
                   named <a><code>characteristicvaluechanged</code></a>
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
                   at <var>characteristicObject</var>.
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </section>
+
+        <section id="service-change-events">
+          <h2>Responding to Service Changes</h2>
+
+          <p>
+            The Bluetooth Attribute Caching system ([[!BLUETOOTH41]] 3.G.2.5.3) allows clients
+            to track changes to <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
+            Before discovering any of these entities for the purpose of exposing them to a web page,
+            if the Service Changed characteristic ([[!BLUETOOTH41]] 3.G.7.1) exists.
+            the UA MUST subscribe to Indications from it.
+            When the UA receives an Indication on the Service Changed characteristic,
+            it MUST perform the following steps.
+
+          <ol>
+            <li>
+              Let <var>removedEntities</var> be the list of entities in
+              the range indicated by the Service Changed characteristic
+              that the UA had discovered before the Indication.
+            </li>
+            <li>
+              Use the Primary Service Discovery, Relationship Discovery, Characteristic Discovery,
+              and Characteristic Descriptor Discovery procedures
+              ([[!BLUETOOTH41]] 3.G 4.4, 4.5, 4.6, and 4.7)
+              to re-discover entities in the range indicated by the Service Changed characteristic.
+              The UA MAY skip discovering all or part of the indicated range
+              if it can prove that the results of that discovery
+              could not affect the events fired below.
+            </li>
+            <li>
+              Let <var>addedEntities</var> be the list of entities discovered in the previous step.
+            </li>
+            <li>
+              If an entity with the same definition, ignoring Characteristic and Descriptor values,
+              appears in both <var>removedEntities</var> and <var>addedEntities</var>,
+              remove it from both.
+            </li>
+            <li>
+              Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
+            </li>
+            <li>
+              If the same <a>Service</a> appears in both <var>removedEntities</var> and <var>addedEntities</var>,
+              remove it from both, and add it to <var>changedServices</var>.
+              <a>Service</a>s with different UUIDs or Primary/Secondary status
+              MUST NOT be considered "the same",
+              but this specification says nothing else about determining identity.
+            </li>
+            <li>
+              For each <a>Characteristic</a> and <a>Descriptor</a>
+              in <var>removedEntities</var> and <var>addedEntities</var>,
+              remove it from its original list,
+              and add its parent <a>Service</a> to <var>changedServices</var>.
+              <span class="note">After this point, <var>removedEntities</var> and <var>addedEntities</var> contain only <a>Service</a>s.</span>
+            </li>
+            <li>
+              If a <a>Service</a> in <var>addedEntities</var>
+              would not have been returned to any script execution environment
+              if it had existed at the time of any previous call to
+              <code>getService</code>, <code>getAllServices</code>,
+              <code>getIncludedService</code>, or <code>getAllIncludedServices</code>,
+              the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
+            </li>
+            <li>
+              Let <var>changedDevices</var> be the set of Bluetooth devices that
+              contain any <a>Service</a> in
+              <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
+            </li>
+            <li>
+              For each script execution environment
+              that is connected to a device in <var>changedDevices</var>,
+              <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a>
+              on its event loop to do the following steps:
+              <ol>
+                <li>
+                  For each <a>Service</a> in <var>removedEntities</var>,
+                  <a href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a>
+                  named <a><code>serviceremoved</code></a>
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at the <a>BluetoothGATTService</a> representing the <a>Service</a>.
+                  Then remove this <a>BluetoothGATTService</a> from the <a>Bluetooth tree</a>.
+                </li>
+                <li>
+                  For each <a>Service</a> in <var>addedEntities</var>,
+                  add the <a>BluetoothGATTService</a> representing this <a>Service</a> to the <a>Bluetooth tree</a>.
+                  Then <a href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a>
+                  named <a><code>serviceadded</code></a>
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at the <a>BluetoothGATTService</a>.
+                </li>
+                <li>
+                  For each <a>Service</a> in <var>changedServices</var>,
+                  <a href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a>
+                  named <a><code>servicechanged</code></a>
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at the <a>BluetoothGATTService</a> representing the <a>Service</a>.
                 </li>
               </ol>
             </li>
