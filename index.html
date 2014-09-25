@@ -1346,18 +1346,30 @@
       <div title="typedef DOMString UUID" class="idl">
         <p>
           A <a>UUID</a> string represents a 128-bit [[!RFC4122]] UUID.
-          All UUIDs passed to or returned from functions in this specification MUST match
+          A <dfn>valid UUID</dfn> is a string that matches
+          the [[!ECMAScript]] regexp
           <code>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/</code>.
-          That is, they are lower-case and
-          do not use the 16- or 32-bit abbreviations defined by the Bluetooth standard.
-          This standard provides the <a href=""><code>canonicalUUID()</code></a> function
-          to map a 16- or 32-bit Bluetooth UUID to its canonical form.
+          That is, a <a>valid UUID</a> is lower-case and
+          does not use the 16- or 32-bit abbreviations defined by the Bluetooth standard.
+          All UUIDs returned from functions and attributes in this specification
+          MUST be <a>valid UUID</a>s.
+          If a function in this specification takes a parameter whose type is <a>UUID</a>
+          or a dictionary including a <a>UUID</a> attribute,
+          and the argument passed in any <a>UUID</a> slot is not a <a>valid UUID</a>,
+          the function MUST return a <a>Promise</a> rejected with a <code>TypeError</code>
+          and abort its other steps.
 
-        <p>
-          When sending a UUID to a Bluetooth device,
-          if that UUID can be expressed as a 16- or 32-bit UUID,
-          the UA SHOULD send the UUID in
-          the same form as previously received from the device, if any.
+        <p class="note">
+          This standard provides the
+          <a href="#widl-BluetoothUuids-canonicalUUID-UUID-unsigned-long-alias"><code>canonicalUUID()</code></a> function
+          to map a 16- or 32-bit Bluetooth UUID alias to its 128-bit form.
+
+        <p class="note">
+          Bluetooth devices are required to convert 16- and 32-bit UUIDs to 128-bit UUIDs
+          before comparing them ([[BLUETOOTH41]] 3.F.3.2.1), but not all devices do so.
+          To interoperate with these devices,
+          if the UA has received a UUID from the device in one form (16-, 32-, or 128-bit),
+          it should send other aliases of that UUID back to the device in the same form.
       </div>
     </section>
 
@@ -1543,29 +1555,29 @@
           these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
 
         <dl title="enum BluetoothServiceName" class="idl">
-          <dt>alert_notification</dt><dd>refers to the 16-bit UUID 0x1811</dd>
-          <dt>battery_service</dt><dd>refers to the 16-bit UUID 0x180F</dd>
-          <dt>blood_pressure</dt><dd>refers to the 16-bit UUID 0x1810</dd>
-          <dt>current_time</dt><dd>refers to the 16-bit UUID 0x1805</dd>
-          <dt>cycling_power</dt><dd>refers to the 16-bit UUID 0x1818</dd>
-          <dt>cycling_speed_and_cadence</dt><dd>refers to the 16-bit UUID 0x1816</dd>
-          <dt>device_information</dt><dd>refers to the 16-bit UUID 0x180A</dd>
-          <dt>generic_access</dt><dd>refers to the 16-bit UUID 0x1800</dd>
-          <dt>generic_attribute</dt><dd>refers to the 16-bit UUID 0x1801</dd>
-          <dt>glucose</dt><dd>refers to the 16-bit UUID 0x1808</dd>
-          <dt>health_thermometer</dt><dd>refers to the 16-bit UUID 0x1809</dd>
-          <dt>heart_rate</dt><dd>refers to the 16-bit UUID 0x180D</dd>
-          <dt>human_interface_device</dt><dd>refers to the 16-bit UUID 0x1812</dd>
-          <dt>immediate_alert</dt><dd>refers to the 16-bit UUID 0x1802</dd>
-          <dt>link_loss</dt><dd>refers to the 16-bit UUID 0x1803 </dd>
-          <dt>location_and_navigation</dt><dd>refers to the 16-bit UUID 0x1819</dd>
-          <dt>next_dst_change</dt><dd>refers to the 16-bit UUID 0x1807</dd>
-          <dt>phone_alert_status</dt><dd>refers to the 16-bit UUID 0x180E</dd>
-          <dt>reference_time_update</dt><dd>refers to the 16-bit UUID 0x1806</dd>
-          <dt>running_speed_and_cadence</dt><dd>refers to the 16-bit UUID 0x1814</dd>
-          <dt>scan_parameters</dt><dd>refers to the 16-bit UUID 0x1813</dd>
-          <dt>tx_power</dt><dd>refers to the 16-bit UUID 0x1804</dd>
-          <dt>user_data</dt><dd>refers to the 16-bit UUID 0x181C</dd>
+          <dt>alert_notification</dt><dd>refers to <code>canonicalUUID(0x1811)</code></dd>
+          <dt>battery_service</dt><dd>refers to <code>canonicalUUID(0x180F)</code></dd>
+          <dt>blood_pressure</dt><dd>refers to <code>canonicalUUID(0x1810)</code></dd>
+          <dt>current_time</dt><dd>refers to <code>canonicalUUID(0x1805)</code></dd>
+          <dt>cycling_power</dt><dd>refers to <code>canonicalUUID(0x1818)</code></dd>
+          <dt>cycling_speed_and_cadence</dt><dd>refers to <code>canonicalUUID(0x1816)</code></dd>
+          <dt>device_information</dt><dd>refers to <code>canonicalUUID(0x180A)</code></dd>
+          <dt>generic_access</dt><dd>refers to <code>canonicalUUID(0x1800)</code></dd>
+          <dt>generic_attribute</dt><dd>refers to <code>canonicalUUID(0x1801)</code></dd>
+          <dt>glucose</dt><dd>refers to <code>canonicalUUID(0x1808)</code></dd>
+          <dt>health_thermometer</dt><dd>refers to <code>canonicalUUID(0x1809)</code></dd>
+          <dt>heart_rate</dt><dd>refers to <code>canonicalUUID(0x180D)</code></dd>
+          <dt>human_interface_device</dt><dd>refers to <code>canonicalUUID(0x1812)</code></dd>
+          <dt>immediate_alert</dt><dd>refers to <code>canonicalUUID(0x1802)</code></dd>
+          <dt>link_loss</dt><dd>refers to <code>canonicalUUID(0x1803)</code> </dd>
+          <dt>location_and_navigation</dt><dd>refers to <code>canonicalUUID(0x1819)</code></dd>
+          <dt>next_dst_change</dt><dd>refers to <code>canonicalUUID(0x1807)</code></dd>
+          <dt>phone_alert_status</dt><dd>refers to <code>canonicalUUID(0x180E)</code></dd>
+          <dt>reference_time_update</dt><dd>refers to <code>canonicalUUID(0x1806)</code></dd>
+          <dt>running_speed_and_cadence</dt><dd>refers to <code>canonicalUUID(0x1814)</code></dd>
+          <dt>scan_parameters</dt><dd>refers to <code>canonicalUUID(0x1813)</code></dd>
+          <dt>tx_power</dt><dd>refers to <code>canonicalUUID(0x1804)</code></dd>
+          <dt>user_data</dt><dd>refers to <code>canonicalUUID(0x181C)</code></dd>
         </dl>
 
         <div title="typedef (BluetoothServiceName or UUID) BluetoothServiceUuid" class="idl"></div>
@@ -1685,106 +1697,106 @@
           these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
 
         <dl title="enum BluetoothCharacteristicName" class="idl">
-          <dt>aerobic_heart_rate_lower_limit</dt><dd>refers to the 16-bit UUID 0x2A7E</dd>
-          <dt>aerobic_heart_rate_upper_limit</dt><dd>refers to the 16-bit UUID 0x2A84</dd>
-          <dt>aerobic_threshold</dt><dd>refers to the 16-bit UUID 0x2A7F</dd>
-          <dt>age</dt><dd>refers to the 16-bit UUID 0x2A80</dd>
-          <dt>alert_category_id</dt><dd>refers to the 16-bit UUID 0x2A43</dd>
-          <dt>alert_category_id_bit_mask</dt><dd>refers to the 16-bit UUID 0x2A42</dd>
-          <dt>alert_level</dt><dd>refers to the 16-bit UUID 0x2A06</dd>
-          <dt>alert_notification_control_point</dt><dd>refers to the 16-bit UUID 0x2A44</dd>
-          <dt>alert_status</dt><dd>refers to the 16-bit UUID 0x2A3F</dd>
-          <dt>anaerobic_heart_rate_lower_limit</dt><dd>refers to the 16-bit UUID 0x2A81</dd>
-          <dt>anaerobic_heart_rate_upper_limit</dt><dd>refers to the 16-bit UUID 0x2A82</dd>
-          <dt>anaerobic_threshold</dt><dd>refers to the 16-bit UUID 0x2A83</dd>
-          <dt>gap.appearance</dt><dd>refers to the 16-bit UUID 0x2A01</dd>
-          <dt>battery_level</dt><dd>refers to the 16-bit UUID 0x2A19</dd>
-          <dt>blood_pressure_feature</dt><dd>refers to the 16-bit UUID 0x2A49</dd>
-          <dt>blood_pressure_measurement</dt><dd>refers to the 16-bit UUID 0x2A35</dd>
-          <dt>body_sensor_location</dt><dd>refers to the 16-bit UUID 0x2A38</dd>
-          <dt>boot_keyboard_input_report</dt><dd>refers to the 16-bit UUID 0x2A22</dd>
-          <dt>boot_keyboard_output_report</dt><dd>refers to the 16-bit UUID 0x2A32</dd>
-          <dt>boot_mouse_input_report</dt><dd>refers to the 16-bit UUID 0x2A33</dd>
-          <dt>csc_feature</dt><dd>refers to the 16-bit UUID 0x2A5C</dd>
-          <dt>csc_measurement</dt><dd>refers to the 16-bit UUID 0x2A5B</dd>
-          <dt>current_time</dt><dd>refers to the 16-bit UUID 0x2A2B</dd>
-          <dt>cycling_power_control_point</dt><dd>refers to the 16-bit UUID 0x2A66</dd>
-          <dt>cycling_power_feature</dt><dd>refers to the 16-bit UUID 0x2A65</dd>
-          <dt>cycling_power_measurement</dt><dd>refers to the 16-bit UUID 0x2A63</dd>
-          <dt>cycling_power_vector</dt><dd>refers to the 16-bit UUID 0x2A64</dd>
-          <dt>database_change_increment</dt><dd>refers to the 16-bit UUID 0x2A99</dd>
-          <dt>date_of_birth</dt><dd>refers to the 16-bit UUID 0x2A85</dd>
-          <dt>date_of_threshold_assessment</dt><dd>refers to the 16-bit UUID 0x2A86</dd>
-          <dt>date_time</dt><dd>refers to the 16-bit UUID 0x2A08</dd>
-          <dt>day_date_time</dt><dd>refers to the 16-bit UUID 0x2A0A</dd>
-          <dt>day_of_week</dt><dd>refers to the 16-bit UUID 0x2A09</dd>
-          <dt>gap.device_name</dt><dd>refers to the 16-bit UUID 0x2A00</dd>
-          <dt>dst_offset</dt><dd>refers to the 16-bit UUID 0x2A0D</dd>
-          <dt>email_address</dt><dd>refers to the 16-bit UUID 0x2A87</dd>
-          <dt>exact_time_256</dt><dd>refers to the 16-bit UUID 0x2A0C</dd>
-          <dt>fat_burn_heart_rate_lower_limit</dt><dd>refers to the 16-bit UUID 0x2A88</dd>
-          <dt>fat_burn_heart_rate_upper_limit</dt><dd>refers to the 16-bit UUID 0x2A89</dd>
-          <dt>firmware_revision_string</dt><dd>refers to the 16-bit UUID 0x2A26</dd>
-          <dt>first_name</dt><dd>refers to the 16-bit UUID 0x2A8A</dd>
-          <dt>five_zone_heart_rate_limits</dt><dd>refers to the 16-bit UUID 0x2A8B</dd>
-          <dt>gender</dt><dd>refers to the 16-bit UUID 0x2A8C</dd>
-          <dt>glucose_feature</dt><dd>refers to the 16-bit UUID 0x2A51</dd>
-          <dt>glucose_measurement</dt><dd>refers to the 16-bit UUID 0x2A18</dd>
-          <dt>glucose_measurement_context</dt><dd>refers to the 16-bit UUID 0x2A34</dd>
-          <dt>hardware_revision_string</dt><dd>refers to the 16-bit UUID 0x2A27</dd>
-          <dt>heart_rate_control_point</dt><dd>refers to the 16-bit UUID 0x2A39</dd>
-          <dt>heart_rate_max</dt><dd>refers to the 16-bit UUID 0x2A8D</dd>
-          <dt>heart_rate_measurement</dt><dd>refers to the 16-bit UUID 0x2A37</dd>
-          <dt>height</dt><dd>refers to the 16-bit UUID 0x2A8E</dd>
-          <dt>hid_control_point</dt><dd>refers to the 16-bit UUID 0x2A4C</dd>
-          <dt>hid_information</dt><dd>refers to the 16-bit UUID 0x2A4A</dd>
-          <dt>hip_circumference</dt><dd>refers to the 16-bit UUID 0x2A8F</dd>
-          <dt>ieee_11073-20601_regulatory_certification_data_list</dt><dd>refers to the 16-bit UUID 0x2A2A</dd>
-          <dt>intermediate_blood_pressure</dt><dd>refers to the 16-bit UUID 0x2A36</dd>
-          <dt>intermediate_temperature</dt><dd>refers to the 16-bit UUID 0x2A1E</dd>
-          <dt>language</dt><dd>refers to the 16-bit UUID 0x2AA2</dd>
-          <dt>last_name</dt><dd>refers to the 16-bit UUID 0x2A90</dd>
-          <dt>ln_control_point</dt><dd>refers to the 16-bit UUID 0x2A6B</dd>
-          <dt>ln_feature</dt><dd>refers to the 16-bit UUID 0x2A6A</dd>
-          <dt>local_time_information</dt><dd>refers to the 16-bit UUID 0x2A0F</dd>
-          <dt>location_and_speed</dt><dd>refers to the 16-bit UUID 0x2A67</dd>
-          <dt>manufacturer_name_string</dt><dd>refers to the 16-bit UUID 0x2A29</dd>
-          <dt>maximum_recommended_heart_rate</dt><dd>refers to the 16-bit UUID 0x2A91</dd>
-          <dt>measurement_interval</dt><dd>refers to the 16-bit UUID 0x2A21</dd>
-          <dt>model_number_string</dt><dd>refers to the 16-bit UUID 0x2A24</dd>
-          <dt>navigation</dt><dd>refers to the 16-bit UUID 0x2A68</dd>
-          <dt>new_alert</dt><dd>refers to the 16-bit UUID 0x2A46</dd>
-          <dt>gap.peripheral_preferred_connection_parameters</dt><dd>refers to the 16-bit UUID 0x2A04</dd>
-          <dt>gap.peripheral_privacy_flag</dt><dd>refers to the 16-bit UUID 0x2A02</dd>
-          <dt>pnp_id</dt><dd>refers to the 16-bit UUID 0x2A50</dd>
-          <dt>position_quality</dt><dd>refers to the 16-bit UUID 0x2A69</dd>
-          <dt>protocol_mode</dt><dd>refers to the 16-bit UUID 0x2A4E</dd>
-          <dt>gap.reconnection_address</dt><dd>refers to the 16-bit UUID 0x2A03</dd>
-          <dt>record_access_control_point</dt><dd>refers to the 16-bit UUID 0x2A52</dd>
-          <dt>reference_time_information</dt><dd>refers to the 16-bit UUID 0x2A14</dd>
-          <dt>report</dt><dd>refers to the 16-bit UUID 0x2A4D</dd>
-          <dt>report_map</dt><dd>refers to the 16-bit UUID 0x2A4B</dd>
-          <dt>resting_heart_rate</dt><dd>refers to the 16-bit UUID 0x2A92</dd>
-          <dt>ringer_control_point</dt><dd>refers to the 16-bit UUID 0x2A40</dd>
-          <dt>ringer_setting</dt><dd>refers to the 16-bit UUID 0x2A41</dd>
-          <dt>rsc_feature</dt><dd>refers to the 16-bit UUID 0x2A54</dd>
-          <dt>rsc_measurement</dt><dd>refers to the 16-bit UUID 0x2A53</dd>
-          <dt>sc_control_point</dt><dd>refers to the 16-bit UUID 0x2A55</dd>
-          <dt>scan_interval_window</dt><dd>refers to the 16-bit UUID 0x2A4F</dd>
-          <dt>scan_refresh</dt><dd>refers to the 16-bit UUID 0x2A31</dd>
-          <dt>sensor_location</dt><dd>refers to the 16-bit UUID 0x2A5D</dd>
-          <dt>serial_number_string</dt><dd>refers to the 16-bit UUID 0x2A25</dd>
-          <dt>gatt.service_changed</dt><dd>refers to the 16-bit UUID 0x2A05</dd>
-          <dt>software_revision_string</dt><dd>refers to the 16-bit UUID 0x2A28</dd>
-          <dt>sport_type_for_aerobic_and_anaerobic_thresholds</dt><dd>refers to the 16-bit UUID 0x2A93</dd>
-          <dt>supported_new_alert_category</dt><dd>refers to the 16-bit UUID 0x2A47</dd>
-          <dt>supported_unread_alert_category</dt><dd>refers to the 16-bit UUID 0x2A48</dd>
-          <dt>system_id</dt><dd>refers to the 16-bit UUID 0x2A23</dd>
-          <dt>temperature_measurement</dt><dd>refers to the 16-bit UUID 0x2A1C</dd>
-          <dt>temperature_type</dt><dd>refers to the 16-bit UUID 0x2A1D</dd>
-          <dt>three_zone_heart_rate_limits</dt><dd>refers to the 16-bit UUID 0x2A94</dd>
-          <dt>time_accuracy</dt><dd>refers to the 16-bit UUID 0x2A12</dd>
-          <dt>time_source</dt><dd>refers to the 16-bit UUID 0x2A13</dd>
+          <dt>aerobic_heart_rate_lower_limit</dt><dd>refers to <code>canonicalUUID(0x2A7E)</code></dd>
+          <dt>aerobic_heart_rate_upper_limit</dt><dd>refers to <code>canonicalUUID(0x2A84)</code></dd>
+          <dt>aerobic_threshold</dt><dd>refers to <code>canonicalUUID(0x2A7F)</code></dd>
+          <dt>age</dt><dd>refers to <code>canonicalUUID(0x2A80)</code></dd>
+          <dt>alert_category_id</dt><dd>refers to <code>canonicalUUID(0x2A43)</code></dd>
+          <dt>alert_category_id_bit_mask</dt><dd>refers to <code>canonicalUUID(0x2A42)</code></dd>
+          <dt>alert_level</dt><dd>refers to <code>canonicalUUID(0x2A06)</code></dd>
+          <dt>alert_notification_control_point</dt><dd>refers to <code>canonicalUUID(0x2A44)</code></dd>
+          <dt>alert_status</dt><dd>refers to <code>canonicalUUID(0x2A3F)</code></dd>
+          <dt>anaerobic_heart_rate_lower_limit</dt><dd>refers to <code>canonicalUUID(0x2A81)</code></dd>
+          <dt>anaerobic_heart_rate_upper_limit</dt><dd>refers to <code>canonicalUUID(0x2A82)</code></dd>
+          <dt>anaerobic_threshold</dt><dd>refers to <code>canonicalUUID(0x2A83)</code></dd>
+          <dt>gap.appearance</dt><dd>refers to <code>canonicalUUID(0x2A01)</code></dd>
+          <dt>battery_level</dt><dd>refers to <code>canonicalUUID(0x2A19)</code></dd>
+          <dt>blood_pressure_feature</dt><dd>refers to <code>canonicalUUID(0x2A49)</code></dd>
+          <dt>blood_pressure_measurement</dt><dd>refers to <code>canonicalUUID(0x2A35)</code></dd>
+          <dt>body_sensor_location</dt><dd>refers to <code>canonicalUUID(0x2A38)</code></dd>
+          <dt>boot_keyboard_input_report</dt><dd>refers to <code>canonicalUUID(0x2A22)</code></dd>
+          <dt>boot_keyboard_output_report</dt><dd>refers to <code>canonicalUUID(0x2A32)</code></dd>
+          <dt>boot_mouse_input_report</dt><dd>refers to <code>canonicalUUID(0x2A33)</code></dd>
+          <dt>csc_feature</dt><dd>refers to <code>canonicalUUID(0x2A5C)</code></dd>
+          <dt>csc_measurement</dt><dd>refers to <code>canonicalUUID(0x2A5B)</code></dd>
+          <dt>current_time</dt><dd>refers to <code>canonicalUUID(0x2A2B)</code></dd>
+          <dt>cycling_power_control_point</dt><dd>refers to <code>canonicalUUID(0x2A66)</code></dd>
+          <dt>cycling_power_feature</dt><dd>refers to <code>canonicalUUID(0x2A65)</code></dd>
+          <dt>cycling_power_measurement</dt><dd>refers to <code>canonicalUUID(0x2A63)</code></dd>
+          <dt>cycling_power_vector</dt><dd>refers to <code>canonicalUUID(0x2A64)</code></dd>
+          <dt>database_change_increment</dt><dd>refers to <code>canonicalUUID(0x2A99)</code></dd>
+          <dt>date_of_birth</dt><dd>refers to <code>canonicalUUID(0x2A85)</code></dd>
+          <dt>date_of_threshold_assessment</dt><dd>refers to <code>canonicalUUID(0x2A86)</code></dd>
+          <dt>date_time</dt><dd>refers to <code>canonicalUUID(0x2A08)</code></dd>
+          <dt>day_date_time</dt><dd>refers to <code>canonicalUUID(0x2A0A)</code></dd>
+          <dt>day_of_week</dt><dd>refers to <code>canonicalUUID(0x2A09)</code></dd>
+          <dt>gap.device_name</dt><dd>refers to <code>canonicalUUID(0x2A00)</code></dd>
+          <dt>dst_offset</dt><dd>refers to <code>canonicalUUID(0x2A0D)</code></dd>
+          <dt>email_address</dt><dd>refers to <code>canonicalUUID(0x2A87)</code></dd>
+          <dt>exact_time_256</dt><dd>refers to <code>canonicalUUID(0x2A0C)</code></dd>
+          <dt>fat_burn_heart_rate_lower_limit</dt><dd>refers to <code>canonicalUUID(0x2A88)</code></dd>
+          <dt>fat_burn_heart_rate_upper_limit</dt><dd>refers to <code>canonicalUUID(0x2A89)</code></dd>
+          <dt>firmware_revision_string</dt><dd>refers to <code>canonicalUUID(0x2A26)</code></dd>
+          <dt>first_name</dt><dd>refers to <code>canonicalUUID(0x2A8A)</code></dd>
+          <dt>five_zone_heart_rate_limits</dt><dd>refers to <code>canonicalUUID(0x2A8B)</code></dd>
+          <dt>gender</dt><dd>refers to <code>canonicalUUID(0x2A8C)</code></dd>
+          <dt>glucose_feature</dt><dd>refers to <code>canonicalUUID(0x2A51)</code></dd>
+          <dt>glucose_measurement</dt><dd>refers to <code>canonicalUUID(0x2A18)</code></dd>
+          <dt>glucose_measurement_context</dt><dd>refers to <code>canonicalUUID(0x2A34)</code></dd>
+          <dt>hardware_revision_string</dt><dd>refers to <code>canonicalUUID(0x2A27)</code></dd>
+          <dt>heart_rate_control_point</dt><dd>refers to <code>canonicalUUID(0x2A39)</code></dd>
+          <dt>heart_rate_max</dt><dd>refers to <code>canonicalUUID(0x2A8D)</code></dd>
+          <dt>heart_rate_measurement</dt><dd>refers to <code>canonicalUUID(0x2A37)</code></dd>
+          <dt>height</dt><dd>refers to <code>canonicalUUID(0x2A8E)</code></dd>
+          <dt>hid_control_point</dt><dd>refers to <code>canonicalUUID(0x2A4C)</code></dd>
+          <dt>hid_information</dt><dd>refers to <code>canonicalUUID(0x2A4A)</code></dd>
+          <dt>hip_circumference</dt><dd>refers to <code>canonicalUUID(0x2A8F)</code></dd>
+          <dt>ieee_11073-20601_regulatory_certification_data_list</dt><dd>refers to <code>canonicalUUID(0x2A2A)</code></dd>
+          <dt>intermediate_blood_pressure</dt><dd>refers to <code>canonicalUUID(0x2A36)</code></dd>
+          <dt>intermediate_temperature</dt><dd>refers to <code>canonicalUUID(0x2A1E)</code></dd>
+          <dt>language</dt><dd>refers to <code>canonicalUUID(0x2AA2)</code></dd>
+          <dt>last_name</dt><dd>refers to <code>canonicalUUID(0x2A90)</code></dd>
+          <dt>ln_control_point</dt><dd>refers to <code>canonicalUUID(0x2A6B)</code></dd>
+          <dt>ln_feature</dt><dd>refers to <code>canonicalUUID(0x2A6A)</code></dd>
+          <dt>local_time_information</dt><dd>refers to <code>canonicalUUID(0x2A0F)</code></dd>
+          <dt>location_and_speed</dt><dd>refers to <code>canonicalUUID(0x2A67)</code></dd>
+          <dt>manufacturer_name_string</dt><dd>refers to <code>canonicalUUID(0x2A29)</code></dd>
+          <dt>maximum_recommended_heart_rate</dt><dd>refers to <code>canonicalUUID(0x2A91)</code></dd>
+          <dt>measurement_interval</dt><dd>refers to <code>canonicalUUID(0x2A21)</code></dd>
+          <dt>model_number_string</dt><dd>refers to <code>canonicalUUID(0x2A24)</code></dd>
+          <dt>navigation</dt><dd>refers to <code>canonicalUUID(0x2A68)</code></dd>
+          <dt>new_alert</dt><dd>refers to <code>canonicalUUID(0x2A46)</code></dd>
+          <dt>gap.peripheral_preferred_connection_parameters</dt><dd>refers to <code>canonicalUUID(0x2A04)</code></dd>
+          <dt>gap.peripheral_privacy_flag</dt><dd>refers to <code>canonicalUUID(0x2A02)</code></dd>
+          <dt>pnp_id</dt><dd>refers to <code>canonicalUUID(0x2A50)</code></dd>
+          <dt>position_quality</dt><dd>refers to <code>canonicalUUID(0x2A69)</code></dd>
+          <dt>protocol_mode</dt><dd>refers to <code>canonicalUUID(0x2A4E)</code></dd>
+          <dt>gap.reconnection_address</dt><dd>refers to <code>canonicalUUID(0x2A03)</code></dd>
+          <dt>record_access_control_point</dt><dd>refers to <code>canonicalUUID(0x2A52)</code></dd>
+          <dt>reference_time_information</dt><dd>refers to <code>canonicalUUID(0x2A14)</code></dd>
+          <dt>report</dt><dd>refers to <code>canonicalUUID(0x2A4D)</code></dd>
+          <dt>report_map</dt><dd>refers to <code>canonicalUUID(0x2A4B)</code></dd>
+          <dt>resting_heart_rate</dt><dd>refers to <code>canonicalUUID(0x2A92)</code></dd>
+          <dt>ringer_control_point</dt><dd>refers to <code>canonicalUUID(0x2A40)</code></dd>
+          <dt>ringer_setting</dt><dd>refers to <code>canonicalUUID(0x2A41)</code></dd>
+          <dt>rsc_feature</dt><dd>refers to <code>canonicalUUID(0x2A54)</code></dd>
+          <dt>rsc_measurement</dt><dd>refers to <code>canonicalUUID(0x2A53)</code></dd>
+          <dt>sc_control_point</dt><dd>refers to <code>canonicalUUID(0x2A55)</code></dd>
+          <dt>scan_interval_window</dt><dd>refers to <code>canonicalUUID(0x2A4F)</code></dd>
+          <dt>scan_refresh</dt><dd>refers to <code>canonicalUUID(0x2A31)</code></dd>
+          <dt>sensor_location</dt><dd>refers to <code>canonicalUUID(0x2A5D)</code></dd>
+          <dt>serial_number_string</dt><dd>refers to <code>canonicalUUID(0x2A25)</code></dd>
+          <dt>gatt.service_changed</dt><dd>refers to <code>canonicalUUID(0x2A05)</code></dd>
+          <dt>software_revision_string</dt><dd>refers to <code>canonicalUUID(0x2A28)</code></dd>
+          <dt>sport_type_for_aerobic_and_anaerobic_thresholds</dt><dd>refers to <code>canonicalUUID(0x2A93)</code></dd>
+          <dt>supported_new_alert_category</dt><dd>refers to <code>canonicalUUID(0x2A47)</code></dd>
+          <dt>supported_unread_alert_category</dt><dd>refers to <code>canonicalUUID(0x2A48)</code></dd>
+          <dt>system_id</dt><dd>refers to <code>canonicalUUID(0x2A23)</code></dd>
+          <dt>temperature_measurement</dt><dd>refers to <code>canonicalUUID(0x2A1C)</code></dd>
+          <dt>temperature_type</dt><dd>refers to <code>canonicalUUID(0x2A1D)</code></dd>
+          <dt>three_zone_heart_rate_limits</dt><dd>refers to <code>canonicalUUID(0x2A94)</code></dd>
+          <dt>time_accuracy</dt><dd>refers to <code>canonicalUUID(0x2A12)</code></dd>
+          <dt>time_source</dt><dd>refers to <code>canonicalUUID(0x2A13)</code></dd>
         </dl>
 
         <div title="typedef (BluetoothCharacteristicName or UUID) BluetoothCharacteristicUuid" class="idl"></div>
@@ -1813,15 +1825,15 @@
           these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
 
         <dl title="enum BluetoothDescriptorName" class="idl">
-          <dt>gatt.characteristic_extended_properties</dt><dd>refers to the 16-bit UUID 0x2900</dd>
-          <dt>gatt.characteristic_user_description</dt><dd>refers to the 16-bit UUID 0x2901</dd>
-          <dt>gatt.client_characteristic_configuration</dt><dd>refers to the 16-bit UUID 0x2902</dd>
-          <dt>gatt.server_characteristic_configuration</dt><dd>refers to the 16-bit UUID 0x2903</dd>
-          <dt>gatt.characteristic_presentation_format</dt><dd>refers to the 16-bit UUID 0x2904</dd>
-          <dt>gatt.characteristic_aggregate_format</dt><dd>refers to the 16-bit UUID 0x2905</dd>
-          <dt>valid_range</dt><dd>refers to the 16-bit UUID 0x2906</dd>
-          <dt>external_report_reference</dt><dd>refers to the 16-bit UUID 0x2907</dd>
-          <dt>report_reference</dt><dd>refers to the 16-bit UUID 0x2908</dd>
+          <dt>gatt.characteristic_extended_properties</dt><dd>refers to <code>canonicalUUID(0x2900)</code></dd>
+          <dt>gatt.characteristic_user_description</dt><dd>refers to <code>canonicalUUID(0x2901)</code></dd>
+          <dt>gatt.client_characteristic_configuration</dt><dd>refers to <code>canonicalUUID(0x2902)</code></dd>
+          <dt>gatt.server_characteristic_configuration</dt><dd>refers to <code>canonicalUUID(0x2903)</code></dd>
+          <dt>gatt.characteristic_presentation_format</dt><dd>refers to <code>canonicalUUID(0x2904)</code></dd>
+          <dt>gatt.characteristic_aggregate_format</dt><dd>refers to <code>canonicalUUID(0x2905)</code></dd>
+          <dt>valid_range</dt><dd>refers to <code>canonicalUUID(0x2906)</code></dd>
+          <dt>external_report_reference</dt><dd>refers to <code>canonicalUUID(0x2907)</code></dd>
+          <dt>report_reference</dt><dd>refers to <code>canonicalUUID(0x2908)</code></dd>
         </dl>
 
         <div title="typedef (BluetoothDescriptorName or UUID) BluetoothDescriptorUuid" class="idl"></div>
