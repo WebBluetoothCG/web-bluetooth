@@ -905,7 +905,7 @@
         <dl title="interface BluetoothGATTDescriptor" class="idl">
 
           <dt>readonly attribute UUID uuid</dt>
-          <dd>The UUID of the characteristic descriptor, e.g. <code><a>UUID</a>.parse('00002902-0000-1000-8000-00805f9b34fb')</code>.</dd>
+          <dd>The UUID of the characteristic descriptor, e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code>.</dd>
 
           <dt>readonly attribute BluetoothGATTCharacteristic characteristic</dt>
           <dd>The GATT characteristic this descriptor belongs to.</dd>
@@ -1343,17 +1343,22 @@
     <section>
       <h2>UUIDs</h2>
 
-      <p>A <a>UUID</a> instance represents a 128-bit [[!RFC4122]] UUID.
+      <div title="typedef DOMString UUID" class="idl">
+        <p>
+          A <a>UUID</a> string represents a 128-bit [[!RFC4122]] UUID.
+          All UUIDs passed to or returned from functions in this specification MUST match
+          <code>/^[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}$/</code>.
+          That is, they are lower-case and
+          do not use the 16- or 32-bit abbreviations defined by the Bluetooth standard.
+          This standard provides the <a href=""><code>canonicalUUID()</code></a> function
+          to map a 16- or 32-bit Bluetooth UUID to its canonical form.
 
-      <dl title="interface UUID" class="idl">
-        <dt>static UUID parse(DOMString uuid)</dt>
-        <dd>
-          Parses <code>uuid</code> using the <code>UUID</code> production in [[!RFC4122]].
-          If <code>uuid</code> does not match the <code>UUID</code> production, throws a <a>SyntaxError</a>.
-        </dd>
-        <dt>stringifier DOMString ()</dt>
-        <dd>Generates the string representation of this UUID as defined in [[!RFC4122]].</dd>
-      </dl>
+        <p>
+          When sending a UUID to a Bluetooth device,
+          if that UUID can be expressed as a 16- or 32-bit UUID,
+          the UA SHOULD send the UUID in
+          the same form as previously received from the device, if any.
+      </div>
     </section>
 
     <section>
@@ -1372,12 +1377,12 @@
         <dd></dd>
         <dt>readonly attribute BluetoothUuidsDescriptor descriptor</dt>
         <dd></dd>
-        <dt>UUID registeredUUID(unsigned long alias)</dt>
+        <dt>UUID canonicalUUID(unsigned long alias)</dt>
         <dd>
           Returns a 128-bit <a>UUID</a> given a 16- or 32-bit Bluetooth UUID alias.
           The algorithm for converting an alias to a full 128-bit UUID is defined in [[!BLUETOOTH41]] Volume 3 Part B Section 2.5.1:
-          the top 32 bits of "<code>00000000-0000-1000-8000-00805F9B34FB</code>" are replaced by the bits of the alias.
-          For example, <code>registeredUUID(0xDEADBEEF)</code> returns <code>UUID.parse("DEADBEEF-0000-1000-8000-00805F9B34FB")</code>.
+          the top 32 bits of "<code>00000000-0000-1000-8000-00805f9b34fb</code>" are replaced by the bits of the alias.
+          For example, <code>canonicalUUID(0xDEADBEEF)</code> returns <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
         </dd>
       </dl>
 
@@ -1387,117 +1392,117 @@
         <p>Each standardized unit listed in [[!BLUETOOTH-NUMBERS-UNITS]] MUST be reflected into <code>navigator.bluetooth.uuids.unit</code> under the name listed under "Type" with <code>org.bluetooth.unit.</code> removed.
 
         <dl title="[NoInterfaceObject] interface BluetoothUuidsUnit" class="idl">
-          <dt>readonly attribute UUID unitless</dt><dd><code>registeredUUID(0x2700)</code></dd>
-          <dt>readonly attribute UUID length.metre</dt><dd><code>registeredUUID(0x2701)</code></dd>
-          <dt>readonly attribute UUID mass.kilogram</dt><dd><code>registeredUUID(0x2702)</code></dd>
-          <dt>readonly attribute UUID time.second</dt><dd><code>registeredUUID(0x2703)</code></dd>
-          <dt>readonly attribute UUID electric_current.ampere</dt><dd><code>registeredUUID(0x2704)</code></dd>
-          <dt>readonly attribute UUID thermodynamic_temperature.kelvin</dt><dd><code>registeredUUID(0x2705)</code></dd>
-          <dt>readonly attribute UUID amount_of_substance.mole</dt><dd><code>registeredUUID(0x2706)</code></dd>
-          <dt>readonly attribute UUID luminous_intensity.candela</dt><dd><code>registeredUUID(0x2707)</code></dd>
-          <dt>readonly attribute UUID area.square_metres</dt><dd><code>registeredUUID(0x2710)</code></dd>
-          <dt>readonly attribute UUID volume.cubic_metres</dt><dd><code>registeredUUID(0x2711)</code></dd>
-          <dt>readonly attribute UUID velocity.metres_per_second</dt><dd><code>registeredUUID(0x2712)</code></dd>
-          <dt>readonly attribute UUID acceleration.metres_per_second_squared</dt><dd><code>registeredUUID(0x2713)</code></dd>
-          <dt>readonly attribute UUID wavenumber.reciprocal_metre</dt><dd><code>registeredUUID(0x2714)</code></dd>
-          <dt>readonly attribute UUID density.kilogram_per_cubic_metre</dt><dd><code>registeredUUID(0x2715)</code></dd>
-          <dt>readonly attribute UUID surface_density.kilogram_per_square_metre</dt><dd><code>registeredUUID(0x2716)</code></dd>
-          <dt>readonly attribute UUID specific_volume.cubic_metre_per_kilogram</dt><dd><code>registeredUUID(0x2717)</code></dd>
-          <dt>readonly attribute UUID current_density.ampere_per_square_metre</dt><dd><code>registeredUUID(0x2718)</code></dd>
-          <dt>readonly attribute UUID magnetic_field_strength.ampere_per_metre</dt><dd><code>registeredUUID(0x2719)</code></dd>
-          <dt>readonly attribute UUID amount_concentration.mole_per_cubic_metre</dt><dd><code>registeredUUID(0x271A)</code></dd>
-          <dt>readonly attribute UUID mass_concentration.kilogram_per_cubic_metre</dt><dd><code>registeredUUID(0x271B)</code></dd>
-          <dt>readonly attribute UUID luminance.candela_per_square_metre</dt><dd><code>registeredUUID(0x271C)</code></dd>
-          <dt>readonly attribute UUID refractive_index</dt><dd><code>registeredUUID(0x271D)</code></dd>
-          <dt>readonly attribute UUID relative_permeability</dt><dd><code>registeredUUID(0x271E)</code></dd>
-          <dt>readonly attribute UUID plane_angle.radian</dt><dd><code>registeredUUID(0x2720)</code></dd>
-          <dt>readonly attribute UUID solid_angle.steradian</dt><dd><code>registeredUUID(0x2721)</code></dd>
-          <dt>readonly attribute UUID frequency.hertz</dt><dd><code>registeredUUID(0x2722)</code></dd>
-          <dt>readonly attribute UUID force.newton</dt><dd><code>registeredUUID(0x2723)</code></dd>
-          <dt>readonly attribute UUID pressure.pascal</dt><dd><code>registeredUUID(0x2724)</code></dd>
-          <dt>readonly attribute UUID energy.joule</dt><dd><code>registeredUUID(0x2725)</code></dd>
-          <dt>readonly attribute UUID power.watt</dt><dd><code>registeredUUID(0x2726)</code></dd>
-          <dt>readonly attribute UUID electric_charge.coulomb</dt><dd><code>registeredUUID(0x2727)</code></dd>
-          <dt>readonly attribute UUID electric_potential_difference.volt</dt><dd><code>registeredUUID(0x2728)</code></dd>
-          <dt>readonly attribute UUID capacitance.farad</dt><dd><code>registeredUUID(0x2729)</code></dd>
-          <dt>readonly attribute UUID electric_resistance.ohm</dt><dd><code>registeredUUID(0x272A)</code></dd>
-          <dt>readonly attribute UUID electric_conductance.siemens</dt><dd><code>registeredUUID(0x272B)</code></dd>
-          <dt>readonly attribute UUID magnetic_flux.weber</dt><dd><code>registeredUUID(0x272C)</code></dd>
-          <dt>readonly attribute UUID magnetic_flux_density.tesla</dt><dd><code>registeredUUID(0x272D)</code></dd>
-          <dt>readonly attribute UUID inductance.henry</dt><dd><code>registeredUUID(0x272E)</code></dd>
-          <dt>readonly attribute UUID thermodynamic_temperature.degree_celsius</dt><dd><code>registeredUUID(0x272F)</code></dd>
-          <dt>readonly attribute UUID luminous_flux.lumen</dt><dd><code>registeredUUID(0x2730)</code></dd>
-          <dt>readonly attribute UUID illuminance.lux</dt><dd><code>registeredUUID(0x2731)</code></dd>
-          <dt>readonly attribute UUID activity_referred_to_a_radionuclide.becquerel</dt><dd><code>registeredUUID(0x2732)</code></dd>
-          <dt>readonly attribute UUID absorbed_dose.gray</dt><dd><code>registeredUUID(0x2733)</code></dd>
-          <dt>readonly attribute UUID dose_equivalent.sievert</dt><dd><code>registeredUUID(0x2734)</code></dd>
-          <dt>readonly attribute UUID catalytic_activity.katal</dt><dd><code>registeredUUID(0x2735)</code></dd>
-          <dt>readonly attribute UUID dynamic_viscosity.pascal_second</dt><dd><code>registeredUUID(0x2740)</code></dd>
-          <dt>readonly attribute UUID moment_of_force.newton_metre</dt><dd><code>registeredUUID(0x2741)</code></dd>
-          <dt>readonly attribute UUID surface_tension.newton_per_metre</dt><dd><code>registeredUUID(0x2742)</code></dd>
-          <dt>readonly attribute UUID angular_velocity.radian_per_second</dt><dd><code>registeredUUID(0x2743)</code></dd>
-          <dt>readonly attribute UUID angular_acceleration.radian_per_second_squared</dt><dd><code>registeredUUID(0x2744)</code></dd>
-          <dt>readonly attribute UUID heat_flux_density.watt_per_square_metre</dt><dd><code>registeredUUID(0x2745)</code></dd>
-          <dt>readonly attribute UUID heat_capacity.joule_per_kelvin</dt><dd><code>registeredUUID(0x2746)</code></dd>
-          <dt>readonly attribute UUID specific_heat_capacity.joule_per_kilogram_kelvin</dt><dd><code>registeredUUID(0x2747)</code></dd>
-          <dt>readonly attribute UUID specific_energy.joule_per_kilogram</dt><dd><code>registeredUUID(0x2748)</code></dd>
-          <dt>readonly attribute UUID thermal_conductivity.watt_per_metre_kelvin</dt><dd><code>registeredUUID(0x2749)</code></dd>
-          <dt>readonly attribute UUID energy_density.joule_per_cubic_metre</dt><dd><code>registeredUUID(0x274A)</code></dd>
-          <dt>readonly attribute UUID electric_field_strength.volt_per_metre</dt><dd><code>registeredUUID(0x274B)</code></dd>
-          <dt>readonly attribute UUID electric_charge_density.coulomb_per_cubic_metre</dt><dd><code>registeredUUID(0x274C)</code></dd>
-          <dt>readonly attribute UUID surface_charge_density.coulomb_per_square_metre</dt><dd><code>registeredUUID(0x274D)</code></dd>
-          <dt>readonly attribute UUID electric_flux_density.coulomb_per_square_metre</dt><dd><code>registeredUUID(0x274E)</code></dd>
-          <dt>readonly attribute UUID permittivity.farad_per_metre</dt><dd><code>registeredUUID(0x274F)</code></dd>
-          <dt>readonly attribute UUID permeability.henry_per_metre</dt><dd><code>registeredUUID(0x2750)</code></dd>
-          <dt>readonly attribute UUID molar_energy.joule_per_mole</dt><dd><code>registeredUUID(0x2751)</code></dd>
-          <dt>readonly attribute UUID molar_entropy.joule_per_mole_kelvin</dt><dd><code>registeredUUID(0x2752)</code></dd>
-          <dt>readonly attribute UUID exposure.coulomb_per_kilogram</dt><dd><code>registeredUUID(0x2753)</code></dd>
-          <dt>readonly attribute UUID absorbed_dose_rate.gray_per_second</dt><dd><code>registeredUUID(0x2754)</code></dd>
-          <dt>readonly attribute UUID radiant_intensity.watt_per_steradian</dt><dd><code>registeredUUID(0x2755)</code></dd>
-          <dt>readonly attribute UUID radiance.watt_per_square_metre_steradian</dt><dd><code>registeredUUID(0x2756)</code></dd>
-          <dt>readonly attribute UUID catalytic_activity_concentration.katal_per_cubic_metre</dt><dd><code>registeredUUID(0x2757)</code></dd>
-          <dt>readonly attribute UUID time.minute</dt><dd><code>registeredUUID(0x2760)</code></dd>
-          <dt>readonly attribute UUID time.hour</dt><dd><code>registeredUUID(0x2761)</code></dd>
-          <dt>readonly attribute UUID time.day</dt><dd><code>registeredUUID(0x2762)</code></dd>
-          <dt>readonly attribute UUID plane_angle.degree</dt><dd><code>registeredUUID(0x2763)</code></dd>
-          <dt>readonly attribute UUID plane_angle.minute</dt><dd><code>registeredUUID(0x2764)</code></dd>
-          <dt>readonly attribute UUID plane_angle.second</dt><dd><code>registeredUUID(0x2765)</code></dd>
-          <dt>readonly attribute UUID area.hectare</dt><dd><code>registeredUUID(0x2766)</code></dd>
-          <dt>readonly attribute UUID volume.litre</dt><dd><code>registeredUUID(0x2767)</code></dd>
-          <dt>readonly attribute UUID mass.tonne</dt><dd><code>registeredUUID(0x2768)</code></dd>
-          <dt>readonly attribute UUID pressure.bar</dt><dd><code>registeredUUID(0x2780)</code></dd>
-          <dt>readonly attribute UUID pressure.millimetre_of_mercury</dt><dd><code>registeredUUID(0x2781)</code></dd>
-          <dt>readonly attribute UUID length.ångström</dt><dd><code>registeredUUID(0x2782)</code></dd>
-          <dt>readonly attribute UUID length.nautical_mile</dt><dd><code>registeredUUID(0x2783)</code></dd>
-          <dt>readonly attribute UUID area.barn</dt><dd><code>registeredUUID(0x2784)</code></dd>
-          <dt>readonly attribute UUID velocity.knot</dt><dd><code>registeredUUID(0x2785)</code></dd>
-          <dt>readonly attribute UUID logarithmic_radio_quantity.neper</dt><dd><code>registeredUUID(0x2786)</code></dd>
-          <dt>readonly attribute UUID logarithmic_radio_quantity.bel</dt><dd><code>registeredUUID(0x2787)</code></dd>
-          <dt>readonly attribute UUID length.yard</dt><dd><code>registeredUUID(0x27A0)</code></dd>
-          <dt>readonly attribute UUID length.parsec</dt><dd><code>registeredUUID(0x27A1)</code></dd>
-          <dt>readonly attribute UUID length.inch</dt><dd><code>registeredUUID(0x27A2)</code></dd>
-          <dt>readonly attribute UUID length.foot</dt><dd><code>registeredUUID(0x27A3)</code></dd>
-          <dt>readonly attribute UUID length.mile</dt><dd><code>registeredUUID(0x27A4)</code></dd>
-          <dt>readonly attribute UUID pressure.pound_force_per_square_inch</dt><dd><code>registeredUUID(0x27A5)</code></dd>
-          <dt>readonly attribute UUID velocity.kilometre_per_hour</dt><dd><code>registeredUUID(0x27A6)</code></dd>
-          <dt>readonly attribute UUID velocity.mile_per_hour</dt><dd><code>registeredUUID(0x27A7)</code></dd>
-          <dt>readonly attribute UUID angular_velocity.revolution_per_minute</dt><dd><code>registeredUUID(0x27A8)</code></dd>
-          <dt>readonly attribute UUID energy.gram_calorie</dt><dd><code>registeredUUID(0x27A9)</code></dd>
-          <dt>readonly attribute UUID energy.kilogram_calorie</dt><dd><code>registeredUUID(0x27AA)</code></dd>
-          <dt>readonly attribute UUID energy.kilowatt_hour</dt><dd><code>registeredUUID(0x27AB)</code></dd>
-          <dt>readonly attribute UUID thermodynamic_temperature.degree_fahrenheit</dt><dd><code>registeredUUID(0x27AC)</code></dd>
-          <dt>readonly attribute UUID percentage</dt><dd><code>registeredUUID(0x27AD)</code></dd>
-          <dt>readonly attribute UUID per_mille</dt><dd><code>registeredUUID(0x27AE)</code></dd>
-          <dt>readonly attribute UUID period.beats_per_minute</dt><dd><code>registeredUUID(0x27AF)</code></dd>
-          <dt>readonly attribute UUID electric_charge.ampere_hours</dt><dd><code>registeredUUID(0x27B0)</code></dd>
-          <dt>readonly attribute UUID mass_density.milligram_per_decilitre</dt><dd><code>registeredUUID(0x27B1)</code></dd>
-          <dt>readonly attribute UUID mass_density.millimole_per_litre</dt><dd><code>registeredUUID(0x27B2)</code></dd>
-          <dt>readonly attribute UUID time.year</dt><dd><code>registeredUUID(0x27B3)</code></dd>
-          <dt>readonly attribute UUID time.month</dt><dd><code>registeredUUID(0x27B4)</code></dd>
-          <dt>readonly attribute UUID concentration.count_per_cubic_metre</dt><dd><code>registeredUUID(0x27B5)</code></dd>
-          <dt>readonly attribute UUID irradiance.watt_per_square_metre</dt><dd><code>registeredUUID(0x27B6)</code></dd>
-          <dt>readonly attribute UUID milliliter_per_kilogram_per_minute</dt><dd><code>registeredUUID(0x27B7)</code></dd>
-          <dt>readonly attribute UUID mass.pound</dt><dd><code>registeredUUID(0x27B8)</code></dd>
+          <dt>readonly attribute UUID unitless</dt><dd><code>canonicalUUID(0x2700)</code></dd>
+          <dt>readonly attribute UUID length.metre</dt><dd><code>canonicalUUID(0x2701)</code></dd>
+          <dt>readonly attribute UUID mass.kilogram</dt><dd><code>canonicalUUID(0x2702)</code></dd>
+          <dt>readonly attribute UUID time.second</dt><dd><code>canonicalUUID(0x2703)</code></dd>
+          <dt>readonly attribute UUID electric_current.ampere</dt><dd><code>canonicalUUID(0x2704)</code></dd>
+          <dt>readonly attribute UUID thermodynamic_temperature.kelvin</dt><dd><code>canonicalUUID(0x2705)</code></dd>
+          <dt>readonly attribute UUID amount_of_substance.mole</dt><dd><code>canonicalUUID(0x2706)</code></dd>
+          <dt>readonly attribute UUID luminous_intensity.candela</dt><dd><code>canonicalUUID(0x2707)</code></dd>
+          <dt>readonly attribute UUID area.square_metres</dt><dd><code>canonicalUUID(0x2710)</code></dd>
+          <dt>readonly attribute UUID volume.cubic_metres</dt><dd><code>canonicalUUID(0x2711)</code></dd>
+          <dt>readonly attribute UUID velocity.metres_per_second</dt><dd><code>canonicalUUID(0x2712)</code></dd>
+          <dt>readonly attribute UUID acceleration.metres_per_second_squared</dt><dd><code>canonicalUUID(0x2713)</code></dd>
+          <dt>readonly attribute UUID wavenumber.reciprocal_metre</dt><dd><code>canonicalUUID(0x2714)</code></dd>
+          <dt>readonly attribute UUID density.kilogram_per_cubic_metre</dt><dd><code>canonicalUUID(0x2715)</code></dd>
+          <dt>readonly attribute UUID surface_density.kilogram_per_square_metre</dt><dd><code>canonicalUUID(0x2716)</code></dd>
+          <dt>readonly attribute UUID specific_volume.cubic_metre_per_kilogram</dt><dd><code>canonicalUUID(0x2717)</code></dd>
+          <dt>readonly attribute UUID current_density.ampere_per_square_metre</dt><dd><code>canonicalUUID(0x2718)</code></dd>
+          <dt>readonly attribute UUID magnetic_field_strength.ampere_per_metre</dt><dd><code>canonicalUUID(0x2719)</code></dd>
+          <dt>readonly attribute UUID amount_concentration.mole_per_cubic_metre</dt><dd><code>canonicalUUID(0x271A)</code></dd>
+          <dt>readonly attribute UUID mass_concentration.kilogram_per_cubic_metre</dt><dd><code>canonicalUUID(0x271B)</code></dd>
+          <dt>readonly attribute UUID luminance.candela_per_square_metre</dt><dd><code>canonicalUUID(0x271C)</code></dd>
+          <dt>readonly attribute UUID refractive_index</dt><dd><code>canonicalUUID(0x271D)</code></dd>
+          <dt>readonly attribute UUID relative_permeability</dt><dd><code>canonicalUUID(0x271E)</code></dd>
+          <dt>readonly attribute UUID plane_angle.radian</dt><dd><code>canonicalUUID(0x2720)</code></dd>
+          <dt>readonly attribute UUID solid_angle.steradian</dt><dd><code>canonicalUUID(0x2721)</code></dd>
+          <dt>readonly attribute UUID frequency.hertz</dt><dd><code>canonicalUUID(0x2722)</code></dd>
+          <dt>readonly attribute UUID force.newton</dt><dd><code>canonicalUUID(0x2723)</code></dd>
+          <dt>readonly attribute UUID pressure.pascal</dt><dd><code>canonicalUUID(0x2724)</code></dd>
+          <dt>readonly attribute UUID energy.joule</dt><dd><code>canonicalUUID(0x2725)</code></dd>
+          <dt>readonly attribute UUID power.watt</dt><dd><code>canonicalUUID(0x2726)</code></dd>
+          <dt>readonly attribute UUID electric_charge.coulomb</dt><dd><code>canonicalUUID(0x2727)</code></dd>
+          <dt>readonly attribute UUID electric_potential_difference.volt</dt><dd><code>canonicalUUID(0x2728)</code></dd>
+          <dt>readonly attribute UUID capacitance.farad</dt><dd><code>canonicalUUID(0x2729)</code></dd>
+          <dt>readonly attribute UUID electric_resistance.ohm</dt><dd><code>canonicalUUID(0x272A)</code></dd>
+          <dt>readonly attribute UUID electric_conductance.siemens</dt><dd><code>canonicalUUID(0x272B)</code></dd>
+          <dt>readonly attribute UUID magnetic_flux.weber</dt><dd><code>canonicalUUID(0x272C)</code></dd>
+          <dt>readonly attribute UUID magnetic_flux_density.tesla</dt><dd><code>canonicalUUID(0x272D)</code></dd>
+          <dt>readonly attribute UUID inductance.henry</dt><dd><code>canonicalUUID(0x272E)</code></dd>
+          <dt>readonly attribute UUID thermodynamic_temperature.degree_celsius</dt><dd><code>canonicalUUID(0x272F)</code></dd>
+          <dt>readonly attribute UUID luminous_flux.lumen</dt><dd><code>canonicalUUID(0x2730)</code></dd>
+          <dt>readonly attribute UUID illuminance.lux</dt><dd><code>canonicalUUID(0x2731)</code></dd>
+          <dt>readonly attribute UUID activity_referred_to_a_radionuclide.becquerel</dt><dd><code>canonicalUUID(0x2732)</code></dd>
+          <dt>readonly attribute UUID absorbed_dose.gray</dt><dd><code>canonicalUUID(0x2733)</code></dd>
+          <dt>readonly attribute UUID dose_equivalent.sievert</dt><dd><code>canonicalUUID(0x2734)</code></dd>
+          <dt>readonly attribute UUID catalytic_activity.katal</dt><dd><code>canonicalUUID(0x2735)</code></dd>
+          <dt>readonly attribute UUID dynamic_viscosity.pascal_second</dt><dd><code>canonicalUUID(0x2740)</code></dd>
+          <dt>readonly attribute UUID moment_of_force.newton_metre</dt><dd><code>canonicalUUID(0x2741)</code></dd>
+          <dt>readonly attribute UUID surface_tension.newton_per_metre</dt><dd><code>canonicalUUID(0x2742)</code></dd>
+          <dt>readonly attribute UUID angular_velocity.radian_per_second</dt><dd><code>canonicalUUID(0x2743)</code></dd>
+          <dt>readonly attribute UUID angular_acceleration.radian_per_second_squared</dt><dd><code>canonicalUUID(0x2744)</code></dd>
+          <dt>readonly attribute UUID heat_flux_density.watt_per_square_metre</dt><dd><code>canonicalUUID(0x2745)</code></dd>
+          <dt>readonly attribute UUID heat_capacity.joule_per_kelvin</dt><dd><code>canonicalUUID(0x2746)</code></dd>
+          <dt>readonly attribute UUID specific_heat_capacity.joule_per_kilogram_kelvin</dt><dd><code>canonicalUUID(0x2747)</code></dd>
+          <dt>readonly attribute UUID specific_energy.joule_per_kilogram</dt><dd><code>canonicalUUID(0x2748)</code></dd>
+          <dt>readonly attribute UUID thermal_conductivity.watt_per_metre_kelvin</dt><dd><code>canonicalUUID(0x2749)</code></dd>
+          <dt>readonly attribute UUID energy_density.joule_per_cubic_metre</dt><dd><code>canonicalUUID(0x274A)</code></dd>
+          <dt>readonly attribute UUID electric_field_strength.volt_per_metre</dt><dd><code>canonicalUUID(0x274B)</code></dd>
+          <dt>readonly attribute UUID electric_charge_density.coulomb_per_cubic_metre</dt><dd><code>canonicalUUID(0x274C)</code></dd>
+          <dt>readonly attribute UUID surface_charge_density.coulomb_per_square_metre</dt><dd><code>canonicalUUID(0x274D)</code></dd>
+          <dt>readonly attribute UUID electric_flux_density.coulomb_per_square_metre</dt><dd><code>canonicalUUID(0x274E)</code></dd>
+          <dt>readonly attribute UUID permittivity.farad_per_metre</dt><dd><code>canonicalUUID(0x274F)</code></dd>
+          <dt>readonly attribute UUID permeability.henry_per_metre</dt><dd><code>canonicalUUID(0x2750)</code></dd>
+          <dt>readonly attribute UUID molar_energy.joule_per_mole</dt><dd><code>canonicalUUID(0x2751)</code></dd>
+          <dt>readonly attribute UUID molar_entropy.joule_per_mole_kelvin</dt><dd><code>canonicalUUID(0x2752)</code></dd>
+          <dt>readonly attribute UUID exposure.coulomb_per_kilogram</dt><dd><code>canonicalUUID(0x2753)</code></dd>
+          <dt>readonly attribute UUID absorbed_dose_rate.gray_per_second</dt><dd><code>canonicalUUID(0x2754)</code></dd>
+          <dt>readonly attribute UUID radiant_intensity.watt_per_steradian</dt><dd><code>canonicalUUID(0x2755)</code></dd>
+          <dt>readonly attribute UUID radiance.watt_per_square_metre_steradian</dt><dd><code>canonicalUUID(0x2756)</code></dd>
+          <dt>readonly attribute UUID catalytic_activity_concentration.katal_per_cubic_metre</dt><dd><code>canonicalUUID(0x2757)</code></dd>
+          <dt>readonly attribute UUID time.minute</dt><dd><code>canonicalUUID(0x2760)</code></dd>
+          <dt>readonly attribute UUID time.hour</dt><dd><code>canonicalUUID(0x2761)</code></dd>
+          <dt>readonly attribute UUID time.day</dt><dd><code>canonicalUUID(0x2762)</code></dd>
+          <dt>readonly attribute UUID plane_angle.degree</dt><dd><code>canonicalUUID(0x2763)</code></dd>
+          <dt>readonly attribute UUID plane_angle.minute</dt><dd><code>canonicalUUID(0x2764)</code></dd>
+          <dt>readonly attribute UUID plane_angle.second</dt><dd><code>canonicalUUID(0x2765)</code></dd>
+          <dt>readonly attribute UUID area.hectare</dt><dd><code>canonicalUUID(0x2766)</code></dd>
+          <dt>readonly attribute UUID volume.litre</dt><dd><code>canonicalUUID(0x2767)</code></dd>
+          <dt>readonly attribute UUID mass.tonne</dt><dd><code>canonicalUUID(0x2768)</code></dd>
+          <dt>readonly attribute UUID pressure.bar</dt><dd><code>canonicalUUID(0x2780)</code></dd>
+          <dt>readonly attribute UUID pressure.millimetre_of_mercury</dt><dd><code>canonicalUUID(0x2781)</code></dd>
+          <dt>readonly attribute UUID length.ångström</dt><dd><code>canonicalUUID(0x2782)</code></dd>
+          <dt>readonly attribute UUID length.nautical_mile</dt><dd><code>canonicalUUID(0x2783)</code></dd>
+          <dt>readonly attribute UUID area.barn</dt><dd><code>canonicalUUID(0x2784)</code></dd>
+          <dt>readonly attribute UUID velocity.knot</dt><dd><code>canonicalUUID(0x2785)</code></dd>
+          <dt>readonly attribute UUID logarithmic_radio_quantity.neper</dt><dd><code>canonicalUUID(0x2786)</code></dd>
+          <dt>readonly attribute UUID logarithmic_radio_quantity.bel</dt><dd><code>canonicalUUID(0x2787)</code></dd>
+          <dt>readonly attribute UUID length.yard</dt><dd><code>canonicalUUID(0x27A0)</code></dd>
+          <dt>readonly attribute UUID length.parsec</dt><dd><code>canonicalUUID(0x27A1)</code></dd>
+          <dt>readonly attribute UUID length.inch</dt><dd><code>canonicalUUID(0x27A2)</code></dd>
+          <dt>readonly attribute UUID length.foot</dt><dd><code>canonicalUUID(0x27A3)</code></dd>
+          <dt>readonly attribute UUID length.mile</dt><dd><code>canonicalUUID(0x27A4)</code></dd>
+          <dt>readonly attribute UUID pressure.pound_force_per_square_inch</dt><dd><code>canonicalUUID(0x27A5)</code></dd>
+          <dt>readonly attribute UUID velocity.kilometre_per_hour</dt><dd><code>canonicalUUID(0x27A6)</code></dd>
+          <dt>readonly attribute UUID velocity.mile_per_hour</dt><dd><code>canonicalUUID(0x27A7)</code></dd>
+          <dt>readonly attribute UUID angular_velocity.revolution_per_minute</dt><dd><code>canonicalUUID(0x27A8)</code></dd>
+          <dt>readonly attribute UUID energy.gram_calorie</dt><dd><code>canonicalUUID(0x27A9)</code></dd>
+          <dt>readonly attribute UUID energy.kilogram_calorie</dt><dd><code>canonicalUUID(0x27AA)</code></dd>
+          <dt>readonly attribute UUID energy.kilowatt_hour</dt><dd><code>canonicalUUID(0x27AB)</code></dd>
+          <dt>readonly attribute UUID thermodynamic_temperature.degree_fahrenheit</dt><dd><code>canonicalUUID(0x27AC)</code></dd>
+          <dt>readonly attribute UUID percentage</dt><dd><code>canonicalUUID(0x27AD)</code></dd>
+          <dt>readonly attribute UUID per_mille</dt><dd><code>canonicalUUID(0x27AE)</code></dd>
+          <dt>readonly attribute UUID period.beats_per_minute</dt><dd><code>canonicalUUID(0x27AF)</code></dd>
+          <dt>readonly attribute UUID electric_charge.ampere_hours</dt><dd><code>canonicalUUID(0x27B0)</code></dd>
+          <dt>readonly attribute UUID mass_density.milligram_per_decilitre</dt><dd><code>canonicalUUID(0x27B1)</code></dd>
+          <dt>readonly attribute UUID mass_density.millimole_per_litre</dt><dd><code>canonicalUUID(0x27B2)</code></dd>
+          <dt>readonly attribute UUID time.year</dt><dd><code>canonicalUUID(0x27B3)</code></dd>
+          <dt>readonly attribute UUID time.month</dt><dd><code>canonicalUUID(0x27B4)</code></dd>
+          <dt>readonly attribute UUID concentration.count_per_cubic_metre</dt><dd><code>canonicalUUID(0x27B5)</code></dd>
+          <dt>readonly attribute UUID irradiance.watt_per_square_metre</dt><dd><code>canonicalUUID(0x27B6)</code></dd>
+          <dt>readonly attribute UUID milliliter_per_kilogram_per_minute</dt><dd><code>canonicalUUID(0x27B7)</code></dd>
+          <dt>readonly attribute UUID mass.pound</dt><dd><code>canonicalUUID(0x27B8)</code></dd>
         </dl>
       </section>
 
@@ -1507,29 +1512,29 @@
         <p>Each standardized service listed in [[!BLUETOOTH-NUMBERS-SERVICES]] MUST be reflected into <code>navigator.bluetooth.uuids.service</code> under the name listed under "SpecificationType" with <code>org.bluetooth.service.</code> removed.
 
         <dl title="[NoInterfaceObject] interface BluetoothUuidsService" class="idl">
-          <dt>readonly attribute UUID alert_notification</dt><dd><code>registeredUUID(0x1811)</code></dd>
-          <dt>readonly attribute UUID battery_service</dt><dd><code>registeredUUID(0x180F)</code></dd>
-          <dt>readonly attribute UUID blood_pressure</dt><dd><code>registeredUUID(0x1810)</code></dd>
-          <dt>readonly attribute UUID current_time</dt><dd><code>registeredUUID(0x1805)</code></dd>
-          <dt>readonly attribute UUID cycling_power</dt><dd><code>registeredUUID(0x1818)</code></dd>
-          <dt>readonly attribute UUID cycling_speed_and_cadence</dt><dd><code>registeredUUID(0x1816)</code></dd>
-          <dt>readonly attribute UUID device_information</dt><dd><code>registeredUUID(0x180A)</code></dd>
-          <dt>readonly attribute UUID generic_access</dt><dd><code>registeredUUID(0x1800)</code></dd>
-          <dt>readonly attribute UUID generic_attribute</dt><dd><code>registeredUUID(0x1801)</code></dd>
-          <dt>readonly attribute UUID glucose</dt><dd><code>registeredUUID(0x1808)</code></dd>
-          <dt>readonly attribute UUID health_thermometer</dt><dd><code>registeredUUID(0x1809)</code></dd>
-          <dt>readonly attribute UUID heart_rate</dt><dd><code>registeredUUID(0x180D)</code></dd>
-          <dt>readonly attribute UUID human_interface_device</dt><dd><code>registeredUUID(0x1812)</code></dd>
-          <dt>readonly attribute UUID immediate_alert</dt><dd><code>registeredUUID(0x1802)</code></dd>
-          <dt>readonly attribute UUID link_loss</dt><dd><code>registeredUUID(0x1803 )</code></dd>
-          <dt>readonly attribute UUID location_and_navigation</dt><dd><code>registeredUUID(0x1819)</code></dd>
-          <dt>readonly attribute UUID next_dst_change</dt><dd><code>registeredUUID(0x1807)</code></dd>
-          <dt>readonly attribute UUID phone_alert_status</dt><dd><code>registeredUUID(0x180E)</code></dd>
-          <dt>readonly attribute UUID reference_time_update</dt><dd><code>registeredUUID(0x1806)</code></dd>
-          <dt>readonly attribute UUID running_speed_and_cadence</dt><dd><code>registeredUUID(0x1814)</code></dd>
-          <dt>readonly attribute UUID scan_parameters</dt><dd><code>registeredUUID(0x1813)</code></dd>
-          <dt>readonly attribute UUID tx_power</dt><dd><code>registeredUUID(0x1804)</code></dd>
-          <dt>readonly attribute UUID user_data</dt><dd><code>registeredUUID(0x181C)</code></dd>
+          <dt>readonly attribute UUID alert_notification</dt><dd><code>canonicalUUID(0x1811)</code></dd>
+          <dt>readonly attribute UUID battery_service</dt><dd><code>canonicalUUID(0x180F)</code></dd>
+          <dt>readonly attribute UUID blood_pressure</dt><dd><code>canonicalUUID(0x1810)</code></dd>
+          <dt>readonly attribute UUID current_time</dt><dd><code>canonicalUUID(0x1805)</code></dd>
+          <dt>readonly attribute UUID cycling_power</dt><dd><code>canonicalUUID(0x1818)</code></dd>
+          <dt>readonly attribute UUID cycling_speed_and_cadence</dt><dd><code>canonicalUUID(0x1816)</code></dd>
+          <dt>readonly attribute UUID device_information</dt><dd><code>canonicalUUID(0x180A)</code></dd>
+          <dt>readonly attribute UUID generic_access</dt><dd><code>canonicalUUID(0x1800)</code></dd>
+          <dt>readonly attribute UUID generic_attribute</dt><dd><code>canonicalUUID(0x1801)</code></dd>
+          <dt>readonly attribute UUID glucose</dt><dd><code>canonicalUUID(0x1808)</code></dd>
+          <dt>readonly attribute UUID health_thermometer</dt><dd><code>canonicalUUID(0x1809)</code></dd>
+          <dt>readonly attribute UUID heart_rate</dt><dd><code>canonicalUUID(0x180D)</code></dd>
+          <dt>readonly attribute UUID human_interface_device</dt><dd><code>canonicalUUID(0x1812)</code></dd>
+          <dt>readonly attribute UUID immediate_alert</dt><dd><code>canonicalUUID(0x1802)</code></dd>
+          <dt>readonly attribute UUID link_loss</dt><dd><code>canonicalUUID(0x1803 )</code></dd>
+          <dt>readonly attribute UUID location_and_navigation</dt><dd><code>canonicalUUID(0x1819)</code></dd>
+          <dt>readonly attribute UUID next_dst_change</dt><dd><code>canonicalUUID(0x1807)</code></dd>
+          <dt>readonly attribute UUID phone_alert_status</dt><dd><code>canonicalUUID(0x180E)</code></dd>
+          <dt>readonly attribute UUID reference_time_update</dt><dd><code>canonicalUUID(0x1806)</code></dd>
+          <dt>readonly attribute UUID running_speed_and_cadence</dt><dd><code>canonicalUUID(0x1814)</code></dd>
+          <dt>readonly attribute UUID scan_parameters</dt><dd><code>canonicalUUID(0x1813)</code></dd>
+          <dt>readonly attribute UUID tx_power</dt><dd><code>canonicalUUID(0x1804)</code></dd>
+          <dt>readonly attribute UUID user_data</dt><dd><code>canonicalUUID(0x181C)</code></dd>
         </dl>
 
         <p>
@@ -1572,106 +1577,106 @@
         <p>Each standardized characteristic listed in [[!BLUETOOTH-NUMBERS-CHARACTERISTICS]] MUST be reflected into <code>navigator.bluetooth.uuids.characteristic</code> under the name listed under "SpecificationType" with <code>org.bluetooth.characteristic.</code> removed.
 
         <dl title="[NoInterfaceObject] interface BluetoothUuidsCharacteristic" class="idl">
-          <dt>readonly attribute UUID aerobic_heart_rate_lower_limit</dt><dd><code>registeredUUID(0x2A7E)</code></dd>
-          <dt>readonly attribute UUID aerobic_heart_rate_upper_limit</dt><dd><code>registeredUUID(0x2A84)</code></dd>
-          <dt>readonly attribute UUID aerobic_threshold</dt><dd><code>registeredUUID(0x2A7F)</code></dd>
-          <dt>readonly attribute UUID age</dt><dd><code>registeredUUID(0x2A80)</code></dd>
-          <dt>readonly attribute UUID alert_category_id</dt><dd><code>registeredUUID(0x2A43)</code></dd>
-          <dt>readonly attribute UUID alert_category_id_bit_mask</dt><dd><code>registeredUUID(0x2A42)</code></dd>
-          <dt>readonly attribute UUID alert_level</dt><dd><code>registeredUUID(0x2A06)</code></dd>
-          <dt>readonly attribute UUID alert_notification_control_point</dt><dd><code>registeredUUID(0x2A44)</code></dd>
-          <dt>readonly attribute UUID alert_status</dt><dd><code>registeredUUID(0x2A3F)</code></dd>
-          <dt>readonly attribute UUID anaerobic_heart_rate_lower_limit</dt><dd><code>registeredUUID(0x2A81)</code></dd>
-          <dt>readonly attribute UUID anaerobic_heart_rate_upper_limit</dt><dd><code>registeredUUID(0x2A82)</code></dd>
-          <dt>readonly attribute UUID anaerobic_threshold</dt><dd><code>registeredUUID(0x2A83)</code></dd>
-          <dt>readonly attribute UUID gap.appearance</dt><dd><code>registeredUUID(0x2A01)</code></dd>
-          <dt>readonly attribute UUID battery_level</dt><dd><code>registeredUUID(0x2A19)</code></dd>
-          <dt>readonly attribute UUID blood_pressure_feature</dt><dd><code>registeredUUID(0x2A49)</code></dd>
-          <dt>readonly attribute UUID blood_pressure_measurement</dt><dd><code>registeredUUID(0x2A35)</code></dd>
-          <dt>readonly attribute UUID body_sensor_location</dt><dd><code>registeredUUID(0x2A38)</code></dd>
-          <dt>readonly attribute UUID boot_keyboard_input_report</dt><dd><code>registeredUUID(0x2A22)</code></dd>
-          <dt>readonly attribute UUID boot_keyboard_output_report</dt><dd><code>registeredUUID(0x2A32)</code></dd>
-          <dt>readonly attribute UUID boot_mouse_input_report</dt><dd><code>registeredUUID(0x2A33)</code></dd>
-          <dt>readonly attribute UUID csc_feature</dt><dd><code>registeredUUID(0x2A5C)</code></dd>
-          <dt>readonly attribute UUID csc_measurement</dt><dd><code>registeredUUID(0x2A5B)</code></dd>
-          <dt>readonly attribute UUID current_time</dt><dd><code>registeredUUID(0x2A2B)</code></dd>
-          <dt>readonly attribute UUID cycling_power_control_point</dt><dd><code>registeredUUID(0x2A66)</code></dd>
-          <dt>readonly attribute UUID cycling_power_feature</dt><dd><code>registeredUUID(0x2A65)</code></dd>
-          <dt>readonly attribute UUID cycling_power_measurement</dt><dd><code>registeredUUID(0x2A63)</code></dd>
-          <dt>readonly attribute UUID cycling_power_vector</dt><dd><code>registeredUUID(0x2A64)</code></dd>
-          <dt>readonly attribute UUID database_change_increment</dt><dd><code>registeredUUID(0x2A99)</code></dd>
-          <dt>readonly attribute UUID date_of_birth</dt><dd><code>registeredUUID(0x2A85)</code></dd>
-          <dt>readonly attribute UUID date_of_threshold_assessment</dt><dd><code>registeredUUID(0x2A86)</code></dd>
-          <dt>readonly attribute UUID date_time</dt><dd><code>registeredUUID(0x2A08)</code></dd>
-          <dt>readonly attribute UUID day_date_time</dt><dd><code>registeredUUID(0x2A0A)</code></dd>
-          <dt>readonly attribute UUID day_of_week</dt><dd><code>registeredUUID(0x2A09)</code></dd>
-          <dt>readonly attribute UUID gap.device_name</dt><dd><code>registeredUUID(0x2A00)</code></dd>
-          <dt>readonly attribute UUID dst_offset</dt><dd><code>registeredUUID(0x2A0D)</code></dd>
-          <dt>readonly attribute UUID email_address</dt><dd><code>registeredUUID(0x2A87)</code></dd>
-          <dt>readonly attribute UUID exact_time_256</dt><dd><code>registeredUUID(0x2A0C)</code></dd>
-          <dt>readonly attribute UUID fat_burn_heart_rate_lower_limit</dt><dd><code>registeredUUID(0x2A88)</code></dd>
-          <dt>readonly attribute UUID fat_burn_heart_rate_upper_limit</dt><dd><code>registeredUUID(0x2A89)</code></dd>
-          <dt>readonly attribute UUID firmware_revision_string</dt><dd><code>registeredUUID(0x2A26)</code></dd>
-          <dt>readonly attribute UUID first_name</dt><dd><code>registeredUUID(0x2A8A)</code></dd>
-          <dt>readonly attribute UUID five_zone_heart_rate_limits</dt><dd><code>registeredUUID(0x2A8B)</code></dd>
-          <dt>readonly attribute UUID gender</dt><dd><code>registeredUUID(0x2A8C)</code></dd>
-          <dt>readonly attribute UUID glucose_feature</dt><dd><code>registeredUUID(0x2A51)</code></dd>
-          <dt>readonly attribute UUID glucose_measurement</dt><dd><code>registeredUUID(0x2A18)</code></dd>
-          <dt>readonly attribute UUID glucose_measurement_context</dt><dd><code>registeredUUID(0x2A34)</code></dd>
-          <dt>readonly attribute UUID hardware_revision_string</dt><dd><code>registeredUUID(0x2A27)</code></dd>
-          <dt>readonly attribute UUID heart_rate_control_point</dt><dd><code>registeredUUID(0x2A39)</code></dd>
-          <dt>readonly attribute UUID heart_rate_max</dt><dd><code>registeredUUID(0x2A8D)</code></dd>
-          <dt>readonly attribute UUID heart_rate_measurement</dt><dd><code>registeredUUID(0x2A37)</code></dd>
-          <dt>readonly attribute UUID height</dt><dd><code>registeredUUID(0x2A8E)</code></dd>
-          <dt>readonly attribute UUID hid_control_point</dt><dd><code>registeredUUID(0x2A4C)</code></dd>
-          <dt>readonly attribute UUID hid_information</dt><dd><code>registeredUUID(0x2A4A)</code></dd>
-          <dt>readonly attribute UUID hip_circumference</dt><dd><code>registeredUUID(0x2A8F)</code></dd>
-          <dt>readonly attribute UUID ieee_11073-20601_regulatory_certification_data_list</dt><dd><code>registeredUUID(0x2A2A)</code></dd>
-          <dt>readonly attribute UUID intermediate_blood_pressure</dt><dd><code>registeredUUID(0x2A36)</code></dd>
-          <dt>readonly attribute UUID intermediate_temperature</dt><dd><code>registeredUUID(0x2A1E)</code></dd>
-          <dt>readonly attribute UUID language</dt><dd><code>registeredUUID(0x2AA2)</code></dd>
-          <dt>readonly attribute UUID last_name</dt><dd><code>registeredUUID(0x2A90)</code></dd>
-          <dt>readonly attribute UUID ln_control_point</dt><dd><code>registeredUUID(0x2A6B)</code></dd>
-          <dt>readonly attribute UUID ln_feature</dt><dd><code>registeredUUID(0x2A6A)</code></dd>
-          <dt>readonly attribute UUID local_time_information</dt><dd><code>registeredUUID(0x2A0F)</code></dd>
-          <dt>readonly attribute UUID location_and_speed</dt><dd><code>registeredUUID(0x2A67)</code></dd>
-          <dt>readonly attribute UUID manufacturer_name_string</dt><dd><code>registeredUUID(0x2A29)</code></dd>
-          <dt>readonly attribute UUID maximum_recommended_heart_rate</dt><dd><code>registeredUUID(0x2A91)</code></dd>
-          <dt>readonly attribute UUID measurement_interval</dt><dd><code>registeredUUID(0x2A21)</code></dd>
-          <dt>readonly attribute UUID model_number_string</dt><dd><code>registeredUUID(0x2A24)</code></dd>
-          <dt>readonly attribute UUID navigation</dt><dd><code>registeredUUID(0x2A68)</code></dd>
-          <dt>readonly attribute UUID new_alert</dt><dd><code>registeredUUID(0x2A46)</code></dd>
-          <dt>readonly attribute UUID gap.peripheral_preferred_connection_parameters</dt><dd><code>registeredUUID(0x2A04)</code></dd>
-          <dt>readonly attribute UUID gap.peripheral_privacy_flag</dt><dd><code>registeredUUID(0x2A02)</code></dd>
-          <dt>readonly attribute UUID pnp_id</dt><dd><code>registeredUUID(0x2A50)</code></dd>
-          <dt>readonly attribute UUID position_quality</dt><dd><code>registeredUUID(0x2A69)</code></dd>
-          <dt>readonly attribute UUID protocol_mode</dt><dd><code>registeredUUID(0x2A4E)</code></dd>
-          <dt>readonly attribute UUID gap.reconnection_address</dt><dd><code>registeredUUID(0x2A03)</code></dd>
-          <dt>readonly attribute UUID record_access_control_point</dt><dd><code>registeredUUID(0x2A52)</code></dd>
-          <dt>readonly attribute UUID reference_time_information</dt><dd><code>registeredUUID(0x2A14)</code></dd>
-          <dt>readonly attribute UUID report</dt><dd><code>registeredUUID(0x2A4D)</code></dd>
-          <dt>readonly attribute UUID report_map</dt><dd><code>registeredUUID(0x2A4B)</code></dd>
-          <dt>readonly attribute UUID resting_heart_rate</dt><dd><code>registeredUUID(0x2A92)</code></dd>
-          <dt>readonly attribute UUID ringer_control_point</dt><dd><code>registeredUUID(0x2A40)</code></dd>
-          <dt>readonly attribute UUID ringer_setting</dt><dd><code>registeredUUID(0x2A41)</code></dd>
-          <dt>readonly attribute UUID rsc_feature</dt><dd><code>registeredUUID(0x2A54)</code></dd>
-          <dt>readonly attribute UUID rsc_measurement</dt><dd><code>registeredUUID(0x2A53)</code></dd>
-          <dt>readonly attribute UUID sc_control_point</dt><dd><code>registeredUUID(0x2A55)</code></dd>
-          <dt>readonly attribute UUID scan_interval_window</dt><dd><code>registeredUUID(0x2A4F)</code></dd>
-          <dt>readonly attribute UUID scan_refresh</dt><dd><code>registeredUUID(0x2A31)</code></dd>
-          <dt>readonly attribute UUID sensor_location</dt><dd><code>registeredUUID(0x2A5D)</code></dd>
-          <dt>readonly attribute UUID serial_number_string</dt><dd><code>registeredUUID(0x2A25)</code></dd>
-          <dt>readonly attribute UUID gatt.service_changed</dt><dd><code>registeredUUID(0x2A05)</code></dd>
-          <dt>readonly attribute UUID software_revision_string</dt><dd><code>registeredUUID(0x2A28)</code></dd>
-          <dt>readonly attribute UUID sport_type_for_aerobic_and_anaerobic_thresholds</dt><dd><code>registeredUUID(0x2A93)</code></dd>
-          <dt>readonly attribute UUID supported_new_alert_category</dt><dd><code>registeredUUID(0x2A47)</code></dd>
-          <dt>readonly attribute UUID supported_unread_alert_category</dt><dd><code>registeredUUID(0x2A48)</code></dd>
-          <dt>readonly attribute UUID system_id</dt><dd><code>registeredUUID(0x2A23)</code></dd>
-          <dt>readonly attribute UUID temperature_measurement</dt><dd><code>registeredUUID(0x2A1C)</code></dd>
-          <dt>readonly attribute UUID temperature_type</dt><dd><code>registeredUUID(0x2A1D)</code></dd>
-          <dt>readonly attribute UUID three_zone_heart_rate_limits</dt><dd><code>registeredUUID(0x2A94)</code></dd>
-          <dt>readonly attribute UUID time_accuracy</dt><dd><code>registeredUUID(0x2A12)</code></dd>
-          <dt>readonly attribute UUID time_source</dt><dd><code>registeredUUID(0x2A13)</code></dd>
+          <dt>readonly attribute UUID aerobic_heart_rate_lower_limit</dt><dd><code>canonicalUUID(0x2A7E)</code></dd>
+          <dt>readonly attribute UUID aerobic_heart_rate_upper_limit</dt><dd><code>canonicalUUID(0x2A84)</code></dd>
+          <dt>readonly attribute UUID aerobic_threshold</dt><dd><code>canonicalUUID(0x2A7F)</code></dd>
+          <dt>readonly attribute UUID age</dt><dd><code>canonicalUUID(0x2A80)</code></dd>
+          <dt>readonly attribute UUID alert_category_id</dt><dd><code>canonicalUUID(0x2A43)</code></dd>
+          <dt>readonly attribute UUID alert_category_id_bit_mask</dt><dd><code>canonicalUUID(0x2A42)</code></dd>
+          <dt>readonly attribute UUID alert_level</dt><dd><code>canonicalUUID(0x2A06)</code></dd>
+          <dt>readonly attribute UUID alert_notification_control_point</dt><dd><code>canonicalUUID(0x2A44)</code></dd>
+          <dt>readonly attribute UUID alert_status</dt><dd><code>canonicalUUID(0x2A3F)</code></dd>
+          <dt>readonly attribute UUID anaerobic_heart_rate_lower_limit</dt><dd><code>canonicalUUID(0x2A81)</code></dd>
+          <dt>readonly attribute UUID anaerobic_heart_rate_upper_limit</dt><dd><code>canonicalUUID(0x2A82)</code></dd>
+          <dt>readonly attribute UUID anaerobic_threshold</dt><dd><code>canonicalUUID(0x2A83)</code></dd>
+          <dt>readonly attribute UUID gap.appearance</dt><dd><code>canonicalUUID(0x2A01)</code></dd>
+          <dt>readonly attribute UUID battery_level</dt><dd><code>canonicalUUID(0x2A19)</code></dd>
+          <dt>readonly attribute UUID blood_pressure_feature</dt><dd><code>canonicalUUID(0x2A49)</code></dd>
+          <dt>readonly attribute UUID blood_pressure_measurement</dt><dd><code>canonicalUUID(0x2A35)</code></dd>
+          <dt>readonly attribute UUID body_sensor_location</dt><dd><code>canonicalUUID(0x2A38)</code></dd>
+          <dt>readonly attribute UUID boot_keyboard_input_report</dt><dd><code>canonicalUUID(0x2A22)</code></dd>
+          <dt>readonly attribute UUID boot_keyboard_output_report</dt><dd><code>canonicalUUID(0x2A32)</code></dd>
+          <dt>readonly attribute UUID boot_mouse_input_report</dt><dd><code>canonicalUUID(0x2A33)</code></dd>
+          <dt>readonly attribute UUID csc_feature</dt><dd><code>canonicalUUID(0x2A5C)</code></dd>
+          <dt>readonly attribute UUID csc_measurement</dt><dd><code>canonicalUUID(0x2A5B)</code></dd>
+          <dt>readonly attribute UUID current_time</dt><dd><code>canonicalUUID(0x2A2B)</code></dd>
+          <dt>readonly attribute UUID cycling_power_control_point</dt><dd><code>canonicalUUID(0x2A66)</code></dd>
+          <dt>readonly attribute UUID cycling_power_feature</dt><dd><code>canonicalUUID(0x2A65)</code></dd>
+          <dt>readonly attribute UUID cycling_power_measurement</dt><dd><code>canonicalUUID(0x2A63)</code></dd>
+          <dt>readonly attribute UUID cycling_power_vector</dt><dd><code>canonicalUUID(0x2A64)</code></dd>
+          <dt>readonly attribute UUID database_change_increment</dt><dd><code>canonicalUUID(0x2A99)</code></dd>
+          <dt>readonly attribute UUID date_of_birth</dt><dd><code>canonicalUUID(0x2A85)</code></dd>
+          <dt>readonly attribute UUID date_of_threshold_assessment</dt><dd><code>canonicalUUID(0x2A86)</code></dd>
+          <dt>readonly attribute UUID date_time</dt><dd><code>canonicalUUID(0x2A08)</code></dd>
+          <dt>readonly attribute UUID day_date_time</dt><dd><code>canonicalUUID(0x2A0A)</code></dd>
+          <dt>readonly attribute UUID day_of_week</dt><dd><code>canonicalUUID(0x2A09)</code></dd>
+          <dt>readonly attribute UUID gap.device_name</dt><dd><code>canonicalUUID(0x2A00)</code></dd>
+          <dt>readonly attribute UUID dst_offset</dt><dd><code>canonicalUUID(0x2A0D)</code></dd>
+          <dt>readonly attribute UUID email_address</dt><dd><code>canonicalUUID(0x2A87)</code></dd>
+          <dt>readonly attribute UUID exact_time_256</dt><dd><code>canonicalUUID(0x2A0C)</code></dd>
+          <dt>readonly attribute UUID fat_burn_heart_rate_lower_limit</dt><dd><code>canonicalUUID(0x2A88)</code></dd>
+          <dt>readonly attribute UUID fat_burn_heart_rate_upper_limit</dt><dd><code>canonicalUUID(0x2A89)</code></dd>
+          <dt>readonly attribute UUID firmware_revision_string</dt><dd><code>canonicalUUID(0x2A26)</code></dd>
+          <dt>readonly attribute UUID first_name</dt><dd><code>canonicalUUID(0x2A8A)</code></dd>
+          <dt>readonly attribute UUID five_zone_heart_rate_limits</dt><dd><code>canonicalUUID(0x2A8B)</code></dd>
+          <dt>readonly attribute UUID gender</dt><dd><code>canonicalUUID(0x2A8C)</code></dd>
+          <dt>readonly attribute UUID glucose_feature</dt><dd><code>canonicalUUID(0x2A51)</code></dd>
+          <dt>readonly attribute UUID glucose_measurement</dt><dd><code>canonicalUUID(0x2A18)</code></dd>
+          <dt>readonly attribute UUID glucose_measurement_context</dt><dd><code>canonicalUUID(0x2A34)</code></dd>
+          <dt>readonly attribute UUID hardware_revision_string</dt><dd><code>canonicalUUID(0x2A27)</code></dd>
+          <dt>readonly attribute UUID heart_rate_control_point</dt><dd><code>canonicalUUID(0x2A39)</code></dd>
+          <dt>readonly attribute UUID heart_rate_max</dt><dd><code>canonicalUUID(0x2A8D)</code></dd>
+          <dt>readonly attribute UUID heart_rate_measurement</dt><dd><code>canonicalUUID(0x2A37)</code></dd>
+          <dt>readonly attribute UUID height</dt><dd><code>canonicalUUID(0x2A8E)</code></dd>
+          <dt>readonly attribute UUID hid_control_point</dt><dd><code>canonicalUUID(0x2A4C)</code></dd>
+          <dt>readonly attribute UUID hid_information</dt><dd><code>canonicalUUID(0x2A4A)</code></dd>
+          <dt>readonly attribute UUID hip_circumference</dt><dd><code>canonicalUUID(0x2A8F)</code></dd>
+          <dt>readonly attribute UUID ieee_11073-20601_regulatory_certification_data_list</dt><dd><code>canonicalUUID(0x2A2A)</code></dd>
+          <dt>readonly attribute UUID intermediate_blood_pressure</dt><dd><code>canonicalUUID(0x2A36)</code></dd>
+          <dt>readonly attribute UUID intermediate_temperature</dt><dd><code>canonicalUUID(0x2A1E)</code></dd>
+          <dt>readonly attribute UUID language</dt><dd><code>canonicalUUID(0x2AA2)</code></dd>
+          <dt>readonly attribute UUID last_name</dt><dd><code>canonicalUUID(0x2A90)</code></dd>
+          <dt>readonly attribute UUID ln_control_point</dt><dd><code>canonicalUUID(0x2A6B)</code></dd>
+          <dt>readonly attribute UUID ln_feature</dt><dd><code>canonicalUUID(0x2A6A)</code></dd>
+          <dt>readonly attribute UUID local_time_information</dt><dd><code>canonicalUUID(0x2A0F)</code></dd>
+          <dt>readonly attribute UUID location_and_speed</dt><dd><code>canonicalUUID(0x2A67)</code></dd>
+          <dt>readonly attribute UUID manufacturer_name_string</dt><dd><code>canonicalUUID(0x2A29)</code></dd>
+          <dt>readonly attribute UUID maximum_recommended_heart_rate</dt><dd><code>canonicalUUID(0x2A91)</code></dd>
+          <dt>readonly attribute UUID measurement_interval</dt><dd><code>canonicalUUID(0x2A21)</code></dd>
+          <dt>readonly attribute UUID model_number_string</dt><dd><code>canonicalUUID(0x2A24)</code></dd>
+          <dt>readonly attribute UUID navigation</dt><dd><code>canonicalUUID(0x2A68)</code></dd>
+          <dt>readonly attribute UUID new_alert</dt><dd><code>canonicalUUID(0x2A46)</code></dd>
+          <dt>readonly attribute UUID gap.peripheral_preferred_connection_parameters</dt><dd><code>canonicalUUID(0x2A04)</code></dd>
+          <dt>readonly attribute UUID gap.peripheral_privacy_flag</dt><dd><code>canonicalUUID(0x2A02)</code></dd>
+          <dt>readonly attribute UUID pnp_id</dt><dd><code>canonicalUUID(0x2A50)</code></dd>
+          <dt>readonly attribute UUID position_quality</dt><dd><code>canonicalUUID(0x2A69)</code></dd>
+          <dt>readonly attribute UUID protocol_mode</dt><dd><code>canonicalUUID(0x2A4E)</code></dd>
+          <dt>readonly attribute UUID gap.reconnection_address</dt><dd><code>canonicalUUID(0x2A03)</code></dd>
+          <dt>readonly attribute UUID record_access_control_point</dt><dd><code>canonicalUUID(0x2A52)</code></dd>
+          <dt>readonly attribute UUID reference_time_information</dt><dd><code>canonicalUUID(0x2A14)</code></dd>
+          <dt>readonly attribute UUID report</dt><dd><code>canonicalUUID(0x2A4D)</code></dd>
+          <dt>readonly attribute UUID report_map</dt><dd><code>canonicalUUID(0x2A4B)</code></dd>
+          <dt>readonly attribute UUID resting_heart_rate</dt><dd><code>canonicalUUID(0x2A92)</code></dd>
+          <dt>readonly attribute UUID ringer_control_point</dt><dd><code>canonicalUUID(0x2A40)</code></dd>
+          <dt>readonly attribute UUID ringer_setting</dt><dd><code>canonicalUUID(0x2A41)</code></dd>
+          <dt>readonly attribute UUID rsc_feature</dt><dd><code>canonicalUUID(0x2A54)</code></dd>
+          <dt>readonly attribute UUID rsc_measurement</dt><dd><code>canonicalUUID(0x2A53)</code></dd>
+          <dt>readonly attribute UUID sc_control_point</dt><dd><code>canonicalUUID(0x2A55)</code></dd>
+          <dt>readonly attribute UUID scan_interval_window</dt><dd><code>canonicalUUID(0x2A4F)</code></dd>
+          <dt>readonly attribute UUID scan_refresh</dt><dd><code>canonicalUUID(0x2A31)</code></dd>
+          <dt>readonly attribute UUID sensor_location</dt><dd><code>canonicalUUID(0x2A5D)</code></dd>
+          <dt>readonly attribute UUID serial_number_string</dt><dd><code>canonicalUUID(0x2A25)</code></dd>
+          <dt>readonly attribute UUID gatt.service_changed</dt><dd><code>canonicalUUID(0x2A05)</code></dd>
+          <dt>readonly attribute UUID software_revision_string</dt><dd><code>canonicalUUID(0x2A28)</code></dd>
+          <dt>readonly attribute UUID sport_type_for_aerobic_and_anaerobic_thresholds</dt><dd><code>canonicalUUID(0x2A93)</code></dd>
+          <dt>readonly attribute UUID supported_new_alert_category</dt><dd><code>canonicalUUID(0x2A47)</code></dd>
+          <dt>readonly attribute UUID supported_unread_alert_category</dt><dd><code>canonicalUUID(0x2A48)</code></dd>
+          <dt>readonly attribute UUID system_id</dt><dd><code>canonicalUUID(0x2A23)</code></dd>
+          <dt>readonly attribute UUID temperature_measurement</dt><dd><code>canonicalUUID(0x2A1C)</code></dd>
+          <dt>readonly attribute UUID temperature_type</dt><dd><code>canonicalUUID(0x2A1D)</code></dd>
+          <dt>readonly attribute UUID three_zone_heart_rate_limits</dt><dd><code>canonicalUUID(0x2A94)</code></dd>
+          <dt>readonly attribute UUID time_accuracy</dt><dd><code>canonicalUUID(0x2A12)</code></dd>
+          <dt>readonly attribute UUID time_source</dt><dd><code>canonicalUUID(0x2A13)</code></dd>
         </dl>
 
         <p>
@@ -1791,15 +1796,15 @@
         <p>Each standardized descriptor listed in [[!BLUETOOTH-NUMBERS-DESCRIPTORS]] MUST be reflected into <code>navigator.bluetooth.uuids.descriptor</code> under the name listed under "SpecificationType" with <code>org.bluetooth.descriptor.</code> removed.
 
         <dl title="[NoInterfaceObject] interface BluetoothUuidsDescriptor" class="idl">
-          <dt>readonly attribute UUID gatt.characteristic_extended_properties</dt><dd><code>registeredUUID(0x2900)</code></dd>
-          <dt>readonly attribute UUID gatt.characteristic_user_description</dt><dd><code>registeredUUID(0x2901)</code></dd>
-          <dt>readonly attribute UUID gatt.client_characteristic_configuration</dt><dd><code>registeredUUID(0x2902)</code></dd>
-          <dt>readonly attribute UUID gatt.server_characteristic_configuration</dt><dd><code>registeredUUID(0x2903)</code></dd>
-          <dt>readonly attribute UUID gatt.characteristic_presentation_format</dt><dd><code>registeredUUID(0x2904)</code></dd>
-          <dt>readonly attribute UUID gatt.characteristic_aggregate_format</dt><dd><code>registeredUUID(0x2905)</code></dd>
-          <dt>readonly attribute UUID valid_range</dt><dd><code>registeredUUID(0x2906)</code></dd>
-          <dt>readonly attribute UUID external_report_reference</dt><dd><code>registeredUUID(0x2907)</code></dd>
-          <dt>readonly attribute UUID report_reference</dt><dd><code>registeredUUID(0x2908)</code></dd>
+          <dt>readonly attribute UUID gatt.characteristic_extended_properties</dt><dd><code>canonicalUUID(0x2900)</code></dd>
+          <dt>readonly attribute UUID gatt.characteristic_user_description</dt><dd><code>canonicalUUID(0x2901)</code></dd>
+          <dt>readonly attribute UUID gatt.client_characteristic_configuration</dt><dd><code>canonicalUUID(0x2902)</code></dd>
+          <dt>readonly attribute UUID gatt.server_characteristic_configuration</dt><dd><code>canonicalUUID(0x2903)</code></dd>
+          <dt>readonly attribute UUID gatt.characteristic_presentation_format</dt><dd><code>canonicalUUID(0x2904)</code></dd>
+          <dt>readonly attribute UUID gatt.characteristic_aggregate_format</dt><dd><code>canonicalUUID(0x2905)</code></dd>
+          <dt>readonly attribute UUID valid_range</dt><dd><code>canonicalUUID(0x2906)</code></dd>
+          <dt>readonly attribute UUID external_report_reference</dt><dd><code>canonicalUUID(0x2907)</code></dd>
+          <dt>readonly attribute UUID report_reference</dt><dd><code>canonicalUUID(0x2908)</code></dd>
         </dl>
 
         <p>
