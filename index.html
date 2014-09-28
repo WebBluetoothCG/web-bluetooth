@@ -614,7 +614,7 @@
           <dt>Promise&lt;BluetoothGATTService> getService(BluetoothServiceUuid service)</dt>
           <dd>
             Returns a promise that is asynchronously resolved with
-            the first primary GATT service on the remote device
+            the <a href="#bluetooth-tree">first</a> primary GATT service on the remote device
             whose UUID is <var>service</var> and
             whose UUID is in the <a>allowed services list</a> for this device and origin.
             If there is no such service, resolves the promise with <code>null</code>.
@@ -680,7 +680,11 @@
           </dd>
 
           <dt>Promise&lt;BluetoothGATTCharacteristic> getCharacteristic(BluetoothCharacteristicUuid characteristic)</dt>
-          <dd>Returns a promise that is asynchronously resolved with the first GATT characteristic within this Service whose UUID is <var>characteristic</var>.</dd>
+          <dd>
+            Returns a promise that is asynchronously resolved with
+            the <a href="#bluetooth-tree">first</a> GATT characteristic within this Service
+            whose UUID is <var>characteristic</var>.
+          </dd>
 
           <dt>Promise&lt;BluetoothGATTCharacteristicSequence> getAllCharacteristics()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service.</dd>
@@ -690,7 +694,11 @@
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service with UUIDs in <var>characteristics</var>.</dd>
 
           <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceUuid service)</dt>
-          <dd>Returns a promise that is asynchronously resolved with the first GATT included service within this Service whose UUID is <var>service</var>.</dd>
+          <dd>
+            Returns a promise that is asynchronously resolved with the first GATT included service
+            (in the order returned by the Find Included Services procedure: [[BLUETOOTH41]] 3.G.4.5.1)
+            within this Service whose UUID is <var>service</var>.
+          </dd>
 
           <dt>Promise&lt;BluetoothGATTServiceSequence> getAllIncludedServices()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service.</dd>
@@ -741,7 +749,11 @@
           </dd>
 
           <dt>Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUuid descriptor)</dt>
-          <dd>Returns a promise that is asynchronously resolved with the first GATT descriptor within this Characteristic whose UUID is <var>descriptor</var>.</dd>
+          <dd>
+            Returns a promise that is asynchronously resolved with
+            the <a href="#bluetooth-tree">first</a> GATT descriptor within this Characteristic
+            whose UUID is <var>descriptor</var>.
+          </dd>
 
           <dt>Promise&lt;BluetoothGATTDescriptorSequence> getAllDescriptors()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic.</dd>
@@ -988,7 +1000,7 @@
       <section>
         <h2>Events</h2>
 
-        <section>
+        <section id="bluetooth-tree">
           <h2>Bluetooth Tree</h2>
 
           <p>
@@ -1009,19 +1021,16 @@
             <li>
               The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
               of a <a>BluetoothDevice</a> are the <a>BluetoothGATTService</a> objects representing
-              <a>Service</a>s on its GATT <a>Server</a>
+              Primary and Secondary <a>Service</a>s on its GATT <a>Server</a>
               whose UUIDs are on the origin and device's <a>allowed services list</a>.
-              The order of these services MUST be consistent with the order returned by
+              The order of the primary services MUST be consistent with the order returned by
               the Discover Primary Service by Service UUID procedure ([[!BLUETOOTH41]] 3.G.4.4.2),
-              but services with different UUIDs may be in any order.
+              but secondary services and primary services with different UUIDs may be in any order.
             </li>
             <li>
               The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
               of a <a>BluetoothGATTService</a> are
-              the <a>BluetoothGATTService</a> objects representing its Included Services followed by
               the <a>BluetoothGATTCharacteristic</a> objects representing its Characteristics.
-              The Included Services MUST be in the order returned by
-              the Find Included Services procedure ([[!BLUETOOTH41]] 3.G.4.5.1).
               The order of the characteristics MUST be consistent with the order returned by
               the Discover Characteristics by UUID procedure ([[!BLUETOOTH41]] 3.G.4.6.2),
               but characteristics with different UUIDs may be in any order.
