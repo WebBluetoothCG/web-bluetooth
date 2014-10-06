@@ -611,7 +611,7 @@
             since there may be other sites with open connections.
           </dd>
 
-          <dt>Promise&lt;BluetoothGATTService> getService(BluetoothServiceUuid service)</dt>
+          <dt>Promise&lt;BluetoothGATTService> getPrimaryService(BluetoothServiceUuid service)</dt>
           <dd>
             Returns a promise that is asynchronously resolved with
             the <a href="#bluetooth-tree">first</a> primary GATT service on the remote device
@@ -620,17 +620,17 @@
             If there is no such service, resolves the promise with <code>null</code>.
           </dd>
 
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getAllServices()</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getPrimaryServices()</dt>
           <dd>
             Returns a promise that is asynchronously resolved with
             a sequence of all the primary GATT services on the remote device
             whose UUIDs are in the <a>allowed services list</a> for this device and origin.
           </dd>
 
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getAllServices(BluetoothServiceUuid service)</dt>
-          <dd>Returns <code>this.getAllServices([service])</code></dd>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getPrimaryServices(BluetoothServiceUuid service)</dt>
+          <dd>Returns <code>this.getPrimaryServices([service])</code></dd>
 
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getAllServices(sequence&lt;BluetoothServiceUuid> services)</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getPrimaryServices(sequence&lt;BluetoothServiceUuid> services)</dt>
           <dd>
             Returns a promise that is asynchronously resolved with
             a sequence of all the primary GATT services on the remote device with UUIDs in
@@ -686,11 +686,11 @@
             whose UUID is <var>characteristic</var>.
           </dd>
 
-          <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getAllCharacteristics()</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getCharacteristics()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service.</dd>
-          <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getAllCharacteristics(BluetoothCharacteristicUuid characteristic)</dt>
-          <dd>Returns <code>this.getAllCharacteristics([characteristic])</code></dd>
-          <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getAllCharacteristics(sequence&lt;BluetoothCharacteristicUuid> characteristics)</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getCharacteristics(BluetoothCharacteristicUuid characteristic)</dt>
+          <dd>Returns <code>this.getCharacteristics([characteristic])</code></dd>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getCharacteristics(sequence&lt;BluetoothCharacteristicUuid> characteristics)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service with UUIDs in <var>characteristics</var>.</dd>
 
           <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceUuid service)</dt>
@@ -700,16 +700,16 @@
             within this Service whose UUID is <var>service</var>.
           </dd>
 
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getAllIncludedServices()</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getIncludedServices()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service.</dd>
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getAllIncludedServices(BluetoothServiceUuid service)</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getIncludedServices(BluetoothServiceUuid service)</dt>
           <dd>
-            Returns <code>this.getAllIncludedServices([service])</code>
+            Returns <code>this.getIncludedServices([service])</code>
             <p class="note">
               Bluetooth's procedure for finding included services (3.G.4.5) doesn't include a way to optimize for a single UUID.
               Maybe we should omit this and the next overloads to avoid implying that they're more efficient than the no-argument version.
           </dd>
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getAllIncludedServices(sequence&lt;BluetoothServiceUuid> services)</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getIncludedServices(sequence&lt;BluetoothServiceUuid> services)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service with UUIDs in <var>services</var>.</dd>
         </dl>
       </section>
@@ -754,11 +754,11 @@
             whose UUID is <var>descriptor</var>.
           </dd>
 
-          <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getAllDescriptors()</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getDescriptors()</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic.</dd>
-          <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getAllDescriptors(BluetoothDescriptorUuid descriptor)</dt>
-          <dd>Returns <code>this.getAllDescriptors([descriptor])</code></dd>
-          <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getAllDescriptors(sequence&lt;BluetoothDescriptorUuid> descriptors)</dt>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getDescriptors(BluetoothDescriptorUuid descriptor)</dt>
+          <dd>Returns <code>this.getDescriptors([descriptor])</code></dd>
+          <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getDescriptors(sequence&lt;BluetoothDescriptorUuid> descriptors)</dt>
           <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic with UUIDs in <var>descriptors</var>.</dd>
 
           <dt>Promise&lt;ArrayBuffer> readValue()</dt>
@@ -1172,8 +1172,8 @@
               If a <a>Service</a> in <var>addedEntities</var>
               would not have been returned to any script execution environment
               if it had existed at the time of any previous call to
-              <code>getService</code>, <code>getAllServices</code>,
-              <code>getIncludedService</code>, or <code>getAllIncludedServices</code>,
+              <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
+              <code>getIncludedService</code>, or <code>getIncludedServices</code>,
               the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
             </li>
             <li>
