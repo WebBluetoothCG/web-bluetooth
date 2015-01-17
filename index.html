@@ -368,7 +368,7 @@
               in the device and origin's <a>allowed services list</a>.
             </li>
             <li>
-              Connect to the device. ([[BLUETOOTH41]] 3.G.6.2.1)
+              <a title="Connection Establishment">Connect to the device</a>.
               If the connection fails, reject the Promise with a <a>NetworkError</a> and abort these steps.
             </li>
             <li>
@@ -426,26 +426,26 @@
         <li>If the UA supports the LE transport:
           <ol>
             <li>
-              The UA MUST perform the <dfn>General Discovery Procedure</dfn> ([[BLUETOOTH41]] 3.C.9.2.6).
-              The UA SHOULD enable the <dfn>Privacy Feature</dfn> ([[BLUETOOTH41]] 3.C.10.7).
+              The UA MUST perform the <a>General Discovery Procedure</a>
+              The UA SHOULD enable the <a>Privacy Feature</a>
 
               <p class="issue">
-                Both <dfn>passive scanning</dfn> ([[!BLUETOOTH41]] 6.B.4.4.3.1) and
+                Both <a>passive scanning</a> and
                 the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
                 We ought to require UAs to use either one,
                 but none of the OS APIs appear to expose either.
                 Bluetooth also makes it hard to use <a>passive scanning</a> since
                 it doesn't require <a>Central</a> devices to support the
-                <dfn>Observation Procedure</dfn> ([[!BLUETOOTH41]] 3.C.9.1.2).
+                <a>Observation Procedure</a>.
 
             <li>
-              For each <dfn>discovered LE device</dfn> ([[BLUETOOTH41]] 3.C.9.2.6),
+              For each <dfn>discovered LE device</dfn> (by the <a>General Discovery Procedure</a>),
               if the complete device name was not acquired during the <a>General Discovery Procedure</a>,
-              the UA SHOULD perform the <dfn>Name Discovery Procedure</dfn> ([[BLUETOOTH41]] 3.C.9.2.7).
+              the UA SHOULD perform the <a>Name Discovery Procedure</a>.
 
             <li>
               For each <a>discovered LE device</a>,
-              if the advertised Service UUIDs ([[BLUETOOTH-SUPPLEMENT4]], A.1.1)
+              if the advertised <a title="Service UUID Data Type">Service UUIDs</a>
               have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
 
@@ -454,14 +454,14 @@
               the UA MAY connect to the device and
               <ul>
                 <li>
-                  Use <dfn>Attribute Caching</dfn> ([[BLUETOOTH41]] 3.G.2.5.2) and
-                  the <dfn>Service Changed characteristic</dfn> ([[BLUETOOTH41]] 3.G.7.1) to
+                  Use <a>Attribute Caching</a> and
+                  the <a>Service Changed</a> characteristic to
                   recall and validate the supported Service UUIDs from a previous connection,
                 <li>
-                  <dfn>Discover Primary Service by Service UUID</dfn> ([[BLUETOOTH41]] 3.G.4.4.2)
+                  <a>Discover Primary Service by Service UUID</a>
                   for each UUID in the <var>set of <a>Service</a> UUIDs</var>, or
                 <li>
-                  <dfn>Discover All Primary Services</dfn> ([[BLUETOOTH41]] 3.G.4.4.1).
+                  <a>Discover All Primary Services</a>.
               </ul>
               If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
@@ -487,16 +487,16 @@
         <li>If the UA supports the BR/EDR transport:
           <ol>
             <li>
-              The UA MUST perform the <dfn>Device Discovery</dfn> procedure ([[BLUETOOTH41]] 3.C.6.4).
+              The UA MUST perform the <a>Device Discovery</a> procedure.
 
               <p class="issue">
                 All forms of BR/EDR inquiry/discovery
                 appear to leak the unique, immutable device address.
 
             <li>
-              For each <dfn>discovered BR/EDR device</dfn> ([[BLUETOOTH41]] 3.C.6.4.3),
-              if the Service UUIDs ([[BLUETOOTH-SUPPLEMENT4]], A.1.1)
-              in the <dfn>Extended Inquiry Response</dfn> ([[BLUETOOTH41]] 1.A.4.2.1.1.1)
+              For each <dfn>discovered BR/EDR device</dfn> (<a>Device Discovery</a>),
+              if the <a title="Service UUID Data Type">Service UUIDs</a>
+              in the <a>Extended Inquiry Response</a>
               have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
 
@@ -513,7 +513,7 @@
               the UA MAY connect to the device and
               <ul>
                 <li>
-                  Use <a>Attribute Caching</a> and the <a>Service Changed characteristic</a> to
+                  Use <a>Attribute Caching</a> and the <a>Service Changed</a> characteristic to
                   recall and validate the supported Service UUIDs from a previous connection,
                 <li>
                   <a>Discover Primary Service by Service UUID</a>
@@ -523,7 +523,7 @@
                 <li>
                   use the Service Discovery Protocol (<abbr title="Service Discovery Protocol">SDP</abbr>)
                   to find GATT Services with UUIDs in the <var>set of <a>Service</a> UUIDs</var>.
-                  ([[BLUETOOTH41]] 3.B.2.5)
+                  (<a>Searching for Services</a>)
               </ul>
               If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
               add the device to <var>result</var>.
@@ -696,7 +696,7 @@
           <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceUuid service)</dt>
           <dd>
             Returns a promise that is asynchronously resolved with the first GATT included service
-            (in the order returned by the Find Included Services procedure: [[BLUETOOTH41]] 3.G.4.5.1)
+            (in the order returned by the <a>Find Included Services</a> procedure)
             within this Service whose UUID is <var>service</var>.
           </dd>
 
@@ -802,12 +802,12 @@
           </li>
           <li>
             If the <code>Read</code> bit is not set
-            in <var>characteristic</var>'s properties ([[!BLUETOOTH41]] 3.G.3.3.1.1),
+            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
             reject the promise with a <a>NotSupportedError</a> and abort these steps.
           </li>
           <li>
             Use any combination of the sub-procedures in
-            the Characteristic Value Read procedure ([[!BLUETOOTH41]] 3.G.4.8)
+            the <a>Characteristic Value Read</a> procedure
             to retrieve the value of <var>characteristic</var>.
             <a>Use the Bluetooth error recovery procedure</a> with the promise.
             If this fails, abort these steps.
@@ -842,7 +842,7 @@
           </li>
           <li>
             If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-            in <var>characteristic</var>'s properties ([[!BLUETOOTH41]] 3.G.3.3.1.1),
+            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
             reject the promise with a <a>NotSupportedError</a> and abort these steps.
           </li>
           <li>
@@ -852,7 +852,7 @@
           </li>
           <li>
             Ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
-            <var>characteristic</var>'s Client Characteristic Configuration descriptor ([[!BLUETOOTH41]] 3.G.3.3.3.3)
+            <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
             is set, matching the constraints in <var>characteristic</var>'s properties.
             The UA SHOULD avoid setting both bits,
             and MUST deduplicate <a href="#notification-events">value-change events</a>
@@ -894,7 +894,7 @@
           <li>
             If the <a>active notification context set</a> became empty,
             the UA SHOULD clear the <code>Notification</code> and <code>Indication</code> bits in
-            <var>characteristic</var>'s Client Characteristic Configuration descriptor ([[!BLUETOOTH41]] 3.G.3.3.3.3).
+            <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
           </li>
           <li>
             <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a>
@@ -1021,7 +1021,7 @@
               Primary and Secondary <a>Service</a>s on its GATT <a>Server</a>
               whose UUIDs are on the origin and device's <a>allowed services list</a>.
               The order of the primary services MUST be consistent with the order returned by
-              the Discover Primary Service by Service UUID procedure ([[!BLUETOOTH41]] 3.G.4.4.2),
+              the <a>Discover Primary Service by Service UUID</a> procedure,
               but secondary services and primary services with different UUIDs may be in any order.
             </li>
             <li>
@@ -1029,14 +1029,14 @@
               of a <a>BluetoothGATTService</a> are
               the <a>BluetoothGATTCharacteristic</a> objects representing its Characteristics.
               The order of the characteristics MUST be consistent with the order returned by
-              the Discover Characteristics by UUID procedure ([[!BLUETOOTH41]] 3.G.4.6.2),
+              the <a>Discover Characteristics by UUID</a> procedure,
               but characteristics with different UUIDs may be in any order.
             </li>
             <li>
               The <a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
               of a <a>BluetoothGATTCharacteristic</a> are
               the <a>BluetoothGATTDescriptor</a> objects representing its Descriptors
-              in the order returned by the Discover All Characteristic Descriptors procedure ([[!BLUETOOTH41]] 3.G.4.7.1)
+              in the order returned by the <a>Discover All Characteristic Descriptors</a> procedure.
             </li>
           </ul>
         </section>
@@ -1066,7 +1066,7 @@
               <a href="#service-change-events">when its state changes</a>.
               This involves any characteristics and/or descriptors
               that get added or removed from the service,
-              as well as Service Changed indications ([[!BLUETOOTH41]] 3.G.7.1) from the remote device.
+              as well as <a>Service Changed</a> indications from the remote device.
             </dd>
 
             <dt><dfn><code>serviceremoved</code></dfn></dt>
@@ -1083,8 +1083,8 @@
           <h2>Responding to Notifications and Indications</h2>
 
           <p>
-            When the UA receives a Bluetooth Notification ([[!BLUETOOTH41]] 3.G.4.10)
-            or Indication ([[!BLUETOOTH41]] 3.G.4.11) for a <a>Characteristic</a>,
+            When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
+            or <a title="Characteristic Value Indications">Indication</a>,
             it must perform the following steps:
 
           <ol>
@@ -1120,11 +1120,11 @@
           <h2>Responding to Service Changes</h2>
 
           <p>
-            The Bluetooth Attribute Caching system ([[!BLUETOOTH41]] 3.G.2.5.2) allows clients
+            The Bluetooth <a>Attribute Caching</a> system allows clients
             to track changes to <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
             Before discovering any of these entities for the purpose of exposing them to a web page
             the UA MUST subscribe to Indications from the
-            Service Changed characteristic ([[!BLUETOOTH41]] 3.G.7.1), if it exists.
+            <a>Service Changed</a> characteristic, if it exists.
             When the UA receives an Indication on the Service Changed characteristic,
             it MUST perform the following steps.
 
@@ -1135,9 +1135,8 @@
               that the UA had discovered before the Indication.
             </li>
             <li>
-              Use the Primary Service Discovery, Relationship Discovery, Characteristic Discovery,
-              and Characteristic Descriptor Discovery procedures
-              ([[!BLUETOOTH41]] 3.G 4.4, 4.5, 4.6, and 4.7)
+              Use the <a>Primary Service Discovery</a>, <a>Relationship Discovery</a>, <a>Characteristic Discovery</a>,
+              and <a>Characteristic Descriptor Discovery</a> procedures
               to re-discover entities in the range indicated by the Service Changed characteristic.
               The UA MAY skip discovering all or part of the indicated range
               if it can prove that the results of that discovery
@@ -1260,20 +1259,20 @@
           are likely spec bugs instead of browser bugs.
 
         <p>
-          When a step in an algorithm that uses a Bluetooth GATT procedure ([[!BLUETOOTH41]] 3.G.4)
+          When a step in an algorithm that uses a Bluetooth <a title="GATT procedures">GATT procedure</a>
           says to "<dfn>Use the Bluetooth error recovery procedure</dfn>" with a promise,
           the UA MUST perform the following steps:
 
         <ol>
           <li>
             If the Bluetooth procedure completes with anything other than
-            an <code>Error Response</code> ([[!BLUETOOTH41]] 3.F.3.4.1.1),
+            an <code><a>Error Response</a></code>,
             the recovery procedure succeeds.
             Abort these steps.
           </li>
           <li>
-            If the procedure times out ([[!BLUETOOTH41]] 3.G.4.14) or
-            the ATT Bearer ([[!BLUETOOTH41]] 3.G.2.4) is terminated for any reason,
+            If the <a title="Procedure timeouts">procedure times out</a> or
+            the ATT Bearer (described in <a>Profile Fundamentals</a>) is terminated for any reason,
             reject the promise with a <a>NetworkError</a> and abort these steps.
             The recovery procedure fails.
           </li>
@@ -1372,7 +1371,7 @@
 
         <p class="note">
           Bluetooth devices are required to convert 16- and 32-bit UUIDs to 128-bit UUIDs
-          before comparing them ([[BLUETOOTH41]] 3.F.3.2.1), but not all devices do so.
+          before comparing them (as described in <a>Attribute Type</a>), but not all devices do so.
           To interoperate with these devices,
           if the UA has received a UUID from the device in one form (16-, 32-, or 128-bit),
           it should send other aliases of that UUID back to the device in the same form.
@@ -1397,8 +1396,8 @@
         <dd></dd>
         <dt>UUID canonicalUUID(unsigned long alias)</dt>
         <dd>
-          Returns a 128-bit <a>UUID</a> given a 16- or 32-bit Bluetooth UUID alias.
-          The algorithm for converting an alias to a full 128-bit UUID is defined in [[!BLUETOOTH41]] Volume 3 Part B Section 2.5.1:
+          Returns a 128-bit <a>UUID</a> given a 16- or 32-bit Bluetooth <a title="UUID aliases">UUID alias</a>.
+          The algorithm for converting an alias to a full 128-bit UUID is defined in [[!BLUETOOTH41]] 3.F.3.2.1:
           the top 32 bits of "<code>00000000-0000-1000-8000-00805f9b34fb</code>" are replaced by the bits of the alias.
           For example, <code>canonicalUUID(0xDEADBEEF)</code> returns <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
         </dd>
@@ -1862,5 +1861,250 @@
       <div title="Bluetooth implements BluetoothInteraction" class="idl"></div>
     </section>
 
+    <section>
+      <h2>Terminology</h2>
+
+      <p>
+        This specification uses several terms from other specifications.
+        This section lists those and links to their primary definitions.
+      </p>
+
+      <dl>
+        <dt>[[!BLUETOOTH41]]</dt>
+        <dd>
+          <ol>
+            <li value="1">Architecture &amp; Terminology Overview
+              <ol type="A">
+                <li value="1">Architecture
+                  <ol>
+                    <li value="4">Communication Topology and Operation
+                      <ol>
+                        <li value="2">Operational Procedures and Modes
+                          <ol>
+                            <li value="1">BR/EDR Procedures
+                              <ol>
+                                <li value="1">Inquiry (Discovering) Procedure
+                                  <ol>
+                                    <li value="1"><dfn>Extended Inquiry Response</dfn></li>
+                                  </ol>
+                                </li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+            <li value="3">Core System Package [Host volume]
+              <ol type="A">
+                <li value="2">Service Discovery Protocol (SDP) Specification
+                  <ol>
+                    <li value="5"><dfn>Searching for Services</dfn></li>
+                  </ol>
+                </li>
+                <li value="3">Generic Access Profile
+                  <ol>
+                    <li value="6">Idle Mode Procedures &mdash; BR/EDR Physical Transport
+                      <ol>
+                        <li value="4"><dfn>Device Discovery</dfn></li>
+                      </ol>
+                    </li>
+                    <li value="9">Operational Modes and Procedures &mdash; LE Physical Transport
+                      <ol>
+                        <li value="1">Broadcast Mode and Observation Procedure
+                          <ol>
+                            <li value="2"><dfn>Observation Procedure</dfn></li>
+                          </ol>
+                        </li>
+                        <li value="2">Discovery Modes and Procedures
+                          <ol>
+                            <li value="6"><dfn>General Discovery Procedure</dfn></li>
+                            <li value="7"><dfn>Name Discovery Procedure</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                    <li value="10">Security Aspects &mdash; LE Physical Transport
+                      <ol>
+                        <li value="7"><dfn>Privacy Feature</dfn></li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+                <li value="6">Attribute Protocol (ATT)
+                  <ol>
+                    <li value="3">Protocol Requirements
+                      <ol>
+                        <li value="2">Basic Concepts
+                          <ol>
+                            <li value="1"><dfn>Attribute Type</dfn> and <dfn>UUID aliases</dfn></li>
+                          </ol>
+                        </li>
+                        <li value="4">Attribute Protocol Pdus
+                          <ol>
+                            <li value="1">Error Handling
+                              <ol>
+                                <li value="1"><dfn>Error Response</dfn></li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+                <li value="7">Generic Attribute Profile (GATT)
+                  <ol>
+                    <li value="2">Profile Overview
+                      <ol>
+                        <li value="4"><dfn>Profile Fundamentals</dfn></li>
+                        <li value="5">Attribute Protocol
+                          <ol>
+                            <li value="2"><dfn>Attribute Caching</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                    <li value="3">Service Interoperability Requirements
+                      <ol>
+                        <li value="3">Characteristic Definition
+                          <ol>
+                            <li value="1">Characteristic Declaration
+                              <ol>
+                                <li value="1"><dfn>Characteristic Properties</dfn></li>
+                              </ol>
+                            </li>
+                            <li value="3">Characteristic Descriptor Declarations
+                              <ol>
+                                <li value="3"><dfn>Client Characteristic Configuration</dfn></li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                    <li value="4">GATT Feature Requirements &mdash; defines the <dfn>GATT procedures</dfn>.
+                      <ol>
+                        <li value="4"><dfn>Primary Service Discovery</dfn>
+                          <ol>
+                            <li value="1"><dfn>Discover All Primary Services</dfn></li>
+                            <li value="2"><dfn>Discover Primary Service by Service UUID</dfn></li>
+                          </ol>
+                        </li>
+                        <li value="5"><dfn>Relationship Discovery</dfn>
+                          <ol>
+                            <li value="1"><dfn>Find Included Services</dfn></li>
+                          </ol>
+                        </li>
+                        <li value="6"><dfn>Characteristic Discovery</dfn>
+                          <ol>
+                            <li value="2"><dfn>Discover Characteristics by UUID</dfn></li>
+                          </ol>
+                        </li>
+                        <li value="7"><dfn>Characteristic Descriptor Discovery</dfn>
+                          <ol>
+                            <li value="1"><dfn>Discover All Characteristic Descriptors</dfn></li>
+                          </ol>
+                        </li>
+                        <li value="8"><dfn>Characteristic Value Read</dfn></li>
+                        <li value="10"><dfn>Characteristic Value Notification</dfn></li>
+                        <li value="11"><dfn>Characteristic Value Indications</dfn></li>
+                        <li value="14"><dfn>Procedure Timeouts</dfn></li>
+                      </ol>
+                    </li>
+                    <li value="6">GAP Interoperability Requirements
+                      <ol>
+                        <li value="2">LE GAP Interoperability Requirements
+                          <ol>
+                            <li value="1"><dfn>Connection Establishment</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                    <li value="7">Defined Generic Attribute Profile Service
+                      <ol>
+                        <li value="1"><dfn>Service Changed</dfn></li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+            <li value="6">Core System Package [Low Energy Controller volume]
+              <ol type="A">
+                <li value="2">Link Layer Specification
+                  <ol>
+                    <li value="4">Air Interface Protocol
+                      <ol>
+                        <li value="4">Non-Connected States
+                          <ol>
+                            <li value="3">Scanning State
+                              <ol>
+                                <li value="1"><dfn>Passive Scanning</dfn></li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </dd>
+        <dt>[[!BLUETOOTH-SUPPLEMENT4]]</dt>
+        <dd>
+          <ol type="A">
+            <li value="1">Data Types Specification
+              <ol>
+                <li value="1">Data Types Definitions and Formats
+                  <!-- The section names here are really general, so I've added
+                       "Data Type" to each one. -->
+                  <ol>
+                    <li value="1"><dfn>Service UUID Data Type</dfn></li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </dd>
+        <dt>[[!ECMAScript]]</dt>
+        <dd>
+          <ul>
+            <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects"><dfn>Promise</dfn></a></li>
+          </ul>
+        </dd>
+        <dt>[[!HTML]]</dt>
+        <dd>
+          <ul>
+            <li><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel"
+                   ><dfn>in parallel</dfn></a></li>
+          </ul>
+        </dd>
+        <dt>[[!WebIDL]]</dt>
+        <dd>
+          <ul>
+            <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror"><dfn>InvalidModificationError</dfn></a></li>
+            <li><a href="https://heycam.github.io/webidl/#networkerror"><dfn>NetworkError</dfn></a></li>
+            <li><a href="https://heycam.github.io/webidl/#notsupportederror"><dfn>NotSupportedError</dfn></a></li>
+            <li><a href="https://heycam.github.io/webidl/#securityerror"><dfn>SecurityError</dfn></a></li>
+          </ul>
+        </dd>
+        <dt><a href="https://www.w3.org/2001/tag/doc/promises-guide"
+               >Writing Promise-Using Specifications</a></dt>
+        <dd>
+          <ul>
+            <li><a href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise"
+                   ><dfn>A new promise</dfn></a></li>
+            <li><a href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise"
+                   ><dfn>Resolve <var>p</var> with</dfn></a></li>
+          </ul>
+        </dd>
+      </dl>
+    </section>
   </body>
 </html>
