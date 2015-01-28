@@ -684,6 +684,10 @@
           it has discovered on a device.
           The UA MAY share this cache between multiple origins accessing the same device.
           Each potential entity in the cache is either known-present, known-absent, or unknown.
+          Each known-present entity in the cache is associated with an optional
+          <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
+          or <a>BluetoothGATTDescriptor</a> instance
+          for each <a>script execution environment</a>.
         </p>
 
         <p class="note">
@@ -723,19 +727,38 @@
             using any sequence of <a>GATT procedures</a> that [[BLUETOOTH41]] specifies
             will return enough information.
             Handle errors as described in <a href="#error-handling"></a>.
-            When adding a known-present Service, Characteristic, or Descriptor
-            to the Bluetooth cache,
-            the UA MUST create a <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
-            or <a>BluetoothGATTDescriptor</a>, respectively, representing that entity,
-            and associate it with the cache entry.
           </li>
           <li>
-            If the previous step returns an error, <a>reject</a> <var>promise</var> with that error.
+            If the previous step returns an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
-            Otherwise, <a>resolve</a> <var>promise</var> with
-            the sequence of <code>BluetoothGATT*</code> instances
-            representing the cache entries requested.
+            Let <var>entries</var> be the sequence
+            of known-present cache entries matching the description.
+          </li>
+          <li>
+            Let <var>result</var> be a new sequence.
+          </li>
+          <li>
+            For each <var>entry</var> in <var>entries</var>:
+            <ol>
+              <li>
+                If <var>entry</var> has no associated <code>BluetoothGATT*</code> instance
+                for the current <a>script execution environment</a>,
+                create a <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
+                or <a>BluetoothGATTDescriptor</a>,
+                representing the Service, Characteristic, or Descriptor, respectively,
+                and associate it with <var>entry</var>.
+              </li>
+              <li>
+                Append to <var>result</var>
+                the <code>BluetoothGATT*</code> instance associated with <var>entry</var>
+                for the current <a>script execution environment</a>.
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a>Resolve</a> <var>promise</var> with <var>result</var>.
           </li>
         </ol>
       </section>
