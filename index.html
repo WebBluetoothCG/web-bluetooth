@@ -906,9 +906,9 @@
 
           <dt>Promise&lt;ArrayBuffer> readValue()</dt>
           <dd>
-            The UA MUST return a new promise and asynchronously
-            <a title="read the value of a BluetoothGATTCharacteristic">read the value of this characteristic</a>
-            resolving the promise.
+            Returns the result of
+            <a title="read the value of a BluetoothGATTCharacteristic"
+               >reading the value of this characteristic</a>.
           </dd>
 
           <dt>Promise&lt;void> writeValue()</dt>
@@ -936,8 +936,10 @@
         </dl>
 
         <p>
-          To <dfn>read the value of a <a>BluetoothGATTCharacteristic</a></dfn> resolving a promise, the UA MUST:
-
+          To <dfn>read the value of a <a>BluetoothGATTCharacteristic</a></dfn>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
         <ol>
           <li>
             Let <var>characteristic</var> be the <a>Characteristic</a>
@@ -946,14 +948,17 @@
           <li>
             If the <code>Read</code> bit is not set
             in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
-            reject the promise with a <a>NotSupportedError</a> and abort these steps.
+            <a>reject</a> <var>promise</var> with a <a>NotSupportedError</a> and abort these steps.
           </li>
           <li>
             Use any combination of the sub-procedures in
             the <a>Characteristic Value Read</a> procedure
             to retrieve the value of <var>characteristic</var>.
-            <a>Use the Bluetooth error recovery procedure</a> with the promise.
-            If this fails, abort these steps.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returned an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
             Create an <code>ArrayBuffer</code> holding the retrieved value,
