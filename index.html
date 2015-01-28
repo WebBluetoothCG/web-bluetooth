@@ -923,15 +923,15 @@
 
           <dt>Promise&lt;void> startNotifications()</dt>
           <dd>
-            The UA MUST return a new Promise and asynchronously
-            <a>enable notifications</a> on this characteristic resolving the promise.
+            The UA MUST <a>enable notifications</a> on this characteristic
+            and return the result of that algorithm.
             See <a href="#notification-events"></a> for details of receiving notifications.
           </dd>
 
           <dt>Promise&lt;void> stopNotifications()</dt>
           <dd>
-            The UA MUST return a new Promise and asynchronously
-            <a>disable notifications</a> on this characteristic resolving the promise.
+            The UA MUST <a>disable notifications</a> on this characteristic
+            and return the result of that algorithm.
           </dd>
         </dl>
 
@@ -977,11 +977,13 @@
           This is a single set for the whole UA,
           pointing to the <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a> object
           for each separate <a>script execution environment</a> that has registered for notifications.
+        </p>
 
         <p>
-          To <dfn>enable notifications</dfn> on
-          a <a>BluetoothGATTCharacteristic</a> resolving a promise, the UA MUST:
-
+          To <dfn>enable notifications</dfn> on a <a>BluetoothGATTCharacteristic</a>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
         <ol>
           <li>
             Let <var>characteristic</var> be
@@ -990,29 +992,34 @@
           <li>
             If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
             in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
-            reject the promise with a <a>NotSupportedError</a> and abort these steps.
+            <a>reject</a> <var>promise</var> with a <a>NotSupportedError</a> and abort these steps.
           </li>
           <li>
             If the <a>active notification context set</a> contains
             <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
-            resolve the promise and abort these steps.
+            <a>resolve</a> <var>promise</var> with <code>undefined</code> and abort these steps.
           </li>
           <li>
-            Ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
+            Use any of the <a>Characteristic Descriptors</a> procedures
+            to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
             <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
-            is set, matching the constraints in <var>characteristic</var>'s properties.
+            is set, matching the constraints
+            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>.
             The UA SHOULD avoid setting both bits,
             and MUST deduplicate <a href="#notification-events">value-change events</a>
             if both bits are set.
-            <a>Use the Bluetooth error recovery procedure</a> with the promise.
-            If this fails, abort these steps.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returned an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
             Add <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
             to the <a>active notification context set</a>.
           </li>
           <li>
-            Resolve the promise.
+            <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
           </li>
         </ol>
 
@@ -1023,11 +1030,13 @@
           <a title="perform a microtask checkpoint">microtask checkpoint</a>.
           This allows a developer to set up handlers
           in the <code>.then</code> handler of the result promise.
+        </p>
 
         <p>
-          To <dfn>disable notifications</dfn> on
-          a <a>BluetoothGATTCharacteristic</a> resolving a promise, the UA MUST:
-
+          To <dfn>disable notifications</dfn> on a <a>BluetoothGATTCharacteristic</a>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
         <ol>
           <li>
             Let <var>characteristic</var> be
@@ -1040,11 +1049,12 @@
           </li>
           <li>
             If the <a>active notification context set</a> became empty,
-            the UA SHOULD clear the <code>Notification</code> and <code>Indication</code> bits in
+            the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
+            to clear the <code>Notification</code> and <code>Indication</code> bits in
             <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
           </li>
           <li>
-            <a>Queue a task</a> to resolve the promise.
+            <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with <code>undefined</code>.
           </li>
         </ol>
 
@@ -1052,6 +1062,7 @@
           Queuing a task to resolve the promise ensures that
           no <a href="#notification-events">value change events</a> due to notifications
           arrive after the promise resolves.
+        </p>
       </section>
 
       <section>
@@ -2148,6 +2159,7 @@
                         <li value="8"><dfn>Characteristic Value Read</dfn></li>
                         <li value="10"><dfn>Characteristic Value Notification</dfn></li>
                         <li value="11"><dfn>Characteristic Value Indications</dfn></li>
+                        <li value="12"><dfn>Characteristic Descriptors</dfn></li>
                         <li value="14"><dfn>Procedure Timeouts</dfn></li>
                       </ol>
                     </li>
