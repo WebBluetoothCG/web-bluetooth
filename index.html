@@ -874,7 +874,7 @@
           <dt>readonly attribute BluetoothGATTService service</dt>
           <dd>The GATT service this characteristic belongs to.</dd>
 
-          <dt>readonly attribute CharacteristicProperty[] properties</dt>
+          <dt>readonly attribute CharacteristicProperties properties</dt>
           <dd>The properties of this characteristic.</dd>
 
           <dt>readonly attribute DOMString instanceID</dt>
@@ -1086,6 +1086,76 @@
           no <a href="#notification-events">value change events</a> due to notifications
           arrive after the promise resolves.
         </p>
+
+        <section>
+          <h2><a>CharacteristicProperties</a></h2>
+
+          <p>
+            Each <a>BluetoothGATTCharacteristic</a> exposes its <a>characteristic properties</a>
+            through a <a>CharacteristicProperties</a> object.
+            If the Extended Properties bit of the <a>characteristic properties</a> is set,
+            the UA MUST <a title="Characteristic Descriptor Discovery">discover</a>
+            the <a>Characteristic Extended Properties</a> descriptor for this Characteristic
+            and <a title="Read Characteristic Descriptors">read its value</a>
+            in order to populate the <code>reliableWrite</code>
+            and <code>writableAuxiliaries</code> fields.
+          </p>
+
+          <dl title="interface CharacteristicProperties" class="idl">
+            <dt>readonly attribute boolean broadcast</dt>
+            <dd>
+              Returns the value of the Broadcast bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean read</dt>
+            <dd>
+              Returns the value of the Read bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean writeWithoutResponse</dt>
+
+            <dd>
+              Returns the value of the Write Without Response bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean write</dt>
+
+            <dd>
+              Returns the value of the Write bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean notify</dt>
+
+            <dd>
+              Returns the value of the Notify bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean indicate</dt>
+
+            <dd>
+              Returns the value of the Indicate bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean authenticatedSignedWrites</dt>
+
+            <dd>
+              Returns the value of the Authenticated Signed Writes bit
+              of the underlying <a>characteristic properties</a>.
+            </dd>
+            <dt>readonly attribute boolean reliableWrite</dt>
+
+            <dd>
+              Returns the value of the Reliable Write bit
+              of the <a>Characteristic Extended Properties</a> descriptor for this Characteristic.
+            </dd>
+            <dt>readonly attribute boolean writableAuxiliaries</dt>
+
+            <dd>
+              Returns the value of the Writable Auxiliaries bit
+              of the <a>Characteristic Extended Properties</a> descriptor for this Characteristic.
+            </dd>
+          </dl>
+        </section>
       </section>
 
       <section>
@@ -2148,6 +2218,7 @@
                             </li>
                             <li value="3">Characteristic Descriptor Declarations
                               <ol>
+                                <li value="1"><dfn>Characteristic Extended Properties</dfn></li>
                                 <li value="3"><dfn>Client Characteristic Configuration</dfn></li>
                               </ol>
                             </li>
@@ -2182,7 +2253,9 @@
                         <li value="8"><dfn>Characteristic Value Read</dfn></li>
                         <li value="10"><dfn>Characteristic Value Notification</dfn></li>
                         <li value="11"><dfn>Characteristic Value Indications</dfn></li>
-                        <li value="12"><dfn>Characteristic Descriptors</dfn></li>
+                        <li value="12"><dfn>Characteristic Descriptors</dfn>
+                          <ol value="1"><dfn>Read Characteristic Descriptors</dfn></ol>
+                        </li>
                         <li value="14"><dfn>Procedure Timeouts</dfn></li>
                       </ol>
                     </li>
