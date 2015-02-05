@@ -610,18 +610,27 @@
 
           <dt>Promise&lt;BluetoothGATTService> getPrimaryService(BluetoothServiceUuid service)</dt>
           <dd>
-            Returns a promise that is asynchronously resolved with
-            the <a href="#bluetooth-tree">first</a> primary GATT service on the remote device
-            whose UUID is <var>service</var> and
-            whose UUID is in the <a>allowed services list</a> for this device and origin.
-            If there is no such service, resolves the promise with <code>null</code>.
+            <ol>
+              <li>
+                <a>Query the Bluetooth cache</a> for
+                the first primary GATT service on the remote device whose UUID is <var>service</var>
+                and whose UUID is in the <a>allowed services list</a> for this device and origin,
+                and let <var>promise</var> be the result.
+              </li>
+              <li>
+                Return the result of
+                <a>transforming</a> <var>promise</var> with a fulfilment handler that
+                returns <code>null</code> if its argument is empty
+                or returns the first (only) element of its argument.
+              </li>
+            </ol>
           </dd>
 
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getPrimaryServices()</dt>
           <dd>
-            Returns a promise that is asynchronously resolved with
-            a sequence of all the primary GATT services on the remote device
-            whose UUIDs are in the <a>allowed services list</a> for this device and origin.
+            <a>Query the Bluetooth cache</a> for the primary GATT services on the remote device
+            whose UUIDs are in the <a>allowed services list</a> for this device and origin,
+            and return the result.
           </dd>
 
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getPrimaryServices(BluetoothServiceUuid service)</dt>
@@ -629,9 +638,10 @@
 
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getPrimaryServices(sequence&lt;BluetoothServiceUuid> services)</dt>
           <dd>
-            Returns a promise that is asynchronously resolved with
-            a sequence of all the primary GATT services on the remote device with UUIDs in
-            both <var>services</var> and the <a>allowed services list</a> for this device and origin.
+            <a>Query the Bluetooth cache</a> for the primary GATT services on the remote device
+            whose UUIDs are in both <var>services</var>
+            and the <a>allowed services list</a> for this device and origin,
+            and return the result.
           </dd>
         </dl>
 
@@ -645,6 +655,113 @@
 
     <section>
       <h2>GATT Interaction</h2>
+
+      <section>
+        <h2>GATT Information Model</h2>
+
+        <p class="note">
+          The <a>GATT Profile Hierarchy</a> describes how any device that supports <a>GATT</a>
+          can contain a hierarchy of Profiles, Primary Services, Included Services,
+          Characteristics, and Descriptors.
+          Profiles are purely logical:
+          the specification of a Profile describes the expected interactions between
+          the other GATT entities the Profile contains,
+          but it's impossible to query which Profiles a device supports.
+          On the other hand,
+          GATT defines a set of <a title="GATT procedures">procedures</a> to
+          discover and interact with the Services, Characteristics, and Descriptors on a device.
+          GATT also defines the <a>Service Changed</a> characteristic to allow clients
+          to cache the Services, Characteristics, and Descriptors they have discovered on a device.
+          Services, Characteristics, and Descriptors
+          can be ordered by their <a>Attribute Handle</a>,
+          but while platform interfaces provide these entities in an order,
+          they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
+        </p>
+
+        <p>
+          The UA MUST maintain a <dfn>Bluetooth cache</dfn>
+          of the hierarchy of Services, Characteristics, and Descriptors
+          it has discovered on a device.
+          The UA MAY share this cache between multiple origins accessing the same device.
+          Each potential entity in the cache is either known-present, known-absent, or unknown.
+          Each known-present entity in the cache is associated with an optional
+          <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
+          or <a>BluetoothGATTDescriptor</a> instance
+          for each <a>script execution environment</a>.
+        </p>
+
+        <p class="note">
+          For example, if a user calls the <code>serviceA.getCharacteristic(uuid1)</code> function
+          with an initially empty <a>Bluetooth cache</a>,
+          the UA uses the <a>Discover Characteristics by UUID</a> procedure
+          to fill the needed cache entries,
+          and the UA ends the procedure early because
+          it only needs one Characteristic to fulfil the returned <a>Promise</a>,
+          then the first Characteristic with UUID <code>uuid1</code> inside <code>serviceA</code>
+          is known-present,
+          and any subsequent Characteristics with that UUID remain unknown.
+          If the user later calls <code>serviceA.getCharacteristics(uuid1)</code>,
+          the UA needs to resume or restart the <a>Discover Characteristics by UUID</a> procedure.
+          If it turns out that
+          <code>serviceA</code> only has one Characteristic with UUID <code>uuid1</code>,
+          then the subsequent Characteristics become known-absent.
+        </p>
+
+        <p>
+          The known-present entries in the <a>Bluetooth cache</a> are ordered:
+          Primary Services appear in a particular order within a device,
+          Included Services and Characteristics appear in a particular order within Services,
+          and Descriptors appear in a particular order within Characteristics.
+          The order SHOULD match the order of <a>Attribute Handle</a>s on the device,
+          but UAs MAY use another order if the device's order isn't available.
+        </p>
+
+        <p>
+          To <dfn>query the Bluetooth cache</dfn> for entries matching some description,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
+        <ol>
+          <li>
+            Attempt to make all matching entries in the cache either known-present or known-absent,
+            using any sequence of <a>GATT procedures</a> that [[BLUETOOTH41]] specifies
+            will return enough information.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returns an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
+          </li>
+          <li>
+            Let <var>entries</var> be the sequence
+            of known-present cache entries matching the description.
+          </li>
+          <li>
+            Let <var>result</var> be a new sequence.
+          </li>
+          <li>
+            For each <var>entry</var> in <var>entries</var>:
+            <ol>
+              <li>
+                If <var>entry</var> has no associated <code>BluetoothGATT*</code> instance
+                for the current <a>script execution environment</a>,
+                create a <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
+                or <a>BluetoothGATTDescriptor</a>,
+                representing the Service, Characteristic, or Descriptor, respectively,
+                and associate it with <var>entry</var>.
+              </li>
+              <li>
+                Append to <var>result</var>
+                the <code>BluetoothGATT*</code> instance associated with <var>entry</var>
+                for the current <a>script execution environment</a>.
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a>Resolve</a> <var>promise</var> with <var>result</var>.
+          </li>
+        </ol>
+      </section>
 
       <section>
         <h2><a>BluetoothGATTService</a></h2>
@@ -678,36 +795,70 @@
 
           <dt>Promise&lt;BluetoothGATTCharacteristic> getCharacteristic(BluetoothCharacteristicUuid characteristic)</dt>
           <dd>
-            Returns a promise that is asynchronously resolved with
-            the <a href="#bluetooth-tree">first</a> GATT characteristic within this Service
-            whose UUID is <var>characteristic</var>.
+            <ol>
+              <li>
+                <a>Query the Bluetooth cache</a> for
+                the first GATT characteristic within this Service
+                whose UUID is <var>characteristic</var>,
+                and let <var>promise</var> be the result.
+              </li>
+              <li>
+                Return the result of
+                <a>transforming</a> <var>promise</var> with a fulfilment handler that
+                returns <code>null</code> if its argument is empty
+                or returns the first (only) element of its argument.
+              </li>
+            </ol>
           </dd>
 
           <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getCharacteristics()</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service.</dd>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the GATT characteristics within this Service
+            and return the result.
+          </dd>
           <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getCharacteristics(BluetoothCharacteristicUuid characteristic)</dt>
-          <dd>Returns <code>this.getCharacteristics([characteristic])</code></dd>
+          <dd>
+            Returns <code>this.getCharacteristics([characteristic])</code>
+          </dd>
           <dt>Promise&lt;sequence&lt;BluetoothGATTCharacteristic>> getCharacteristics(sequence&lt;BluetoothCharacteristicUuid> characteristics)</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT characteristics within this Service with UUIDs in <var>characteristics</var>.</dd>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the GATT characteristics within this Service
+            with UUIDs in <var>characteristics</var>,
+            and return the result.
+          </dd>
 
           <dt>Promise&lt;BluetoothGATTService> getIncludedService(BluetoothServiceUuid service)</dt>
           <dd>
-            Returns a promise that is asynchronously resolved with the first GATT included service
-            (in the order returned by the <a>Find Included Services</a> procedure)
-            within this Service whose UUID is <var>service</var>.
+            <ol>
+              <li>
+                <a>Query the Bluetooth cache</a> for the first GATT included service
+                within this Service whose UUID is <var>service</var>,
+                and let <var>promise</var> be the result.
+              </li>
+              <li>
+                Return the result of
+                <a>transforming</a> <var>promise</var> with a fulfilment handler that
+                returns <code>null</code> if its argument is empty
+                or returns the first (only) element of its argument.
+              </li>
+            </ol>
           </dd>
 
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getIncludedServices()</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service.</dd>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the GATT included services within this Service,
+            and return the result.
+          </dd>
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getIncludedServices(BluetoothServiceUuid service)</dt>
           <dd>
             Returns <code>this.getIncludedServices([service])</code>
-            <p class="note">
-              Bluetooth's procedure for finding included services (3.G.4.5) doesn't include a way to optimize for a single UUID.
-              Maybe we should omit this and the next overloads to avoid implying that they're more efficient than the no-argument version.
           </dd>
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>> getIncludedServices(sequence&lt;BluetoothServiceUuid> services)</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT included services within this Service with UUIDs in <var>services</var>.</dd>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the GATT included services within this Service
+            with UUIDs in <var>services</var>,
+            and return the result.
+          </dd>
         </dl>
       </section>
 
@@ -746,23 +897,41 @@
 
           <dt>Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUuid descriptor)</dt>
           <dd>
-            Returns a promise that is asynchronously resolved with
-            the <a href="#bluetooth-tree">first</a> GATT descriptor within this Characteristic
-            whose UUID is <var>descriptor</var>.
+            <ol>
+              <li>
+                <a>Query the Bluetooth cache</a> for
+                the first GATT descriptor within this Characteristic
+                whose UUID is <var>descriptor</var>,
+                and let <var>promise</var> be the result.
+              </li>
+              <li>
+                Return the result of
+                <a>transforming</a> <var>promise</var> with a fulfilment handler that
+                returns <code>null</code> if its argument is empty
+                or returns the first (only) element of its argument.
+              </li>
+            </ol>
           </dd>
 
           <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getDescriptors()</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic.</dd>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the GATT descriptors within this Characteristic,
+            and return the result.
+          </dd>
           <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getDescriptors(BluetoothDescriptorUuid descriptor)</dt>
           <dd>Returns <code>this.getDescriptors([descriptor])</code></dd>
           <dt>Promise&lt;sequence&lt;BluetoothGATTDescriptor>> getDescriptors(sequence&lt;BluetoothDescriptorUuid> descriptors)</dt>
-          <dd>Returns a promise that is asynchronously resolved with a sequence of all the GATT descriptors within this Characteristic with UUIDs in <var>descriptors</var>.</dd>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the GATT descriptors within this Characteristic
+            with UUIDs in <var>descriptors</var>,
+            and return the result.
+          </dd>
 
           <dt>Promise&lt;ArrayBuffer> readValue()</dt>
           <dd>
-            The UA MUST return a new promise and asynchronously
-            <a title="read the value of a BluetoothGATTCharacteristic">read the value of this characteristic</a>
-            resolving the promise.
+            Returns the result of
+            <a title="read the value of a BluetoothGATTCharacteristic"
+               >reading the value of this characteristic</a>.
           </dd>
 
           <dt>Promise&lt;void> writeValue()</dt>
@@ -777,21 +946,23 @@
 
           <dt>Promise&lt;void> startNotifications()</dt>
           <dd>
-            The UA MUST return a new Promise and asynchronously
-            <a>enable notifications</a> on this characteristic resolving the promise.
+            The UA MUST <a>enable notifications</a> on this characteristic
+            and return the result of that algorithm.
             See <a href="#notification-events"></a> for details of receiving notifications.
           </dd>
 
           <dt>Promise&lt;void> stopNotifications()</dt>
           <dd>
-            The UA MUST return a new Promise and asynchronously
-            <a>disable notifications</a> on this characteristic resolving the promise.
+            The UA MUST <a>disable notifications</a> on this characteristic
+            and return the result of that algorithm.
           </dd>
         </dl>
 
         <p>
-          To <dfn>read the value of a <a>BluetoothGATTCharacteristic</a></dfn> resolving a promise, the UA MUST:
-
+          To <dfn>read the value of a <a>BluetoothGATTCharacteristic</a></dfn>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
         <ol>
           <li>
             Let <var>characteristic</var> be the <a>Characteristic</a>
@@ -800,14 +971,17 @@
           <li>
             If the <code>Read</code> bit is not set
             in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
-            reject the promise with a <a>NotSupportedError</a> and abort these steps.
+            <a>reject</a> <var>promise</var> with a <a>NotSupportedError</a> and abort these steps.
           </li>
           <li>
             Use any combination of the sub-procedures in
             the <a>Characteristic Value Read</a> procedure
             to retrieve the value of <var>characteristic</var>.
-            <a>Use the Bluetooth error recovery procedure</a> with the promise.
-            If this fails, abort these steps.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returned an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
             Create an <code>ArrayBuffer</code> holding the retrieved value,
@@ -826,11 +1000,13 @@
           This is a single set for the whole UA,
           pointing to the <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a> object
           for each separate <a>script execution environment</a> that has registered for notifications.
+        </p>
 
         <p>
-          To <dfn>enable notifications</dfn> on
-          a <a>BluetoothGATTCharacteristic</a> resolving a promise, the UA MUST:
-
+          To <dfn>enable notifications</dfn> on a <a>BluetoothGATTCharacteristic</a>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
         <ol>
           <li>
             Let <var>characteristic</var> be
@@ -839,29 +1015,34 @@
           <li>
             If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
             in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
-            reject the promise with a <a>NotSupportedError</a> and abort these steps.
+            <a>reject</a> <var>promise</var> with a <a>NotSupportedError</a> and abort these steps.
           </li>
           <li>
             If the <a>active notification context set</a> contains
             <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
-            resolve the promise and abort these steps.
+            <a>resolve</a> <var>promise</var> with <code>undefined</code> and abort these steps.
           </li>
           <li>
-            Ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
+            Use any of the <a>Characteristic Descriptors</a> procedures
+            to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
             <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
-            is set, matching the constraints in <var>characteristic</var>'s properties.
+            is set, matching the constraints
+            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>.
             The UA SHOULD avoid setting both bits,
             and MUST deduplicate <a href="#notification-events">value-change events</a>
             if both bits are set.
-            <a>Use the Bluetooth error recovery procedure</a> with the promise.
-            If this fails, abort these steps.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returned an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
             Add <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
             to the <a>active notification context set</a>.
           </li>
           <li>
-            Resolve the promise.
+            <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
           </li>
         </ol>
 
@@ -872,11 +1053,13 @@
           <a title="perform a microtask checkpoint">microtask checkpoint</a>.
           This allows a developer to set up handlers
           in the <code>.then</code> handler of the result promise.
+        </p>
 
         <p>
-          To <dfn>disable notifications</dfn> on
-          a <a>BluetoothGATTCharacteristic</a> resolving a promise, the UA MUST:
-
+          To <dfn>disable notifications</dfn> on a <a>BluetoothGATTCharacteristic</a>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
         <ol>
           <li>
             Let <var>characteristic</var> be
@@ -889,11 +1072,12 @@
           </li>
           <li>
             If the <a>active notification context set</a> became empty,
-            the UA SHOULD clear the <code>Notification</code> and <code>Indication</code> bits in
+            the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
+            to clear the <code>Notification</code> and <code>Indication</code> bits in
             <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
           </li>
           <li>
-            <a>Queue a task</a> to resolve the promise.
+            <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with <code>undefined</code>.
           </li>
         </ol>
 
@@ -901,6 +1085,7 @@
           Queuing a task to resolve the promise ensures that
           no <a href="#notification-events">value change events</a> due to notifications
           arrive after the promise resolves.
+        </p>
       </section>
 
       <section>
@@ -1235,7 +1420,7 @@
         </section>
       </section>
 
-      <section>
+      <section id="error-handling">
         <h2>Error handling</h2>
 
         <p class="note">
@@ -1244,25 +1429,23 @@
           The retry logic and possible error distinctions
           are highly constrained by the operating system,
           so places these requirements don't reflect reality
-          are likely spec bugs instead of browser bugs.
+          are likely <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues">spec bugs</a>
+          instead of browser bugs.
+        </p>
 
         <p>
-          When a step in an algorithm that uses a Bluetooth <a title="GATT procedures">GATT procedure</a>
-          says to "<dfn>Use the Bluetooth error recovery procedure</dfn>" with a promise,
+          When the UA is using a <a title="GATT procedures">GATT procedure</a>
+          to execute a step in an algorithm or to handle a query to the <a>Bluetooth cache</a>
+          (both referred to as a "step", here),
+          and the GATT procedure returns an <code><a>Error Response</a></code>,
           the UA MUST perform the following steps:
+        </p>
 
         <ol>
           <li>
-            If the Bluetooth procedure completes with anything other than
-            an <code><a>Error Response</a></code>,
-            the recovery procedure succeeds.
-            Abort these steps.
-          </li>
-          <li>
             If the <a title="Procedure timeouts">procedure times out</a> or
             the ATT Bearer (described in <a>Profile Fundamentals</a>) is terminated for any reason,
-            reject the promise with a <a>NetworkError</a> and abort these steps.
-            The recovery procedure fails.
+            return a <a>NetworkError</a> from the step and abort these steps.
           </li>
           <li>
             Take the following actions depending on the <code>Error Code</code>:
@@ -1275,28 +1458,27 @@
               <dd>
                 These error codes indicate that something unexpected happened at the protocol layer,
                 likely either due to a UA or device bug.
-                Reject the promise with a <a>NotSupportedError</a>.
-                The recovery procedure fails.
+                Return a <a>NotSupportedError</a> from the step.
               </dd>
 
               <dt><code>Invalid Attribute Value Length</code></dt>
               <dd>
-                Reject the promise with an <a>InvalidModificationError</a>.
-                The recovery procedure fails.
+                Return an <a>InvalidModificationError</a> from the step.
               </dd>
 
               <dt><code>Attribute Not Long</code></dt>
               <dd>
-                If this error code is received without having used a "Long" sub-procedure,
-                this may indicate a device bug.
-                Reject the promise with a <a>NotSupportedError</a>,
-                and the recovery procedure fails.
+                <p>
+                  If this error code is received without having used a "Long" sub-procedure,
+                  this may indicate a device bug.
+                  Return a <a>NotSupportedError</a> from the step.
+                </p>
 
                 <p>
-                  Otherwise, retry the GATT procedure without using a "Long" sub-procedure.
+                  Otherwise, retry the step without using a "Long" sub-procedure.
                   If this is impossible due to the length of the value being written,
-                  reject the promise with an <a>InvalidModificationError</a>,
-                  and the recovery procedure fails.
+                  return an <a>InvalidModificationError</a> from the step.
+                </p>
               </dd>
 
               <dt><code>Insufficient Authentication</code></dt>
@@ -1305,15 +1487,13 @@
               <dd>
                 The UA SHOULD attempt to increase the security level of the connection.
                 If this attempt fails or the UA doesn't support any higher security,
-                reject the promise with a <a>SecurityError</a>,
-                and the recovery procedure fails.
-                Otherwise, retry the GATT procedure at the new higher security level.
+                Return a <a>SecurityError</a> from the step.
+                Otherwise, retry the step at the new higher security level.
               </dd>
 
               <dt><code>Insufficient Authorization</code></dt>
               <dd>
-                Reject the promise with a <a>SecurityError</a>,
-                and the recovery procedure fails.
+                Return a <a>SecurityError</a> from the step.
               </dd>
 
               <dt><code>Read Not Permitted</code></dt>
@@ -1324,8 +1504,7 @@
               <dt><code>Unlikely Error</code></dt>
               <dt>Anything else</dt>
               <dd>
-                Reject the promise with a <a>NotSupportedError</a>.
-                The recovery procedure fails.
+                Return a <a>NotSupportedError</a> from the step.
               </dd>
             </dl>
           </li>
@@ -1929,6 +2108,7 @@
                         <li value="2">Basic Concepts
                           <ol>
                             <li value="1"><dfn>Attribute Type</dfn> and <dfn>UUID aliases</dfn></li>
+                            <li value="2"><dfn>Attribute Handle</dfn></li>
                           </ol>
                         </li>
                         <li value="4">Attribute Protocol Pdus
@@ -1954,6 +2134,7 @@
                             <li value="2"><dfn>Attribute Caching</dfn></li>
                           </ol>
                         </li>
+                        <li value="6"><dfn>GATT Profile Hierarchy</dfn></li>
                       </ol>
                     </li>
                     <li value="3">Service Interoperability Requirements
@@ -1989,6 +2170,7 @@
                         </li>
                         <li value="6"><dfn>Characteristic Discovery</dfn>
                           <ol>
+                            <li value="1"><dfn>Discover All Characteristics of a Service</dfn></li>
                             <li value="2"><dfn>Discover Characteristics by UUID</dfn></li>
                           </ol>
                         </li>
@@ -2000,6 +2182,7 @@
                         <li value="8"><dfn>Characteristic Value Read</dfn></li>
                         <li value="10"><dfn>Characteristic Value Notification</dfn></li>
                         <li value="11"><dfn>Characteristic Value Indications</dfn></li>
+                        <li value="12"><dfn>Characteristic Descriptors</dfn></li>
                         <li value="14"><dfn>Procedure Timeouts</dfn></li>
                       </ol>
                     </li>
@@ -2126,6 +2309,10 @@
                    ><dfn>Reject</dfn> a promise with ...</a></li>
             <li><a href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise"
                    ><dfn>Resolve</dfn> a promise with ...</a></li>
+            <li>
+              <a href="https://www.w3.org/2001/tag/doc/promises-guide#transforming-by"
+                 ><dfn>Transforming</dfn> a promise with a fulfillment and/or rejection handler</a>
+            </li>
           </ul>
         </dd>
       </dl>
