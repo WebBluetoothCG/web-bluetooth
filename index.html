@@ -676,8 +676,9 @@
           The UA MAY share this cache between multiple origins accessing the same device.
           Each potential entity in the cache is either known-present, known-absent, or unknown.
           Each known-present entity in the cache is associated with an optional
-          <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
-          or <a>BluetoothGATTDescriptor</a> instance
+          <code>Promise&lt;<a>BluetoothGATTService</a>></code>,
+          <code>Promise&lt;<a>BluetoothGATTCharacteristic</a>></code>,
+          or <code>Promise&lt;<a>BluetoothGATTDescriptor</a>></code> instance
           for each <a>script execution environment</a>.
         </p>
 
@@ -736,20 +737,26 @@
               <li>
                 If <var>entry</var> has no associated <code>BluetoothGATT*</code> instance
                 for the current <a>script execution environment</a>,
-                create a <a>BluetoothGATTService</a>, <a>BluetoothGATTCharacteristic</a>,
-                or <a>BluetoothGATTDescriptor</a>,
-                representing the Service, Characteristic, or Descriptor, respectively,
-                and associate it with <var>entry</var>.
+                <a>create a <code>BluetoothGATTService</code>
+                representing</a> <var>entry</var>,
+                <a>create a <code>BluetoothGATTCharacteristic</code>
+                representing</a> <var>entry</var>,
+                or <a>create a <code>BluetoothGATTDescriptor</code>
+                representing</a> <var>entry</var>,
+                depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
+                and associate the resulting <code>Promise</code> with <var>entry</var>.
               </li>
               <li>
                 Append to <var>result</var>
-                the <code>BluetoothGATT*</code> instance associated with <var>entry</var>
+                the <code>Promise&lt;BluetoothGATT*></code> instance
+                associated with <var>entry</var>
                 for the current <a>script execution environment</a>.
               </li>
             </ol>
           </li>
           <li>
-            <a>Resolve</a> <var>promise</var> with <var>result</var>.
+            <a>Resolve</a> <var>promise</var> with the result of
+            <a>waiting for all</a> elements of <var>result</var>.
           </li>
         </ol>
 
@@ -815,6 +822,33 @@
         <h2><a>BluetoothGATTService</a></h2>
 
         <p><a>BluetoothGATTService</a> represents a GATT <a>Service</a> within a Bluetooth <a>Peripheral</a>, a collection of characteristics and relationships to other services that encapsulate the behavior of part of a device.</p>
+
+        <p>
+          To <dfn>create a <code>BluetoothGATTService</code> representing</dfn>
+          a Service <var>service</var>,
+          the UA must return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>.
+        </p>
+        <ol>
+          <li>Let <var>result</var> be a new instance of <a>BluetoothGATTService</a>.</li>
+          <li>Initialize <code>result.uuid</code> from the UUID of <var>service</var>.</li>
+          <li>
+            If <var>service</var> is a Primary Service,
+            initialize <code>result.isPrimary</code> to true.
+            Otherwise initialize <code>result.isPrimary</code> to false.
+          </li>
+          <li>
+            Initialize <code>result.device</code> from
+            the <a>BluetoothDevice</a> instance representing
+            the device in which <var>service</var> appears.
+          </li>
+          <li>
+            <a>Get an attribute id</a> for <var>service</var>,
+            and initialize <code>result.instanceID</code> to the result.
+          </li>
+          <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
+        </ol>
+
         <dl title="interface BluetoothGATTService : ServiceEventHandlers" class="idl">
 
           <dt>readonly attribute UUID uuid</dt>
@@ -902,6 +936,49 @@
         <h2><a>BluetoothGATTCharacteristic</a></h2>
 
         <p><a>BluetoothGATTCharacteristic</a> represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
+
+        <p>
+          To <dfn>create a <code>BluetoothGATTCharacteristic</code> representing</dfn>
+          a Characteristic <var>characteristic</var>,
+          the UA must return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>.
+        </p>
+        <ol>
+          <li>Let <var>result</var> be a new instance of <a>BluetoothGATTCharacteristic</a>.</li>
+          <li>Initialize <code>result.uuid</code> from the UUID of <var>characteristic</var>.</li>
+          <li>
+            Initialize <code>result.service</code> from
+            the <a>BluetoothGATTService</a> instance representing
+            the Service in which <var>characteristic</var> appears.
+          </li>
+          <li>
+            <a>Get an attribute id</a> for <var>characteristic</var>,
+            and initialize <code>result.instanceID</code> to the result.
+          </li>
+          <li>
+            <a>Create a <code>CharacteristicProperties</code> instance
+            from the Characteristic</a> <var>characteristic</var>,
+            and let <var>propertiesPromise</var> be the result.
+          </li>
+          <li>Wait for <var>propertiesPromise</var> to settle.</li>
+          <li>
+            If <var>propertiesPromise</var> was rejected,
+            <a>resolve</a> <var>promise</var> with <var>propertiesPromise</var> and abort these steps.
+          </li>
+          <li>
+            Initialize <code>result.properties</code> from
+            the value <var>propertiesPromise</var> was fulfilled with.
+          </li>
+          <li>
+            Initialize <code>result.value</code> to <code>null</code>.
+            The UA MAY initialize <code>result.value</code> to
+            a new <code>ArrayBuffer</code> containing
+            the most recently read value from <var>characteristic</var>
+            if this value is available.
+          </li>
+          <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
+        </ol>
+
         <dl title="interface BluetoothGATTCharacteristic : CharacteristicEventHandlers" class="idl">
 
           <dt>readonly attribute UUID uuid</dt>
@@ -1125,13 +1202,67 @@
           <p>
             Each <a>BluetoothGATTCharacteristic</a> exposes its <a>characteristic properties</a>
             through a <a>CharacteristicProperties</a> object.
-            If the Extended Properties bit of the <a>characteristic properties</a> is set,
-            the UA MUST <a title="Characteristic Descriptor Discovery">discover</a>
-            the <a>Characteristic Extended Properties</a> descriptor for this Characteristic
-            and <a title="Read Characteristic Descriptors">read its value</a>
-            in order to populate the <code>reliableWrite</code>
-            and <code>writableAuxiliaries</code> fields.
+            To <dfn>create a <code>CharacteristicProperties</code> instance
+            from the Characteristic</dfn> <var>characteristic</var>,
+            the UA MUST return <a>a new promise</a> <var>promise</var>
+            and run the following steps <a>in parallel</a>:
           </p>
+          <ol>
+            <li>
+              Let <var>propertiesObj</var> be a new instance of <a>CharacteristicProperties</a>.
+            </li>
+            <li>
+              Let <var>properties</var> be
+              the <a>characteristic properties</a> of <var>characteristic</var>.
+            </li>
+            <li>
+              Initialize the attributes of <var>propertiesObj</var> from
+              the corresponding bits in <var>properties</var>:
+              <table>
+                <tr><th>Attribute</th><th>Bit</th></tr>
+                <tr><td><code>broadcast</code></td><td>Broadcast</td></tr>
+                <tr><td><code>read</code></td><td>Read</td></tr>
+                <tr><td><code>writeWithoutResponse</code></td><td>Write Without Response</td></tr>
+                <tr><td><code>write</code></td><td>Write</td></tr>
+                <tr><td><code>notify</code></td><td>Notify</td></tr>
+                <tr><td><code>indicate</code></td><td>Indicate</td></tr>
+                <tr>
+                  <td><code>authenticatedSignedWrites</code></td>
+                  <td>Authenticated Signed Writes</td>
+                </tr>
+              </table>
+            </li>
+            <li>
+              If the Extended Properties bit of the <a>characteristic properties</a> is not set,
+              initialize <code><var>properties</var>.reliableWrite</code> and
+              <code><var>properties</var>.writableAuxiliaries</code> to <code>false</code>.
+              Otherwise, run the following steps:
+              <ol>
+                <li>
+                  <a title="Characteristic Descriptor Discovery">Discover</a> the
+                  <a>Characteristic Extended Properties</a> descriptor for <var>characteristic</var>
+                  and <a title="Read Characteristic Descriptors">read its value</a>
+                  into <var>extendedProperties</var>.
+                  Handle errors as described in <a href="#error-handling"></a>.
+                </li>
+                <li>
+                  If the previous step returned an error,
+                  <a>reject</a> <var>promise</var> with that error and abort these steps.
+                </li>
+                <li>
+                  Initialize <var>propertiesObj.reliableWrite</var> from
+                  the Reliable Write bit of <var>extendedProperties</var>.
+                </li>
+                <li>
+                  Initialize <var>propertiesObj.writableAuxiliaries</var> from
+                  the Writable Auxiliaries bit of <var>extendedProperties</var>.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a>Resolve</a> <var>promise</var> with <var>propertiesObj</var>.
+            </li>
+          </ol>
 
           <dl title="interface CharacteristicProperties" class="idl">
             <dt>readonly attribute boolean broadcast</dt>
@@ -1195,6 +1326,35 @@
         <h2><a>BluetoothGATTDescriptor</a></h2>
 
         <p><a>BluetoothGATTDescriptor</a> represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
+
+        <p>
+          To <dfn>create a <code>BluetoothGATTDescriptor</code> representing</dfn>
+          a Descriptor <var>descriptor</var>,
+          the UA must return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>.
+        </p>
+        <ol>
+          <li>Let <var>result</var> be a new instance of <a>BluetoothGATTDescriptor</a>.</li>
+          <li>Initialize <code>result.uuid</code> from the UUID of <var>descriptor</var>.</li>
+          <li>
+            Initialize <code>result.characteristic</code> from
+            the <a>BluetoothGATTCharacteristic</a> instance representing
+            the Characteristic in which <var>descriptor</var> appears.
+          </li>
+          <li>
+            <a>Get an attribute id</a> for <var>descriptor</var>,
+            and initialize <code>result.instanceID</code> to the result.
+          </li>
+          <li>
+            Initialize <code>result.value</code> to <code>null</code>.
+            The UA MAY initialize <code>result.value</code> to
+            a new <code>ArrayBuffer</code> containing
+            the most recently read value from <var>descriptor</var>
+            if this value is available.
+          </li>
+          <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
+        </ol>
+
         <dl title="interface BluetoothGATTDescriptor" class="idl">
 
           <dt>readonly attribute UUID uuid</dt>
@@ -2416,6 +2576,10 @@
             <li>
               <a href="https://www.w3.org/2001/tag/doc/promises-guide#transforming-by"
                  ><dfn>Transforming</dfn> a promise with a fulfillment and/or rejection handler</a>
+            </li>
+            <li>
+              <a href="http://www.w3.org/2001/tag/doc/promises-guide#waiting-for-all"
+                 ><dfn>Waiting for all</dfn> of a collection of promises</a>
             </li>
           </ul>
         </dd>
