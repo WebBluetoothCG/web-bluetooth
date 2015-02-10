@@ -752,6 +752,63 @@
             <a>Resolve</a> <var>promise</var> with <var>result</var>.
           </li>
         </ol>
+
+        <section>
+          <h2>Identifying Services, Characteristics, and Descriptors</h2>
+
+          <p>
+            When checking whether two Services, Characteristics, or Descriptors
+            <var>a</var> and <var>b</var> are the <dfn>same attribute</dfn>,
+            the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var>
+            are inside the same Bluetooth Device and have the same <a>Attribute Handle</a>,
+            but MAY use any algorithm it wants with the constraint that
+            <var>a</var> and <var>b</var> MUST NOT be the <a>same attribute</a> if
+            they fit any of the following conditions:
+          </p>
+          <ul>
+            <li>They are not both Services, both Characteristics, or both Descriptors.</li>
+            <li>They are both Services, but are not both primary or both secondary services.</li>
+            <li>They have different UUIDs.</li>
+            <li>
+              Their parent Devices aren't the same Device or
+              their parent Services, or Characteristics aren't the <a>same attribute</a>.
+            </li>
+          </ul>
+
+          <p class="note">
+            This definition is loose because platform APIs expose their own notion of identity
+            without documenting whether it's based on <a>Attribute Handle</a> equality.
+          </p>
+
+          <p>
+            For each origin, the UA must maintain an <dfn>attribute instance id map</dfn>
+            mapping Services, Characteristics, and Descriptors to <code>DOMString</code>s.
+          </p>
+
+          <p>
+            To <dfn>get an attribute id</dfn> for
+            a Service, Characteristic, or Descriptor <var>attribute</var>,
+            the UA MUST run the following steps.
+          </p>
+          <ol>
+            <li>
+              If <var>attribute</var> is the <a>same attribute</a> as
+              a key in this origin's <a>attribute instance id map</a>,
+              return the <code>DOMString</code> for that key and abort these steps.
+            </li>
+            <li>
+              Let <var>id</var> be a new <code>DOMString</code> that
+              isn't equal to any value in this origin's <a>attribute instance id map</a>.
+            </li>
+            <li>
+              Add a mapping from <var>attribute</var> to <var>id</var> in
+              this origin's <a>attribute instance id map</a>.
+            </li>
+            <li>
+              Return <var>id</var>.
+            </li>
+          </ol>
+        </section>
       </section>
 
       <section>
@@ -1377,11 +1434,9 @@
               Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
             </li>
             <li>
-              If the same <a>Service</a> appears in both <var>removedEntities</var> and <var>addedEntities</var>,
+              If the <a title="same attribute">same</a> <a>Service</a> appears in
+              both <var>removedEntities</var> and <var>addedEntities</var>,
               remove it from both, and add it to <var>changedServices</var>.
-              <a>Service</a>s with different UUIDs or Primary/Secondary status
-              MUST NOT be considered "the same",
-              but this specification says nothing else about determining identity.
             </li>
             <li>
               For each <a>Characteristic</a> and <a>Descriptor</a>
