@@ -769,7 +769,7 @@
             the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var>
             are inside the same Bluetooth Device and have the same <a>Attribute Handle</a>,
             but MAY use any algorithm it wants with the constraint that
-            <var>a</var> and <var>b</var> MUST NOT be the <a>same attribute</a> if
+            <var>a</var> and <var>b</var> MUST NOT be considered the <a>same attribute</a> if
             they fit any of the following conditions:
           </p>
           <ul>
@@ -778,7 +778,7 @@
             <li>They have different UUIDs.</li>
             <li>
               Their parent Devices aren't the same Device or
-              their parent Services, or Characteristics aren't the <a>same attribute</a>.
+              their parent Services or Characteristics aren't the <a>same attribute</a>.
             </li>
           </ul>
 
@@ -831,20 +831,22 @@
         </p>
         <ol>
           <li>Let <var>result</var> be a new instance of <a>BluetoothGATTService</a>.</li>
-          <li>Initialize <code>result.uuid</code> from the UUID of <var>service</var>.</li>
           <li>
-            If <var>service</var> is a Primary Service,
-            initialize <code>result.isPrimary</code> to true.
-            Otherwise initialize <code>result.isPrimary</code> to false.
+            Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
           </li>
           <li>
-            Initialize <code>result.device</code> from
+            If <var>service</var> is a Primary Service,
+            initialize <code><var>result</var>.isPrimary</code> to true.
+            Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.device</code> from
             the <a>BluetoothDevice</a> instance representing
             the device in which <var>service</var> appears.
           </li>
           <li>
             <a>Get an attribute id</a> for <var>service</var>,
-            and initialize <code>result.instanceID</code> to the result.
+            and initialize <code><var>result</var>.instanceID</code> to the result.
           </li>
           <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
         </ol>
@@ -945,15 +947,18 @@
         </p>
         <ol>
           <li>Let <var>result</var> be a new instance of <a>BluetoothGATTCharacteristic</a>.</li>
-          <li>Initialize <code>result.uuid</code> from the UUID of <var>characteristic</var>.</li>
           <li>
-            Initialize <code>result.service</code> from
+            Initialize <code><var>result</var>.uuid</code> from
+            the UUID of <var>characteristic</var>.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.service</code> from
             the <a>BluetoothGATTService</a> instance representing
             the Service in which <var>characteristic</var> appears.
           </li>
           <li>
             <a>Get an attribute id</a> for <var>characteristic</var>,
-            and initialize <code>result.instanceID</code> to the result.
+            and initialize <code><var>result</var>.instanceID</code> to the result.
           </li>
           <li>
             <a>Create a <code>CharacteristicProperties</code> instance
@@ -963,15 +968,16 @@
           <li>Wait for <var>propertiesPromise</var> to settle.</li>
           <li>
             If <var>propertiesPromise</var> was rejected,
-            <a>resolve</a> <var>promise</var> with <var>propertiesPromise</var> and abort these steps.
+            <a>resolve</a> <var>promise</var> with <var>propertiesPromise</var> and
+            abort these steps.
           </li>
           <li>
-            Initialize <code>result.properties</code> from
+            Initialize <code><var>result</var>.properties</code> from
             the value <var>propertiesPromise</var> was fulfilled with.
           </li>
           <li>
-            Initialize <code>result.value</code> to <code>null</code>.
-            The UA MAY initialize <code>result.value</code> to
+            Initialize <code><var>result</var>.value</code> to <code>null</code>.
+            The UA MAY initialize <code><var>result</var>.value</code> to
             a new <code>ArrayBuffer</code> containing
             the most recently read value from <var>characteristic</var>
             if this value is available.
@@ -1234,8 +1240,8 @@
             </li>
             <li>
               If the Extended Properties bit of the <a>characteristic properties</a> is not set,
-              initialize <code><var>properties</var>.reliableWrite</code> and
-              <code><var>properties</var>.writableAuxiliaries</code> to <code>false</code>.
+              initialize <code><var>propertiesObj</var>.reliableWrite</code> and
+              <code><var>propertiesObj</var>.writableAuxiliaries</code> to <code>false</code>.
               Otherwise, run the following steps:
               <ol>
                 <li>
@@ -1244,17 +1250,22 @@
                   and <a title="Read Characteristic Descriptors">read its value</a>
                   into <var>extendedProperties</var>.
                   Handle errors as described in <a href="#error-handling"></a>.
+                  <p class="issue">
+                    <a>Characteristic Extended Properties</a> isn't clear whether
+                    the extended properties are immutable for a given Characteristic.
+                    If they are, the UA should be allowed to cache them.
+                  </p>
                 </li>
                 <li>
                   If the previous step returned an error,
                   <a>reject</a> <var>promise</var> with that error and abort these steps.
                 </li>
                 <li>
-                  Initialize <var>propertiesObj.reliableWrite</var> from
+                  Initialize <code><var>propertiesObj</var>.reliableWrite</code> from
                   the Reliable Write bit of <var>extendedProperties</var>.
                 </li>
                 <li>
-                  Initialize <var>propertiesObj.writableAuxiliaries</var> from
+                  Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
                   the Writable Auxiliaries bit of <var>extendedProperties</var>.
                 </li>
               </ol>
@@ -1335,19 +1346,21 @@
         </p>
         <ol>
           <li>Let <var>result</var> be a new instance of <a>BluetoothGATTDescriptor</a>.</li>
-          <li>Initialize <code>result.uuid</code> from the UUID of <var>descriptor</var>.</li>
           <li>
-            Initialize <code>result.characteristic</code> from
+            Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.characteristic</code> from
             the <a>BluetoothGATTCharacteristic</a> instance representing
             the Characteristic in which <var>descriptor</var> appears.
           </li>
           <li>
             <a>Get an attribute id</a> for <var>descriptor</var>,
-            and initialize <code>result.instanceID</code> to the result.
+            and initialize <code><var>result</var>.instanceID</code> to the result.
           </li>
           <li>
-            Initialize <code>result.value</code> to <code>null</code>.
-            The UA MAY initialize <code>result.value</code> to
+            Initialize <code><var>result</var>.value</code> to <code>null</code>.
+            The UA MAY initialize <code><var>result</var>.value</code> to
             a new <code>ArrayBuffer</code> containing
             the most recently read value from <var>descriptor</var>
             if this value is available.
