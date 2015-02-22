@@ -304,22 +304,6 @@
     <section>
       <h2>Device Discovery</h2>
 
-      <p>
-        The UA MUST maintain an <dfn>allowed devices list</dfn> for each origin,
-        storing a set of Bluetooth devices the origin is allowed to access.
-        For each device in the <a>allowed devices list</a> for an origin,
-        the UA MUST maintain an <dfn>allowed services list</dfn> consisting of
-        UUIDs for GATT Primary <a>Service</a>s the origin is allowed to access on the device.
-        The UA MAY remove devices from the <a>allowed devices list</a> at any time
-        based on signals from the user.
-        For example, if the user chooses not to remember access,
-        the UA might remove a device when the tab that was granted access to it is closed.
-        Or the UA might provide a revocation UI that allows the user
-        to explicitly remove a device even while a tab is actively using that device.
-        If a device is removed from this list while
-        a <a>Promise</a> is pending to do something with the device,
-        it MUST be treated the same as if the device moved out of Bluetooth range.
-
       <dl title="[NoInterfaceObject] interface BluetoothDiscovery" class="idl" data-merge="BluetoothScanFilter RequestDeviceOptions">
         <dt>Promise&lt;BluetoothDevice> requestDevice(sequence&lt;BluetoothScanFilter> filters, optional RequestDeviceOptions options)</dt>
         <dd>
@@ -352,21 +336,21 @@
               The UA MAY allow the user to select a nearby device that does not match <var>filters</var>.
             </li>
             <li>
-              Wait for the user to have made their selection.
+              Wait for the user to have selected a <var>device</var> or cancelled the prompt.
             </li>
             <li>
               If the user cancels the prompt,
               <a>reject</a> <var>promise</var> with a <a>NotFoundError</a> and abort these steps.
             </li>
             <li>
-              Record the selected device in the origin's <a>allowed devices list</a>
-              and the union of the service UUIDs from <code>filters</code>
-              and <code>options.optionalServices</code>
-              in the device and origin's <a>allowed services list</a>.
+              <a title="add an allowed bluetooth device"
+                 >Add <var>device</var> to the origin's allowed devices map.</a>
+              with the union of the service UUIDs from <code>filters</code>
+              and <code>options.optionalServices</code> as <var>allowed services</var>.
             </li>
             <li>
-              <a>Resolve</a> <var>promise</var> with
-              a <a>BluetoothDevice</a> instance representing the selected device.
+              <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
+              and <a>resolve</a> <var>promise</var> with the result.
             </li>
           </ol>
         </dd>
@@ -584,7 +568,7 @@
             Devices bond using the <a>Bonding Procedure</a>.
             <p class="note">
               The Bluetooth standard uses "pairing" to refer to
-              the creation and exchange of a shared secret,
+              creating and exchanging a shared secret,
               and "bonding" to refer to storing that secret for use in subsequent connections.
               Platform APIs don't give independent control of the two processes,
               and they present the combined process to users under the label "pairing",
@@ -637,138 +621,200 @@
         <h2>Per-origin Bluetooth device properties</h2>
 
         <p>
-          For each origin, the UA must maintain a <dfn>device id map</dfn>
-          mapping <a>Bluetooth device</a>s to <code>DOMString</code>s.
+          For each origin, the UA MUST maintain an <dfn>allowed devices map</dfn>,
+          whose keys are the <a>Bluetooth device</a>s the origin is allowed to access,
+          and whose values are pairs of a <code>DOMString</code> <dfn>device id</dfn> and
+          an <dfn>allowed services list</dfn> consisting of UUIDs
+          for GATT Primary <a>Service</a>s the origin is allowed to access on the device.
         </p>
 
-          <p>
-            To <dfn>get a device id</dfn> for a <a>Bluetooth device</a> <var>device</var>,
-            the UA MUST run the following steps.
-          </p>
-          <ol>
-            <li>
-              If <var>device</var> is the <a>same device</a> as
-              a key in this origin's <a>device id map</a>,
-              return the <code>DOMString</code> for that key and abort these steps.
-            </li>
-            <li>
-              Let <var>id</var> be a new <code>DOMString</code> that
-              isn't equal to any value in this origin's <a>device id map</a>
-              and isn't equal to any of <var>device</var>'s
-              <a>Public Bluetooth Address</a>, <a>Static Address</a>,
-              or <a>Identity Resolving Key</a>.
-            </li>
-            <li>
-              Add a mapping from <var>device</var> to <var>id</var> in
-              this origin's <a>device id map</a>.
-            </li>
-            <li>
-              Return <var>id</var>.
-            </li>
-          </ol>
+        <p>
+          The UA MAY remove devices from the <a>allowed devices map</a> at any time
+          based on signals from the user.
+          <span class="issue">
+            This needs a definition involving
+            removing <a>BluetoothDevice</a> instances from <a>device instance map</a>s
+            and clearing out their [<span></span>[representedDevice]] fields.
+          </span>
+          For example, if the user chooses not to remember access,
+          the UA might remove a device when the tab that was granted access to it is closed.
+          Or the UA might provide a revocation UI that allows the user
+          to explicitly remove a device even while a tab is actively using that device.
+          If a device is removed from this list while
+          a <a>Promise</a> is pending to do something with the device,
+          it MUST be treated the same as if the device moved out of Bluetooth range.
+        </p>
+
+        <p>
+          To <dfn>add an allowed <a>Bluetooth device</a></dfn> <var>device</var>
+          to an origin's <a>allowed devices map</a>
+          with an optional <var>allowed services</var> list of <a>UUID</a>s,
+          the UA MUST run the following steps.
+        </p>
+        <ol>
+          <li>
+            If <var>device</var> is the <a>same device</a> as
+            an existing key in the <a>allowed devices map</a>,
+            abort these steps.
+          </li>
+          <li>
+            Let <var>id</var> be a new <code>DOMString</code> that
+            isn't equal to any of the <a>device id</a>s the origin's <a>allowed devices map</a>
+            and isn't equal to any of <var>device</var>'s
+            <a>Public Bluetooth Address</a>, <a>Static Address</a>,
+            or <a>Identity Resolving Key</a>.
+          </li>
+          <li>
+            If <var>allowed services</var> wasn't provided, set it to an empty list.
+          </li>
+          <li>
+            Add a mapping from <var>device</var>
+            to a pair of <var>id</var> and <var>allowed servces</var>
+            in the <a>allowed devices map</a>.
+          </li>
+        </ol>
+
+        <p>
+          To <dfn>get the device id</dfn> for a <a>Bluetooth device</a> <var>device</var>,
+          the UA MUST run the following steps.
+        </p>
+        <ol>
+          <li>
+            Find the key in this origin's <a>allowed devices map</a>
+            that is the <a>same device</a> as <var>device</var>.
+            If there is no such key, this specification has a bug.
+          </li>
+          <li>Return the <a>device id</a> this key maps to.</li>
+        </ol>
       </section>
 
       <section>
         <h2><a>BluetoothDevice</a></h2>
 
         <p>
-          A <a>BluetoothDevice</a> instance represents a known <a>Bluetooth device</a>
+          A <a>BluetoothDevice</a> instance represents a <a>Bluetooth device</a>
           inside a particular <a>script execution environment</a>.
-          To <dfn>create a <code>BluetoothDevice</code> representing</dfn>
+        </p>
+
+        <p>
+          For each <a>script execution environment</a>,
+          the UA must maintain a <dfn>device instance map</dfn>
+          mapping <a>Bluetooth device</a>s
+          to <code>Promise&lt;<a>BluetoothDevice</a>></code> instances.
+          To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
           a <a>Bluetooth device</a> <var>device</var>,
-          the UA must return <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>.
+          the UA MUST run the following steps:
         </p>
         <ol>
-          <li>Let <var>result</var> be a new instance of <a>BluetoothDevice</a>.</li>
-          <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
           <li>
-            <a>Get a device id</a> for <var>device</var>,
-            and initialize <code><var>result</var>.instanceId</code> to the result.
+            If there is a key in
+            the current <a>script execution environment</a>'s <a>device instance map</a>
+            that is the <a>same device</a> as <var>device</var>,
+            return its value and abort these steps.
           </li>
+          <li>Let <var>promise</var> be <a>a new promise</a>.</li>
           <li>
-            If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
-            set <code><var>result</var>.instanceId</code> to that string.
+            Add a mapping from <var>device</var> to <var>promise</var>
+            in the current <a>script execution environment</a>'s <a>device instance map</a>.
           </li>
-          <li>
-            If <var>device</var> has a <a>Class of Device</a>,
-            set <code><var>result</var>.deviceClass</code> to that value.
-          </li>
-          <li>
-            <a>Populate the Bluetooth cache</a> with
-            the <a>org.bluetooth.characteristic.pnp_id</a> characteristic inside
-            the <a>org.bluetooth.service.device_information</a> service.
-            Ignore any errors from this step.
-          </li>
-          <li>
-            If the <a>Bluetooth cache</a> now has a known-present entry for this characteristic,
-            run the following substeps.
+          <li>Return <var>promise</var>, and run the following steps <a>in parallel</a>.
             <ol>
+              <li>Let <var>result</var> be a new instance of <a>BluetoothDevice</a>.</li>
+              <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
               <li>
-                Use any combination of the sub-procedures in
-                the <a>Characteristic Value Read</a> procedure to retrieve the value
-                of the <a>org.bluetooth.characteristic.pnp_id</a> characteristic
-                into <var>pnp</var>.
-                Handle errors as described in 5.7 Error handling.
-              </li>
-              <li>If the previous step returned an error, abort these substeps.</li>
-              <li>
-                Parse <var>pnp</var> as specified by
-                the <a>org.bluetooth.characteristic.pnp_id</a> characteristic definition.
-                If it's not 7 bytes long or
-                if the Vendor ID Source is not <code>1</code> or <code>2</code>,
-                abort these substeps.
+                Initialize an internal
+                <code><var>result</var>@[<span></span>[representedDevice]]</code> field
+                to <var>device</var>.
               </li>
               <li>
-                Set <code><var>result</var>.vendorIDSource</code> according to the following table:
-                <table>
-                  <tr><th>Parsed Vendor Id Source</th><th><code>vendorIDSource</code></th></tr>
-                  <tr><td>1</td><td><code>"bluetooth"</code></td>
-                  <tr><td>2</td><td><code>"usb"</code></td>
-                </table>
+                <a>Get the device id</a> for <var>device</var>,
+                and initialize <code><var>result</var>.instanceId</code> to the result.
               </li>
               <li>
-                Set <code><var>result</var>.vendorID</code> to the value parsed for Vendor ID.
+                If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
+                set <code><var>result</var>.instanceId</code> to that string.
               </li>
               <li>
-                Set <code><var>result</var>.productID</code> to the value parsed for Product ID.
+                If <var>device</var> has a <a>Class of Device</a>,
+                set <code><var>result</var>.deviceClass</code> to that value.
               </li>
               <li>
-                Set <code><var>result</var>.productVersion</code> to
-                the value parsed for Product Version.
+                <a>Populate the Bluetooth cache</a> with
+                the <a>org.bluetooth.characteristic.pnp_id</a> characteristic inside
+                the <a>org.bluetooth.service.device_information</a> service.
+                Ignore any errors from this step.
               </li>
+              <li>
+                If the <a>Bluetooth cache</a> now has a known-present entry for this characteristic,
+                run the following substeps.
+                <ol>
+                  <li>
+                    Use any combination of the sub-procedures in
+                    the <a>Characteristic Value Read</a> procedure to retrieve the value
+                    of the <a>org.bluetooth.characteristic.pnp_id</a> characteristic
+                    into <var>pnp</var>.
+                    Handle errors as described in <a href="#error-handling"></a>.
+                  </li>
+                  <li>If the previous step returned an error, abort these substeps.</li>
+                  <li>
+                    Parse <var>pnp</var> as specified by
+                    the <a>org.bluetooth.characteristic.pnp_id</a> characteristic definition.
+                    If it's not 7 bytes long or
+                    if the Vendor ID Source is not <code>1</code> or <code>2</code>,
+                    abort these substeps.
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.vendorIDSource</code> according to the following table:
+                    <table>
+                      <tr><th>Parsed Vendor Id Source</th><th><code>vendorIDSource</code></th></tr>
+                      <tr><td>1</td><td><code>"bluetooth"</code></td></tr>
+                      <tr><td>2</td><td><code>"usb"</code></td></tr>
+                    </table>
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.vendorID</code> to the value parsed for Vendor ID.
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.productID</code> to the value parsed for Product ID.
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.productVersion</code> to
+                    the value parsed for Product Version.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                Initialize <code><var>result</var>.paired</code> to
+                the value of <var>device</var>'s <a>bonded flag</a>.
+              </li>
+              <li>
+                Initialize <code><var>result</var>.connected</code> to
+                the value of <var>device</var>'s <a>LE-connected flag</a>.
+              </li>
+              <li>
+                Let <var>uuids</var> be an empty set of UUIDs.
+              </li>
+              <li>
+                If <var>device</var>'s advertising data includes
+                advertised <a title="Service UUID Data Type">Service UUID</a>s,
+                add those UUIDs to <var>uuids</var>.
+              </li>
+              <li>
+                The UA MAY <a>populate the Bluetooth cache</a> with
+                all Services inside <var>device</var>.
+                Ignore any errors from this step.
+              </li>
+              <li>
+                If the <a>Bluetooth cache</a> contains known-present Services inside <var>device</var>,
+                add the UUIDs of those Services to <var>uuids</var>.
+              </li>
+              <li>
+                Initialize <code><var>result</var>.uuids</code> to
+                a <a>read only Array</a> holding the elements of <var>uuids</var>.
+              </li>
+              <li>Resolve <var>promise</var> with <var>result</var>.</li>
             </ol>
           </li>
-          <li>
-            Initialize <code><var>result</var>.paired</code> to
-            the value of <var>device</var>'s <a>bonded flag</a>.
-          </li>
-          <li>
-            Initialize <code><var>result</var>.connected</code> to
-            the value of <var>device</var>'s <a>LE-connected flag</a>.
-          </li>
-          <li>
-            Let <var>uuids</var> be an empty set of UUIDs.
-          </li>
-          <li>
-            If <var>device</var>'s advertising data includes
-            advertised <a title="Service UUID Data Type">Service UUID</a>s,
-            add those UUIDs to <var>uuids</var>.
-          </li>
-          <li>
-            The UA MAY <a>populate the Bluetooth cache</a> with
-            all Services inside <var>device</var>.
-            Ignore any errors from this step.
-          </li>
-          <li>
-            If the <a>Bluetooth cache</a> contains known-present Services inside <var>device</var>,
-            add the UUIDs of those Services to <var>uuids</var>.
-          </li>
-          <li>
-            Initialize <code><var>result</var>.uuids</code> to
-            a <a>read only Array</a> holding the elements of <var>uuids</var>.
-          </li>
-          <li>Resolve <var>promise</var> with <var>result</var>.</li>
         </ol>
 
         <dl title="interface BluetoothDevice : ServiceEventHandlers" class="idl" data-merge="VendorIDSource">
@@ -1013,7 +1059,7 @@
             When checking whether two Services, Characteristics, or Descriptors
             <var>a</var> and <var>b</var> are the <dfn>same attribute</dfn>,
             the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var>
-            are inside the same Bluetooth Device and have the same <a>Attribute Handle</a>,
+            are inside the <a>same device</a> and have the same <a>Attribute Handle</a>,
             but MAY use any algorithm it wants with the constraint that
             <var>a</var> and <var>b</var> MUST NOT be considered the <a>same attribute</a> if
             they fit any of the following conditions:
@@ -1023,7 +1069,7 @@
             <li>They are both Services, but are not both primary or both secondary services.</li>
             <li>They have different UUIDs.</li>
             <li>
-              Their parent Devices aren't the same Device or
+              Their parent Devices aren't the <a>same device</a> or
               their parent Services or Characteristics aren't the <a>same attribute</a>.
             </li>
           </ul>
@@ -1086,9 +1132,17 @@
             Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
           </li>
           <li>
-            Initialize <code><var>result</var>.device</code> from
-            the <a>BluetoothDevice</a> instance representing
-            the device in which <var>service</var> appears.
+            <a>Get the <code>BluetoothDevice</code> representing</a>
+            the device in which <var>service</var> appears,
+            and let <var>device</var> be the result.
+          </li>
+          <li>Wait for <var>device</var> to settle.</li>
+          <li>
+            If <var>device</var> rejected,
+            <a>resolve</a> <var>promise</var> with <var>device</var> and abort these steps.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.device</code> from the value of <var>device</var>.
           </li>
           <li>
             <a>Get an attribute id</a> for <var>service</var>,
@@ -1251,7 +1305,8 @@
             This identifier MUST continue referring to the same <a>Characteristic</a> until either
             an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
             referring to the <a>BluetoothGATTService</a> of this characteristic or
-            if this characteristic's <a>BluetoothDevice</a> is not <code>paired</code>, it is disconnected.
+            if this characteristic's <a>Bluetooth device</a>'s <a>bonded flag</a> is false,
+            it is disconnected.
           </dd>
 
           <dt>readonly attribute ArrayBuffer? value</dt>
@@ -1714,7 +1769,7 @@
               The <a>children</a>
               of <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
               are the <a>BluetoothDevice</a> objects representing
-              devices on the origin's <a>allowed devices list</a>,
+              devices on the origin's <a>allowed devices map</a>,
               in an unspecified order.
             </li>
             <li>
@@ -1873,7 +1928,7 @@
               the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
             </li>
             <li>
-              Let <var>changedDevices</var> be the set of Bluetooth devices that
+              Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
               contain any <a>Service</a> in
               <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
             </li>
