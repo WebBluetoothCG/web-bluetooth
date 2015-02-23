@@ -400,49 +400,64 @@
           <span class="issue">TODO: Nail down the amount of time.</span>
           with a set of UUIDs that was a superset of the UUIDs for the current scan,
           then the UA MAY return the result of that scan and abort these steps.
-        <li>Let <var>result</var> be a set of Bluetooth devices, initially empty.
-        <li>If the UA supports the LE transport:
+        </li>
+        <li>Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
+        <li>
+          If the UA supports the LE transport, perform the <a>General Discovery Procedure</a>
+          and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
+          The UA SHOULD enable the <a>Privacy Feature</a>.
+
+          <p class="issue">
+            Both <a>passive scanning</a> and
+            the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
+            We ought to require UAs to use either one,
+            but none of the OS APIs appear to expose either.
+            Bluetooth also makes it hard to use <a>passive scanning</a> since
+            it doesn't require <a>Central</a> devices to support the
+            <a>Observation Procedure</a>.
+          </p>
+        </li>
+        <li>
+          If the UA supports the BR/EDR transport, perform the <a>Device Discovery</a> procedure
+          and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
+
+          <p class="issue">
+            All forms of BR/EDR inquiry/discovery
+            appear to leak the unique, immutable device address.
+          </p>
+        </li>
+        <li>Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
+        <li>
+          For each <a>Bluetooth device</a> <var>device</var> in <var>nearbyDevices</var>,
+          do the following substeps:
           <ol>
             <li>
-              The UA MUST perform the <a>General Discovery Procedure</a>
-              The UA SHOULD enable the <a>Privacy Feature</a>
-
-              <p class="issue">
-                Both <a>passive scanning</a> and
-                the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
-                We ought to require UAs to use either one,
-                but none of the OS APIs appear to expose either.
-                Bluetooth also makes it hard to use <a>passive scanning</a> since
-                it doesn't require <a>Central</a> devices to support the
-                <a>Observation Procedure</a>.
-
+              If <var>device</var>'s <a>supported physical transports</a> include LE and
+              its <a>Bluetooth Device Name</a> is partial or absent,
+              the UA SHOULD perform the <a>Name Discovery Procedure</a>
+              to acquire a complete name.
+            </li>
             <li>
-              For each <dfn>discovered LE device</dfn> (by the <a>General Discovery Procedure</a>),
-              if the complete device name was not acquired during the <a>General Discovery Procedure</a>,
-              the UA SHOULD perform the <a>Name Discovery Procedure</a>.
-
-            <li>
-              For each <a>discovered LE device</a>,
-              if the advertised <a title="Service UUID Data Type">Service UUIDs</a>
+              If <var>device</var>'s advertised <a title="Service UUID Data Type">Service UUIDs</a>
               have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
+              add <var>device</var> to <var>result</var> and abort these substeps.
 
+              <p class="note">
+                For BR/EDR devices, there is no way to distinguish GATT from non-GATT services
+                in the <a>Extended Inquiry Response</a>.
+                If a site filters to the UUID of a non-GATT service,
+                the user may be able to select a device
+                for the result of <code>requestDevice</code>
+                that this API provides no way to interact with.
+              </p>
+            </li>
             <li>
-              For each <a>discovered LE device</a>,
-              the UA MAY connect to the device and
-              <ul>
-                <li>
-                  Use <a>Attribute Caching</a> and
-                  the <a>Service Changed</a> characteristic to
-                  recall and validate the supported Service UUIDs from a previous connection,
-                <li>
-                  <a>Discover Primary Service by Service UUID</a>
-                  for each UUID in the <var>set of <a>Service</a> UUIDs</var>, or
-                <li>
-                  <a>Discover All Primary Services</a>.
-              </ul>
-              If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
+              The UA MAY connect to <var>device</var> and <a>populate the Bluetooth cache</a>
+              with all Services whose UUIDs are in the <var>set of <a>Service</a> UUIDs</var>.
+              If <var>device</var>'s <a>supported physical transports</a> include BR/EDR,
+              then in addition to the standard GATT procedures,
+              the UA MAY use the Service Discovery Protocol (<a>Searching for Services</a>)
+              when populating the cache.
 
               <div class="note" id="note-extra-discovery">
                 <p>
@@ -450,6 +465,7 @@
                   can slow down other use of the Bluetooth radio.
                   UAs should only discover extra services on a device if
                   they have some reason to expect that device to be interesting.
+                </p>
 
                 <p>
                   UAs should also help developers avoid relying on this extra discovery behavior.
@@ -460,56 +476,18 @@
                   even if the filter would likely exclude the device on users' machines.
                   The UA could provide a developer option to warn when this happens or
                   to include only advertised services in matching filters.
+                </p>
               </div>
+            </li>
+            <li>
+              If the <a>Bluetooth cache</a> contains
+              known-present Services inside <var>device</var>
+              with UUIDs in the <var>set of <a>Service</a> UUIDs</var>,
+              the UA MAY add <var>device</var> to <var>result</var>.
+            </li>
           </ol>
-        <li>If the UA supports the BR/EDR transport:
-          <ol>
-            <li>
-              The UA MUST perform the <a>Device Discovery</a> procedure.
-
-              <p class="issue">
-                All forms of BR/EDR inquiry/discovery
-                appear to leak the unique, immutable device address.
-
-            <li>
-              For each <dfn>discovered BR/EDR device</dfn> (<a>Device Discovery</a>),
-              if the <a title="Service UUID Data Type">Service UUIDs</a>
-              in the <a>Extended Inquiry Response</a>
-              have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
-
-              <p class="note">
-                There is no way to distinguish GATT from non-GATT services
-                in the <a>Extended Inquiry Response</a>.
-                If a site filters to the UUID of a non-GATT service,
-                the user may be able to select a device
-                for the result of <code>requestDevice</code>
-                that this API provides no way to interact with.
-
-            <li>
-              For each <a>discovered BR/EDR device</a>,
-              the UA MAY connect to the device and
-              <ul>
-                <li>
-                  Use <a>Attribute Caching</a> and the <a>Service Changed</a> characteristic to
-                  recall and validate the supported Service UUIDs from a previous connection,
-                <li>
-                  <a>Discover Primary Service by Service UUID</a>
-                  for each UUID in the <var>set of <a>Service</a> UUIDs</var>,
-                <li>
-                  <a>Discover All Primary Services</a>, or
-                <li>
-                  use the Service Discovery Protocol (<abbr title="Service Discovery Protocol">SDP</abbr>)
-                  to find GATT Services with UUIDs in the <var>set of <a>Service</a> UUIDs</var>.
-                  (<a>Searching for Services</a>)
-              </ul>
-              If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
-
-              <p class="note">
-                See the <a href="#note-extra-discovery">note for discovered LE devices</a>.
-          </ol>
-        <li>Return <var>result</var> from the scan.
+        </li>
+        <li>Return <var>result</var> from the scan.</li>
       </ol>
 
       <p class="issue">
@@ -543,6 +521,14 @@
         </p>
 
         <ul>
+          <li>
+            A set of <dfn>supported physical transports</dfn>,
+            including one or both of BR/EDR and LE.
+            This set will generally be filled based on
+            the transports over which the device was discovered
+            and the <a>Flags Data Type</a>
+            in the <a>Advertising Data</a> or <a>Extended Inquiry Response</a>.
+          </li>
           <li>
             One or more of several kinds of 48-bit address:
             a <a>Public Bluetooth Address</a>, a (random) <a>Static Address</a>,
@@ -578,7 +564,8 @@
           </li>
 
           <li>
-            The following optional elements of advertising data:
+            The following optional elements
+            from <a>Advertising Data</a> or the <a>Extended Inquiry Response</a>:
             <ul>
               <li>A list of advertised <a title="Service UUID Data Type">Service UUID</a>s.</li>
               <li>
@@ -795,9 +782,9 @@
                 Let <var>uuids</var> be an empty set of UUIDs.
               </li>
               <li>
-                If <var>device</var>'s advertising data includes
-                advertised <a title="Service UUID Data Type">Service UUID</a>s,
-                add those UUIDs to <var>uuids</var>.
+                Add <var>device</var>'s
+                advertised <a title="Service UUID Data Type">Service UUID</a>s
+                to <var>uuids</var>.
               </li>
               <li>
                 The UA MAY <a>populate the Bluetooth cache</a> with
@@ -2703,6 +2690,7 @@
                         </li>
                       </ol>
                     </li>
+                    <li value="11"><dfn>Advertising Data</dfn> and Scan Response Data Format</li>
                     <li value="15">Bluetooth Device Requirements
                       <ol>
                         <li value="1">Bluetooth Device Address
@@ -2905,6 +2893,7 @@
                   <ol>
                     <li value="1"><dfn>Service UUID Data Type</dfn></li>
                     <li value="2"><dfn>Local Name Data Type</dfn></li>
+                    <li value="3"><dfn>Flags Data Type</dfn></li>
                     <li value="4"><dfn>Manufacturer Specific Data</dfn></li>
                     <li value="5"><dfn>TX Power Level</dfn></li>
                     <li value="11"><dfn>Service Data</dfn></li>
