@@ -574,12 +574,21 @@
               <li>
                 <a>Manufacturer Specific Data</a>,
                 consisting of a map from 16-bit Company Identifier Codes to byte arrays.
+                This is treated as an empty map if it's not present.
               </li>
               <li>A <a>TX Power Level</a>, from -127dBm to 127dBm.</li>
-              <li><a>Service Data</a>, consisting of a map from UUIDs to byte arrays.</li>
+              <li>
+                <a>Service Data</a>, consisting of a map from UUIDs to byte arrays.
+                This is treated as an empty map if it's not present.
+              </li>
               <li>
                 An <a>Appearance</a>, one of the values defined by
                 the <a>org.bluetooth.characteristic.gap.appearance</a> characteristic.
+              </li>
+              <li>
+                A <a>Received Signal Strength Indication</a> (RSSI), from -127dBm to 20dBm.
+                This is received from the local Bluetooth adapter
+                rather than being sent by the remote device.
               </li>
             </ul>
           </li>
@@ -719,6 +728,11 @@
                 set <code><var>result</var>.name</code> to that string.
               </li>
               <li>
+                <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>device</var>
+                and <code><var>result</var>@[[\allowedServices]]</code>,
+                and set <code><var>result</var>.adData</code> to the result.
+              </li>
+              <li>
                 If <var>device</var> has a <a>Class of Device</a>,
                 set <code><var>result</var>.deviceClass</code> to that value.
               </li>
@@ -823,6 +837,13 @@
           <dt>readonly attribute DOMString? name</dt>
           <dd>The human-readable name of the device.</dd>
 
+          <dt>readonly attribute BluetoothAdvertisingData adData</dt>
+          <dd>
+            The most recent advertising data received for this device.
+            <span class="issue">TODO: Write the algorithm to update this
+              when an advertising packet is received.</span>
+          </dd>
+
           <dt>readonly attribute unsigned long? deviceClass</dt>
           <dd>The class of the device, a bit-field defined by [[!BLUETOOTH-ASSIGNED-BASEBAND]].</dd>
 
@@ -907,6 +928,88 @@
           <dt>bluetooth</dt><dd>
           <dt>usb</dt><dd>
         </dl>
+
+        <section>
+          <h2><a>BluetoothAdvertisingData</a></h2>
+
+          <p>
+            To <dfn>create a <a>BluetoothAdvertisingData</a></dfn>
+            from a <a>Bluetooth device</a> <var>device</var>
+            and an <var>allowed services list</var>,
+            the UA must perform the following steps:
+          </p>
+          <ol>
+            <li>Let <var>adData</var> be a new instance of <a>BluetoothAdvertisingData</a>.</li>
+            <li>
+              If <var>device</var> has an <a>Appearance</a>,
+              initialize <code><var>adData</var>.appearance</code> to its value.
+              Otherwise, initialize it to <code>null</code>.
+            </li>
+            <li>
+              If <var>device</var> has both a <a>TX Power Level</a> and an <a>RSSI</a>,
+              initialize <code><var>adData</var>.pathLoss</code>
+              to <code><a>TX Power Level</a> - <a>RSSI</a></code>.
+              Otherwise initialize it to <code>null</code>.
+            </li>
+            <li>
+              Initialize <code><var>adData</var>.manufacturerData</code> with
+              the return value of these substeps:
+              <ol>
+                <li>Let <var>mdata</var> be a new <a>Map</a> instance.</li>
+                <li>
+                  For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
+                  make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+                  containing the contents of its byte array,
+                  and add a mapping from the 16-bit code to <var>bytes</var> in <var>mdata</var>.
+                </li>
+                <li>
+                  Return a <a>read only Map</a> whose value is <var>mdata</var>.
+                </li>
+              </ol>
+            </li>
+            <li>
+              Initialize <code><var>adData</var>.serviceData</code> with
+              the return value of these substeps:
+              <ol>
+                <li>Let <var>sdata</var> be a new <a>Map</a> instance.</li>
+                <li>
+                  For each mapping in <var>device</var>'s <a>Service Data</a>,
+                  if the UUID is in <var>allowed services list</var>,
+                  make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+                  containing the contents of its byte array,
+                  and add a mapping from the <a>UUID</a> to <var>bytes</var> in <var>sdata</var>.
+                </li>
+                <li>
+                  Return a <a>read only Map</a> whose value is <var>sdata</var>.
+                </li>
+              </ol>
+            </li>
+            <li>Return <var>adData</var>.</li>
+          </ol>
+
+          <p>
+            All fields in <a>BluetoothAdvertisingData</a> return
+            the last value they were initialized or set to.
+          </p>
+          <dl title="[NoInterfaceObject] interface BluetoothAdvertisingData" class="idl">
+            <dt>readonly attribute unsigned short? appearance</dt>
+            <dd>
+              An <a>Appearance</a>, one of the values defined by
+              the <a>org.bluetooth.characteristic.gap.appearance</a> characteristic.
+            </dd>
+            <dt>readonly attribute short? pathLoss</dt>
+            <dd>
+              The number of decibels of radio signal strength lost
+              between the Bluetooth device sending data and the UA receiving it.
+              Equal to <code><a>TX Power Level</a> - <a>RSSI</a></code>.
+            </dd>
+            <dt>readonly attribute Map manufacturerData</dt>
+            <dd>Maps <code>unsigned short</code> Company Identifier Codes to <a>ArrayBuffer</a>s.
+</dd>
+            <dt>readonly attribute Map serviceData</dt>
+            <dd>Maps <a>UUID</a>s to <a>ArrayBuffer</a>s.</dd>
+          </dl>
+        </section>
       </section>
     </section>
 
@@ -2609,6 +2712,25 @@
            >internal slots</a> of an object, instead of saying "the [[\y]] internal slot of x."
       </p>
 
+      <p>
+        This specification uses a few read-only types
+        that are similar to WebIDL's <a>read only Array</a>.
+      </p>
+      <ul>
+        <li>
+          A <dfn>read only Map</dfn> has <a>Map</a>'s values and interface,
+          except the <code>clear</code>, <code>delete</code>, and <code>set</code> methods
+          are omitted.
+        </li>
+        <li>
+          A <dfn>read only ArrayBuffer</dfn> has <a>ArrayBuffer</a>'s values and interface,
+          except that attempting to write to its contents or transfer it
+          has the same effect as trying to write to a <a>read only Array</a>'s contents.
+          This applies to <a>TypedArray</a>s and <a>DataView</a>s
+          wrapped around the <a>ArrayBuffer</a> too.
+        </li>
+      </p>
+
       <dl>
         <dt>[[!BLUETOOTH41]]</dt>
         <dd>
@@ -2629,6 +2751,26 @@
                                   </ol>
                                 </li>
                               </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+            <li value="2">Core System Package [BR/EDR Controller volume]
+              <ol type="A">
+                <li value="5">Host Controller Interface Functional Specification
+                  <ol>
+                    <li value="7">HCI Commands and Events
+                      <ol>
+                        <li value="5">Status Parameters
+                          <ol>
+                            <li value="4">
+                              Read <dfn><abbr title="Received Signal Strength Indication"
+                                              >RSSI</abbr></dfn> Command
                             </li>
                           </ol>
                         </li>
@@ -2930,7 +3072,15 @@
         <dt>[[!ECMAScript]]</dt>
         <dd>
           <ul>
+            <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-arraybuffer-constructor"
+                   ><dfn><code>ArrayBuffer</code></dfn></a></li>
+            <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-dataview-constructor"
+                   ><dfn><code>DataView</code></dfn></a></li>
+            <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-constructor"
+                   ><dfn><code>Map</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects"><dfn>Promise</dfn></a></li>
+            <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-typedarray-constructors"
+                   ><dfn><code>TypedArray</code></dfn></a></li>
           </ul>
         </dd>
         <dt>[[!HTML]]</dt>
