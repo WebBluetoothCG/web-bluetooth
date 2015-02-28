@@ -326,14 +326,17 @@
             </li>
             <li>
               Remove devices from the result of the scan if
-              they do not <a title="matches a filter">match a filter</a> in <var>filters</var>.
+              they do not <a title="matches a filter">match a filter</a>
+              in <code><var>filters</var></code>.
             <li>
               Display a prompt to the user requesting that the user specify some devices from the result of the scan.
               The UA SHOULD show the user the human-readable name of each device.
               If this name is not available because the UA's Bluetooth system doesn't support privacy-enabled scans,
               the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
               <p>
-              The UA MAY allow the user to select a nearby device that does not match <var>filters</var>.
+                The UA MAY allow the user to select a nearby device
+                that does not match <code><var>filters</var></code>.
+              </p>
             </li>
             <li>
               Wait for the user to have selected a <var>device</var> or cancelled the prompt.
@@ -345,7 +348,7 @@
             <li>
               <a title="add an allowed bluetooth device"
                  >Add <var>device</var> to the origin's allowed devices map.</a>
-              with the union of the service UUIDs from <code>filters</code>
+              with the union of the service UUIDs from <code><var>filters</var></code>
               and <code>options.optionalServices</code> as <var>allowed services</var>.
             </li>
             <li>
@@ -660,19 +663,6 @@
             in the <a>allowed devices map</a>.
           </li>
         </ol>
-
-        <p>
-          To <dfn>get the device id</dfn> for a <a>Bluetooth device</a> <var>device</var>,
-          the UA MUST run the following steps.
-        </p>
-        <ol>
-          <li>
-            Find the key in this origin's <a>allowed devices map</a>
-            that is the <a>same device</a> as <var>device</var>.
-            If there is no such key, this specification has a bug.
-          </li>
-          <li>Return the <a>device id</a> this key maps to.</li>
-        </ol>
       </section>
 
       <section>
@@ -714,12 +704,19 @@
                 to <var>device</var>.
               </li>
               <li>
-                <a>Get the device id</a> for <var>device</var>,
-                and initialize <code><var>result</var>.instanceId</code> to the result.
+                Find the key in this origin's <a>allowed devices map</a>
+                that is the <a>same device</a> as <var>device</var>.
+                If there is no such key,
+                <a>resolve</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+                Otherwise, initialize <code><var>result</var>.instanceId</code>
+                to the <a>device id</a> this key maps to,
+                and initialize an internal
+                <code><var>result</var>@[<span></span>[allowedServices]]</code> field
+                to the <a>allowed services list</a> this key maps to.
               </li>
               <li>
                 If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
-                set <code><var>result</var>.instanceId</code> to that string.
+                set <code><var>result</var>.name</code> to that string.
               </li>
               <li>
                 If <var>device</var> has a <a>Class of Device</a>,
@@ -792,12 +789,14 @@
                 Ignore any errors from this step.
               </li>
               <li>
-                If the <a>Bluetooth cache</a> contains known-present Services inside <var>device</var>,
+                If the <a>Bluetooth cache</a> contains
+                known-present Services inside <var>device</var>,
                 add the UUIDs of those Services to <var>uuids</var>.
               </li>
               <li>
                 Initialize <code><var>result</var>.uuids</code> to
-                a <a>read only Array</a> holding the elements of <var>uuids</var>.
+                a <a>read only Array</a> holding the elements of <var>uuids</var>
+                that are also in <code><var>result</var>@[<span></span>[allowedServices]]</code>.
               </li>
               <li>Resolve <var>promise</var> with <var>result</var>.</li>
             </ol>
@@ -877,8 +876,10 @@
             <ol>
               <li>
                 <a>Query the Bluetooth cache</a> for
-                the first primary GATT service on the remote device whose UUID is <var>service</var>
-                and whose UUID is in the <a>allowed services list</a> for this device and origin,
+                the first primary GATT service
+                on <code>this@[<span></span>[representedDevice]]</code>
+                whose UUID is <var>service</var>
+                and whose UUID is in <code>this@[<span></span>[allowedServices]]</code>,
                 and let <var>promise</var> be the result.
               </li>
               <li>
@@ -893,8 +894,9 @@
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>>
               getPrimaryServices(optional BluetoothServiceUuid service)</dt>
           <dd>
-            <a>Query the Bluetooth cache</a> for the primary GATT services on the remote device
-            whose UUIDs are in the <a>allowed services list</a> for this device and origin
+            <a>Query the Bluetooth cache</a> for the primary GATT services
+            on <code>this@[<span></span>[representedDevice]]</code>
+            whose UUIDs are in <code>this@[<span></span>[allowedServices]]</code>
             and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
             and return the result.
           </dd>
@@ -1121,15 +1123,16 @@
           <li>
             <a>Get the <code>BluetoothDevice</code> representing</a>
             the device in which <var>service</var> appears,
-            and let <var>device</var> be the result.
+            and let <var>devicePromise</var> be the result.
           </li>
-          <li>Wait for <var>device</var> to settle.</li>
+          <li>Wait for <var>devicePromise</var> to settle.</li>
           <li>
-            If <var>device</var> rejected,
-            <a>resolve</a> <var>promise</var> with <var>device</var> and abort these steps.
+            If <var>devicePromise</var> rejected,
+            <a>resolve</a> <var>promise</var> with <var>devicePromise</var> and abort these steps.
           </li>
           <li>
-            Initialize <code><var>result</var>.device</code> from the value of <var>device</var>.
+            Initialize <code><var>result</var>.device</code> from
+            the value of <var>devicePromise</var>.
           </li>
           <li>
             <a>Get an attribute id</a> for <var>service</var>,
