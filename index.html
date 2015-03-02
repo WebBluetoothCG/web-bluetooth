@@ -252,10 +252,7 @@
           for the <a>BD_ADDR</a> and the <a>Public Device Address</a> ([[!BLUETOOTH41]] 2.E.7.4.6).
 
         <p>
-          An LE device may also have a unique, 128-bit
-          <dfn title="Identity Resolving Key">Identity Resolving Key
-          (<abbr title="Identity Resolving Key">IRK</abbr>)</dfn>
-          ([[!BLUETOOTH41]] 3.H.2.4.2.1),
+          An LE device may also have a unique, 128-bit <a>Identity Resolving Key</a>,
           which is sent to trusted devices during the bonding process.
           To avoid leaking a persistent identifier, an LE device may scan and advertise using
           a random <dfn>Resolvable Private Address</dfn> or <dfn>Non-Resolvable Private Address</dfn>
@@ -307,22 +304,6 @@
     <section>
       <h2>Device Discovery</h2>
 
-      <p>
-        The UA MUST maintain an <dfn>allowed devices list</dfn> for each origin,
-        storing a set of Bluetooth devices the origin is allowed to access.
-        For each device in the <a>allowed devices list</a> for an origin,
-        the UA MUST maintain an <dfn>allowed services list</dfn> consisting of
-        UUIDs for GATT Primary <a>Service</a>s the origin is allowed to access on the device.
-        The UA MAY remove devices from the <a>allowed devices list</a> at any time
-        based on signals from the user.
-        For example, if the user chooses not to remember access,
-        the UA might remove a device when the tab that was granted access to it is closed.
-        Or the UA might provide a revocation UI that allows the user
-        to explicitly remove a device even while a tab is actively using that device.
-        If a device is removed from this list while
-        a <a>Promise</a> is pending to do something with the device,
-        it MUST be treated the same as if the device moved out of Bluetooth range.
-
       <dl title="[NoInterfaceObject] interface BluetoothDiscovery" class="idl" data-merge="BluetoothScanFilter RequestDeviceOptions">
         <dt>Promise&lt;BluetoothDevice> requestDevice(sequence&lt;BluetoothScanFilter> filters, optional RequestDeviceOptions options)</dt>
         <dd>
@@ -345,31 +326,34 @@
             </li>
             <li>
               Remove devices from the result of the scan if
-              they do not <a title="matches a filter">match a filter</a> in <var>filters</var>.
+              they do not <a title="matches a filter">match a filter</a>
+              in <code><var>filters</var></code>.
             <li>
               Display a prompt to the user requesting that the user specify some devices from the result of the scan.
               The UA SHOULD show the user the human-readable name of each device.
               If this name is not available because the UA's Bluetooth system doesn't support privacy-enabled scans,
               the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
               <p>
-              The UA MAY allow the user to select a nearby device that does not match <var>filters</var>.
+                The UA MAY allow the user to select a nearby device
+                that does not match <code><var>filters</var></code>.
+              </p>
             </li>
             <li>
-              Wait for the user to have made their selection.
+              Wait for the user to have selected a <var>device</var> or cancelled the prompt.
             </li>
             <li>
               If the user cancels the prompt,
               <a>reject</a> <var>promise</var> with a <a>NotFoundError</a> and abort these steps.
             </li>
             <li>
-              Record the selected device in the origin's <a>allowed devices list</a>
-              and the union of the service UUIDs from <code>filters</code>
-              and <code>options.optionalServices</code>
-              in the device and origin's <a>allowed services list</a>.
+              <a title="add an allowed bluetooth device"
+                 >Add <var>device</var> to the origin's allowed devices map.</a>
+              with the union of the service UUIDs from <code><var>filters</var></code>
+              and <code>options.optionalServices</code> as <var>allowed services</var>.
             </li>
             <li>
-              <a>Resolve</a> <var>promise</var> with
-              a <a>BluetoothDevice</a> instance representing the selected device.
+              <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
+              and <a>resolve</a> <var>promise</var> with the result.
             </li>
           </ol>
         </dd>
@@ -419,49 +403,64 @@
           <span class="issue">TODO: Nail down the amount of time.</span>
           with a set of UUIDs that was a superset of the UUIDs for the current scan,
           then the UA MAY return the result of that scan and abort these steps.
-        <li>Let <var>result</var> be a set of Bluetooth devices, initially empty.
-        <li>If the UA supports the LE transport:
+        </li>
+        <li>Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
+        <li>
+          If the UA supports the LE transport, perform the <a>General Discovery Procedure</a>
+          and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
+          The UA SHOULD enable the <a>Privacy Feature</a>.
+
+          <p class="issue">
+            Both <a>passive scanning</a> and
+            the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
+            We ought to require UAs to use either one,
+            but none of the OS APIs appear to expose either.
+            Bluetooth also makes it hard to use <a>passive scanning</a> since
+            it doesn't require <a>Central</a> devices to support the
+            <a>Observation Procedure</a>.
+          </p>
+        </li>
+        <li>
+          If the UA supports the BR/EDR transport, perform the <a>Device Discovery</a> procedure
+          and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
+
+          <p class="issue">
+            All forms of BR/EDR inquiry/discovery
+            appear to leak the unique, immutable device address.
+          </p>
+        </li>
+        <li>Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
+        <li>
+          For each <a>Bluetooth device</a> <var>device</var> in <var>nearbyDevices</var>,
+          do the following substeps:
           <ol>
             <li>
-              The UA MUST perform the <a>General Discovery Procedure</a>
-              The UA SHOULD enable the <a>Privacy Feature</a>
-
-              <p class="issue">
-                Both <a>passive scanning</a> and
-                the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
-                We ought to require UAs to use either one,
-                but none of the OS APIs appear to expose either.
-                Bluetooth also makes it hard to use <a>passive scanning</a> since
-                it doesn't require <a>Central</a> devices to support the
-                <a>Observation Procedure</a>.
-
+              If <var>device</var>'s <a>supported physical transports</a> include LE and
+              its <a>Bluetooth Device Name</a> is partial or absent,
+              the UA SHOULD perform the <a>Name Discovery Procedure</a>
+              to acquire a complete name.
+            </li>
             <li>
-              For each <dfn>discovered LE device</dfn> (by the <a>General Discovery Procedure</a>),
-              if the complete device name was not acquired during the <a>General Discovery Procedure</a>,
-              the UA SHOULD perform the <a>Name Discovery Procedure</a>.
-
-            <li>
-              For each <a>discovered LE device</a>,
-              if the advertised <a title="Service UUID Data Type">Service UUIDs</a>
+              If <var>device</var>'s advertised <a title="Service UUID Data Type">Service UUIDs</a>
               have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
+              add <var>device</var> to <var>result</var> and abort these substeps.
 
+              <p class="note">
+                For BR/EDR devices, there is no way to distinguish GATT from non-GATT services
+                in the <a>Extended Inquiry Response</a>.
+                If a site filters to the UUID of a non-GATT service,
+                the user may be able to select a device
+                for the result of <code>requestDevice</code>
+                that this API provides no way to interact with.
+              </p>
+            </li>
             <li>
-              For each <a>discovered LE device</a>,
-              the UA MAY connect to the device and
-              <ul>
-                <li>
-                  Use <a>Attribute Caching</a> and
-                  the <a>Service Changed</a> characteristic to
-                  recall and validate the supported Service UUIDs from a previous connection,
-                <li>
-                  <a>Discover Primary Service by Service UUID</a>
-                  for each UUID in the <var>set of <a>Service</a> UUIDs</var>, or
-                <li>
-                  <a>Discover All Primary Services</a>.
-              </ul>
-              If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
+              The UA MAY connect to <var>device</var> and <a>populate the Bluetooth cache</a>
+              with all Services whose UUIDs are in the <var>set of <a>Service</a> UUIDs</var>.
+              If <var>device</var>'s <a>supported physical transports</a> include BR/EDR,
+              then in addition to the standard GATT procedures,
+              the UA MAY use the Service Discovery Protocol (<a>Searching for Services</a>)
+              when populating the cache.
 
               <div class="note" id="note-extra-discovery">
                 <p>
@@ -469,6 +468,7 @@
                   can slow down other use of the Bluetooth radio.
                   UAs should only discover extra services on a device if
                   they have some reason to expect that device to be interesting.
+                </p>
 
                 <p>
                   UAs should also help developers avoid relying on this extra discovery behavior.
@@ -479,67 +479,330 @@
                   even if the filter would likely exclude the device on users' machines.
                   The UA could provide a developer option to warn when this happens or
                   to include only advertised services in matching filters.
+                </p>
               </div>
+            </li>
+            <li>
+              If the <a>Bluetooth cache</a> contains
+              known-present Services inside <var>device</var>
+              with UUIDs in the <var>set of <a>Service</a> UUIDs</var>,
+              the UA MAY add <var>device</var> to <var>result</var>.
+            </li>
           </ol>
-        <li>If the UA supports the BR/EDR transport:
-          <ol>
-            <li>
-              The UA MUST perform the <a>Device Discovery</a> procedure.
-
-              <p class="issue">
-                All forms of BR/EDR inquiry/discovery
-                appear to leak the unique, immutable device address.
-
-            <li>
-              For each <dfn>discovered BR/EDR device</dfn> (<a>Device Discovery</a>),
-              if the <a title="Service UUID Data Type">Service UUIDs</a>
-              in the <a>Extended Inquiry Response</a>
-              have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
-
-              <p class="note">
-                There is no way to distinguish GATT from non-GATT services
-                in the <a>Extended Inquiry Response</a>.
-                If a site filters to the UUID of a non-GATT service,
-                the user may be able to select a device
-                for the result of <code>requestDevice</code>
-                that this API provides no way to interact with.
-
-            <li>
-              For each <a>discovered BR/EDR device</a>,
-              the UA MAY connect to the device and
-              <ul>
-                <li>
-                  Use <a>Attribute Caching</a> and the <a>Service Changed</a> characteristic to
-                  recall and validate the supported Service UUIDs from a previous connection,
-                <li>
-                  <a>Discover Primary Service by Service UUID</a>
-                  for each UUID in the <var>set of <a>Service</a> UUIDs</var>,
-                <li>
-                  <a>Discover All Primary Services</a>, or
-                <li>
-                  use the Service Discovery Protocol (<abbr title="Service Discovery Protocol">SDP</abbr>)
-                  to find GATT Services with UUIDs in the <var>set of <a>Service</a> UUIDs</var>.
-                  (<a>Searching for Services</a>)
-              </ul>
-              If one of the discovered services is in the <var>set of <a>Service</a> UUIDs</var>,
-              add the device to <var>result</var>.
-
-              <p class="note">
-                See the <a href="#note-extra-discovery">note for discovered LE devices</a>.
-          </ol>
-        <li>Return <var>result</var> from the scan.
+        </li>
+        <li>Return <var>result</var> from the scan.</li>
       </ol>
 
       <p class="issue">
         We need a way for a site to register to receive an event
         when an interesting device comes within range.
+      </p>
+    </section>
 
+    <section>
+      <h2>Device Representation</h2>
+
+      <p>
+        The UA needs to track Bluetooth device properties at several levels:
+        globally, per origin, and per <a>script execution environment</a>.
+      </p>
+
+      <section>
+        <h2>Global Bluetooth device properties</h2>
+
+        <p>
+          The physical Bluetooth device may be guaranteed to have
+          some properties that the UA may not have received.
+          Those properties are described as optional here.
+        </p>
+
+        <p>
+          A <dfn>Bluetooth device</dfn> has the following properties.
+          Optional properties are not present, and sequence and map properties are empty,
+          unless/until described otherwise.
+          Other properties have a default specified or are specified when a device is introduced.
+        </p>
+
+        <ul>
+          <li>
+            A set of <dfn>supported physical transports</dfn>,
+            including one or both of BR/EDR and LE.
+            This set will generally be filled based on
+            the transports over which the device was discovered
+            and the <a>Flags Data Type</a>
+            in the <a>Advertising Data</a> or <a>Extended Inquiry Response</a>.
+          </li>
+          <li>
+            One or more of several kinds of 48-bit address:
+            a <a>Public Bluetooth Address</a>, a (random) <a>Static Address</a>,
+            and a resolvable or non-resolvable <a>Private Address</a>.
+          </li>
+          <li>An optional 128-bit <a>Identity Resolving Key</a>.</li>
+
+          <li>
+            An optional partial or complete <a>Bluetooth Device Name</a>.
+            A device has a partial name when the <a>Shortened Local Name</a> AD data was received,
+            but the full name hasn't been read yet.
+          </li>
+
+          <li>
+            An <dfn>LE-connected flag</dfn>,
+            indicating whether the device is connected to the UA over the LE physical transport.
+            This flag is initially false.
+            The <a>Connection Modes and Procedures</a> create and destroy LE connections.
+          </li>
+
+          <li>
+            A <dfn>bonded flag</dfn>, indicating whether the Bluetooth device is bonded to the UA.
+            Devices bond using the <a>Bonding Procedure</a>.
+            <p class="note">
+              The Bluetooth standard uses "pairing" to refer to
+              creating and exchanging a shared secret,
+              and "bonding" to refer to storing that secret for use in subsequent connections.
+              Platform APIs don't give independent control of the two processes,
+              and they present the combined process to users under the label "pairing",
+              so this specification uses "pairing" and "bonding" interchangeably
+              to refer to Bluetooth bonding.
+            </p>
+          </li>
+
+          <li>
+            The following optional elements
+            from <a>Advertising Data</a> or the <a>Extended Inquiry Response</a>:
+            <ul>
+              <li>A list of advertised <a title="Service UUID Data Type">Service UUID</a>s.</li>
+              <li>
+                <a>Manufacturer Specific Data</a>,
+                consisting of a map from 16-bit Company Identifier Codes to byte arrays.
+              </li>
+              <li>A <a>TX Power Level</a>, from -127dBm to 127dBm.</li>
+              <li><a>Service Data</a>, consisting of a map from UUIDs to byte arrays.</li>
+              <li>
+                An <a>Appearance</a>, one of the values defined by
+                the <a>org.bluetooth.characteristic.gap.appearance</a> characteristic.
+              </li>
+            </ul>
+          </li>
+
+          <li>
+            An optional <a>Class of Device</a>,
+            one of the values defined in [[!BLUETOOTH-ASSIGNED-BASEBAND]].
+            The Class of Device is only used over the BR/EDR physical transport, not LE.
+          </li>
+
+          <li>
+            A hierarchy of GATT attributes, described in <a href="#information-model"></a>.
+          </li>
+        </ul>
+
+        <p>
+          The UA SHOULD determine that
+          two <a>Bluetooth device</a>s are the <dfn>same device</dfn> if and only if
+          they have the same <a>Public Bluetooth Address</a>, <a>Static Address</a>,
+          <a>Private Address</a>, or <a>Identity Resolving Key</a>,
+          or if the <a>Resolvable Private Address Resolution Procedure</a> succeeds using
+          one device's IRK and the other's Resolvable <a>Private Address</a>.
+          However, because platform APIs don't document how they determine device identity,
+          the UA MAY use another procedure.
+        </p>
+      </section>
+
+      <section>
+        <h2>Per-origin Bluetooth device properties</h2>
+
+        <p>
+          For each origin, the UA MUST maintain an <dfn>allowed devices map</dfn>,
+          whose keys are the <a>Bluetooth device</a>s the origin is allowed to access,
+          and whose values are pairs of a <code>DOMString</code> <dfn>device id</dfn> and
+          an <dfn>allowed services list</dfn> consisting of UUIDs
+          for GATT Primary <a>Service</a>s the origin is allowed to access on the device.
+        </p>
+
+        <p>
+          The UA MAY remove devices from the <a>allowed devices map</a> at any time
+          based on signals from the user.
+          <span class="issue">
+            This needs a definition involving
+            removing <a>BluetoothDevice</a> instances from <a>device instance map</a>s
+            and clearing out their [[\representedDevice]] fields.
+          </span>
+          For example, if the user chooses not to remember access,
+          the UA might remove a device when the tab that was granted access to it is closed.
+          Or the UA might provide a revocation UI that allows the user
+          to explicitly remove a device even while a tab is actively using that device.
+          If a device is removed from this list while
+          a <a>Promise</a> is pending to do something with the device,
+          it MUST be treated the same as if the device moved out of Bluetooth range.
+        </p>
+
+        <p>
+          To <dfn>add an allowed <a>Bluetooth device</a></dfn> <var>device</var>
+          to an origin's <a>allowed devices map</a>
+          with an optional <var>allowed services</var> list of <a>UUID</a>s,
+          the UA MUST run the following steps.
+        </p>
+        <ol>
+          <li>
+            If <var>device</var> is the <a>same device</a> as
+            an existing key in the <a>allowed devices map</a>,
+            abort these steps.
+          </li>
+          <li>
+            Let <var>id</var> be a new <code>DOMString</code> that
+            isn't equal to any of the <a>device id</a>s the origin's <a>allowed devices map</a>
+            and isn't equal to any of <var>device</var>'s
+            <a>Public Bluetooth Address</a>, <a>Static Address</a>,
+            or <a>Identity Resolving Key</a>.
+          </li>
+          <li>
+            If <var>allowed services</var> wasn't provided, set it to an empty list.
+          </li>
+          <li>
+            Add a mapping from <var>device</var>
+            to a pair of <var>id</var> and <var>allowed servces</var>
+            in the <a>allowed devices map</a>.
+          </li>
+        </ol>
+      </section>
 
       <section>
         <h2><a>BluetoothDevice</a></h2>
 
-        <p>Represents a known Bluetooth device.
+        <p>
+          A <a>BluetoothDevice</a> instance represents a <a>Bluetooth device</a>
+          inside a particular <a>script execution environment</a>.
+        </p>
+
+        <p>
+          For each <a>script execution environment</a>,
+          the UA must maintain a <dfn>device instance map</dfn>
+          mapping <a>Bluetooth device</a>s
+          to <code>Promise&lt;<a>BluetoothDevice</a>></code> instances.
+          To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
+          a <a>Bluetooth device</a> <var>device</var>,
+          the UA MUST run the following steps:
+        </p>
+        <ol>
+          <li>
+            If there is a key in
+            the current <a>script execution environment</a>'s <a>device instance map</a>
+            that is the <a>same device</a> as <var>device</var>,
+            return its value and abort these steps.
+          </li>
+          <li>Let <var>promise</var> be <a>a new promise</a>.</li>
+          <li>
+            Add a mapping from <var>device</var> to <var>promise</var>
+            in the current <a>script execution environment</a>'s <a>device instance map</a>.
+          </li>
+          <li>Return <var>promise</var>, and run the following steps <a>in parallel</a>.
+            <ol>
+              <li>Let <var>result</var> be a new instance of <a>BluetoothDevice</a>.</li>
+              <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
+              <li>
+                Initialize an internal
+                <code><var>result</var>@[[\representedDevice]]</code> field
+                to <var>device</var>.
+              </li>
+              <li>
+                Find the key in this origin's <a>allowed devices map</a>
+                that is the <a>same device</a> as <var>device</var>.
+                If there is no such key,
+                <a>resolve</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+                Otherwise, initialize <code><var>result</var>.instanceId</code>
+                to the <a>device id</a> this key maps to,
+                and initialize an internal
+                <code><var>result</var>@[[\allowedServices]]</code> field
+                to the <a>allowed services list</a> this key maps to.
+              </li>
+              <li>
+                If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
+                set <code><var>result</var>.name</code> to that string.
+              </li>
+              <li>
+                If <var>device</var> has a <a>Class of Device</a>,
+                set <code><var>result</var>.deviceClass</code> to that value.
+              </li>
+              <li>
+                <a>Populate the Bluetooth cache</a> with
+                the <a>org.bluetooth.characteristic.pnp_id</a> characteristic inside
+                the <a>org.bluetooth.service.device_information</a> service.
+                Ignore any errors from this step.
+              </li>
+              <li>
+                If the <a>Bluetooth cache</a> now has a known-present entry for this characteristic,
+                run the following substeps.
+                <ol>
+                  <li>
+                    Use any combination of the sub-procedures in
+                    the <a>Characteristic Value Read</a> procedure to retrieve the value
+                    of the <a>org.bluetooth.characteristic.pnp_id</a> characteristic
+                    into <var>pnp</var>.
+                    Handle errors as described in <a href="#error-handling"></a>.
+                  </li>
+                  <li>If the previous step returned an error, abort these substeps.</li>
+                  <li>
+                    Parse <var>pnp</var> as specified by
+                    the <a>org.bluetooth.characteristic.pnp_id</a> characteristic definition.
+                    If it's not 7 bytes long or
+                    if the Vendor ID Source is not <code>1</code> or <code>2</code>,
+                    abort these substeps.
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.vendorIDSource</code> according to the following table:
+                    <table>
+                      <tr><th>Parsed Vendor Id Source</th><th><code>vendorIDSource</code></th></tr>
+                      <tr><td>1</td><td><code>"bluetooth"</code></td></tr>
+                      <tr><td>2</td><td><code>"usb"</code></td></tr>
+                    </table>
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.vendorID</code> to the value parsed for Vendor ID.
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.productID</code> to the value parsed for Product ID.
+                  </li>
+                  <li>
+                    Set <code><var>result</var>.productVersion</code> to
+                    the value parsed for Product Version.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                Initialize <code><var>result</var>.paired</code> to
+                the value of <var>device</var>'s <a>bonded flag</a>.
+              </li>
+              <li>
+                Initialize <code><var>result</var>.connected</code> to
+                the value of <var>device</var>'s <a>LE-connected flag</a>.
+              </li>
+              <li>
+                Let <var>uuids</var> be an empty set of UUIDs.
+              </li>
+              <li>
+                Add <var>device</var>'s
+                advertised <a title="Service UUID Data Type">Service UUID</a>s
+                to <var>uuids</var>.
+              </li>
+              <li>
+                The UA MAY <a>populate the Bluetooth cache</a> with
+                all Services inside <var>device</var>.
+                Ignore any errors from this step.
+              </li>
+              <li>
+                If the <a>Bluetooth cache</a> contains
+                known-present Services inside <var>device</var>,
+                add the UUIDs of those Services to <var>uuids</var>.
+              </li>
+              <li>
+                Initialize <code><var>result</var>.uuids</code> to
+                a <a>read only Array</a> holding the elements of <var>uuids</var>
+                that are also in <code><var>result</var>@[[\allowedServices]]</code>.
+              </li>
+              <li>Resolve <var>promise</var> with <var>result</var>.</li>
+            </ol>
+          </li>
+        </ol>
+
         <dl title="interface BluetoothDevice : ServiceEventHandlers" class="idl" data-merge="VendorIDSource">
           <dt>readonly attribute DOMString instanceID</dt>
           <dd>
@@ -584,13 +847,13 @@
             service.
           </dd>
 
-          <dt>readonly attribute boolean? paired</dt>
+          <dt>readonly attribute boolean paired</dt>
           <dd>Indicates whether or not the device is paired with the system.</dd>
 
-          <dt>readonly attribute boolean? connected</dt>
+          <dt>readonly attribute boolean connected</dt>
           <dd>Indicates whether the device is currently connected to the system.</dd>
 
-          <dt>readonly attribute sequence&lt;UUID>? uuids</dt>
+          <dt>readonly attribute UUID[] uuids</dt>
           <dd>
             UUIDs of protocols, profiles and services advertised by the device.
             For Low Energy devices, this list is obtained from AD and GATT primary services.
@@ -613,8 +876,10 @@
             <ol>
               <li>
                 <a>Query the Bluetooth cache</a> for
-                the first primary GATT service on the remote device whose UUID is <var>service</var>
-                and whose UUID is in the <a>allowed services list</a> for this device and origin,
+                the first primary GATT service
+                on <code>this@[[\representedDevice]]</code>
+                whose UUID is <var>service</var>
+                and whose UUID is in <code>this@[[\allowedServices]]</code>,
                 and let <var>promise</var> be the result.
               </li>
               <li>
@@ -629,8 +894,9 @@
           <dt>Promise&lt;sequence&lt;BluetoothGATTService>>
               getPrimaryServices(optional BluetoothServiceUuid service)</dt>
           <dd>
-            <a>Query the Bluetooth cache</a> for the primary GATT services on the remote device
-            whose UUIDs are in the <a>allowed services list</a> for this device and origin
+            <a>Query the Bluetooth cache</a> for the primary GATT services
+            on <code>this@[[\representedDevice]]</code>
+            whose UUIDs are in <code>this@[[\allowedServices]]</code>
             and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
             and return the result.
           </dd>
@@ -647,7 +913,7 @@
     <section>
       <h2>GATT Interaction</h2>
 
-      <section>
+      <section id="information-model">
         <h2>GATT Information Model</h2>
 
         <p class="note">
@@ -709,9 +975,10 @@
         </p>
 
         <p>
-          To <dfn>query the Bluetooth cache</dfn> for entries matching some description,
-          the UA MUST return <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>:
+          To <dfn>populate the Bluetooth cache</dfn> with entries matching some description,
+          the UA MUST run the following steps.
+          <span class="note">Note that these steps can block,
+            so uses of this algorithm must be <a>in parallel</a>.</span>
         </p>
         <ol>
           <li>
@@ -719,6 +986,20 @@
             using any sequence of <a>GATT procedures</a> that [[BLUETOOTH41]] specifies
             will return enough information.
             Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returns an error, return that error from this algorithm.
+          </li>
+        </ol>
+
+        <p>
+          To <dfn>query the Bluetooth cache</dfn> for entries matching some description,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
+        <ol>
+          <li>
+            <a>Populate the Bluetooth cache</a> with entries matching the description.
           </li>
           <li>
             If the previous step returns an error,
@@ -767,7 +1048,7 @@
             When checking whether two Services, Characteristics, or Descriptors
             <var>a</var> and <var>b</var> are the <dfn>same attribute</dfn>,
             the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var>
-            are inside the same Bluetooth Device and have the same <a>Attribute Handle</a>,
+            are inside the <a>same device</a> and have the same <a>Attribute Handle</a>,
             but MAY use any algorithm it wants with the constraint that
             <var>a</var> and <var>b</var> MUST NOT be considered the <a>same attribute</a> if
             they fit any of the following conditions:
@@ -777,7 +1058,7 @@
             <li>They are both Services, but are not both primary or both secondary services.</li>
             <li>They have different UUIDs.</li>
             <li>
-              Their parent Devices aren't the same Device or
+              Their parent Devices aren't the <a>same device</a> or
               their parent Services or Characteristics aren't the <a>same attribute</a>.
             </li>
           </ul>
@@ -840,9 +1121,18 @@
             Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
           </li>
           <li>
+            <a>Get the <code>BluetoothDevice</code> representing</a>
+            the device in which <var>service</var> appears,
+            and let <var>devicePromise</var> be the result.
+          </li>
+          <li>Wait for <var>devicePromise</var> to settle.</li>
+          <li>
+            If <var>devicePromise</var> rejected,
+            <a>resolve</a> <var>promise</var> with <var>devicePromise</var> and abort these steps.
+          </li>
+          <li>
             Initialize <code><var>result</var>.device</code> from
-            the <a>BluetoothDevice</a> instance representing
-            the device in which <var>service</var> appears.
+            the value of <var>devicePromise</var>.
           </li>
           <li>
             <a>Get an attribute id</a> for <var>service</var>,
@@ -1005,7 +1295,8 @@
             This identifier MUST continue referring to the same <a>Characteristic</a> until either
             an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
             referring to the <a>BluetoothGATTService</a> of this characteristic or
-            if this characteristic's <a>BluetoothDevice</a> is not <code>paired</code>, it is disconnected.
+            if this characteristic's <a>Bluetooth device</a>'s <a>bonded flag</a> is false,
+            it is disconnected.
           </dd>
 
           <dt>readonly attribute ArrayBuffer? value</dt>
@@ -1468,7 +1759,7 @@
               The <a>children</a>
               of <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
               are the <a>BluetoothDevice</a> objects representing
-              devices on the origin's <a>allowed devices list</a>,
+              devices on the origin's <a>allowed devices map</a>,
               in an unspecified order.
             </li>
             <li>
@@ -1627,7 +1918,7 @@
               the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
             </li>
             <li>
-              Let <var>changedDevices</var> be the set of Bluetooth devices that
+              Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
               contain any <a>Service</a> in
               <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
             </li>
@@ -2303,11 +2594,19 @@
     </section>
 
     <section>
-      <h2>Terminology</h2>
+      <h2>Terminology and Conventions</h2>
 
       <p>
-        This specification uses several terms from other specifications.
+        This specification uses a few conventions and several terms from other specifications.
         This section lists those and links to their primary definitions.
+      </p>
+
+      <p>
+        Inspired by
+        the <a href="https://streams.spec.whatwg.org/#conventions">Streams specification</a>,
+        we use the notation x@[[\y]] to refer to
+        <a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object-internal-methods-and-internal-slots"
+           >internal slots</a> of an object, instead of saying "the [[\y]] internal slot of x."
       </p>
 
       <dl>
@@ -2348,6 +2647,17 @@
                 </li>
                 <li value="3">Generic Access Profile
                   <ol>
+                    <li value="3">User Interface Aspects
+                      <ol>
+                        <li value="2">Representation of Bluetooth Parameters
+                          <ol>
+                            <li value="2"><dfn>Bluetooth Device Name</dfn> (the user-friendly name)
+                            </li>
+                            <li value="4"><dfn>Class of Device</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
                     <li value="6">Idle Mode Procedures &mdash; BR/EDR Physical Transport
                       <ol>
                         <li value="4"><dfn>Device Discovery</dfn></li>
@@ -2366,11 +2676,43 @@
                             <li value="7"><dfn>Name Discovery Procedure</dfn></li>
                           </ol>
                         </li>
+                        <li value="3"><dfn>Connection Modes and Procedures</dfn></li>
+                        <li value="4">Bonding Modes and Procedures
+                          <ol>
+                            <li value="4"><dfn>Bonding Procedure</dfn></li>
+                          </ol>
+                        </li>
                       </ol>
                     </li>
                     <li value="10">Security Aspects &mdash; LE Physical Transport
                       <ol>
                         <li value="7"><dfn>Privacy Feature</dfn></li>
+                        <li value="8">Random Device Address
+                          <ol>
+                            <li value="1"><dfn>Static Address</dfn></li>
+                            <li value="2"><dfn>Private address</dfn>
+                              <ol>
+                                <li value="3">
+                                  <dfn>Resolvable Private Address Resolution Procedure</dfn>
+                                </li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                    <li value="11"><dfn>Advertising Data</dfn> and Scan Response Data Format</li>
+                    <li value="15">Bluetooth Device Requirements
+                      <ol>
+                        <li value="1">Bluetooth Device Address
+                          <ol>
+                            <li value="1">Bluetooth Device Address Types
+                              <ol>
+                                <li value="1"><dfn>Public Bluetooth Address</dfn></li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
                       </ol>
                     </li>
                   </ol>
@@ -2479,6 +2821,22 @@
                     </li>
                   </ol>
                 </li>
+                <li value="8">Security Manager Specification
+                  <ol>
+                    <li value="2">Security Manager
+                      <ol>
+                        <li value="4">Security in Bluetooth Low Energy
+                          <ol>
+                            <li value="1">Definition of Keys and Values,
+                              defines the <dfn>Identity Resolving Key</dfn>
+                              (<abbr title="Identity Resolving Key">IRK</abbr>)
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
               </ol>
             </li>
             <li value="6">Core System Package [Low Energy Controller volume]
@@ -2504,6 +2862,37 @@
             </li>
           </ol>
         </dd>
+        <dt>[[!BLUETOOTH-ASSIGNED]]</dt>
+        <dd>
+          <ul>
+            <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx"
+                   >Characteristics</a>
+              <ul>
+                <li>
+                  <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml"
+                     ><dfn>org.bluetooth.characteristic.gap.appearance</dfn></a>
+                </li>
+                <li>
+                  <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml"
+                     ><dfn>org.bluetooth.characteristic.pnp_id</dfn></a>
+                </li>
+              </ul>
+            </li>
+            <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx"
+                   >Services</a>
+              <ul>
+                <li>
+                  <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml"
+                     ><dfn>org.bluetooth.service.device_information</dfn></a>
+                </li>
+              </ul>
+            </li>
+            <li>
+              <a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile"
+                 ><dfn>Shortened Local Name</dfn></a>
+            </li>
+          </ul>
+        </dd>
         <dt>[[!BLUETOOTH-SUPPLEMENT4]]</dt>
         <dd>
           <ol type="A">
@@ -2511,9 +2900,15 @@
               <ol>
                 <li value="1">Data Types Definitions and Formats
                   <!-- The section names here are really general, so I've added
-                       "Data Type" to each one. -->
+                       "Data Type" to some. -->
                   <ol>
                     <li value="1"><dfn>Service UUID Data Type</dfn></li>
+                    <li value="2"><dfn>Local Name Data Type</dfn></li>
+                    <li value="3"><dfn>Flags Data Type</dfn></li>
+                    <li value="4"><dfn>Manufacturer Specific Data</dfn></li>
+                    <li value="5"><dfn>TX Power Level</dfn></li>
+                    <li value="11"><dfn>Service Data</dfn></li>
+                    <li value="12"><dfn>Appearance</dfn></li>
                   </ol>
                 </li>
               </ol>
@@ -2568,10 +2963,20 @@
         <dt>[[!WebIDL]]</dt>
         <dd>
           <ul>
-            <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror"><dfn>InvalidModificationError</dfn></a></li>
-            <li><a href="https://heycam.github.io/webidl/#networkerror"><dfn>NetworkError</dfn></a></li>
-            <li><a href="https://heycam.github.io/webidl/#notsupportederror"><dfn>NotSupportedError</dfn></a></li>
-            <li><a href="https://heycam.github.io/webidl/#securityerror"><dfn>SecurityError</dfn></a></li>
+            <li>Errors
+              <ul>
+                <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror"
+                       ><dfn>InvalidModificationError</dfn></a></li>
+                <li><a href="https://heycam.github.io/webidl/#networkerror"
+                       ><dfn>NetworkError</dfn></a></li>
+                <li><a href="https://heycam.github.io/webidl/#notsupportederror"
+                       ><dfn>NotSupportedError</dfn></a></li>
+                <li><a href="https://heycam.github.io/webidl/#securityerror"
+                       ><dfn>SecurityError</dfn></a></li>
+              </ul>
+            </li>
+            <li><a href="https://heycam.github.io/webidl/#dfn-read-only-array"
+                   ><dfn>read only Array</dfn></a></li>
           </ul>
         </dd>
         <dt><a href="https://www.w3.org/2001/tag/doc/promises-guide"
