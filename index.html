@@ -775,10 +775,6 @@
                 the value of <var>device</var>'s <a>bonded flag</a>.
               </li>
               <li>
-                Initialize <code><var>result</var>.connected</code> to
-                the value of <var>device</var>'s <a>LE-connected flag</a>.
-              </li>
-              <li>
                 Let <var>uuids</var> be an empty set of UUIDs.
               </li>
               <li>
@@ -853,8 +849,12 @@
           <dt>readonly attribute boolean paired</dt>
           <dd>Indicates whether or not the device is paired with the system.</dd>
 
-          <dt>readonly attribute boolean connected</dt>
-          <dd>Indicates whether the device is currently connected to the system.</dd>
+          <dt>readonly attribute BluetoothGATTRemoteServer? gattServer</dt>
+          <dd>
+            If the UA is currently connected to this device's GATT server,
+            this provides a way to interact with it.
+            While this device is disconnected, <code>gattServer</code> is <code>null</code>.
+          </dd>
 
           <dt>readonly attribute UUID[] uuids</dt>
           <dd>
@@ -862,46 +862,9 @@
             For Low Energy devices, this list is obtained from AD and GATT primary services.
           </dd>
 
-          <dt>Promise&lt;void> connect()</dt>
+          <dt>Promise&lt;BluetoothGATTRemoteServer> connectGATT()</dt>
           <dd>
             Establishes a connection to the device.
-          </dd>
-
-          <dt>Promise&lt;void> disconnect()</dt>
-          <dd>
-            Closes the site's connection to the device.
-            Note that this will not always destroy the physical link itself,
-            since there may be other sites with open connections.
-          </dd>
-
-          <dt>Promise&lt;BluetoothGATTService> getPrimaryService(BluetoothServiceUuid service)</dt>
-          <dd>
-            <ol>
-              <li>
-                <a>Query the Bluetooth cache</a> for
-                the first primary GATT service
-                on <code>this@[[\representedDevice]]</code>
-                whose UUID is <var>service</var>
-                and whose UUID is in <code>this@[[\allowedServices]]</code>,
-                and let <var>promise</var> be the result.
-              </li>
-              <li>
-                Return the result of
-                <a>transforming</a> <var>promise</var> with a fulfilment handler that
-                returns <code>null</code> if its argument is empty
-                or returns the first (only) element of its argument.
-              </li>
-            </ol>
-          </dd>
-
-          <dt>Promise&lt;sequence&lt;BluetoothGATTService>>
-              getPrimaryServices(optional BluetoothServiceUuid service)</dt>
-          <dd>
-            <a>Query the Bluetooth cache</a> for the primary GATT services
-            on <code>this@[[\representedDevice]]</code>
-            whose UUIDs are in <code>this@[[\allowedServices]]</code>
-            and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
-            and return the result.
           </dd>
         </dl>
 
@@ -1100,6 +1063,49 @@
             </li>
           </ol>
         </section>
+      </section>
+
+      <section>
+        <h2><a>BluetoothGATTRemoteServer</a></h2>
+
+        <dl title="interface BluetoothGATTRemoteServer : ServiceEventHandlers" class="idl">
+          <dt>Promise&lt;void> disconnect()</dt>
+          <dd>
+            Closes the site's connection to the device.
+            Note that this will not always destroy the physical link itself,
+            since there may be other sites with open connections.
+          </dd>
+
+          <dt>Promise&lt;BluetoothGATTService> getPrimaryService(BluetoothServiceUuid service)</dt>
+          <dd>
+            <ol>
+              <li>
+                <a>Query the Bluetooth cache</a> for
+                the first primary GATT service
+                on <code>this@[[\representedDevice]]</code>
+                whose UUID is <var>service</var>
+                and whose UUID is in <code>this@[[\allowedServices]]</code>,
+                and let <var>promise</var> be the result.
+              </li>
+              <li>
+                Return the result of
+                <a>transforming</a> <var>promise</var> with a fulfilment handler that
+                returns <code>null</code> if its argument is empty
+                or returns the first (only) element of its argument.
+              </li>
+            </ol>
+          </dd>
+
+          <dt>Promise&lt;sequence&lt;BluetoothGATTService>>
+              getPrimaryServices(optional BluetoothServiceUuid service)</dt>
+          <dd>
+            <a>Query the Bluetooth cache</a> for the primary GATT services
+            on <code>this@[[\representedDevice]]</code>
+            whose UUIDs are in <code>this@[[\allowedServices]]</code>
+            and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
+            and return the result.
+          </dd>
+        </dl>
       </section>
 
       <section>
