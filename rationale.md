@@ -78,3 +78,42 @@ and the [Android API](https://developer.android.com/reference/android/bluetooth/
 doesn't document which it prefers when both are available.
 Neither gives enough control to
 implement a web standard that gives the web page the ability to choose.
+
+## Why do we have just one connection instead of one per call to connect()?
+
+If each call to `BluetoothDevice.connect()` returned a separate `BluetoothGATTRemoteServer` instance,
+which could be disconnected independently of other concurrent instances,
+then components of a page could do their own lifecycle management,
+disconnecting when they were finished with a device.
+This implies separate Service, Characteristic, and Descriptor instances for each connection because
+we'd want _some_ way to get a `BluetoothGATTRemoteServer` instance given a `BluetoothGATTService`,
+but we wouldn't want to return a different one than
+the component-using-the-Service controlled the lifetime of.
+However, because events bubble, this would result in a separate, e.g.,
+`characteristicvaluechanged` event to arrive at the `BluetoothDevice` for each connection.
+To avoid that, we have only one connection per device.
+
+## Why is `BluetoothGATTRemoteServer` created lazily?
+
+If/when Bluetooth devices support more than GATT communication,
+this may allow implementations to avoid creating data structures that aren't used.
+
+## Why are GATT connection and disconnection asymmetric?
+
+`BluetoothGATTRemoteServer.disconnect()` exists
+to release the current script's claim on the GATT connection,
+but there's no parallel `BluetoothGATTRemoteServer.connect()`.
+Users just have to call `BluetoothDevice.connectGATT()` again.
+If we made users call `BluetoothDevice.gattServer.connect()`,
+it would still need to return a `Promise<BluetoothGATTRemoteServer>` (WebBluetoothCG/web-bluetooth#65),
+and would just be more characters in the common case.
+We could provide both, but they'd be two ways of spelling the same operation,
+which seems more confusing than worth it.
+
+## Why doesn't `BluetoothGATTRemoteServer.disconnect()` return a `Promise`?
+
+Disconnection can easily take effect synchronously
+(if it is physically asynchronous, simply discard events that came in after it was requested).
+We're also not signaling any error conditions from the disconnection:
+if other operations were in flight, they'll return a NetworkError,
+which still allows the possibility that they took effect.
