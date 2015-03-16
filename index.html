@@ -946,9 +946,13 @@
               Otherwise, initialize it to <code>null</code>.
             </li>
             <li>
-              If <var>device</var> has both a <a>TX Power Level</a> and an <a>RSSI</a>,
-              initialize <code><var>adData</var>.pathLoss</code>
-              to <code><a>TX Power Level</a> - <a>RSSI</a></code>.
+              If <var>device</var> has a <a>TX Power Level</a>,
+              initialize <code><var>adData</var>.txPower</code> to its value.
+              Otherwise initialize it to <code>null</code>.
+            </li>
+            <li>
+              If <var>device</var> has an <a>RSSI</a>,
+              initialize <code><var>adData</var>.rssi</code> to its value.
               Otherwise initialize it to <code>null</code>.
             </li>
             <li>
@@ -997,11 +1001,15 @@
               An <a>Appearance</a>, one of the values defined by
               the <a>org.bluetooth.characteristic.gap.appearance</a> characteristic.
             </dd>
-            <dt>readonly attribute short? pathLoss</dt>
+            <dt>readonly attribute byte? txPower</dt>
             <dd>
-              The number of decibels of radio signal strength lost
-              between the Bluetooth device sending data and the UA receiving it.
-              Equal to <code><a>TX Power Level</a> - <a>RSSI</a></code>.
+              The transmission power at which the device is broadcasting, measured in dBm.
+              This is used to compute the path loss as <code>this.txPower - this.rssi</code>.
+            </dd>
+            <dt>readonly attribute byte? rssi</dt>
+            <dd>
+              The power at which the device's packets are being received, measured in dBm.
+              This is used to compute the path loss as <code>this.txPower - this.rssi</code>.
             </dd>
             <dt>readonly attribute Map manufacturerData</dt>
             <dd>Maps <code>unsigned short</code> Company Identifier Codes to <a>ArrayBuffer</a>s.
