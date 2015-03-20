@@ -79,9 +79,9 @@ doesn't document which it prefers when both are available.
 Neither gives enough control to
 implement a web standard that gives the web page the ability to choose.
 
-## Why do we have just one connection instead of one per call to connect()?
+## Why do we have just one connection instead of one per call to connectGATT()?
 
-If each call to `BluetoothDevice.connect()` returned a separate `BluetoothGATTRemoteServer` instance,
+If each call to `BluetoothDevice.connectGATT()` returned a separate `BluetoothGATTRemoteServer` instance,
 which could be disconnected independently of other concurrent instances,
 then components of a page could do their own lifecycle management,
 disconnecting when they were finished with a device.
