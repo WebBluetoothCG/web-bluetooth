@@ -42,11 +42,11 @@
           }],
 
           localBiblio: {
-            "BLUETOOTH41": {
-              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=282159",
-              title: "BLUETOOTH SPECIFICATION Version 4.1",
+            "BLUETOOTH42": {
+              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439",
+              title: "BLUETOOTH SPECIFICATION Version 4.2",
               publisher: "Bluetooth SIG",
-              date: "3 December 2013",
+              date: "2 December 2014",
             },
             "BLUETOOTH-GATT-REST": {
               href: "https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=285910",
@@ -84,10 +84,10 @@
               status: "Living Standard",
               publisher: "Bluetooth SIG",
             },
-            "BLUETOOTH-SUPPLEMENT4": {
-              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=282152",
-              title: "Supplement to the Bluetooth Core Specification Version 4",
-              date: "3 December 2013",
+            "BLUETOOTH-SUPPLEMENT5": {
+              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=291904",
+              title: "Supplement to the Bluetooth Core Specification Version 5",
+              date: "2 December 2014",
               publisher: "Bluetooth SIG",
             },
           },
@@ -151,9 +151,10 @@
       <p>
         The first version of this specification focuses on the Bluetooth 4 GATT protocol
         in the <a>Central</a> and <a>Client</a> roles, over either a BR/EDR or LE connection.
-        While this specification cites the [[BLUETOOTH41]] specification,
-        it intends to also support communication with devices that only implement Bluetooth 4.0.
-
+        While this specification cites the [[BLUETOOTH42]] specification,
+        it intends to also support communication
+        with devices that only implement Bluetooth 4.0 or 4.1.
+      </p>
     </section>
 
     <section>
@@ -213,7 +214,8 @@
               UAs are encouraged to validate these values when they can.
 
           <li>
-            This API never exposes Bluetooth addressing, data signing or encryption keys ([[!BLUETOOTH41]] Volume 3 Part H Section 2.4.1) to websites.
+            This API never exposes Bluetooth addressing, data signing or encryption keys
+            (<a>Definition of Keys and Values</a>) to websites.
             This makes it more difficult for a website to predict the bits that will be sent over the radio,
             which blocks <a href="https://www.usenix.org/legacy/events/woot11/tech/final_files/Goodspeed.pdf">packet-in-packet injection attacks</a>.
             Unfortunately, this only works over encrypted links,
@@ -236,28 +238,28 @@
 
         <p>
           Each Bluetooth BR/EDR device has a unique 48-bit MAC address
-          known as the <dfn>BD_ADDR</dfn> ([[!BLUETOOTH41]] 3.C.15).
+          known as the <a>BD_ADDR</a>.
           Each Bluetooth LE device has at least one of a <a>Public Device Address</a>
-          and a <a>Static Random Address</a>.
-          The <dfn>Public Device Address</dfn> is a MAC address ([[!BLUETOOTH41]] 6.B.1.3).
-          The <dfn>Static Random Address</dfn> may be regenerated
-          on each restart ([[!BLUETOOTH41]] 3.C.10.8).
+          and a <a>Static Device Address</a>.
+          The <a>Public Device Address</a> is a MAC address.
+          The <a>Static Device Address</a> may be regenerated on each restart.
           A BR/EDR/LE device will use the same value
-          for the <a>BD_ADDR</a> and the <a>Public Device Address</a> ([[!BLUETOOTH41]] 2.E.7.4.6).
-
+          for the <a>BD_ADDR</a> and the <a>Public Device Address</a>
+          (specified in the <a>Read BD_ADDR Command</a>).
+        </p>
         <p>
           An LE device may also have a unique, 128-bit <a>Identity Resolving Key</a>,
           which is sent to trusted devices during the bonding process.
           To avoid leaking a persistent identifier, an LE device may scan and advertise using
-          a random <dfn>Resolvable Private Address</dfn> or <dfn>Non-Resolvable Private Address</dfn>
+          a random Resolvable or Non-Resolvable <a>Private Address</a>
           instead of its Static or Public Address.
           These are regenerated periodically (approximately every 15 minutes),
           but a bonded device can check whether one of its stored <a>IRK</a>s matches
-          any given Resolvable Private Address ([[!BLUETOOTH41]] 3.C.10.8.2.3).
-
+          any given Resolvable Private Address
+          using the <a>Resolvable Private Address Resolution Procedure</a>.
+        </p>
         <p>
-          Each Bluetooth device also has a human-readable <dfn>Device Name</dfn>
-          (([[!BLUETOOTH41]] 3.C.3.2.2).
+          Each Bluetooth device also has a human-readable <a>Bluetooth Device Name</a>.
           These aren't guaranteed to be unique, but may well be, depending on the device type.
 
         <section class="informative">
@@ -546,7 +548,7 @@
             An <a>ATT Bearer</a>, over which all GATT communication happens.
             The <a>ATT Bearer</a> is created by procedures described in
             "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
-            It is disconnected in ways [[BLUETOOTH41]] isn't entirely clear about.
+            It is disconnected in ways [[BLUETOOTH42]] isn't entirely clear about.
           </li>
 
           <li>
@@ -1080,7 +1082,7 @@
         <ol>
           <li>
             Attempt to make all matching entries in the cache either known-present or known-absent,
-            using any sequence of <a>GATT procedures</a> that [[BLUETOOTH41]] specifies
+            using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
             will return enough information.
             Handle errors as described in <a href="#error-handling"></a>.
           </li>
@@ -2265,7 +2267,7 @@
         <p class="note">
           This standard provides the
           <a href="#widl-BluetoothUuids-canonicalUUID-UUID-unsigned-long-alias"><code>canonicalUUID()</code></a> function
-          to map a 16- or 32-bit Bluetooth UUID alias to its 128-bit form.
+          to map a 16- or 32-bit Bluetooth <a>UUID alias</a> to its 128-bit form.
 
         <p class="note">
           Bluetooth devices are required to convert 16- and 32-bit UUIDs to 128-bit UUIDs
@@ -2292,8 +2294,8 @@
         <dd></dd>
         <dt>UUID canonicalUUID(unsigned long alias)</dt>
         <dd>
-          Returns a 128-bit <a>UUID</a> given a 16- or 32-bit Bluetooth <a title="UUID aliases">UUID alias</a>.
-          The algorithm for converting an alias to a full 128-bit UUID is defined in [[!BLUETOOTH41]] 3.F.3.2.1:
+          Returns a 128-bit <a>UUID</a> given a 16- or 32-bit Bluetooth <a>UUID alias</a>.
+          The algorithm for converting an alias to a full 128-bit UUID is defined in [[!BLUETOOTH42]] 3.B.2.5.1:
           the top 32 bits of "<code>00000000-0000-1000-8000-00805f9b34fb</code>" are replaced by the bits of the alias.
           For example, <code>canonicalUUID(0xDEADBEEF)</code> returns <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
         </dd>
@@ -2673,7 +2675,7 @@
       </p>
 
       <dl>
-        <dt>[[!BLUETOOTH41]]</dt>
+        <dt>[[!BLUETOOTH42]]</dt>
         <dd>
           <ol>
             <li value="1">Architecture &amp; Terminology Overview
@@ -2707,6 +2709,11 @@
                   <ol>
                     <li value="7">HCI Commands and Events
                       <ol>
+                        <li value="4">Informational Parameters
+                          <ol>
+                            <li value="6"><dfn>Read BD_ADDR Command</dfn></li>
+                          </ol>
+                        </li>
                         <li value="5">Status Parameters
                           <ol>
                             <li value="4">
@@ -2725,7 +2732,15 @@
               <ol type="A">
                 <li value="2">Service Discovery Protocol (SDP) Specification
                   <ol>
-                    <li value="5"><dfn>Searching for Services</dfn></li>
+                    <li value="2">Overview
+                      <ol>
+                        <li value="5"><dfn>Searching for Services</dfn>
+                          <ol>
+                            <li value="1"><dfn>UUID alias</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
                   </ol>
                 </li>
                 <li value="3">Generic Access Profile
@@ -2787,7 +2802,7 @@
                     <li value="11"><dfn>Advertising Data</dfn> and Scan Response Data Format</li>
                     <li value="15">Bluetooth Device Requirements
                       <ol>
-                        <li value="1">Bluetooth Device Address
+                        <li value="1">Bluetooth Device Address (defines <dfn>BD_ADDR</dfn>)
                           <ol>
                             <li value="1">Bluetooth Device Address Types
                               <ol>
@@ -2806,7 +2821,7 @@
                       <ol>
                         <li value="2">Basic Concepts
                           <ol>
-                            <li value="1"><dfn>Attribute Type</dfn> and <dfn>UUID aliases</dfn></li>
+                            <li value="1"><dfn>Attribute Type</dfn></li>
                             <li value="2"><dfn>Attribute Handle</dfn></li>
                           </ol>
                         </li>
@@ -2918,7 +2933,7 @@
                       <ol>
                         <li value="4">Security in Bluetooth Low Energy
                           <ol>
-                            <li value="1">Definition of Keys and Values,
+                            <li value="1"><dfn>Definition of Keys and Values</dfn>,
                               defines the <dfn>Identity Resolving Key</dfn>
                               (<abbr title="Identity Resolving Key">IRK</abbr>)
                             </li>
@@ -2934,6 +2949,20 @@
               <ol type="A">
                 <li value="2">Link Layer Specification
                   <ol>
+                    <li value="1">General Description
+                      <ol>
+                        <li value="3">Device Address
+                          <ol>
+                            <li value="1"><dfn>Public Device Address</dfn></li>
+                            <li value="2">Random Device Address
+                              <ol>
+                                <li value="1"><dfn>Static Device Address</dfn></li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
                     <li value="4">Air Interface Protocol
                       <ol>
                         <li value="4">Non-Connected States
@@ -2984,7 +3013,7 @@
             </li>
           </ul>
         </dd>
-        <dt>[[!BLUETOOTH-SUPPLEMENT4]]</dt>
+        <dt>[[!BLUETOOTH-SUPPLEMENT5]]</dt>
         <dd>
           <ol type="A">
             <li value="1">Data Types Specification
