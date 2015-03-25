@@ -16,15 +16,11 @@ select and approve access to devices as opposed to assuming certification and in
 
 ## Scope of Work
 
-{TBD: Describe topics that are in scope.
-For specifications that the CLA patent section applies to,
-it is helpful to describe the scope in a way that it is clear
-what types of technologies will be defined in specifications,
-as opposed to adoption by reference or underlying technology not defined in the proposed spec.
-Key use cases are often helpful in describing scope.
-If no specifications will be defined in the group that the CLA patent section applies to,
-the charter should clearly state that.
-A clear scope is particularly important where patent licensing obligations may apply.}
+The [Web Bluetooth Use Cases](http://webbluetoothcg.github.io/web-bluetooth/use-cases.html)
+document describes the use cases the group aims to address with the Web Bluetooth API.
+The specification focuses on the Bluetooth 4 GATT protocol in the Central and Client roles,
+over either a BR/EDR or LE connection, and intends to support communication with devices
+that implement Bluetooth 4.0, 4.1, or 4.2.
 
 ### Out of Scope
 
@@ -32,32 +28,29 @@ A clear scope is particularly important where patent licensing obligations may a
 
 ## Deliverables
 
-{TBD: Provide a brief description of each specification the group plans to produce.
-Where an estimate is possible, it can be useful to provide an estimated schedule for key deliverables.
-As described below, the group may later modify the charter deliverables. }
-
 ### Community Group Reports that are Specifications
 
-{TBD: Provide a brief description of each Community Group Report the group plans to publish.
-The description should be enough for those considering participation to know
-the general types of technologies that will be defined in the report.}
-
-### Community Group Reports that are not Specifications {TBD: Include only as necessary}
-
-{TBD: Describe Community Group Reports that are not Specifications (e.g,. primers).}
-The group MAY produce other Community Group Reports within the scope of this charter
-but that are not Specifications covered by the CLA.
-
-### Test Suites and Other Software {TBD: Include only as necessary}
-
-{TBD: State whether test suites or any other software will be created for any Specifications.
-For information about contributions to W3C test suites, please see Test the Web Forward,
-and take note of W3C's test suite contribution policy and licenses for W3C test suites.
-For other software contributions, clearly state which licenses will govern contributions and distribution.}
+* Web Bluetooth API to discover and communicate with devices over the Bluetooth 4 wireless
+standard using the Generic Attribute Profile (GATT). See the
+[Web Bluetooth API](http://webbluetoothcg.github.io/web-bluetooth/) that serves as the
+initial input.
 
 ## Dependencies or Liaisons
 
-{TBD: List any significant dependencies on other groups (inside or outside W3C) or materials. }
+* Web Application Security Working Group.
+[Privileged Contexts](https://w3c.github.io/webappsec/specs/powerfulfeatures/) outlines normative
+requirements which should be incorporated into documents specifying new features. Since the
+Web Bluetooth API requires that only sufficiently secure contexts can access Bluetooth devices,
+the group should coordinate with the Web Application Security Working Group to ensure the API
+adheres to the requirements.
+
+* Web NFC Community Group. The Web Bluetooth Community Group will closely follow the work of the
+Web NFC Community Group, specifically, the [Web NFC API](http://w3c.github.io/web-nfc/),
+exploring the similarities of the approach on using these technologies by Web pages where applicable.
+Specifically, the group will coordinate with the Web NFC Community Group with regard to the NFC handover.
+
+* Bluetooth SIG. The Web Bluetooth Community Group defines an API that builds atop Bluetooth
+APIs provided by the underlying platform, defined by Bluetooth SIG.
 
 ## Community and Business Group Process
 
@@ -102,9 +95,6 @@ Participants dissatisfied with the outcome of an election may ask the Community 
 The Community Development Lead, after evaluating the election, may take any action including no action.
 
 ### Decision Process
-
-{TBD: If you do not use the decision process from the template and if your decision process is not consensus-based,
-it is important to indicate that clearly, and to describe the decision process you will use.}
 
 This group will seek to make decisions when there is consensus.
 When the group discusses an issue on the mailing list and there is a call from the group for assessing consensus,
