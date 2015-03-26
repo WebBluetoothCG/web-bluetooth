@@ -24,7 +24,8 @@ that implement Bluetooth 4.0, 4.1, or 4.2.
 
 ### Out of Scope
 
-{TBD: Identify topics known in advance to be out of scope}
+* Communication over arbitrary L2CAP channels, RFCOMM channels,
+  or other stream and socket-based channels.
 
 ## Deliverables
 
@@ -34,15 +35,37 @@ that implement Bluetooth 4.0, 4.1, or 4.2.
 standard using the Generic Attribute Profile (GATT). See the
 [Web Bluetooth API](http://webbluetoothcg.github.io/web-bluetooth/) that serves as the
 initial input.
+This specification is a candidate for the Dual License as specified in
+[section 8 of the HTML Working Group charter](http://www.w3.org/2013/09/html-charter.html#documentlicense).
+
+This could be published as either one or a set of related specifications.
+
+### Community Group Reports that are not Specifications
+
+The group MAY produce other Community Group Reports within the scope of this charter
+but that are not Specifications covered by the CLA.
+Such reports may include:
+
+* A description of the Web Bluetooth API's security model,
+  including one or more potential ceremonies through which a user grants limited access to a device.
+
+### Test Suites and Other Software
+
+The group MAY produce test suites and other software to support the Specifications.
+This software will be hosted in the [WebBluetoothCG GitHub organization](https://github.com/WebBluetoothCG/)
+under the [Apache 2](http://www.apache.org/licenses/LICENSE-2.0.html) license.
+This software may include:
+
+* A test suite for the Web Bluetooth API.
+* Polyfills for the Web Bluetooth on top of existing native APIs
+  like [Chrome Apps](https://github.com/WebBluetoothCG/chrome-app-polyfill) and Cordova.
 
 ## Dependencies or Liaisons
 
 * Web Application Security Working Group.
-[Privileged Contexts](https://w3c.github.io/webappsec/specs/powerfulfeatures/) outlines normative
-requirements which should be incorporated into documents specifying new features. Since the
-Web Bluetooth API requires that only sufficiently secure contexts can access Bluetooth devices,
-the group should coordinate with the Web Application Security Working Group to ensure the API
-adheres to the requirements.
+  Because the Web Bluetooth specification grants new capabilities to websites,
+  the group should coordinate with the Web Application Security Working Group to ensure
+  the API receives sufficient review from a security perspective.
 
 * Web NFC Community Group. The Web Bluetooth Community Group will closely follow the work of the
 Web NFC Community Group, specifically, the [Web NFC API](http://w3c.github.io/web-nfc/),
@@ -51,6 +74,8 @@ Specifically, the group will coordinate with the Web NFC Community Group with re
 
 * Bluetooth SIG. The Web Bluetooth Community Group defines an API that builds atop Bluetooth
 APIs provided by the underlying platform, defined by Bluetooth SIG.
+  The group may request changes to the underlying platform through the Bluetooth SIG,
+  if such changes are needed in order to better serve the web platform.
 
 ## Community and Business Group Process
 
@@ -65,8 +90,15 @@ The CLA applies to these Community Group Reports.
 
 ### Contribution Mechanics
 
-For these Reports, Community Group participants agree to send contributions to
-either the group "contrib" list or to the general group list, with subject line starting "[short-name-for spec]".
+For these Reports and Software, Community Group participants agree to send contributions to
+either:
+
+* The report or software's [github repository](https://github.com/WebBluetoothCG/)
+  as either an issue or pull request.
+  These contributions will be logged to the [public-web-bluetooth-log](http://lists.w3.org/Archives/Public/public-web-bluetooth-log/) list.
+* The [general group list](http://lists.w3.org/Archives/Public/public-web-bluetooth/)
+* The [group "contrib" list](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/)
+
 When meeting discussion includes contributions,
 contributors are expected to record those contributions explicitly on the mailing list as described.
 
