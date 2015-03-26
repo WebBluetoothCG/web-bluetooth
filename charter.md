@@ -59,6 +59,7 @@ This software may include:
 * A test suite for the Web Bluetooth API.
 * Polyfills for the Web Bluetooth on top of existing native APIs
   like [Chrome Apps](https://github.com/WebBluetoothCG/chrome-app-polyfill) and Cordova.
+* Demo applications and debugging tools for developers using the Web Bluetooth API.
 
 ## Dependencies or Liaisons
 
