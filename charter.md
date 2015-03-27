@@ -29,14 +29,19 @@ that implement Bluetooth 4.0, 4.1, or 4.2.
 
 ## Deliverables
 
+If documents (including Specifications) from this Community Group are adopted by W3C Working Groups,
+it is requested that the W3C apply dual licensing to the Working Group version
+to license the work under a permissive copyright license,
+preferably a license compatible with the W3C Community Group CLA.
+An example of dual licensing in Working Groups can be found in the
+[HTML WG Charter](http://www.w3.org/2013/09/html-charter.html#documentlicense).
+
 ### Community Group Reports that are Specifications
 
 * Web Bluetooth API to discover and communicate with devices over the Bluetooth 4 wireless
 standard using the Generic Attribute Profile (GATT). See the
 [Web Bluetooth API](http://webbluetoothcg.github.io/web-bluetooth/) that serves as the
 initial input.
-This specification is a candidate for the Dual License as specified in
-[section 8 of the HTML Working Group charter](http://www.w3.org/2013/09/html-charter.html#documentlicense).
 
 This could be published as either one or a set of related specifications.
 
@@ -91,17 +96,24 @@ The CLA applies to these Community Group Reports.
 
 ### Contribution Mechanics
 
-For these Reports and Software, Community Group participants agree to send contributions to
-either:
+Community Group Participants agree to make all contributions
+through pull requests for a particular report in GitHub.
+A participant may ask someone else to make the pull request for them by sending a post to the
+["contrib" list](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/)
+or [group list](http://lists.w3.org/Archives/Public/public-web-bluetooth/),
+with subject line starting "[short-name-for-spec]PR"
+or by making the request in a GitHub issue.
+The pull request that results from this must indicate who the request was made for
+and provide the URL for the archived request.
+For software, the GitHub CONTRIBUTING and LICENSE files describe how to contribute
+and under what license Contributions are made.
 
-* The report or software's [github repository](https://github.com/WebBluetoothCG/)
-  as either an issue or pull request.
-  These contributions will be logged to the [public-web-bluetooth-log](http://lists.w3.org/Archives/Public/public-web-bluetooth-log/) list.
-* The [general group list](http://lists.w3.org/Archives/Public/public-web-bluetooth/)
-* The [group "contrib" list](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/)
+GitHub issues and pull requests will be archived to the
+[public-web-bluetooth-log](http://lists.w3.org/Archives/Public/public-web-bluetooth-log/) list.
 
 When meeting discussion includes contributions,
-contributors are expected to record those contributions explicitly on the mailing list as described.
+contributors are expected to record those contributions explicitly
+on GitHub or the mailing list as described.
 
 ### Chair Selection
 
