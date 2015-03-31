@@ -96,24 +96,11 @@ The CLA applies to these Community Group Reports.
 
 ### Contribution Mechanics
 
-Community Group Participants agree to make all contributions
-through pull requests for a particular report in GitHub.
-A participant may ask someone else to make the pull request for them by sending a post to the
-["contrib" list](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/)
-or [group list](http://lists.w3.org/Archives/Public/public-web-bluetooth/),
-with subject line starting "[short-name-for-spec]PR"
-or by making the request in a GitHub issue.
-The pull request that results from this must indicate who the request was made for
-and provide the URL for the archived request.
-For software, the GitHub CONTRIBUTING and LICENSE files describe how to contribute
-and under what license Contributions are made.
+Community Group Participants agree that all Contributions will be documented in pull requests and commits for a particular document in the group's GitHub repository.
 
-GitHub issues and pull requests will be archived to the
-[public-web-bluetooth-log](http://lists.w3.org/Archives/Public/public-web-bluetooth-log/) list.
+For Contributions to Specifications, if someone other than the Contributor makes the pull request, the pull request MUST indicate who the request was made on behalf of and MUST provide a link to the archived change request in a GitHub Issue or in the archived Community Group contrib or general mail list. This could be a link to archived meeeting minutes that clearly indicate who requested changes to a Specification. The information MUST be specific enough to easily determine who the Contributors were and that the intention was to change a particular Specification.
 
-When meeting discussion includes contributions,
-contributors are expected to record those contributions explicitly
-on GitHub or the mailing list as described.
+For software, the GitHub Contributing and License files describes how to Contribute and the license under which Contributions are made.
 
 ### Chair Selection
 
@@ -156,11 +143,17 @@ and does not unreasonably favor or discriminate against any group participant or
 
 ### Transparency
 
-The group will conduct all of its technical work on its public mailing list.
+The group will conduct all of its technical work in public.
+
+Discussions MAY take place on the group's [public mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/). Other discussions MAY take place using Issues in the group's [GitHub repository](https://github.com/WebBluetoothCG/). Other contributions MAY be also be directly posted to the contrib list.  For convenience, GitHub issues and pull requests will be archived to the group's [public-web-bluetooth-contrib/](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/) list. 
+
+Meetings MAY be restricted to Community Group participants, but a public summary or minutes MUST be posted to the group's public mail list.
+
 Any decisions reached at any meeting are tentative.
-Any group participant may object to a decision reached at an online meeting
+Any group participant may object to a decision reached at a meeting
 within 7 days of publication of the decision on the mail list.
 That decision must then be confirmed on the mail list by the Decision Process above.
+
 
 ## Amendments to this Charter
 
