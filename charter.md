@@ -145,7 +145,7 @@ and does not unreasonably favor or discriminate against any group participant or
 
 The group will conduct all of its technical work in public.
 
-Discussions MAY take place on the group's [public mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/). Other discussions take place using Issues in the group's [GitHub repository](https://github.com/WebBluetoothCG/). For convenience, GitHub issues and pull requests will be archived to the group's [public-web-bluetooth-contrib/](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/) list. Other contributions MAY be directly posted to the contrib list.
+Discussions MAY take place on the group's [public mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/). Other discussions MAY take place using Issues in the group's [GitHub repository](https://github.com/WebBluetoothCG/). Other contributions MAY be also be directly posted to the contrib list.  For convenience, GitHub issues and pull requests will be archived to the group's [public-web-bluetooth-contrib/](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/) list. 
 
 Meetings MAY be restricted to Community Group participants, but a public summary or minutes MUST be posted to the group's public mail list.
 
