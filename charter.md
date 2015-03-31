@@ -143,11 +143,16 @@ and does not unreasonably favor or discriminate against any group participant or
 
 ### Transparency
 
-The group will conduct all of its technical work on its public mailing list.
+The group will conduct all of its technical work in public.
+
+Discussions MAY take place on the group's [public mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/). Other discussions take place using Issues in the group's [GitHub repository](https://github.com/WebBluetoothCG/). For convenience, GitHub issues and pull requests will be archived to the group's [public-web-bluetooth-contrib/](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/) list.  Other contributions MAY be directly posted to the contrib list.
+
 Any decisions reached at any meeting are tentative.
 Any group participant may object to a decision reached at an online meeting
 within 7 days of publication of the decision on the mail list.
 That decision must then be confirmed on the mail list by the Decision Process above.
+
+Meetings MAY be restricted to Community Group participants, but a public summary or minutes will be posted to the group's public mail list.
 
 ## Amendments to this Charter
 
