@@ -355,6 +355,62 @@
               and <a>resolve</a> <var>promise</var> with the result.
             </li>
           </ol>
+          <aside class="example">
+            <p>
+              Say the UA is close to the following devices:
+            </p>
+            <table>
+              <tr><th>Device</th><th>Advertises Services</th></tr>
+              <tr><td>D1</td><td>A, B, C, D</td></tr>
+              <tr><td>D2</td><td>A, B, E</td></tr>
+              <tr><td>D3</td><td>C, D</td></tr>
+              <tr><td>D4</td><td>E</td></tr>
+            </table>
+            <p>
+              If the website calls
+            </p>
+            <pre class="highlight">navigator.bluetooth.requestDevice(
+  [ {services: [A, B]} ])</pre>
+            <p>
+              the user will be shown a dialog containing devices D1 and D2.
+              If the user selects D1, the website will not be able to access services C or D.
+              If the user selects D2, the website will not be able to access service E.
+            </p>
+            <p>
+              On the other hand, if the website calls
+            </p>
+            <pre class="highlight">navigator.bluetooth.requestDevice(
+  [
+    {services: [A, B]},
+    {services: [C, D]}
+  ])</pre>
+            <p>
+              the dialog will contain devices D1, D2, and D3,
+              and if the user selects D1,
+              the website will be able to access services A, B, C, and D.
+            </p>
+            <p>
+              The <code>optionalServices</code> list doesn't add any devices
+              to the dialog the user sees,
+              but it does affect which services the website can use from the device the user picks.
+            </p>
+            <pre class="highlight">navigator.bluetooth.requestDevice(
+  [ {services: [A, B]} ],
+  {optionalServices: [E]})</pre>
+            <p>
+              Shows a dialog containing D1 and D2,
+              but not D4, since D4 doesn't contain the required services.
+              If the user selects D2, unlike in the first example,
+              the website will be able to access services A, B, and E.
+            </p>
+            <p>
+              The allowed services also apply if the device changes after the user grants access.
+              For example, if the user selects D1 in the previous <code>requestDevice()</code> call,
+              and D1 later adds a new E service,
+              that will fire the <code><a>serviceadded</a></code> event,
+              and the web page will be able to access service E.
+            </p>
+          </aside>
         </dd>
       </dl>
 
