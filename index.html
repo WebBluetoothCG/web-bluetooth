@@ -1061,6 +1061,45 @@
             <dt>readonly attribute Map serviceData</dt>
             <dd>Maps <a>UUID</a>s to <a>ArrayBuffer</a>s.</dd>
           </dl>
+
+          <aside class="example">
+            <p>
+              To retrieve a device and read the iBeacon data out of it,
+              a developer could use the following code.
+              Note that this API currently doesn't provide a way
+              to request devices with certain manufacturer data,
+              so the iBeacon will need to rotate its advertisements to include a known service
+              in order for users to select this device in the <code>requestDevice</code> dialog.
+            </p>
+
+            <pre class="highlight">var known_service = "A service in the iBeacon's GATT server";
+return navigator.bluetooth.requestDevice([{services: [known_service]}])
+.then(device => {
+  var rssi = device.adData.rssi;
+  var appleData = new DataView(device.adData.manufacturerData.get(<a
+               href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
+               title="Apple, Inc.'s Company Identifier">0x004C</a>));
+  if (appleData.byteLength != 23 ||
+      appleData.getUint16(0, false) !== 0x0215) {
+    return {isBeacon: false};
+  }
+  var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
+  var major = appleData.getUint16(18, false);
+  var minor = appleData.getUint16(20, false);
+  var txPowerAt1m = -appleData.getInt8(22);
+  return {isBeacon: true,
+          uuidArray,
+          major,
+          minor,
+          pathLossVs1m: txPowerAt1m - rssi};
+});</pre>
+
+            <p>
+              The format of iBeacon advertisements was derived from
+              <a href="http://www.warski.org/blog/2014/01/how-ibeacons-work/">How do iBeacons work?</a>
+              by Adam Warski.
+            </p>
+          </aside>
         </section>
       </section>
     </section>
