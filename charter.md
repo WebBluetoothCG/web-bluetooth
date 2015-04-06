@@ -98,7 +98,14 @@ The CLA applies to these Community Group Reports.
 
 Community Group Participants agree that all Contributions will be documented in pull requests and commits for a particular document in the group's GitHub repository.
 
-For Contributions to Specifications, if someone other than the Contributor makes the pull request, the pull request MUST indicate who the request was made on behalf of and MUST provide a link to the archived change request in a GitHub Issue or in the archived Community Group contrib or general mail list. This could be a link to archived meeeting minutes that clearly indicate who requested changes to a Specification. The information MUST be specific enough to easily determine who the Contributors were and that the intention was to change a particular Specification.
+For Contributions to Specifications, if someone other than the Contributor makes the pull request,
+the pull request MUST indicate who the request was made on behalf of
+and MUST provide a link to the archived change request
+in a [GitHub Issue](https://github.com/WebBluetoothCG/web-bluetooth/issues)
+or in the archived Community Group [contrib](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/)
+or [general mail](http://lists.w3.org/Archives/Public/public-web-bluetooth/) list.
+This could be a link to archived meeeting minutes that clearly indicate who requested changes to a Specification.
+The information MUST be specific enough to easily determine who the Contributors were and that the intention was to change a particular Specification.
 
 For software, the GitHub Contributing and License files describes how to Contribute and the license under which Contributions are made.
 
@@ -129,7 +136,8 @@ The Community Development Lead, after evaluating the election, may take any acti
 ### Decision Process
 
 This group will seek to make decisions when there is consensus.
-When the group discusses an issue on the mailing list and there is a call from the group for assessing consensus,
+When the group discusses an issue on the [mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/)
+and there is a call from the group for assessing consensus,
 after due consideration of different opinions, the Chair should record a decision and any objections.
 Participants may call for an online vote if
 they feel the Chair has not accurately determined the consensus of the group or if the Chair refuses to assess consensus.
@@ -145,9 +153,15 @@ and does not unreasonably favor or discriminate against any group participant or
 
 The group will conduct all of its technical work in public.
 
-Discussions MAY take place on the group's [public mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/). Other discussions MAY take place using Issues in the group's [GitHub repository](https://github.com/WebBluetoothCG/). Other contributions MAY be also be directly posted to the contrib list.  For convenience, GitHub issues and pull requests will be archived to the group's [public-web-bluetooth-contrib/](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/) list. 
+Discussions MAY take place on the group's [public mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/).
+Other discussions MAY take place using Issues in the group's [GitHub repository](https://github.com/WebBluetoothCG/).
+Other contributions MAY be also be directly posted to the [contrib list](http://lists.w3.org/Archives/Public/public-web-bluetooth-contrib/).
+For convenience, GitHub issues and pull requests will be archived to the group's
+[public-web-bluetooth-log](http://lists.w3.org/Archives/Public/public-web-bluetooth-log/) list.
 
-Meetings MAY be restricted to Community Group participants, but a public summary or minutes MUST be posted to the group's public mail list.
+Meetings MAY be restricted to Community Group participants,
+but a public summary or minutes MUST be posted to
+the group's [public mail list](http://lists.w3.org/Archives/Public/public-web-bluetooth/).
 
 Any decisions reached at any meeting are tentative.
 Any group participant may object to a decision reached at a meeting
