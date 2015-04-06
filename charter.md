@@ -1,8 +1,8 @@
 # Web Bluetooth Community Group Charter
 
-* This Charter: TBD
+* This Charter: https://github.com/WebBluetoothCG/web-bluetooth/blob/charter-2015-04/charter.md
 * Previous Charter: None
-* Start Date: 2015-??-??
+* Start Date: 2015-05-07
 
 ## Goals
 
