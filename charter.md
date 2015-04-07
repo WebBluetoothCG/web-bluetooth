@@ -90,13 +90,20 @@ Terms of in this charter that conflict with those of the Community and Business 
 ### Work Limited to Charter Scope
 
 The group will not publish Community Group Reports that are
-Specifications on topics other than those listed under "Community Group Reports that are Specifications" above.
+Specifications on topics other than those described in "Community Group Reports that are Specifications" above.
 See below for how to modify the charter.
-The CLA applies to these Community Group Reports.
 
 ### Contribution Mechanics
 
+#### Who can make Contributions
+
+Contributions can only be made by Community Group Participants (so all Contributors have agreed to the CLA). Particular care must be taken to ensure Contributions of content that is implementable comes from Community Group participants.
+
+#### How Contributions are made
+
 Community Group Participants agree that all Contributions will be documented in pull requests and commits for a particular document in the group's GitHub repository.
+
+##### Specifications
 
 For Contributions to Specifications, if someone other than the Contributor makes the pull request,
 the pull request MUST indicate who the request was made on behalf of
@@ -107,13 +114,16 @@ or [general mail](http://lists.w3.org/Archives/Public/public-web-bluetooth/) lis
 This could be a link to archived meeeting minutes that clearly indicate who requested changes to a Specification.
 The information MUST be specific enough to easily determine who the Contributors were and that the intention was to change a particular Specification.
 
+##### Software
 For software, the GitHub Contributing and License files describes how to Contribute and the license under which Contributions are made.
 
 ### Chair Selection
 
 Participants in this group choose their Chair(s) and
 can replace their Chair(s) at any time using whatever means they prefer.
-However, if 5 participants—no two from the same organization—call for an election,
+
+The following process is used if the less formal process above is not acceptable to group members. 
+If 5 participants—no two from the same organization—call for an election,
 the group must use the following process to replace any current Chair(s) with a new Chair,
 consulting the Community Development Lead on election operations (e.g., voting infrastructure and using RFC 2777).
 
@@ -123,7 +133,7 @@ consulting the Community Development Lead on election operations (e.g., voting i
    If there is only one candidate, that person becomes the Chair.
    If there are two or more candidates, there is a vote.
    Otherwise, nothing changes.
-1. Participants vote.
+2. Participants vote.
    Participants have 21 days to vote for a single candidate,
    but this period ends as soon as all participants have voted.
    The individual who receives the most votes—no two from the same organization—is elected chair.
@@ -139,8 +149,13 @@ This group will seek to make decisions when there is consensus.
 When the group discusses an issue on the [mailing list](http://lists.w3.org/Archives/Public/public-web-bluetooth/)
 and there is a call from the group for assessing consensus,
 after due consideration of different opinions, the Chair should record a decision and any objections.
+
+A common way to determine consensus for important decisions is to conduct a Call for Consensus (CfC) where the Chair puts a proposal to the group on the public mail list and asks for feedback from the Participants within some period of time that is at least 7 days. Not responding indicates going along with the proposal. Direct feedback is encouraged, especially to weigh the degree of consensus when there is dissent.
+
 Participants may call for an online vote if
 they feel the Chair has not accurately determined the consensus of the group or if the Chair refuses to assess consensus.
+
+This should be a rare event, only where the usual, less formal means of making decisions are not accepted.
 The call for a vote must specify the duration of the vote
 which must be at least 7 days and should be no more than 14 days.
 The Chair must start the vote within 7 days of the request.
