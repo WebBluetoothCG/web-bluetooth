@@ -150,7 +150,7 @@ When the group discusses an issue on the [mailing list](http://lists.w3.org/Arch
 and there is a call from the group for assessing consensus,
 after due consideration of different opinions, the Chair should record a decision and any objections.
 
-A common way to determine consensus for important decisions is to conduct a Call for Consenus (CfC) where the Chair puts a proposal to the group on the public mail list and asks for feedback from the Participants within some period of time that is at least 7 days. Not responding indicates going along with the proposal. Direct feedback is encouraged, especially to weigh the degree of consensus when there is dissent.
+A common way to determine consensus for important decisions is to conduct a Call for Consensus (CfC) where the Chair puts a proposal to the group on the public mail list and asks for feedback from the Participants within some period of time that is at least 7 days. Not responding indicates going along with the proposal. Direct feedback is encouraged, especially to weigh the degree of consensus when there is dissent.
 
 Participants may call for an online vote if
 they feel the Chair has not accurately determined the consensus of the group or if the Chair refuses to assess consensus.
