@@ -317,17 +317,43 @@
             optional RequestDeviceOptions options);
         };
       </pre>
-      <p>
-        <dfn for="BluetoothScanFilter" title="services">BluetoothScanFilter.services</dfn>
-        holds a list of <a>Service</a> UUIDs that a device must support
-        to match the <a>BluetoothScanFilter</a>.
-      </dl>
+      <div class="note" title="BluetoothScanFilter attributes" dfn-for="BluetoothScanFilter">
+        <p>
+          <dfn>services</dfn> holds a list of <a>Service</a> UUIDs that a device must support
+          to <a title="matches a filter">match</a> the <a>BluetoothScanFilter</a>.
+        </p>
+      </div>
 
-      <p dfn-for="RequestDeviceOptions">
-        In <a>RequestDeviceOptions</a>, <dfn>optionalServices</dfn> holds
-        a list of <a>Service</a> UUIDs that aren't required for the website to use a device,
-        but that the website can take advantage of if they're present.
+      <p>
+        A device <dfn>matches a filter</dfn> <var>filter</var> if
       </p>
+      <ul>
+        <li><code><var>filter</var>.services</code> is not empty and</li>
+        <li>
+          the UA has received advertising data, an <a>extended inquiry response</a>,
+          or a service discovery response indicating that
+          the device supports each of the <a>Service</a> UUIDs
+          included in <code><var>filter</var>.services</code> as a primary (vs included) service.
+        </li>
+      </ul>
+
+      <p class="note">
+        The list of Service UUIDs that a device advertises
+        might not include all the UUIDs the device supports.
+        The advertising data does specify whether this list is complete.
+        If a website filters for a UUID that a nearby device supports but doesn't advertise,
+        that device might not be included in the list of devices presented to the user.
+        The UA would need to connect to the device to discover the full list of supported services,
+        which can impair radio performance and cause delays, so this spec doesn't require it.
+      </p>
+
+      <div class="note" title="RequestDeviceOptions attributes" dfn-for="RequestDeviceOptions">
+        <p>
+          <dfn>optionalServices</dfn> holds
+          a list of <a>Service</a> UUIDs that aren't required for the website to use a device,
+          but that the website can take advantage of if they're present.
+        </p>
+      </div>
 
       <p>
         When <code><dfn for="BluetoothDiscovery">requestDevice</dfn>(<var>filters</var>, <var>options</var>)</code> is invoked,
@@ -439,26 +465,6 @@
           </p>
         </aside>
       </p>
-
-      <p>
-        A device <dfn>matches a filter</dfn> <var>filter</var> if
-      <ul>
-        <li><code><var>filter</var>.services</code> is not empty and</li>
-        <li>
-          the UA has received advertising data, an <a>extended inquiry response</a>,
-          or a service discovery response indicating that
-          the device supports each of the <a>Service</a> UUIDs
-          included in <code><var>filter</var>.services</code> as a primary (vs included) service.
-      </ul>
-
-      <p class="note">
-        The list of Service UUIDs that a device advertises
-        might not include all the UUIDs the device supports.
-        The advertising data does specify whether this list is complete.
-        If a website filters for a UUID that a nearby device supports but doesn't advertise,
-        that device might not be included in the list of devices presented to the user.
-        The UA would need to connect to the device to discover the full list of supported services,
-        which can impair radio performance and cause delays, so this spec doesn't require it.
 
       <p>
         To <dfn>scan for devices</dfn> with
