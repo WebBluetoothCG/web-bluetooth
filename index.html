@@ -732,10 +732,15 @@
           </li>
           <li>
             Let <var>id</var> be a new <code>DOMString</code> that
-            isn't equal to any of the <a>device id</a>s the origin's <a>allowed devices map</a>
-            and isn't equal to any of <var>device</var>'s
+            isn't equal to any of the <a>device id</a>s in the origin's <a>allowed devices map</a>
+            and isn't equal to or derived from any of <var>device</var>'s
             <a>Public Bluetooth Address</a>, <a>Static Address</a>,
             or <a>Identity Resolving Key</a>.
+            <var>id</var> MUST, with very high probability,
+            be unequal to the <a>device id</a>s used for keys
+            in any other origin's <a>allowed devices map</a>
+            or previously in this origin's <a>allowed devices map</a>
+            that are the <a>same device</a> as <var>device</var>.
           </li>
           <li>
             If <var>allowed services</var> wasn't provided, set it to an empty list.
@@ -814,7 +819,7 @@
                 that is the <a>same device</a> as <var>device</var>.
                 If there is no such key,
                 <a>resolve</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
-                Otherwise, initialize <code><var>result</var>.instanceId</code>
+                Otherwise, initialize <code><var>result</var>.instanceID</code>
                 to the <a>device id</a> this key maps to,
                 and initialize an internal
                 <code><var>result</var>@[[\allowedServices]]</code> field
@@ -912,18 +917,11 @@
 
         <div class="note" title="BluetoothDevice attributes">
           <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this device.
-            This identifier MUST uniquely identify a device to the extent that
+            <dfn>instanceID</dfn> uniquely identifies a device to the extent that
             the UA can determine that two Bluetooth connections are to the same device.
-            For example, a paired device MUST keep the same <code>instanceID</code>
-            across a change to its <a>Resolvable Private Address</a>.
-            On the other hand, a device using <a>Non-Resolvable Private Address</a>es
-            might not keep the same <code>instanceID</code>.
-            The UA MAY use different identifiers for the same device on two different origins.
-            The UA MAY create a new identifier for a known device on an origin
-            if the user revokes and re-grants access to that device.
-            The UA MAY re-use identifiers for existing devices on an origin
-            if the user clears the origin's data.
+            It is computed as the <a>device id</a> in <a>add an allowed Bluetooth device</a>.
+            This ID can't be used to match a device across origins
+            or after the user revokes and re-grants access to the device.
           </p>
 
           <p>
@@ -1497,10 +1495,7 @@ return navigator.bluetooth.requestDevice([{services: [known_service]}])
             which can be used distinguish between
             multiple primary services with the same UUID in a single device or
             multiple included services with the same UUID in a single primary service.
-            This identifier MUST be unique among all services accessible by this website.
-            This identifier MUST continue referring to the same <a>Service</a> until either
-            an <code>onServiceRemoved</code> event is delivered referring to this <a>BluetoothGATTService</a> or
-            if this service's device is not <code>paired</code>, it is disconnected.
+            It is computed by the <a>get an attribute id</a> algorithm.
           </p>
 
           <p>
@@ -1646,14 +1641,9 @@ read        <p>
           </p>
           <p>
             <dfn>instanceID</dfn> is the opaque identifier assigned to this characteristic,
-            which can be used distinguish between multiple characteristics
-            with the same UUID in a single service.
-            This identifier MUST be unique among all characteristics accessible by this website.
-            This identifier MUST continue referring to the same <a>Characteristic</a> until either
-            an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
-            referring to the <a>BluetoothGATTService</a> of this characteristic or
-            if this characteristic's <a>Bluetooth device</a>'s <a>bonded flag</a> is false,
-            it is disconnected.
+            which can be used distinguish between
+            multiple characteristics with the same UUID in a single service.
+            It is computed by the <a>get an attribute id</a> algorithm.
           </p>
           <p>
             <dfn>value</dfn> is the currently cached characteristic value.
@@ -1972,16 +1962,9 @@ read        <p>
           </p>
           <p>
             <dfn>instanceID</dfn> is the opaque identifier assigned to this descriptor,
-            which can be used distinguish between multiple descriptors
-            with the same UUID in a single characteristic.
-            This identifier MUST be unique among all descriptors accessible by this website.
-            This identifier MUST continue referring to the same <a>Descriptor</a> until either
-            an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
-            referring to the <a>BluetoothGATTService</a> of this descriptor or
-            if this descriptor's device is not <code>paired</code>, it is disconnected.
-            Use the instance ID to distinguish between descriptors from a peripheral with the same UUID and
-            to make function calls that take in a descriptor identifier.
-            Present, if this instance represents a remote characteristic.
+            which can be used distinguish between
+            multiple descriptors with the same UUID in a single characteristic.
+            It is computed by the <a>get an attribute id</a> algorithm.
           </p>
 
           <p>
