@@ -166,7 +166,7 @@
 
         <p>
           When a website requests access to devices using
-          <code><a href="#widl-BluetoothDiscovery-requestDevice-Promise-BluetoothDevice--sequence-BluetoothScanFilter--filters-RequestDeviceOptions-options">requestDevice</a></code>,
+          <code><a for="BluetoothDiscovery">requestDevice</a></code>,
           it gets the ability to access all GATT services mentioned in the call.
           The UA MUST inform the user what capabilities these services give the website
           before asking which devices to entrust to it.
@@ -317,12 +317,80 @@
             optional RequestDeviceOptions options);
         };
       </pre>
-      <div class="note" title="BluetoothScanFilter attributes" dfn-for="BluetoothScanFilter">
+      <div class="note" title="BluetoothDiscovery members">
         <p>
-          <dfn>services</dfn> holds a list of <a>Service</a> UUIDs that a device must support
-          to <a title="matches a filter">match</a> the <a>BluetoothScanFilter</a>.
+          <code><a for="BluetoothDiscovery">requestDevice</a>(filters, options)</code> asks the user
+          to grant this origin access to a device
+          that <a>matches a filter</a> in <code>filters</code>.
+          The user will be shown devices that support
+          <em>all</em> the GATT service UUIDs in the <dfn for="BluetoothScanFilter">services</dfn> list
+          of <em>any</em> <a>BluetoothScanFilter</a> in <code>filters</code>.
+        </p>
+        <p>
+          After the user selects a device to pair with this origin,
+          the origin is allowed to access to any service whose UUID was listed
+          in the <a for="BluetoothScanFilter">services</a> list
+          in any element of <code>filters</code>
+          or in <code>options.<dfn for="RequestDeviceOptions">optionalServices</dfn></code>.
         </p>
       </div>
+
+      <aside class="example">
+        <p>
+          Say the UA is close to the following devices:
+        </p>
+        <table>
+          <tr><th>Device</th><th>Advertised Services</th></tr>
+          <tr><td>D1</td><td>A, B, C, D</td></tr>
+          <tr><td>D2</td><td>A, B, E</td></tr>
+          <tr><td>D3</td><td>C, D</td></tr>
+          <tr><td>D4</td><td>E</td></tr>
+        </table>
+        <p>
+          If the website calls
+        </p>
+        <pre class="highlight">navigator.bluetooth.requestDevice(
+  [ {services: [A, B]} ])</pre>
+        <p>
+          the user will be shown a dialog containing devices D1 and D2.
+          If the user selects D1, the website will not be able to access services C or D.
+          If the user selects D2, the website will not be able to access service E.
+        </p>
+        <p>
+          On the other hand, if the website calls
+        </p>
+        <pre class="highlight">navigator.bluetooth.requestDevice(
+  [
+    {services: [A, B]},
+    {services: [C, D]}
+  ])</pre>
+        <p>
+          the dialog will contain devices D1, D2, and D3,
+          and if the user selects D1,
+          the website will be able to access services A, B, C, and D.
+        </p>
+        <p>
+          The <code>optionalServices</code> list doesn't add any devices
+          to the dialog the user sees,
+          but it does affect which services the website can use from the device the user picks.
+        </p>
+        <pre class="highlight">navigator.bluetooth.requestDevice(
+  [ {services: [A, B]} ],
+  {optionalServices: [E]})</pre>
+        <p>
+          Shows a dialog containing D1 and D2,
+          but not D4, since D4 doesn't contain the required services.
+          If the user selects D2, unlike in the first example,
+          the website will be able to access services A, B, and E.
+        </p>
+        <p>
+          The allowed services also apply if the device changes after the user grants access.
+          For example, if the user selects D1 in the previous <code>requestDevice()</code> call,
+          and D1 later adds a new E service,
+          that will fire the <code><a>serviceadded</a></code> event,
+          and the web page will be able to access service E.
+        </p>
+      </aside>
 
       <p>
         A device <dfn>matches a filter</dfn> <var>filter</var> if
@@ -347,124 +415,60 @@
         which can impair radio performance and cause delays, so this spec doesn't require it.
       </p>
 
-      <div class="note" title="RequestDeviceOptions attributes" dfn-for="RequestDeviceOptions">
-        <p>
-          <dfn>optionalServices</dfn> holds
-          a list of <a>Service</a> UUIDs that aren't required for the website to use a device,
-          but that the website can take advantage of if they're present.
-        </p>
-      </div>
-
       <p>
         When <code><dfn for="BluetoothDiscovery">requestDevice</dfn>(<var>filters</var>, <var>options</var>)</code> is invoked,
         the UA MUST return <a>a new promise</a> <var>promise</var>
         and run the following steps <a>in parallel</a>:
-        <ol>
-          <li id="requestDevice-secure-context">
-            If the <a>incumbent settings object</a> is not a <a>sufficiently secure context</a>,
-            <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
-          </li>
-          <li id="requestDevice-user-gesture">
-            If the algorithm is not <a>allowed to show a popup</a>,
-            <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
-          </li>
-          <li>
-            <a>Scan for devices</a> with
-            the union of all <code>services</code> sequences in <code><var>filters</var></code>
-            as the <var>set of <a>Service</a> UUIDs</var>,
-            and let <var>scanResult</var> be the result.
-          </li>
-          <li>
-            Remove devices from <var>scanResult</var> if
-            they do not <a title="matches a filter">match a filter</a>
-            in <code><var>filters</var></code>.
-          </li>
-          <li>
-            Even if <var>scanResult</var> is empty,
-            display a prompt to the user requesting that the user select a device from it.
-            The UA SHOULD show the user the human-readable name of each device.
-            If this name is not available because the UA's Bluetooth system doesn't support privacy-enabled scans,
-            the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
-            <p>
-              The UA MAY allow the user to select a nearby device
-              that does not match <code><var>filters</var></code>.
-            </p>
-          </li>
-          <li>
-            Wait for the user to have selected a <var>device</var> or cancelled the prompt.
-          </li>
-          <li>
-            If the user cancels the prompt,
-            <a>reject</a> <var>promise</var> with a <a>NotFoundError</a> and abort these steps.
-          </li>
-          <li>
-            <a title="add an allowed bluetooth device"
-               >Add <var>device</var> to the origin's allowed devices map.</a>
-            with the union of the service UUIDs from <code><var>filters</var></code>
-            and <code>options.optionalServices</code> as <var>allowed services</var>.
-          </li>
-          <li>
-            <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
-            and <a>resolve</a> <var>promise</var> with the result.
-          </li>
-        </ol>
-        <aside class="example">
-          <p>
-            Say the UA is close to the following devices:
-          </p>
-          <table>
-            <tr><th>Device</th><th>Advertised Services</th></tr>
-            <tr><td>D1</td><td>A, B, C, D</td></tr>
-            <tr><td>D2</td><td>A, B, E</td></tr>
-            <tr><td>D3</td><td>C, D</td></tr>
-            <tr><td>D4</td><td>E</td></tr>
-          </table>
-          <p>
-            If the website calls
-          </p>
-          <pre class="highlight">navigator.bluetooth.requestDevice(
-  [ {services: [A, B]} ])</pre>
-          <p>
-            the user will be shown a dialog containing devices D1 and D2.
-            If the user selects D1, the website will not be able to access services C or D.
-            If the user selects D2, the website will not be able to access service E.
-          </p>
-          <p>
-            On the other hand, if the website calls
-          </p>
-          <pre class="highlight">navigator.bluetooth.requestDevice(
-  [
-    {services: [A, B]},
-    {services: [C, D]}
-  ])</pre>
-          <p>
-            the dialog will contain devices D1, D2, and D3,
-            and if the user selects D1,
-            the website will be able to access services A, B, C, and D.
-          </p>
-          <p>
-            The <code>optionalServices</code> list doesn't add any devices
-            to the dialog the user sees,
-            but it does affect which services the website can use from the device the user picks.
-          </p>
-          <pre class="highlight">navigator.bluetooth.requestDevice(
-  [ {services: [A, B]} ],
-  {optionalServices: [E]})</pre>
-          <p>
-            Shows a dialog containing D1 and D2,
-            but not D4, since D4 doesn't contain the required services.
-            If the user selects D2, unlike in the first example,
-            the website will be able to access services A, B, and E.
-          </p>
-          <p>
-            The allowed services also apply if the device changes after the user grants access.
-            For example, if the user selects D1 in the previous <code>requestDevice()</code> call,
-            and D1 later adds a new E service,
-            that will fire the <code><a>serviceadded</a></code> event,
-            and the web page will be able to access service E.
-          </p>
-        </aside>
       </p>
+      <ol>
+        <li id="requestDevice-secure-context">
+          If the <a>incumbent settings object</a> is not a <a>sufficiently secure context</a>,
+          <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+        </li>
+        <li id="requestDevice-user-gesture">
+          If the algorithm is not <a>allowed to show a popup</a>,
+          <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+        </li>
+        <li>
+          <a>Scan for devices</a> with
+          the union of all <code>services</code> sequences in <code><var>filters</var></code>
+          as the <var>set of <a>Service</a> UUIDs</var>,
+          and let <var>scanResult</var> be the result.
+        </li>
+        <li>
+          Remove devices from <var>scanResult</var> if
+          they do not <a title="matches a filter">match a filter</a>
+          in <code><var>filters</var></code>.
+        </li>
+        <li>
+          Even if <var>scanResult</var> is empty,
+          display a prompt to the user requesting that the user select a device from it.
+          The UA SHOULD show the user the human-readable name of each device.
+          If this name is not available because the UA's Bluetooth system doesn't support privacy-enabled scans,
+          the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
+          <p>
+            The UA MAY allow the user to select a nearby device
+            that does not match <code><var>filters</var></code>.
+          </p>
+        </li>
+        <li>
+          Wait for the user to have selected a <var>device</var> or cancelled the prompt.
+        </li>
+        <li>
+          If the user cancels the prompt,
+          <a>reject</a> <var>promise</var> with a <a>NotFoundError</a> and abort these steps.
+        </li>
+        <li>
+          <a title="add an allowed bluetooth device"
+             >Add <var>device</var> to the origin's allowed devices map.</a>
+          with the union of the service UUIDs from <code><var>filters</var></code>
+          and <code>options.optionalServices</code> as <var>allowed services</var>.
+        </li>
+        <li>
+          <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
+          and <a>resolve</a> <var>promise</var> with the result.
+        </li>
+      </ol>
 
       <p>
         To <dfn>scan for devices</dfn> with
@@ -732,10 +736,15 @@
           </li>
           <li>
             Let <var>id</var> be a new <code>DOMString</code> that
-            isn't equal to any of the <a>device id</a>s the origin's <a>allowed devices map</a>
-            and isn't equal to any of <var>device</var>'s
+            isn't equal to any of the <a>device id</a>s in the origin's <a>allowed devices map</a>
+            and isn't equal to or derived from any of <var>device</var>'s
             <a>Public Bluetooth Address</a>, <a>Static Address</a>,
             or <a>Identity Resolving Key</a>.
+            <var>id</var> MUST, with very high probability,
+            be unequal to the <a>device id</a>s used for keys
+            in any other origin's <a>allowed devices map</a>
+            or previously in this origin's <a>allowed devices map</a>
+            that are the <a>same device</a> as <var>device</var>.
           </li>
           <li>
             If <var>allowed services</var> wasn't provided, set it to an empty list.
@@ -778,6 +787,72 @@
             Promise&lt;BluetoothGATTRemoteServer> connectGATT();
           };
         </pre>
+
+        <div class="note" title="BluetoothDevice attributes">
+          <p>
+            <dfn>instanceID</dfn> uniquely identifies a device to the extent that
+            the UA can determine that two Bluetooth connections are to the same device.
+            It is computed as the <a>device id</a> in <a>add an allowed Bluetooth device</a>.
+            This ID can't be used to match a device across origins
+            or after the user revokes and re-grants access to the device.
+          </p>
+
+          <p>
+            <dfn>name</dfn> is the human-readable name of the device.
+          </p>
+
+          <p>
+            <dfn>adData</dfn> contains the most recent advertising data received for this device.
+            <span class="issue">TODO: Write the algorithm to update this
+              when an advertising packet is received.</span>
+          </p>
+
+          <p>
+            <dfn>deviceClass</dfn> is the class of the device,
+            a bit-field defined by [[!BLUETOOTH-ASSIGNED-BASEBAND]].
+          </p>
+
+          <p>
+            <dfn>vendorIDSource</dfn> is
+            the Vendor ID Source field
+            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
+            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
+          </p>
+          <p>
+            <dfn>vendorID</dfn> is the 16-bit Vendor ID field
+            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
+            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
+          </p>
+          <p>
+            <dfn>productID</dfn> is the 16-bit Product ID field
+            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
+            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
+          </p>
+          <p>
+            <dfn>productVersion</dfn> is the 16-bit Product Version field in the
+            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a>
+            characteristic in the
+            <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a>
+            service.
+          </p>
+
+          <p>
+            <dfn>paired</dfn> indicates whether or not the device is paired with the system.
+          </p>
+
+          <p>
+            If the UA is currently connected to this device's GATT server,
+            <dfn>gattServer</dfn> provides a way to interact with it.
+            While this device is disconnected,
+            <a for="BluetoothDevice">gattServer</a> is <code>null</code>.
+          </p>
+
+          <p>
+            <dfn>uuids</dfn> lists
+            the UUIDs of GATT services known to be on the device,
+            that the current origin is allowed to access.
+          </p>
+        </div>
 
         <p>
           For each <a>script execution environment</a>,
@@ -910,79 +985,6 @@
           </li>
         </ol>
 
-        <div class="note" title="BluetoothDevice attributes">
-          <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this device.
-            This identifier MUST uniquely identify a device to the extent that
-            the UA can determine that two Bluetooth connections are to the same device.
-            For example, a paired device MUST keep the same <code>instanceID</code>
-            across a change to its <a>Resolvable Private Address</a>.
-            On the other hand, a device using <a>Non-Resolvable Private Address</a>es
-            might not keep the same <code>instanceID</code>.
-            The UA MAY use different identifiers for the same device on two different origins.
-            The UA MAY create a new identifier for a known device on an origin
-            if the user revokes and re-grants access to that device.
-            The UA MAY re-use identifiers for existing devices on an origin
-            if the user clears the origin's data.
-          </p>
-
-          <p>
-            <dfn>name</dfn> is the human-readable name of the device.
-          </p>
-
-          <p>
-            <dfn>adData</dfn> contains the most recent advertising data received for this device.
-            <span class="issue">TODO: Write the algorithm to update this
-              when an advertising packet is received.</span>
-          </p>
-
-          <p>
-            <dfn>deviceClass</dfn> is the class of the device,
-            a bit-field defined by [[!BLUETOOTH-ASSIGNED-BASEBAND]].
-          </p>
-
-          <p>
-            <dfn>vendorIDSource</dfn> is
-            the Vendor ID Source field
-            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
-            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
-          </p>
-          <p>
-            <dfn>vendorID</dfn> is the 16-bit Vendor ID field
-            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
-            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
-          </p>
-          <p>
-            <dfn>productID</dfn> is the 16-bit Product ID field
-            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
-            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
-          </p>
-          <p>
-            <dfn>productVersion</dfn> is the 16-bit Product Version field in the
-            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a>
-            characteristic in the
-            <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a>
-            service.
-          </p>
-
-          <p>
-            <dfn>paired</dfn> indicates whether or not the device is paired with the system.
-          </p>
-
-          <p>
-            If the UA is currently connected to this device's GATT server,
-            <dfn>gattServer</dfn> provides a way to interact with it.
-            While this device is disconnected,
-            <a for="BluetoothDevice">gattServer</a> is <code>null</code>.
-          </p>
-
-          <p>
-            <dfn>uuids</dfn> lists
-            the UUIDs of GATT services known to be on the device,
-            that the current origin is allowed to access.
-          </p>
-        </div>
-
         <p>
           When <code><dfn>connectGATT</dfn>()</code> is invoked,
           the UA MUST return <a>a new promise</a> <var>promise</var> and
@@ -1028,69 +1030,6 @@
             };
           </pre>
 
-          <p>
-            To <dfn>create a <a>BluetoothAdvertisingData</a></dfn>
-            from a <a>Bluetooth device</a> <var>device</var>
-            and an <var>allowed services list</var>,
-            the UA must perform the following steps:
-          </p>
-          <ol>
-            <li>Let <var>adData</var> be a new instance of <a>BluetoothAdvertisingData</a>.</li>
-            <li>
-              If <var>device</var> has an <a>Appearance</a>,
-              initialize <code><var>adData</var>.appearance</code> to its value.
-              Otherwise, initialize it to <code>null</code>.
-            </li>
-            <li>
-              If <var>device</var> has a <a>TX Power Level</a>,
-              initialize <code><var>adData</var>.txPower</code> to its value.
-              Otherwise initialize it to <code>null</code>.
-            </li>
-            <li>
-              If <var>device</var> has an <a>RSSI</a>,
-              initialize <code><var>adData</var>.rssi</code> to its value.
-              Otherwise initialize it to <code>null</code>.
-            </li>
-            <li>
-              Initialize <code><var>adData</var>.manufacturerData</code> with
-              the return value of these substeps:
-              <ol>
-                <li>Let <var>mdata</var> be a new <a>Map</a> instance.</li>
-                <li>
-                  For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
-                  make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-                  containing the contents of its byte array,
-                  and add a mapping from the 16-bit code to <var>bytes</var> in <var>mdata</var>.
-                </li>
-                <li>
-                  Return a <a>read only Map</a> whose value is <var>mdata</var>.
-                </li>
-              </ol>
-            </li>
-            <li>
-              Initialize <code><var>adData</var>.serviceData</code> with
-              the return value of these substeps:
-              <ol>
-                <li>Let <var>sdata</var> be a new <a>Map</a> instance.</li>
-                <li>
-                  For each mapping in <var>device</var>'s <a>Service Data</a>,
-                  if the UUID is in <var>allowed services list</var>,
-                  make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-                  containing the contents of its byte array,
-                  and add a mapping from the <a>UUID</a> to <var>bytes</var> in <var>sdata</var>.
-                </li>
-                <li>
-                  Return a <a>read only Map</a> whose value is <var>sdata</var>.
-                </li>
-              </ol>
-            </li>
-            <li>Return <var>adData</var>.</li>
-          </ol>
-
-          <p>
-            All fields in <a>BluetoothAdvertisingData</a> return
-            the last value they were initialized or set to.
-          </p>
           <div class="note" title="BluetoothAdvertisingData attributes">
             <p>
               <dfn>appearance</dfn> is an <a>Appearance</a>, one of the values defined by
@@ -1153,6 +1092,70 @@ return navigator.bluetooth.requestDevice([{services: [known_service]}])
               by Adam Warski.
             </p>
           </aside>
+
+          <p>
+            All fields in <a>BluetoothAdvertisingData</a> return
+            the last value they were initialized or set to.
+          </p>
+
+          <p>
+            To <dfn>create a <a>BluetoothAdvertisingData</a></dfn>
+            from a <a>Bluetooth device</a> <var>device</var>
+            and an <var>allowed services list</var>,
+            the UA must perform the following steps:
+          </p>
+          <ol>
+            <li>Let <var>adData</var> be a new instance of <a>BluetoothAdvertisingData</a>.</li>
+            <li>
+              If <var>device</var> has an <a>Appearance</a>,
+              initialize <code><var>adData</var>.appearance</code> to its value.
+              Otherwise, initialize it to <code>null</code>.
+            </li>
+            <li>
+              If <var>device</var> has a <a>TX Power Level</a>,
+              initialize <code><var>adData</var>.txPower</code> to its value.
+              Otherwise initialize it to <code>null</code>.
+            </li>
+            <li>
+              If <var>device</var> has an <a>RSSI</a>,
+              initialize <code><var>adData</var>.rssi</code> to its value.
+              Otherwise initialize it to <code>null</code>.
+            </li>
+            <li>
+              Initialize <code><var>adData</var>.manufacturerData</code> with
+              the return value of these substeps:
+              <ol>
+                <li>Let <var>mdata</var> be a new <a>Map</a> instance.</li>
+                <li>
+                  For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
+                  make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+                  containing the contents of its byte array,
+                  and add a mapping from the 16-bit code to <var>bytes</var> in <var>mdata</var>.
+                </li>
+                <li>
+                  Return a <a>read only Map</a> whose value is <var>mdata</var>.
+                </li>
+              </ol>
+            </li>
+            <li>
+              Initialize <code><var>adData</var>.serviceData</code> with
+              the return value of these substeps:
+              <ol>
+                <li>Let <var>sdata</var> be a new <a>Map</a> instance.</li>
+                <li>
+                  For each mapping in <var>device</var>'s <a>Service Data</a>,
+                  if the UUID is in <var>allowed services list</var>,
+                  make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+                  containing the contents of its byte array,
+                  and add a mapping from the <a>UUID</a> to <var>bytes</var> in <var>sdata</var>.
+                </li>
+                <li>
+                  Return a <a>read only Map</a> whose value is <var>sdata</var>.
+                </li>
+              </ol>
+            </li>
+            <li>Return <var>adData</var>.</li>
+          </ol>
         </section>
       </section>
     </section>
@@ -1446,6 +1449,31 @@ return navigator.bluetooth.requestDevice([{services: [known_service]}])
           };
         </pre>
 
+        <div class="note" title="BluetoothGATTService attributes">
+          <p>
+            <dfn>uuid</dfn> is the UUID of the service,
+            e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the
+            <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
+               >Heart Rate</a> service.
+          </p>
+          <p>
+            <dfn>isPrimary</dfn> indicates whether the type of this service is primary or secondary.
+          </p>
+
+          <p>
+            <dfn>instanceID</dfn> is the opaque identifier assigned to this service,
+            which can be used distinguish between
+            multiple primary services with the same UUID in a single device or
+            multiple included services with the same UUID in a single primary service.
+            It is computed by the <a>get an attribute id</a> algorithm.
+          </p>
+
+          <p>
+            <dfn>device</dfn> is the <a>BluetoothDevice</a> representing
+            the remote peripheral that the GATT service belongs to.
+          </p>
+        </div>
+
         <p>
           To <dfn>create a <code>BluetoothGATTService</code> representing</dfn>
           a Service <var>service</var>,
@@ -1482,32 +1510,6 @@ return navigator.bluetooth.requestDevice([{services: [known_service]}])
           </li>
           <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
         </ol>
-
-        <div class="note" title="BluetoothGATTService attributes">
-          <p>
-            <dfn>uuid</dfn> is the UUID of the service,
-            e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code>.
-          </p>
-          <p>
-            <dfn>isPrimary</dfn> indicates whether the type of this service is primary or secondary.
-          </p>
-
-          <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this service,
-            which can be used distinguish between
-            multiple primary services with the same UUID in a single device or
-            multiple included services with the same UUID in a single primary service.
-            This identifier MUST be unique among all services accessible by this website.
-            This identifier MUST continue referring to the same <a>Service</a> until either
-            an <code>onServiceRemoved</code> event is delivered referring to this <a>BluetoothGATTService</a> or
-            if this service's device is not <code>paired</code>, it is disconnected.
-          </p>
-
-          <p>
-            <dfn>device</dfn> is the <a>BluetoothDevice</a> representing
-            the remote peripheral that the GATT service belongs to.
-          </p>
-        </div>
 
         <p>
           When <code><dfn>getCharacteristic</dfn>(<var>characteristic</var>)</code> is invoked,
@@ -1587,7 +1589,32 @@ return navigator.bluetooth.requestDevice([{services: [known_service]}])
           };
         </pre>
 
-read        <p>
+        <div class="note" title="BluetoothGATTCharacteristic attributes">
+          <p>
+            <dfn>uuid</dfn> is the UUID of the characteristic,
+            e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the
+            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+               >Heart Rate Measurement</a> characteristic.
+          </p>
+          <p>
+            <dfn>service</dfn> is the GATT service this characteristic belongs to.
+          </p>
+          <p>
+            <dfn>properties</dfn> holds the properties of this characteristic.
+          </p>
+          <p>
+            <dfn>instanceID</dfn> is the opaque identifier assigned to this characteristic,
+            which can be used distinguish between
+            multiple characteristics with the same UUID in a single service.
+            It is computed by the <a>get an attribute id</a> algorithm.
+          </p>
+          <p>
+            <dfn>value</dfn> is the currently cached characteristic value.
+            This value gets updated when the value of the characteristic is read or updated via a notification or indication.
+          </p>
+        </div>
+
+        <p>
           To <dfn>create a <code>BluetoothGATTCharacteristic</code> representing</dfn>
           a Characteristic <var>characteristic</var>,
           the UA must return <a>a new promise</a> <var>promise</var>
@@ -1632,34 +1659,6 @@ read        <p>
           </li>
           <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
         </ol>
-
-        <div class="note" title="BluetoothGATTCharacteristic attributes">
-          <p>
-            <dfn>uuid</dfn> is the UUID of the characteristic,
-            e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code>.
-          </p>
-          <p>
-            <dfn>service</dfn> is the GATT service this characteristic belongs to.
-          </p>
-          <p>
-            <dfn>properties</dfn> holds the properties of this characteristic.
-          </p>
-          <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this characteristic,
-            which can be used distinguish between multiple characteristics
-            with the same UUID in a single service.
-            This identifier MUST be unique among all characteristics accessible by this website.
-            This identifier MUST continue referring to the same <a>Characteristic</a> until either
-            an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
-            referring to the <a>BluetoothGATTService</a> of this characteristic or
-            if this characteristic's <a>Bluetooth device</a>'s <a>bonded flag</a> is false,
-            it is disconnected.
-          </p>
-          <p>
-            <dfn>value</dfn> is the currently cached characteristic value.
-            This value gets updated when the value of the characteristic is read or updated via a notification or indication.
-          </p>
-        </div>
 
         <p>
           When <code><dfn>getDescriptor</dfn>(<var>descriptor</var>)</code> is invoked,
@@ -1715,13 +1714,21 @@ read        <p>
             <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
-            Create an <code>ArrayBuffer</code> holding the retrieved value,
-            and assign it to <code>this.value</code>.
-          </li>
-          <li>
-            <a>Fire an event</a> named <a><code>characteristicvaluechanged</code></a>
-            with its <code>bubbles</code> attribute initialized to <code>true</code>
-            at <code>this</code>.
+            <a>Queue a task</a> to perform the following steps:
+            <ol>
+              <li>
+                Create an <code>ArrayBuffer</code> holding the retrieved value,
+                and assign it to <code>this.value</code>.
+              </li>
+              <li>
+                <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+              </li>
+              <li>
+                <a>Fire an event</a> named <a><code>characteristicvaluechanged</code></a>
+                with its <code>bubbles</code> attribute initialized to <code>true</code>
+                at <code>this</code>.
+              </li>
+            </ol>
           </li>
         </ol>
 
@@ -1734,7 +1741,7 @@ read        <p>
           For each known GATT <a>Characteristic</a>, the UA MUST maintain
           an <dfn>active notification context set</dfn> of <a>BluetoothInteraction</a> objects.
           This is a single set for the whole UA,
-          pointing to the <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a> object
+          pointing to the <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a> object
           for each separate <a>script execution environment</a> that has registered for notifications.
         </p>
 
@@ -1756,7 +1763,7 @@ read        <p>
           </li>
           <li>
             If the <a>active notification context set</a> contains
-            <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
+            <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
             <a>resolve</a> <var>promise</var> with <code>undefined</code> and abort these steps.
           </li>
           <li>
@@ -1775,7 +1782,7 @@ read        <p>
             <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
-            Add <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
+            Add <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a>
             to the <a>active notification context set</a>.
           </li>
           <li>
@@ -1804,7 +1811,7 @@ read        <p>
           </li>
           <li>
             If the <a>active notification context set</a> contains
-            <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
+            <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a>,
             remove it.
           </li>
           <li>
@@ -1932,6 +1939,29 @@ read        <p>
           };
         </pre>
 
+        <div class="note" title="BluetoothGATTDescriptor attributes">
+          <p>
+            <dfn>uuid</dfn> is the UUID of the characteristic descriptor,
+            e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the
+            <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml"
+               >Client Characteristic Configuration</a> descriptor.
+          </p>
+          <p>
+            <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
+          </p>
+          <p>
+            <dfn>instanceID</dfn> is the opaque identifier assigned to this descriptor,
+            which can be used distinguish between
+            multiple descriptors with the same UUID in a single characteristic.
+            It is computed by the <a>get an attribute id</a> algorithm.
+          </p>
+
+          <p>
+            <dfn>value</dfn> is the currently cached descriptor value.
+            This value gets updated when the value of the descriptor is read.
+          </p>
+        </div>
+
         <p>
           To <dfn>create a <code>BluetoothGATTDescriptor</code> representing</dfn>
           a Descriptor <var>descriptor</var>,
@@ -1961,34 +1991,6 @@ read        <p>
           </li>
           <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
         </ol>
-
-        <div class="note" title="BluetoothGATTDescriptor attributes">
-          <p>
-            <dfn>uuid</dfn> is the UUID of the characteristic descriptor,
-            e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code>.
-          </p>
-          <p>
-            <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
-          </p>
-          <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this descriptor,
-            which can be used distinguish between multiple descriptors
-            with the same UUID in a single characteristic.
-            This identifier MUST be unique among all descriptors accessible by this website.
-            This identifier MUST continue referring to the same <a>Descriptor</a> until either
-            an <code>onServiceRemoved</code> or <code>onServiceChanged</code> event is delivered
-            referring to the <a>BluetoothGATTService</a> of this descriptor or
-            if this descriptor's device is not <code>paired</code>, it is disconnected.
-            Use the instance ID to distinguish between descriptors from a peripheral with the same UUID and
-            to make function calls that take in a descriptor identifier.
-            Present, if this instance represents a remote characteristic.
-          </p>
-
-          <p>
-            <dfn>value</dfn> is the currently cached descriptor value.
-            This value gets updated when the value of the descriptor is read.
-          </p>
-        </div>
 
         <p>
           When <code><dfn>readValue</dfn>()</code> is invoked,
@@ -2042,7 +2044,7 @@ read        <p>
           <h2>Bluetooth Tree</h2>
 
           <p>
-            <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a> and
+            <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a> and
             objects implementing the <a>BluetoothDevice</a>, <a>BluetoothGATTService</a>,
             <a>BluetoothGATTCharacteristic</a>, or <a>BluetoothGATTDescriptor</a> interface
             <a>participate in a tree</a>,
@@ -2051,7 +2053,7 @@ read        <p>
           <ul>
             <li>
               The <a>children</a>
-              of <a href="#widl-NavigatorBluetooth-bluetooth"><code>navigator.bluetooth</code></a>
+              of <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a>
               are the <a>BluetoothDevice</a> objects representing
               devices on the origin's <a>allowed devices map</a>,
               in an unspecified order.
@@ -2088,7 +2090,7 @@ read        <p>
             <dd>
               Fired on a <a>BluetoothGATTCharacteristic</a> when its value changes,
               either as a result of
-              a <a href="#widl-BluetoothGATTCharacteristic-readValue-Promise-ArrayBuffer">read request</a>,
+              a <a for="BluetoothGATTCharacteristic" title="readValue">read request</a>,
               or a <a href="#notification-events">value change notification/indication</a>.
             </dd>
 
@@ -2400,7 +2402,7 @@ read        <p>
       </p>
       <p class="note">
         This standard provides the
-        <a href="#widl-BluetoothUuids-canonicalUUID-UUID-unsigned-long-alias"><code>canonicalUUID()</code></a> function
+        <code><a for="BluetoothUuids">canonicalUUID</a>()</code> function
         to map a 16- or 32-bit Bluetooth <a>UUID alias</a> to its 128-bit form.
       </p>
       <p class="note">
