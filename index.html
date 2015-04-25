@@ -307,21 +307,20 @@
         };
 
         dictionary RequestDeviceOptions {
+          required sequence&lt;BluetoothScanFilter> filters;
           sequence&lt;BluetoothServiceUUID> optionalServices = [];
         };
 
         [NoInterfaceObject]
         interface BluetoothDiscovery {
-          Promise&lt;BluetoothDevice> requestDevice(
-            sequence&lt;BluetoothScanFilter> filters,
-            optional RequestDeviceOptions options);
+          Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
         };
       </pre>
       <div class="note" title="BluetoothDiscovery members">
         <p>
-          <code><a for="BluetoothDiscovery">requestDevice</a>(filters, options)</code> asks the user
+          <code><a for="BluetoothDiscovery">requestDevice</a>(options)</code> asks the user
           to grant this origin access to a device
-          that <a>matches a filter</a> in <code>filters</code>.
+          that <a>matches a filter</a> in <code>options.<dfn for="RequestDeviceOptions">filters</dfn></code>.
           The user will be shown devices that support
           <em>all</em> the GATT service UUIDs in the <dfn for="BluetoothScanFilter">services</dfn> list
           of <em>any</em> <a>BluetoothScanFilter</a> in <code>filters</code>.
@@ -330,7 +329,7 @@
           After the user selects a device to pair with this origin,
           the origin is allowed to access to any service whose UUID was listed
           in the <a for="BluetoothScanFilter">services</a> list
-          in any element of <code>filters</code>
+          in any element of <code>options.filters</code>
           or in <code>options.<dfn for="RequestDeviceOptions">optionalServices</dfn></code>.
         </p>
       </div>
@@ -349,8 +348,9 @@
         <p>
           If the website calls
         </p>
-        <pre class="highlight">navigator.bluetooth.requestDevice(
-  [ {services: [A, B]} ])</pre>
+        <pre class="highlight">navigator.bluetooth.requestDevice({
+  filters: [ {services: [A, B]} ]
+})</pre>
         <p>
           the user will be shown a dialog containing devices D1 and D2.
           If the user selects D1, the website will not be able to access services C or D.
@@ -359,11 +359,12 @@
         <p>
           On the other hand, if the website calls
         </p>
-        <pre class="highlight">navigator.bluetooth.requestDevice(
-  [
+        <pre class="highlight">navigator.bluetooth.requestDevice({
+  filters: [
     {services: [A, B]},
     {services: [C, D]}
-  ])</pre>
+  ]
+})</pre>
         <p>
           the dialog will contain devices D1, D2, and D3,
           and if the user selects D1,
@@ -374,9 +375,10 @@
           to the dialog the user sees,
           but it does affect which services the website can use from the device the user picks.
         </p>
-        <pre class="highlight">navigator.bluetooth.requestDevice(
-  [ {services: [A, B]} ],
-  {optionalServices: [E]})</pre>
+        <pre class="highlight">navigator.bluetooth.requestDevice({
+  filters: [ {services: [A, B]} ],
+  optionalServices: [E]
+})</pre>
         <p>
           Shows a dialog containing D1 and D2,
           but not D4, since D4 doesn't contain the required services.
@@ -416,7 +418,7 @@
       </p>
 
       <p dfn-for="BluetoothDiscovery">
-        The <code><dfn>requestDevice</dfn>(<var>filters</var>, <var>options</var>)</code> method,
+        The <code><dfn>requestDevice</dfn>(<var>options</var>)</code> method,
         when invoked, MUST return <a>a new promise</a> <var>promise</var>
         and run the following steps <a>in parallel</a>:
       </p>
@@ -431,14 +433,14 @@
         </li>
         <li>
           <a>Scan for devices</a> with
-          the union of all <code>services</code> sequences in <code><var>filters</var></code>
+          the union of all <code>services</code> sequences in <code><var>options</var>.filters</code>
           as the <var>set of <a>Service</a> UUIDs</var>,
           and let <var>scanResult</var> be the result.
         </li>
         <li>
           Remove devices from <var>scanResult</var> if
           they do not <a title="matches a filter">match a filter</a>
-          in <code><var>filters</var></code>.
+          in <code><var>options</var>.filters</code>.
         </li>
         <li>
           Even if <var>scanResult</var> is empty,
@@ -448,7 +450,7 @@
           the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
           <p>
             The UA MAY allow the user to select a nearby device
-            that does not match <code><var>filters</var></code>.
+            that does not match <code><var>options</var>.filters</code>.
           </p>
         </li>
         <li>
@@ -461,7 +463,7 @@
         <li>
           <a title="add an allowed bluetooth device"
              >Add <var>device</var> to the origin's allowed devices map.</a>
-          with the union of the service UUIDs from <code><var>filters</var></code>
+          with the union of the service UUIDs from <code><var>options</var>.filters</code>
           and <code>options.optionalServices</code> as <var>allowed services</var>.
         </li>
         <li>
@@ -1065,8 +1067,9 @@
             </p>
 
             <pre class="highlight">var known_service = "A service in the iBeacon's GATT server";
-return navigator.bluetooth.requestDevice([{services: [known_service]}])
-.then(device => {
+return navigator.bluetooth.requestDevice({
+  filters: [{services: [known_service]}]
+}).then(device => {
   var rssi = device.adData.rssi;
   var appleData = new DataView(device.adData.manufacturerData.get(<a
                href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
