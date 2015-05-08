@@ -11,6 +11,7 @@ Documents in this repository
 * [Use Cases and Security Requirements](https://webbluetoothcg.github.io/web-bluetooth/use-cases.html)
 * [Explainer](https://github.com/WebBluetoothCG/web-bluetooth/blob/gh-pages/explainer.md), showing how a site might use this API to satisfy the use cases
 * [Specification](https://webbluetoothcg.github.io/web-bluetooth/)
+* [Implementation Status](implementation-status.md)
 
 Communication
 -------------
