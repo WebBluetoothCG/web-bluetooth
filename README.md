@@ -3,7 +3,7 @@ web-bluetooth
 
 Toward Bluetooth support for the Open Web.
 
-This is a project of the [Web Bluetooth Community Group](http://www.w3.org/community/web-bluetooth/).
+This is a project of the [Web Bluetooth Community Group](http://www.w3.org/community/web-bluetooth/). We have a [charter](charter.md).
 
 Documents in this repository
 ----------------------------
