@@ -1585,7 +1585,7 @@ return navigator.bluetooth.requestDevice({
             Promise&lt;sequence&lt;BluetoothGATTDescriptor>>
               getDescriptors(optional BluetoothDescriptorUUID descriptor);
             Promise&lt;ArrayBuffer> readValue();
-            Promise&lt;void> writeValue(ArrayBuffer value);
+            Promise&lt;void> writeValue(BufferSource value);
             Promise&lt;void> startNotifications();
             Promise&lt;void> stopNotifications();
           };
@@ -1736,8 +1736,51 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>writeValue</dfn>(<var>value</var>)</code> method, when invoked,
-          MUST write <code><var>value</var></code> to this characteristic on the remote peripheral.
+          MUST run the following steps:
         </p>
+        <ol>
+          <li>
+            Let <var>characteristic</var> be the <a>Characteristic</a>
+            that <code>this</code> represents.
+          </li>
+          <li>
+            Let <var>bytes</var> be
+            <a>a copy of the bytes held</a> by <code><var>value</var></code>.
+          </li>
+          <li>
+            If <var>bytes</var> is more than 512 bytes long
+            (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
+            return <a>a promise rejected with</a> an <a>InvalidModificationError</a>
+            and abort these steps.
+          </li>
+          <li>Return <a>a new promise</a> <var>promise</var>
+            and run the following steps in parallel.
+            <ol>
+              <li>
+                Use any combination of the sub-procedures in
+                the <a>Characteristic Value Write</a> procedure
+                to write <var>bytes</var> to <var>characteristic</var>.
+                Handle errors as described in <a href="#error-handling"></a>.
+              </li>
+              <li>
+                If the previous step returned an error,
+                <a>reject</a> <var>promise</var> with that error and abort these steps.
+              </li>
+              <li>
+                <a>Queue a task</a> to perform the following steps:
+                <ol>
+                  <li>
+                    Set <code>this.value</code> to
+                    a new <a>ArrayBuffer</a> containing <var>bytes</var>.
+                  </li>
+                  <li>
+                    <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+        </ol>
 
         <p>
           For each known GATT <a>Characteristic</a>, the UA MUST maintain
@@ -1937,7 +1980,7 @@ return navigator.bluetooth.requestDevice({
             readonly attribute DOMString instanceID;
             readonly attribute ArrayBuffer? value;
             Promise&lt;ArrayBuffer> readValue();
-            Promise&lt;void> writeValue(ArrayBuffer value);
+            Promise&lt;void> writeValue(BufferSource value);
           };
         </pre>
 
@@ -1996,14 +2039,85 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>readValue</dfn>()</code> method, when invoked,
-          MUST retrieve the value of this descriptor from a remote peripheral.
-          Updates the descriptor's <code>value</code> field to hold the result of the read request and resolves the promise with the same <a>ArrayBuffer</a>.
+          MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
         </p>
+        <ol>
+          <li>
+            Let <var>descriptor</var> be the <a>Descriptor</a>
+            that <code>this</code> represents.
+          </li>
+          <li>
+            Use either the <a>Read Characteristic Descriptors</a> or
+            the <a>Read Long Characteristic Descriptors</a> sub-procedure
+            to retrieve the value of <var>descriptor</var>.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returned an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
+          </li>
+          <li>
+            <a>Queue a task</a> to perform the following steps:
+            <ol>
+              <li>
+                Create an <code>ArrayBuffer</code> holding the retrieved value,
+                and assign it to <code>this.value</code>.
+              </li>
+              <li>
+                <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+              </li>
+            </ol>
+          </li>
+        </ol>
 
         <p>
           The <code><dfn>writeValue</dfn>(<var>value</var>)</code> method, when invoked,
-          MUST write <code><var>value</var></code> to this characteristic descriptor on the remote peripheral.
+          MUST  run the following steps:
         </p>
+        <ol>
+          <li>
+            Let <var>descriptor</var> be the <a>Descriptor</a>
+            that <code>this</code> represents.
+          </li>
+          <li>
+            Let <var>bytes</var> be
+            <a>a copy of the bytes held</a> by <code><var>value</var></code>.
+          </li>
+          <li>
+            If <var>bytes</var> is more than 512 bytes long
+            (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
+            return <a>a promise rejected with</a> an <a>InvalidModificationError</a>
+            and abort these steps.
+          </li>
+          <li>Return <a>a new promise</a> <var>promise</var>
+            and run the following steps in parallel.
+            <ol>
+              <li>
+                Use either the <a>Write Characteristic Descriptors</a> or
+                the <a>Write Long Characteristic Descriptors</a> sub-procedure
+                to write <var>bytes</var> to <var>descriptor</var>.
+                Handle errors as described in <a href="#error-handling"></a>.
+              </li>
+              <li>
+                If the previous step returned an error,
+                <a>reject</a> <var>promise</var> with that error and abort these steps.
+              </li>
+              <li>
+                <a>Queue a task</a> to perform the following steps:
+                <ol>
+                  <li>
+                    Set <code>this.value</code> to
+                    a new <a>ArrayBuffer</a> containing <var>bytes</var>.
+                  </li>
+                  <li>
+                    <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+                  </li>
+                </ol>
+              </li>
+            </ol>
+          </li>
+        </ol>
       </section>
 
       <section dfn-for="BluetoothInteraction">
@@ -2365,6 +2479,13 @@ return navigator.bluetooth.requestDevice({
               <dt><code>Insufficient Authorization</code></dt>
               <dd>
                 Return a <a>SecurityError</a> from the step.
+              </dd>
+
+              <dt><code>Application Error</code></dt>
+              <dd>
+                If the GATT procedure was a Write,
+                return an <a>InvalidModificationError</a> from the step.
+                Otherwise, return a <a>NotSupportedError</a> from the step.
               </dd>
 
               <dt><code>Read Not Permitted</code></dt>
@@ -3152,6 +3273,7 @@ return navigator.bluetooth.requestDevice({
                           <ol>
                             <li value="1"><dfn>Attribute Type</dfn></li>
                             <li value="2"><dfn>Attribute Handle</dfn></li>
+                            <li value="9"><dfn>Long Attribute Values</dfn></li>
                           </ol>
                         </li>
                         <li value="4">Attribute Protocol Pdus
@@ -3227,10 +3349,14 @@ return navigator.bluetooth.requestDevice({
                           </ol>
                         </li>
                         <li value="8"><dfn>Characteristic Value Read</dfn></li>
+                        <li value="9"><dfn>Characteristic Value Write</dfn></li>
                         <li value="10"><dfn>Characteristic Value Notification</dfn></li>
                         <li value="11"><dfn>Characteristic Value Indications</dfn></li>
                         <li value="12"><dfn>Characteristic Descriptors</dfn>
                           <ol value="1"><dfn>Read Characteristic Descriptors</dfn></ol>
+                          <ol value="2"><dfn>Read Long Characteristic Descriptors</dfn></ol>
+                          <ol value="3"><dfn>Write Characteristic Descriptors</dfn></ol>
+                          <ol value="4"><dfn>Write Long Characteristic Descriptors</dfn></ol>
                         </li>
                         <li value="14"><dfn>Procedure Timeouts</dfn></li>
                       </ol>
@@ -3420,6 +3546,10 @@ return navigator.bluetooth.requestDevice({
         <dt>[[!WebIDL]]</dt>
         <dd>
           <ul>
+            <li><a href="https://heycam.github.io/webidl/#common-BufferSource"
+                   ><dfn><code>BufferSource</code></dfn></a>
+            <li><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy"
+                   >Get <dfn>a copy of the bytes held</dfn> by a <code>BufferSource</code></a></li>
             <li>Errors
               <ul>
                 <li><a href="https://heycam.github.io/webidl/#aborterror"
