@@ -431,15 +431,44 @@
           <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
         </li>
         <li>
+          Let <var>filters</var> be a new <a>Array</a> and
+          <var>requiredServices</var> be a new <a>Set</a>.
+        </li>
+        <li>
+          For each <var>filter</var> in <code><var>options</var>.filters</code>,
+          do the following steps:
+          <ol>
+            <li>
+              Let <var>services</var> be <code>Array.prototype.map.call(<var>filter</var>.services,
+              <a>BluetoothUUID.getService</a>)</code>.
+            </li>
+            <li>
+              If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+              <a>reject</a> <var>promise</var> with that exception and abort these steps.
+            </li>
+            <li>Append <code>{services: <var>services</var>}</code> to <var>filter</var>.</li>
+            <li>Add the elements of <var>services</var> to <var>requiredServices</var>.</li>
+          </ol>
+        </li>
+        <li>
+          Let <var>optionalServices</var> be
+          <code>Array.prototype.map.call(<var>options</var>.optionalServices,
+            <a>BluetoothUUID.getService</a>)</code>.
+        </li>
+        <li>
+          If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+          <a>reject</a> <var>promise</var> with that exception and abort these steps.
+        </li>
+        <li>
           <a>Scan for devices</a> with
-          the union of all <code>services</code> sequences in <code><var>options</var>.filters</code>
+          <var>requiredServices</var>
           as the <var>set of <a>Service</a> UUIDs</var>,
           and let <var>scanResult</var> be the result.
         </li>
         <li>
           Remove devices from <var>scanResult</var> if
           they do not <a title="matches a filter">match a filter</a>
-          in <code><var>options</var>.filters</code>.
+          in <var>filters</var>.
         </li>
         <li>
           Even if <var>scanResult</var> is empty,
@@ -449,7 +478,7 @@
           the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
           <p>
             The UA MAY allow the user to select a nearby device
-            that does not match <code><var>options</var>.filters</code>.
+            that does not match <var>filters</var>.
           </p>
         </li>
         <li>
@@ -462,8 +491,8 @@
         <li>
           <a title="add an allowed bluetooth device"
              >Add <var>device</var> to the origin's allowed devices map.</a>
-          with the union of the service UUIDs from <code><var>options</var>.filters</code>
-          and <code>options.optionalServices</code> as <var>allowed services</var>.
+          with the union of <var>requiredServices</var>
+          and <var>optionalServices</var> as <var>allowed services</var>.
         </li>
         <li>
           <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
@@ -1404,6 +1433,12 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>
+            Set <var>service</var> to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> for
             the first primary GATT service
             on <code>this@[[\representedDevice]]</code>
@@ -1421,12 +1456,23 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getPrimaryServices</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for the primary GATT services
-          on <code>this@[[\representedDevice]]</code>
-          whose UUIDs are in <code>this@[[\allowedServices]]</code>
-          and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>service</var> is present, set it to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for the primary GATT services
+            on <code>this@[[\representedDevice]]</code>
+            whose UUIDs are in <code>this@[[\allowedServices]]</code>
+            and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
+            and return the result.
+          </li>
+        </ol>
       </section>
 
       <section dfn-for="BluetoothGATTService">
@@ -1519,6 +1565,12 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>
+            Set <var>characteristic</var> to
+            <code><a>BluetoothUUID.getCharacteristic</a>(<var>characteristic</var>)</code>.
+            If <a>BluetoothUUID.getCharacteristic</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> for
             the first GATT characteristic within this Service
             whose UUID is <var>characteristic</var>,
@@ -1534,18 +1586,35 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getCharacteristics</dfn>(<var>characteristic</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for
-          the GATT characteristics that are within this Service and,
-          if <var>characteristic</var> is present,
-          that have UUIDs equal to <var>characteristic</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>characteristic</var> is present, set it to
+            <code><a>BluetoothUUID.getCharacteristic</a>(<var>characteristic</var>)</code>.
+            If <a>BluetoothUUID.getCharacteristic</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for
+            the GATT characteristics that are within this Service and,
+            if <var>characteristic</var> is present,
+            that have UUIDs equal to <var>characteristic</var>,
+            and return the result.
+          </li>
+        </ol>
 
         <p>
           The <code><dfn>getIncludedService</dfn>(<var>service</var>)</code> method, when invoked,
           MUST perform the following steps:
         </p>
         <ol>
+          <li>
+            Set <var>service</var> to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
           <li>
             <a>Query the Bluetooth cache</a> for the first GATT included service
             within this Service whose UUID is <var>service</var>,
@@ -1561,12 +1630,23 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getIncludedServices</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for
-          the GATT Included Services that are within this Service and,
-          if <var>service</var> is present,
-          that have UUIDs equal to <var>service</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>service</var> is present, set it to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for
+            the GATT Included Services that are within this Service and,
+            if <var>service</var> is present,
+            that have UUIDs equal to <var>service</var>,
+            and return the result.
+          </li>
+        </ol>
       </section>
 
       <section dfn-for="BluetoothGATTCharacteristic">
@@ -1668,6 +1748,12 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>
+            Set <var>descriptor</var> to
+            <code><a>BluetoothUUID.getDescriptor</a>(<var>descriptor</var>)</code>.
+            If <a>BluetoothUUID.getDescriptor</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> for
             the first GATT descriptor within this Characteristic
             whose UUID is <var>descriptor</var>,
@@ -1683,12 +1769,23 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getDescriptors</dfn>(<var>descriptor</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for
-          the GATT descriptors that are within this Characteristic and,
-          if <var>descriptor</var> is present,
-          that have UUIDs equal to <var>descriptor</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>descriptor</var> is present, set it to
+            <code><a>BluetoothUUID.getDescriptor</a>(<var>descriptor</var>)</code>.
+            If <a>BluetoothUUID.getDescriptor</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for
+            the GATT descriptors that are within this Characteristic and,
+            if <var>descriptor</var> is present,
+            that have UUIDs equal to <var>descriptor</var>,
+            and return the result.
+          </li>
+        </ol>
 
         <p>
           The <code><dfn>readValue</dfn>()</code> method, when invoked,
@@ -2414,7 +2511,7 @@ return navigator.bluetooth.requestDevice({
         it should send other aliases of that UUID back to the device in the same form.
       </p>
 
-      <section>
+      <section id="standardized-uuids">
         <h2>Standardized UUIDs</h2>
 
         <p>
@@ -2432,6 +2529,10 @@ return navigator.bluetooth.requestDevice({
 
             static UUID canonicalUUID(unsigned long alias);
           };
+
+          typedef DOMString BluetoothServiceUUID;
+          typedef DOMString BluetoothCharacteristicUUID;
+          typedef DOMString BluetoothDescriptorUUID;
         </pre>
 
         <p>
@@ -2445,6 +2546,13 @@ return navigator.bluetooth.requestDevice({
           with the bits of the alias.
           For example, <code>canonicalUUID(0xDEADBEEF)</code> returns
           <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
+        </p>
+
+        <p class="note">
+          <dfn>BluetoothServiceUUID</dfn> represents
+          <a>valid UUID</a>s and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
+          or, equivalently, the subset of <a>DOMString</a>s for which
+          <a>BluetoothUUID.getService</a> does not throw an exception.
         </p>
 
         <p>
@@ -2482,6 +2590,13 @@ return navigator.bluetooth.requestDevice({
           </p>
         </aside>
 
+        <p class="note">
+          <dfn>BluetoothCharacteristicUUID</dfn> represents
+          <a>valid UUID</a>s and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
+          or, equivalently, the subset of <a>DOMString</a>s for which
+          <a>BluetoothUUID.getCharacteristic</a> does not throw an exception.
+        </p>
+
         <p>
           The static <code><dfn>BluetoothUUID.getCharacteristic</dfn>(<var>name</var>)</code> method, when invoked,
           MUST run the following steps:
@@ -2508,6 +2623,13 @@ return navigator.bluetooth.requestDevice({
             returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>.
           </p>
         </aside>
+
+        <p class="note">
+          <dfn>BluetoothDescriptorUUID</dfn> represents
+          <a>valid UUID</a>s and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
+          or, equivalently, the subset of <a>DOMString</a>s for which
+          <a>BluetoothUUID.getDescriptor</a> does not throw an exception.
+        </p>
 
         <p>
           The static <code><dfn>BluetoothUUID.getDescriptor</dfn>(<var>name</var>)</code> method, when invoked,
@@ -2569,6 +2691,25 @@ return navigator.bluetooth.requestDevice({
         we use the notation x@[[\y]] to refer to
         <a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object-internal-methods-and-internal-slots"
            >internal slots</a> of an object, instead of saying "the [[\y]] internal slot of x."
+      </p>
+
+      <p>
+        When an algorithm in this specification uses a name defined in this or another specification,
+        the name MUST resolve to its initial value,
+        ignoring any changes that have been made to the name in the current execution environment.
+        For example, when the <a for="BluetoothDiscovery">requestDevice</a> algorithm says to call
+        <code>Array.prototype.map.call(<var>filter</var>.services,
+          <a>BluetoothUUID.getService</a>)</code>,
+        this MUST apply the
+        <code><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.prototype.map"
+                 >Array.prototype.map</a></code> algorithm defined in [[ECMAScript]]
+        with <code><var>filter</var>.services</code> as its <code>this</code> parameter and
+        the algorithm defined in <a href="#standardized-uuids"></a> for <a>BluetoothUUID.getService</a>
+        as its <code>callbackfn</code> parameter,
+        regardless of any modifications that have been made to <code>window</code>,
+        <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
+        <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothUUID</code>,
+        <code>BluetoothUUID.getService</code>, or other objects.
       </p>
 
       <p>
@@ -2970,6 +3111,8 @@ return navigator.bluetooth.requestDevice({
         <dt>[[!ECMAScript]]</dt>
         <dd>
           <ul>
+            <li><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array-objects"
+                   ><dfn><code>Array</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-arraybuffer-constructor"
                    ><dfn><code>ArrayBuffer</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-dataview-constructor"
@@ -2977,6 +3120,8 @@ return navigator.bluetooth.requestDevice({
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-constructor"
                    ><dfn><code>Map</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects"><dfn>Promise</dfn></a></li>
+            <li><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-set-objects"
+                   ><dfn><code>Set</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-typedarray-constructors"
                    ><dfn><code>TypedArray</code></dfn></a></li>
           </ul>
@@ -3011,6 +3156,8 @@ return navigator.bluetooth.requestDevice({
         <dt>[[!WebIDL]]</dt>
         <dd>
           <ul>
+            <li><a href="http://heycam.github.io/webidl/#idl-DOMString"
+                   ><dfn><code>DOMString</code></dfn></a></li>
             <li>Errors
               <ul>
                 <li><a href="https://heycam.github.io/webidl/#aborterror"
