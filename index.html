@@ -165,7 +165,7 @@
 
         <p>
           When a website requests access to devices using
-          <code><a for="BluetoothDiscovery">requestDevice</a></code>,
+          <code><a for="Bluetooth">requestDevice</a></code>,
           it gets the ability to access all GATT services mentioned in the call.
           The UA MUST inform the user what capabilities these services give the website
           before asking which devices to entrust to it.
@@ -311,13 +311,13 @@
         };
 
         [NoInterfaceObject]
-        interface BluetoothDiscovery {
+        interface Bluetooth {
           Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
         };
       </pre>
-      <div class="note" title="BluetoothDiscovery members">
+      <div class="note" title="Bluetooth members">
         <p>
-          <code><a for="BluetoothDiscovery">requestDevice</a>(options)</code> asks the user
+          <code><a for="Bluetooth">requestDevice</a>(options)</code> asks the user
           to grant this origin access to a device
           that <a>matches a filter</a> in <code>options.<dfn for="RequestDeviceOptions">filters</dfn></code>.
           The user will be shown devices that support
@@ -416,7 +416,7 @@
         which can impair radio performance and cause delays, so this spec doesn't require it.
       </p>
 
-      <p dfn-for="BluetoothDiscovery">
+      <p dfn-for="Bluetooth">
         The <code><dfn>requestDevice</dfn>(<var>options</var>)</code> method,
         when invoked, MUST return <a>a new promise</a> <var>promise</var>
         and run the following steps <a>in parallel</a>:
@@ -1229,6 +1229,7 @@ return navigator.bluetooth.requestDevice({
           it has discovered on a device.
           The UA MAY share this cache between multiple origins accessing the same device.
           Each potential entity in the cache is either known-present, known-absent, or unknown.
+          The cache MUST NOT contain two entities that are the <a>same attribute</a>.
           Each known-present entity in the cache is associated with an optional
           <code>Promise&lt;<a>BluetoothGATTService</a>></code>,
           <code>Promise&lt;<a>BluetoothGATTCharacteristic</a>></code>,
@@ -1356,34 +1357,13 @@ return navigator.bluetooth.requestDevice({
             without documenting whether it's based on <a>Attribute Handle</a> equality.
           </p>
 
-          <p>
-            For each origin, the UA must maintain an <dfn>attribute instance id map</dfn>
-            mapping Services, Characteristics, and Descriptors to <code>DOMString</code>s.
+          <p class="note">
+            For two Javascript objects representing Services, Characteristics, or Descriptors,
+            <code><var>x</var> === <var>y</var></code> returns
+            whether the objects represent the <a>same attribute</a>,
+            because of how the <a>query the Bluetooth cache</a> algorithm
+            creates and caches new objects.
           </p>
-
-          <p>
-            To <dfn>get an attribute id</dfn> for
-            a Service, Characteristic, or Descriptor <var>attribute</var>,
-            the UA MUST run the following steps.
-          </p>
-          <ol>
-            <li>
-              If <var>attribute</var> is the <a>same attribute</a> as
-              a key in this origin's <a>attribute instance id map</a>,
-              return the <code>DOMString</code> for that key and abort these steps.
-            </li>
-            <li>
-              Let <var>id</var> be a new <code>DOMString</code> that
-              isn't equal to any value in this origin's <a>attribute instance id map</a>.
-            </li>
-            <li>
-              Add a mapping from <var>attribute</var> to <var>id</var> in
-              this origin's <a>attribute instance id map</a>.
-            </li>
-            <li>
-              Return <var>id</var>.
-            </li>
-          </ol>
         </section>
       </section>
 
@@ -1491,7 +1471,6 @@ return navigator.bluetooth.requestDevice({
           interface BluetoothGATTService : ServiceEventHandlers {
             readonly attribute UUID uuid;
             readonly attribute boolean isPrimary;
-            readonly attribute DOMString instanceID;
             readonly attribute BluetoothDevice device;
             Promise&lt;BluetoothGATTCharacteristic>
               getCharacteristic(BluetoothCharacteristicUUID characteristic);
@@ -1513,14 +1492,6 @@ return navigator.bluetooth.requestDevice({
           </p>
           <p>
             <dfn>isPrimary</dfn> indicates whether the type of this service is primary or secondary.
-          </p>
-
-          <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this service,
-            which can be used distinguish between
-            multiple primary services with the same UUID in a single device or
-            multiple included services with the same UUID in a single primary service.
-            It is computed by the <a>get an attribute id</a> algorithm.
           </p>
 
           <p>
@@ -1558,10 +1529,6 @@ return navigator.bluetooth.requestDevice({
           <li>
             Initialize <code><var>result</var>.device</code> from
             the value of <var>devicePromise</var>.
-          </li>
-          <li>
-            <a>Get an attribute id</a> for <var>service</var>,
-            and initialize <code><var>result</var>.instanceID</code> to the result.
           </li>
           <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
         </ol>
@@ -1692,12 +1659,6 @@ return navigator.bluetooth.requestDevice({
             <dfn>properties</dfn> holds the properties of this characteristic.
           </p>
           <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this characteristic,
-            which can be used distinguish between
-            multiple characteristics with the same UUID in a single service.
-            It is computed by the <a>get an attribute id</a> algorithm.
-          </p>
-          <p>
             <dfn>value</dfn> is the currently cached characteristic value.
             This value gets updated when the value of the characteristic is read or updated via a notification or indication.
           </p>
@@ -1719,10 +1680,6 @@ return navigator.bluetooth.requestDevice({
             Initialize <code><var>result</var>.service</code> from
             the <a>BluetoothGATTService</a> instance representing
             the Service in which <var>characteristic</var> appears.
-          </li>
-          <li>
-            <a>Get an attribute id</a> for <var>characteristic</var>,
-            and initialize <code><var>result</var>.instanceID</code> to the result.
           </li>
           <li>
             <a>Create a <code>CharacteristicProperties</code> instance
@@ -1845,7 +1802,7 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           For each known GATT <a>Characteristic</a>, the UA MUST maintain
-          an <dfn>active notification context set</dfn> of <a>BluetoothInteraction</a> objects.
+          an <dfn>active notification context set</dfn> of <a>Bluetooth</a> objects.
           This is a single set for the whole UA,
           pointing to the <a href="#idl-def-navigatorbluetooth-bluetooth"><code>navigator.bluetooth</code></a> object
           for each separate <a>script execution environment</a> that has registered for notifications.
@@ -2038,7 +1995,6 @@ return navigator.bluetooth.requestDevice({
           interface BluetoothGATTDescriptor {
             readonly attribute UUID uuid;
             readonly attribute BluetoothGATTCharacteristic characteristic;
-            readonly attribute DOMString instanceID;
             readonly attribute ArrayBuffer? value;
             Promise&lt;ArrayBuffer> readValue();
             Promise&lt;void> writeValue(ArrayBuffer value);
@@ -2055,13 +2011,6 @@ return navigator.bluetooth.requestDevice({
           <p>
             <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
           </p>
-          <p>
-            <dfn>instanceID</dfn> is the opaque identifier assigned to this descriptor,
-            which can be used distinguish between
-            multiple descriptors with the same UUID in a single characteristic.
-            It is computed by the <a>get an attribute id</a> algorithm.
-          </p>
-
           <p>
             <dfn>value</dfn> is the currently cached descriptor value.
             This value gets updated when the value of the descriptor is read.
@@ -2085,10 +2034,6 @@ return navigator.bluetooth.requestDevice({
             the Characteristic in which <var>descriptor</var> appears.
           </li>
           <li>
-            <a>Get an attribute id</a> for <var>descriptor</var>,
-            and initialize <code><var>result</var>.instanceID</code> to the result.
-          </li>
-          <li>
             Initialize <code><var>result</var>.value</code> to <code>null</code>.
             The UA MAY initialize <code><var>result</var>.value</code> to
             a new <code>ArrayBuffer</code> containing
@@ -2107,38 +2052,6 @@ return navigator.bluetooth.requestDevice({
         <p>
           The <code><dfn>writeValue</dfn>(<var>value</var>)</code> method, when invoked,
           MUST write <code><var>value</var></code> to this characteristic descriptor on the remote peripheral.
-        </p>
-      </section>
-
-      <section dfn-for="BluetoothInteraction">
-        <h2>Object and UUID lookup on <code>navigator.bluetooth</code></h2>
-
-        <pre class="idl">
-          [NoInterfaceObject]
-          interface BluetoothInteraction : ServiceEventHandlers {
-            Promise&lt;BluetoothGATTService>
-              getService(DOMString serviceInstanceID);
-            Promise&lt;BluetoothGATTCharacteristic>
-              getCharacteristic(DOMString characteristicInstanceID);
-            Promise&lt;BluetoothGATTDescriptor>
-              getDescriptor(DOMString descriptorInstanceID);
-          };
-        </pre>
-
-        <p>
-          The <code><dfn>getService</dfn>(<var>serviceInstanceID</var>)</code> method, when invoked,
-          MUST return the GATT service with an instance ID of
-          <code><var>serviceInstanceID</var></code>.
-        </p>
-        <p>
-          The <code><dfn>getCharacteristic</dfn>(<var>characteristicInstanceID</var>)</code> method, when invoked,
-          MUST return the GATT characteristic with an instance ID of
-          <code><var>characteristicInstanceID</var></code>.
-        </p>
-        <p>
-          The <code><dfn>getDescriptor</dfn>(<var>descriptorInstanceID</var>)</code> method, when invoked,
-          MUST return the GATT descriptor with an instance ID of
-          <code><var>descriptorInstanceID</var></code>.
         </p>
       </section>
 
@@ -2692,10 +2605,6 @@ return navigator.bluetooth.requestDevice({
         interface NavigatorBluetooth {
           readonly attribute Bluetooth bluetooth;
         };
-
-        [NoInterfaceObject] interface Bluetooth {};
-        Bluetooth implements BluetoothDiscovery;
-        Bluetooth implements BluetoothInteraction;
       </pre>
     </section>
 
@@ -2719,7 +2628,7 @@ return navigator.bluetooth.requestDevice({
         When an algorithm in this specification uses a name defined in this or another specification,
         the name MUST resolve to its initial value,
         ignoring any changes that have been made to the name in the current execution environment.
-        For example, when the <a for="BluetoothDiscovery">requestDevice</a> algorithm says to call
+        For example, when the <a for="Bluetooth">requestDevice</a> algorithm says to call
         <code>Array.prototype.map.call(<var>filter</var>.services,
           <a>BluetoothUUID.getService</a>)</code>,
         this MUST apply the
