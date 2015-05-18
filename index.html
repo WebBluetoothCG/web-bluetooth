@@ -431,44 +431,51 @@
           <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
         </li>
         <li>
-          Let <var>filters</var> be a new <a>Array</a> and
-          <var>requiredServices</var> be a new <a>Set</a>.
-        </li>
-        <li>
-          For each <var>filter</var> in <code><var>options</var>.filters</code>,
-          do the following steps:
+          In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
+          do the following substeps:
           <ol>
             <li>
-              Let <var>services</var> be <code>Array.prototype.map.call(<var>filter</var>.services,
-              <a>BluetoothUUID.getService</a>)</code>.
+              Let <var>uuidFilters</var> be a new <a>Array</a> and
+              <var>requiredServiceUUIDs</var> be a new <a>Set</a>.
+            </li>
+            <li>
+              For each <var>filter</var> in <code><var>options</var>.filters</code>,
+              do the following steps:
+              <ol>
+                <li>
+                  Let <var>services</var> be
+                  <code>Array.prototype.map.call(<var>filter</var>.services,
+                    <a>BluetoothUUID.getService</a>)</code>.
+                </li>
+                <li>
+                  If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+                  <a>reject</a> <var>promise</var> with that exception and abort these steps.
+                </li>
+                <li>Append <code>{services: <var>services</var>}</code> to <var>uuidFilters</var>.</li>
+                <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
+              </ol>
+            </li>
+            <li>
+              Let <var>optionalServiceUUIDs</var> be
+              <code>Array.prototype.map.call(<var>options</var>.optionalServices,
+                <a>BluetoothUUID.getService</a>)</code>.
             </li>
             <li>
               If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
               <a>reject</a> <var>promise</var> with that exception and abort these steps.
             </li>
-            <li>Append <code>{services: <var>services</var>}</code> to <var>filter</var>.</li>
-            <li>Add the elements of <var>services</var> to <var>requiredServices</var>.</li>
           </ol>
         </li>
         <li>
-          Let <var>optionalServices</var> be
-          <code>Array.prototype.map.call(<var>options</var>.optionalServices,
-            <a>BluetoothUUID.getService</a>)</code>.
-        </li>
-        <li>
-          If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
-          <a>reject</a> <var>promise</var> with that exception and abort these steps.
-        </li>
-        <li>
           <a>Scan for devices</a> with
-          <var>requiredServices</var>
+          <var>requiredServiceUUIDs</var>
           as the <var>set of <a>Service</a> UUIDs</var>,
           and let <var>scanResult</var> be the result.
         </li>
         <li>
           Remove devices from <var>scanResult</var> if
           they do not <a title="matches a filter">match a filter</a>
-          in <var>filters</var>.
+          in <var>uuidFilters</var>.
         </li>
         <li>
           Even if <var>scanResult</var> is empty,
@@ -478,7 +485,7 @@
           the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
           <p>
             The UA MAY allow the user to select a nearby device
-            that does not match <var>filters</var>.
+            that does not match <var>uuidFilters</var>.
           </p>
         </li>
         <li>
@@ -491,8 +498,8 @@
         <li>
           <a title="add an allowed bluetooth device"
              >Add <var>device</var> to the origin's allowed devices map.</a>
-          with the union of <var>requiredServices</var>
-          and <var>optionalServices</var> as <var>allowed services</var>.
+          with the union of <var>requiredServiceUUIDs</var>
+          and <var>optionalServiceUUIDs</var> as <var>allowed services</var>.
         </li>
         <li>
           <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
@@ -2523,16 +2530,16 @@ return navigator.bluetooth.requestDevice({
 
         <pre class="idl">
           interface BluetoothUUID {
-            static UUID getService(DOMString name);
-            static UUID getCharacteristic(DOMString name);
-            static UUID getDescriptor(DOMString name);
+            static UUID getService((DOMString or unsigned long) name);
+            static UUID getCharacteristic((DOMString or unsigned long) name);
+            static UUID getDescriptor((DOMString or unsigned long) name);
 
             static UUID canonicalUUID(unsigned long alias);
           };
 
-          typedef DOMString BluetoothServiceUUID;
-          typedef DOMString BluetoothCharacteristicUUID;
-          typedef DOMString BluetoothDescriptorUUID;
+          typedef (DOMString or unsigned long) BluetoothServiceUUID;
+          typedef (DOMString or unsigned long) BluetoothCharacteristicUUID;
+          typedef (DOMString or unsigned long) BluetoothDescriptorUUID;
         </pre>
 
         <p>
@@ -2550,8 +2557,9 @@ return navigator.bluetooth.requestDevice({
 
         <p class="note">
           <dfn>BluetoothServiceUUID</dfn> represents
-          <a>valid UUID</a>s and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
-          or, equivalently, the subset of <a>DOMString</a>s for which
+          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+          and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
+          or, equivalently, the values for which
           <a>BluetoothUUID.getService</a> does not throw an exception.
         </p>
 
@@ -2560,6 +2568,10 @@ return navigator.bluetooth.requestDevice({
           MUST run the following steps:
         </p>
         <ol>
+          <li>
+            If <var>name</var> is an <code>unsigned long</code>,
+            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+          </li>
           <li>
             If <var>name</var> is a <a>valid UUID</a>,
             return <var>name</var> and abort these steps.
@@ -2592,8 +2604,9 @@ return navigator.bluetooth.requestDevice({
 
         <p class="note">
           <dfn>BluetoothCharacteristicUUID</dfn> represents
-          <a>valid UUID</a>s and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
-          or, equivalently, the subset of <a>DOMString</a>s for which
+          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+          and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
+          or, equivalently, the values for which
           <a>BluetoothUUID.getCharacteristic</a> does not throw an exception.
         </p>
 
@@ -2602,6 +2615,10 @@ return navigator.bluetooth.requestDevice({
           MUST run the following steps:
         </p>
         <ol>
+          <li>
+            If <var>name</var> is an <code>unsigned long</code>,
+            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+          </li>
           <li>
             If <var>name</var> is a <a>valid UUID</a>,
             return <var>name</var> and abort these steps.
@@ -2626,8 +2643,9 @@ return navigator.bluetooth.requestDevice({
 
         <p class="note">
           <dfn>BluetoothDescriptorUUID</dfn> represents
-          <a>valid UUID</a>s and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
-          or, equivalently, the subset of <a>DOMString</a>s for which
+          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+          and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
+          or, equivalently, the values for which
           <a>BluetoothUUID.getDescriptor</a> does not throw an exception.
         </p>
 
@@ -2636,6 +2654,10 @@ return navigator.bluetooth.requestDevice({
           MUST run the following steps:
         </p>
         <ol>
+          <li>
+            If <var>name</var> is an <code>unsigned long</code>,
+            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+          </li>
           <li>
             If <var>name</var> is a <a>valid UUID</a>,
             return <var>name</var> and abort these steps.
