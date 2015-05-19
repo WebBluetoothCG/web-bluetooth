@@ -66,19 +66,19 @@
               status: "Living Standard",
               publisher: "Bluetooth SIG",
             },
-            "BLUETOOTH-NUMBERS-SERVICES": {
+            "BLUETOOTH-ASSIGNED-SERVICES": {
               href: "https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx",
               title: "Bluetooth GATT Specifications > Services",
               status: "Living Standard",
               publisher: "Bluetooth SIG",
             },
-            "BLUETOOTH-NUMBERS-CHARACTERISTICS": {
+            "BLUETOOTH-ASSIGNED-CHARACTERISTICS": {
               href: "https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx",
               title: "Bluetooth GATT Specifications > Characteristics",
               status: "Living Standard",
               publisher: "Bluetooth SIG",
             },
-            "BLUETOOTH-NUMBERS-DESCRIPTORS": {
+            "BLUETOOTH-ASSIGNED-DESCRIPTORS": {
               href: "https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorsHomePage.aspx",
               title: "Bluetooth GATT Specifications > Descriptors",
               status: "Living Standard",
@@ -431,15 +431,51 @@
           <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
         </li>
         <li>
+          In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
+          do the following substeps:
+          <ol>
+            <li>
+              Let <var>uuidFilters</var> be a new <a>Array</a> and
+              <var>requiredServiceUUIDs</var> be a new <a>Set</a>.
+            </li>
+            <li>
+              For each <var>filter</var> in <code><var>options</var>.filters</code>,
+              do the following steps:
+              <ol>
+                <li>
+                  Let <var>services</var> be
+                  <code>Array.prototype.map.call(<var>filter</var>.services,
+                    <a>BluetoothUUID.getService</a>)</code>.
+                </li>
+                <li>
+                  If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+                  <a>reject</a> <var>promise</var> with that exception and abort these steps.
+                </li>
+                <li>Append <code>{services: <var>services</var>}</code> to <var>uuidFilters</var>.</li>
+                <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
+              </ol>
+            </li>
+            <li>
+              Let <var>optionalServiceUUIDs</var> be
+              <code>Array.prototype.map.call(<var>options</var>.optionalServices,
+                <a>BluetoothUUID.getService</a>)</code>.
+            </li>
+            <li>
+              If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+              <a>reject</a> <var>promise</var> with that exception and abort these steps.
+            </li>
+          </ol>
+        </li>
+        <li>
           <a>Scan for devices</a> with
-          the union of all <code>services</code> sequences in <code><var>options</var>.filters</code>
+          <var>requiredServiceUUIDs</var>
           as the <var>set of <a>Service</a> UUIDs</var>,
           and let <var>scanResult</var> be the result.
         </li>
         <li>
           Remove devices from <var>scanResult</var> if
           they do not <a title="matches a filter">match a filter</a>
-          in <code><var>options</var>.filters</code>.
+          in <var>uuidFilters</var>.
         </li>
         <li>
           Even if <var>scanResult</var> is empty,
@@ -449,7 +485,7 @@
           the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
           <p>
             The UA MAY allow the user to select a nearby device
-            that does not match <code><var>options</var>.filters</code>.
+            that does not match <var>uuidFilters</var>.
           </p>
         </li>
         <li>
@@ -462,8 +498,8 @@
         <li>
           <a title="add an allowed bluetooth device"
              >Add <var>device</var> to the origin's allowed devices map.</a>
-          with the union of the service UUIDs from <code><var>options</var>.filters</code>
-          and <code>options.optionalServices</code> as <var>allowed services</var>.
+          with the union of <var>requiredServiceUUIDs</var>
+          and <var>optionalServiceUUIDs</var> as <var>allowed services</var>.
         </li>
         <li>
           <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
@@ -1404,6 +1440,12 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>
+            Set <var>service</var> to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> for
             the first primary GATT service
             on <code>this@[[\representedDevice]]</code>
@@ -1421,12 +1463,23 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getPrimaryServices</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for the primary GATT services
-          on <code>this@[[\representedDevice]]</code>
-          whose UUIDs are in <code>this@[[\allowedServices]]</code>
-          and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>service</var> is present, set it to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for the primary GATT services
+            on <code>this@[[\representedDevice]]</code>
+            whose UUIDs are in <code>this@[[\allowedServices]]</code>
+            and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
+            and return the result.
+          </li>
+        </ol>
       </section>
 
       <section dfn-for="BluetoothGATTService">
@@ -1519,6 +1572,12 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>
+            Set <var>characteristic</var> to
+            <code><a>BluetoothUUID.getCharacteristic</a>(<var>characteristic</var>)</code>.
+            If <a>BluetoothUUID.getCharacteristic</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> for
             the first GATT characteristic within this Service
             whose UUID is <var>characteristic</var>,
@@ -1534,18 +1593,35 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getCharacteristics</dfn>(<var>characteristic</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for
-          the GATT characteristics that are within this Service and,
-          if <var>characteristic</var> is present,
-          that have UUIDs equal to <var>characteristic</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>characteristic</var> is present, set it to
+            <code><a>BluetoothUUID.getCharacteristic</a>(<var>characteristic</var>)</code>.
+            If <a>BluetoothUUID.getCharacteristic</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for
+            the GATT characteristics that are within this Service and,
+            if <var>characteristic</var> is present,
+            that have UUIDs equal to <var>characteristic</var>,
+            and return the result.
+          </li>
+        </ol>
 
         <p>
           The <code><dfn>getIncludedService</dfn>(<var>service</var>)</code> method, when invoked,
           MUST perform the following steps:
         </p>
         <ol>
+          <li>
+            Set <var>service</var> to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
           <li>
             <a>Query the Bluetooth cache</a> for the first GATT included service
             within this Service whose UUID is <var>service</var>,
@@ -1561,12 +1637,23 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getIncludedServices</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for
-          the GATT Included Services that are within this Service and,
-          if <var>service</var> is present,
-          that have UUIDs equal to <var>service</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>service</var> is present, set it to
+            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
+            If <a>BluetoothUUID.getService</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for
+            the GATT Included Services that are within this Service and,
+            if <var>service</var> is present,
+            that have UUIDs equal to <var>service</var>,
+            and return the result.
+          </li>
+        </ol>
       </section>
 
       <section dfn-for="BluetoothGATTCharacteristic">
@@ -1668,6 +1755,12 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>
+            Set <var>descriptor</var> to
+            <code><a>BluetoothUUID.getDescriptor</a>(<var>descriptor</var>)</code>.
+            If <a>BluetoothUUID.getDescriptor</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> for
             the first GATT descriptor within this Characteristic
             whose UUID is <var>descriptor</var>,
@@ -1683,12 +1776,23 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getDescriptors</dfn>(<var>descriptor</var>)</code> method, when invoked,
-          MUST <a>query the Bluetooth cache</a> for
-          the GATT descriptors that are within this Characteristic and,
-          if <var>descriptor</var> is present,
-          that have UUIDs equal to <var>descriptor</var>,
-          and return the result.
+          MUST perform the following steps:
         </p>
+        <ol>
+          <li>
+            If <var>descriptor</var> is present, set it to
+            <code><a>BluetoothUUID.getDescriptor</a>(<var>descriptor</var>)</code>.
+            If <a>BluetoothUUID.getDescriptor</a> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> for
+            the GATT descriptors that are within this Characteristic and,
+            if <var>descriptor</var> is present,
+            that have UUIDs equal to <var>descriptor</var>,
+            and return the result.
+          </li>
+        </ol>
 
         <p>
           The <code><dfn>readValue</dfn>()</code> method, when invoked,
@@ -2012,7 +2116,6 @@ return navigator.bluetooth.requestDevice({
         <pre class="idl">
           [NoInterfaceObject]
           interface BluetoothInteraction : ServiceEventHandlers {
-            readonly attribute BluetoothUUIDs uuids;
             Promise&lt;BluetoothGATTService>
               getService(DOMString serviceInstanceID);
             Promise&lt;BluetoothGATTCharacteristic>
@@ -2404,7 +2507,7 @@ return navigator.bluetooth.requestDevice({
       </p>
       <p class="note">
         This standard provides the
-        <code><a for="BluetoothUUIDs">canonicalUUID</a>()</code> function
+        <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code> function
         to map a 16- or 32-bit Bluetooth <a>UUID alias</a> to its 128-bit form.
       </p>
       <p class="note">
@@ -2414,536 +2517,168 @@ return navigator.bluetooth.requestDevice({
         if the UA has received a UUID from the device in one form (16-, 32-, or 128-bit),
         it should send other aliases of that UUID back to the device in the same form.
       </p>
-    </section>
 
-    <section>
-      <h2>Standardized identifiers</h2>
+      <section id="standardized-uuids">
+        <h2>Standardized UUIDs</h2>
 
-      <p>
-        The Bluetooth standard defines numbers that identify services, characteristics, descriptors, and other entities.
-        This section provides javascript names for these constants so they don't need to be replicated in each application.
-
-      <pre class="idl">
-        [NoInterfaceObject]
-        interface BluetoothUUIDs {
-          readonly attribute BluetoothUUIDsService service;
-          readonly attribute BluetoothUUIDsCharacteristic characteristic;
-          readonly attribute BluetoothUUIDsDescriptor descriptor;
-          UUID canonicalUUID(unsigned long alias);
-        };
-      </pre>
-
-      <p dfn-for="BluetoothUUIDs">
-        The <code><dfn>canonicalUUID</dfn>(<var>alias</var>)</code> method, when invoked,
-        MUST return <a>the 128-bit UUID represented</a>
-        by the 16- or 32-bit UUID alias <var>alias</var>.
-      </p>
-      <p class="note">
-        This algorithm consists of
-        replacing the top 32 bits of "<code>00000000-0000-1000-8000-00805f9b34fb</code>"
-        with the bits of the alias.
-        For example, <code>canonicalUUID(0xDEADBEEF)</code> returns
-        <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
-      </p>
-
-      <section>
-        <h2>Standard GATT Services</h2>
-
-        <p>Each standardized service listed in [[!BLUETOOTH-NUMBERS-SERVICES]] MUST be reflected into <code>navigator.bluetooth.uuids.service</code> under the name listed under "SpecificationType" with <code>org.bluetooth.service.</code> removed.
+        <p>
+          The Bluetooth SIG maintains a registry at [[BLUETOOTH-ASSIGNED]] of
+          UUIDs that identify services, characteristics, descriptors, and other entities.
+          This section provides a way for script to look up those UUIDs by name
+          so they don't need to be replicated in each application.
         </p>
+
         <pre class="idl">
-          [NoInterfaceObject]
-          interface BluetoothUUIDsService {
-            readonly attribute UUID alert_notification;
-            readonly attribute UUID battery_service;
-            readonly attribute UUID blood_pressure;
-            readonly attribute UUID current_time;
-            readonly attribute UUID cycling_power;
-            readonly attribute UUID cycling_speed_and_cadence;
-            readonly attribute UUID device_information;
-            readonly attribute UUID generic_access;
-            readonly attribute UUID generic_attribute;
-            readonly attribute UUID glucose;
-            readonly attribute UUID health_thermometer;
-            readonly attribute UUID heart_rate;
-            readonly attribute UUID human_interface_device;
-            readonly attribute UUID immediate_alert;
-            readonly attribute UUID link_loss;
-            readonly attribute UUID location_and_navigation;
-            readonly attribute UUID next_dst_change;
-            readonly attribute UUID phone_alert_status;
-            readonly attribute UUID reference_time_update;
-            readonly attribute UUID running_speed_and_cadence;
-            readonly attribute UUID scan_parameters;
-            readonly attribute UUID tx_power;
-            readonly attribute UUID user_data;
+          interface BluetoothUUID {
+            static UUID getService((DOMString or unsigned long) name);
+            static UUID getCharacteristic((DOMString or unsigned long) name);
+            static UUID getDescriptor((DOMString or unsigned long) name);
+
+            static UUID canonicalUUID(unsigned long alias);
           };
+
+          typedef (DOMString or unsigned long) BluetoothServiceUUID;
+          typedef (DOMString or unsigned long) BluetoothCharacteristicUUID;
+          typedef (DOMString or unsigned long) BluetoothDescriptorUUID;
         </pre>
 
         <p>
-          The <a>BluetoothServiceName</a> enumeration allows users to pass the standardized services by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.service</code>.
-          When used as a parameter to a function in this specification that accepts a <a>BluetoothServiceUUID</a> parameter,
-          these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
+          The static <code><dfn>BluetoothUUID.canonicalUUID</dfn>(<var>alias</var>)</code> method, when invoked,
+          MUST return <a>the 128-bit UUID represented</a>
+          by the 16- or 32-bit UUID alias <var>alias</var>.
         </p>
-        <pre class="idl">
-          enum BluetoothServiceName {
-            "alert_notification",
-            "battery_service",
-            "blood_pressure",
-            "current_time",
-            "cycling_power",
-            "cycling_speed_and_cadence",
-            "device_information",
-            "generic_access",
-            "generic_attribute",
-            "glucose",
-            "health_thermometer",
-            "heart_rate",
-            "human_interface_device",
-            "immediate_alert",
-            "link_loss",
-            "location_and_navigation",
-            "next_dst_change",
-            "phone_alert_status",
-            "reference_time_update",
-            "running_speed_and_cadence",
-            "scan_parameters",
-            "tx_power",
-            "user_data"
-          };
-          typedef (BluetoothServiceName or UUID) BluetoothServiceUUID;
-        </pre>
+        <p class="note">
+          This algorithm consists of
+          replacing the top 32 bits of "<code>00000000-0000-1000-8000-00805f9b34fb</code>"
+          with the bits of the alias.
+          For example, <code>canonicalUUID(0xDEADBEEF)</code> returns
+          <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
+        </p>
+
+        <p class="note">
+          <dfn>BluetoothServiceUUID</dfn> represents
+          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+          and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
+          or, equivalently, the values for which
+          <a>BluetoothUUID.getService</a> does not throw an exception.
+        </p>
 
         <p>
-          Each item of <a>BluetoothServiceName</a>
-          and each attribute of <a>BluetoothUUIDsService</a> refers to or has a UUID value,
-          as defined in the following table:
+          The static <code><dfn>BluetoothUUID.getService</dfn>(<var>name</var>)</code> method, when invoked,
+          MUST run the following steps:
         </p>
-        <table dfn-for="BluetoothUUIDsService">
-          <tr><th>Enum value or attribute name</th><th>Value</th></tr>
-          <tr><td><dfn>alert_notification</dfn></td><td><code>canonicalUUID(0x1811)</code></td></tr>
-          <tr><td><dfn>battery_service</dfn></td><td><code>canonicalUUID(0x180F)</code></td></tr>
-          <tr><td><dfn>blood_pressure</dfn></td><td><code>canonicalUUID(0x1810)</code></td></tr>
-          <tr><td><dfn>current_time</dfn></td><td><code>canonicalUUID(0x1805)</code></td></tr>
-          <tr><td><dfn>cycling_power</dfn></td><td><code>canonicalUUID(0x1818)</code></td></tr>
-          <tr><td><dfn>cycling_speed_and_cadence</dfn></td><td><code>canonicalUUID(0x1816)</code></td></tr>
-          <tr><td><dfn>device_information</dfn></td><td><code>canonicalUUID(0x180A)</code></td></tr>
-          <tr><td><dfn>generic_access</dfn></td><td><code>canonicalUUID(0x1800)</code></td></tr>
-          <tr><td><dfn>generic_attribute</dfn></td><td><code>canonicalUUID(0x1801)</code></td></tr>
-          <tr><td><dfn>glucose</dfn></td><td><code>canonicalUUID(0x1808)</code></td></tr>
-          <tr><td><dfn>health_thermometer</dfn></td><td><code>canonicalUUID(0x1809)</code></td></tr>
-          <tr><td><dfn>heart_rate</dfn></td><td><code>canonicalUUID(0x180D)</code></td></tr>
-          <tr><td><dfn>human_interface_device</dfn></td><td><code>canonicalUUID(0x1812)</code></td></tr>
-          <tr><td><dfn>immediate_alert</dfn></td><td><code>canonicalUUID(0x1802)</code></td></tr>
-          <tr><td><dfn>link_loss</dfn></td><td><code>canonicalUUID(0x1803)</code></td></tr>
-          <tr><td><dfn>location_and_navigation</dfn></td><td><code>canonicalUUID(0x1819)</code></td></tr>
-          <tr><td><dfn>next_dst_change</dfn></td><td><code>canonicalUUID(0x1807)</code></td></tr>
-          <tr><td><dfn>phone_alert_status</dfn></td><td><code>canonicalUUID(0x180E)</code></td></tr>
-          <tr><td><dfn>reference_time_update</dfn></td><td><code>canonicalUUID(0x1806)</code></td></tr>
-          <tr><td><dfn>running_speed_and_cadence</dfn></td><td><code>canonicalUUID(0x1814)</code></td></tr>
-          <tr><td><dfn>scan_parameters</dfn></td><td><code>canonicalUUID(0x1813)</code></td></tr>
-          <tr><td><dfn>tx_power</dfn></td><td><code>canonicalUUID(0x1804)</code></td></tr>
-          <tr><td><dfn>user_data</dfn></td><td><code>canonicalUUID(0x181C)</code></td></tr>
-        </table>
-      </section>
+        <ol>
+          <li>
+            If <var>name</var> is an <code>unsigned long</code>,
+            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+          </li>
+          <li>
+            If <var>name</var> is a <a>valid UUID</a>,
+            return <var>name</var> and abort these steps.
+          </li>
+          <li>
+            If <code>org.bluetooth.service.<var>name</var></code> appears in [[!BLUETOOTH-ASSIGNED-SERVICES]],
+            let <var>alias</var> be its assigned number,
+            and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
+          </li>
+          <li>
+            Otherwise, throw a <a>SyntaxError</a>.
+          </li>
+        </ol>
+        <aside class="example">
+          <p>
+            <code><a>BluetoothUUID.getService</a>("<a
+              href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml"
+              >cycling_power</a>")</code>
+            returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>.
+          </p>
+          <p>
+            <code><a>BluetoothUUID.getService</a>("00001801-0000-1000-8000-00805f9b34fb")</code>
+            returns <code>"00001801-0000-1000-8000-00805f9b34fb"</code>.
+          </p>
+          <p>
+            <code><a>BluetoothUUID.getService</a>("unknown-service")</code>
+            throws a <a>SyntaxError</a>.
+          </p>
+        </aside>
 
-      <section>
-        <h2>Standard GATT Characteristics</h2>
-
-        <p>Each standardized characteristic listed in [[!BLUETOOTH-NUMBERS-CHARACTERISTICS]] MUST be reflected into <code>navigator.bluetooth.uuids.characteristic</code> under the name listed under "SpecificationType" with <code>org.bluetooth.characteristic.</code> removed.
+        <p class="note">
+          <dfn>BluetoothCharacteristicUUID</dfn> represents
+          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+          and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
+          or, equivalently, the values for which
+          <a>BluetoothUUID.getCharacteristic</a> does not throw an exception.
         </p>
-        <pre class="idl">
-          [NoInterfaceObject]
-          interface BluetoothUUIDsCharacteristic {
-            readonly attribute UUID aerobic_heart_rate_lower_limit;
-            readonly attribute UUID aerobic_heart_rate_upper_limit;
-            readonly attribute UUID aerobic_threshold;
-            readonly attribute UUID age;
-            readonly attribute UUID alert_category_id;
-            readonly attribute UUID alert_category_id_bit_mask;
-            readonly attribute UUID alert_level;
-            readonly attribute UUID alert_notification_control_point;
-            readonly attribute UUID alert_status;
-            readonly attribute UUID anaerobic_heart_rate_lower_limit;
-            readonly attribute UUID anaerobic_heart_rate_upper_limit;
-            readonly attribute UUID anaerobic_threshold;
-            readonly attribute UUID battery_level;
-            readonly attribute UUID blood_pressure_feature;
-            readonly attribute UUID blood_pressure_measurement;
-            readonly attribute UUID body_sensor_location;
-            readonly attribute UUID boot_keyboard_input_report;
-            readonly attribute UUID boot_keyboard_output_report;
-            readonly attribute UUID boot_mouse_input_report;
-            readonly attribute UUID csc_feature;
-            readonly attribute UUID csc_measurement;
-            readonly attribute UUID current_time;
-            readonly attribute UUID cycling_power_control_point;
-            readonly attribute UUID cycling_power_feature;
-            readonly attribute UUID cycling_power_measurement;
-            readonly attribute UUID cycling_power_vector;
-            readonly attribute UUID database_change_increment;
-            readonly attribute UUID date_of_birth;
-            readonly attribute UUID date_of_threshold_assessment;
-            readonly attribute UUID date_time;
-            readonly attribute UUID day_date_time;
-            readonly attribute UUID day_of_week;
-            readonly attribute UUID dst_offset;
-            readonly attribute UUID email_address;
-            readonly attribute UUID exact_time_256;
-            readonly attribute UUID fat_burn_heart_rate_lower_limit;
-            readonly attribute UUID fat_burn_heart_rate_upper_limit;
-            readonly attribute UUID firmware_revision_string;
-            readonly attribute UUID first_name;
-            readonly attribute UUID five_zone_heart_rate_limits;
-            readonly attribute BluetoothUUIDsCharacteristicGAP gap;
-            readonly attribute BluetoothUUIDsCharacteristicGATT gatt;
-            readonly attribute UUID gender;
-            readonly attribute UUID glucose_feature;
-            readonly attribute UUID glucose_measurement;
-            readonly attribute UUID glucose_measurement_context;
-            readonly attribute UUID hardware_revision_string;
-            readonly attribute UUID heart_rate_control_point;
-            readonly attribute UUID heart_rate_max;
-            readonly attribute UUID heart_rate_measurement;
-            readonly attribute UUID height;
-            readonly attribute UUID hid_control_point;
-            readonly attribute UUID hid_information;
-            readonly attribute UUID hip_circumference;
-            readonly attribute UUID ieee_11073_20601_regulatory_certification_data_list;
-            readonly attribute UUID intermediate_blood_pressure;
-            readonly attribute UUID intermediate_temperature;
-            readonly attribute UUID language;
-            readonly attribute UUID last_name;
-            readonly attribute UUID ln_control_point;
-            readonly attribute UUID ln_feature;
-            readonly attribute UUID local_time_information;
-            readonly attribute UUID location_and_speed;
-            readonly attribute UUID manufacturer_name_string;
-            readonly attribute UUID maximum_recommended_heart_rate;
-            readonly attribute UUID measurement_interval;
-            readonly attribute UUID model_number_string;
-            readonly attribute UUID navigation;
-            readonly attribute UUID new_alert;
-            readonly attribute UUID pnp_id;
-            readonly attribute UUID position_quality;
-            readonly attribute UUID protocol_mode;
-            readonly attribute UUID record_access_control_point;
-            readonly attribute UUID reference_time_information;
-            readonly attribute UUID report;
-            readonly attribute UUID report_map;
-            readonly attribute UUID resting_heart_rate;
-            readonly attribute UUID ringer_control_point;
-            readonly attribute UUID ringer_setting;
-            readonly attribute UUID rsc_feature;
-            readonly attribute UUID rsc_measurement;
-            readonly attribute UUID sc_control_point;
-            readonly attribute UUID scan_interval_window;
-            readonly attribute UUID scan_refresh;
-            readonly attribute UUID sensor_location;
-            readonly attribute UUID serial_number_string;
-            readonly attribute UUID software_revision_string;
-            readonly attribute UUID sport_type_for_aerobic_and_anaerobic_thresholds;
-            readonly attribute UUID supported_new_alert_category;
-            readonly attribute UUID supported_unread_alert_category;
-            readonly attribute UUID system_id;
-            readonly attribute UUID temperature_measurement;
-            readonly attribute UUID temperature_type;
-            readonly attribute UUID three_zone_heart_rate_limits;
-            readonly attribute UUID time_accuracy;
-            readonly attribute UUID time_source;
-          };
-
-          [NoInterfaceObject]
-          interface BluetoothUUIDsCharacteristicGAP {
-            readonly attribute UUID appearance;
-            readonly attribute UUID device_name;
-            readonly attribute UUID peripheral_preferred_connection_parameters;
-            readonly attribute UUID peripheral_privacy_flag;
-            readonly attribute UUID reconnection_address;
-          };
-          [NoInterfaceObject]
-          interface BluetoothUUIDsCharacteristicGATT {
-            readonly attribute UUID service_changed;
-          };
-        </pre>
 
         <p>
-          The <a>BluetoothCharacteristicName</a> enumeration allows users to pass the standardized characteristics by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.characteristic</code>.
-          When used as a parameter to a function in this specification that accepts a <a>BluetoothCharacteristicUUID</a> parameter,
-          these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
+          The static <code><dfn>BluetoothUUID.getCharacteristic</dfn>(<var>name</var>)</code> method, when invoked,
+          MUST run the following steps:
         </p>
-        <pre class="idl">
-          enum BluetoothCharacteristicName {
-            "aerobic_heart_rate_lower_limit",
-            "aerobic_heart_rate_upper_limit",
-            "aerobic_threshold",
-            "age",
-            "alert_category_id",
-            "alert_category_id_bit_mask",
-            "alert_level",
-            "alert_notification_control_point",
-            "alert_status",
-            "anaerobic_heart_rate_lower_limit",
-            "anaerobic_heart_rate_upper_limit",
-            "anaerobic_threshold",
-            "gap.appearance",
-            "battery_level",
-            "blood_pressure_feature",
-            "blood_pressure_measurement",
-            "body_sensor_location",
-            "boot_keyboard_input_report",
-            "boot_keyboard_output_report",
-            "boot_mouse_input_report",
-            "csc_feature",
-            "csc_measurement",
-            "current_time",
-            "cycling_power_control_point",
-            "cycling_power_feature",
-            "cycling_power_measurement",
-            "cycling_power_vector",
-            "database_change_increment",
-            "date_of_birth",
-            "date_of_threshold_assessment",
-            "date_time",
-            "day_date_time",
-            "day_of_week",
-            "gap.device_name",
-            "dst_offset",
-            "email_address",
-            "exact_time_256",
-            "fat_burn_heart_rate_lower_limit",
-            "fat_burn_heart_rate_upper_limit",
-            "firmware_revision_string",
-            "first_name",
-            "five_zone_heart_rate_limits",
-            "gender",
-            "glucose_feature",
-            "glucose_measurement",
-            "glucose_measurement_context",
-            "hardware_revision_string",
-            "heart_rate_control_point",
-            "heart_rate_max",
-            "heart_rate_measurement",
-            "height",
-            "hid_control_point",
-            "hid_information",
-            "hip_circumference",
-            "ieee_11073_20601_regulatory_certification_data_list",
-            "intermediate_blood_pressure",
-            "intermediate_temperature",
-            "language",
-            "last_name",
-            "ln_control_point",
-            "ln_feature",
-            "local_time_information",
-            "location_and_speed",
-            "manufacturer_name_string",
-            "maximum_recommended_heart_rate",
-            "measurement_interval",
-            "model_number_string",
-            "navigation",
-            "new_alert",
-            "gap.peripheral_preferred_connection_parameters",
-            "gap.peripheral_privacy_flag",
-            "pnp_id",
-            "position_quality",
-            "protocol_mode",
-            "gap.reconnection_address",
-            "record_access_control_point",
-            "reference_time_information",
-            "report",
-            "report_map",
-            "resting_heart_rate",
-            "ringer_control_point",
-            "ringer_setting",
-            "rsc_feature",
-            "rsc_measurement",
-            "sc_control_point",
-            "scan_interval_window",
-            "scan_refresh",
-            "sensor_location",
-            "serial_number_string",
-            "gatt.service_changed",
-            "software_revision_string",
-            "sport_type_for_aerobic_and_anaerobic_thresholds",
-            "supported_new_alert_category",
-            "supported_unread_alert_category",
-            "system_id",
-            "temperature_measurement",
-            "temperature_type",
-            "three_zone_heart_rate_limits",
-            "time_accuracy",
-            "time_source"
-          };
+        <ol>
+          <li>
+            If <var>name</var> is an <code>unsigned long</code>,
+            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+          </li>
+          <li>
+            If <var>name</var> is a <a>valid UUID</a>,
+            return <var>name</var> and abort these steps.
+          </li>
+          <li>
+            If <code>org.bluetooth.characteristic.<var>name</var></code> appears in [[!BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
+            let <var>alias</var> be its assigned number,
+            and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
+          </li>
+          <li>
+            Otherwise, throw a <a>SyntaxError</a>.
+          </li>
+        </ol>
+        <aside class="example">
+          <p>
+            <code><a>BluetoothUUID.getCharacteristic</a>("<a
+              href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml"
+              >ieee_11073-20601_regulatory_certification_data_list</a>")</code>
+            returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>.
+          </p>
+        </aside>
 
-          typedef (BluetoothCharacteristicName or UUID) BluetoothCharacteristicUUID;
-        </pre>
+        <p class="note">
+          <dfn>BluetoothDescriptorUUID</dfn> represents
+          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+          and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
+          or, equivalently, the values for which
+          <a>BluetoothUUID.getDescriptor</a> does not throw an exception.
+        </p>
 
         <p>
-          Each item of <a>BluetoothCharacteristicName</a>
-          and each attribute of <a>BluetoothUUIDsCharacteristic</a> refers to or has a UUID value,
-          as defined in the following table:
+          The static <code><dfn>BluetoothUUID.getDescriptor</dfn>(<var>name</var>)</code> method, when invoked,
+          MUST run the following steps:
         </p>
-        <table dfn-for="BluetoothUUIDsCharacteristic">
-          <tr><th>Enum value or attribute name</th><th>Value</th></tr>
-          <tr><td><dfn>aerobic_heart_rate_lower_limit</dfn></td><td><code>canonicalUUID(0x2A7E)</code></td></tr>
-          <tr><td><dfn>aerobic_heart_rate_upper_limit</dfn></td><td><code>canonicalUUID(0x2A84)</code></td></tr>
-          <tr><td><dfn>aerobic_threshold</dfn></td><td><code>canonicalUUID(0x2A7F)</code></td></tr>
-          <tr><td><dfn>age</dfn></td><td><code>canonicalUUID(0x2A80)</code></td></tr>
-          <tr><td><dfn>alert_category_id</dfn></td><td><code>canonicalUUID(0x2A43)</code></td></tr>
-          <tr><td><dfn>alert_category_id_bit_mask</dfn></td><td><code>canonicalUUID(0x2A42)</code></td></tr>
-          <tr><td><dfn>alert_level</dfn></td><td><code>canonicalUUID(0x2A06)</code></td></tr>
-          <tr><td><dfn>alert_notification_control_point</dfn></td><td><code>canonicalUUID(0x2A44)</code></td></tr>
-          <tr><td><dfn>alert_status</dfn></td><td><code>canonicalUUID(0x2A3F)</code></td></tr>
-          <tr><td><dfn>anaerobic_heart_rate_lower_limit</dfn></td><td><code>canonicalUUID(0x2A81)</code></td></tr>
-          <tr><td><dfn>anaerobic_heart_rate_upper_limit</dfn></td><td><code>canonicalUUID(0x2A82)</code></td></tr>
-          <tr><td><dfn>anaerobic_threshold</dfn></td><td><code>canonicalUUID(0x2A83)</code></td></tr>
-          <tr><td><code>gap.<dfn for="BluetoothUUIDsCharacteristicGAP">appearance</dfn></code></td><td><code>canonicalUUID(0x2A01)</code></td></tr>
-          <tr><td><dfn>battery_level</dfn></td><td><code>canonicalUUID(0x2A19)</code></td></tr>
-          <tr><td><dfn>blood_pressure_feature</dfn></td><td><code>canonicalUUID(0x2A49)</code></td></tr>
-          <tr><td><dfn>blood_pressure_measurement</dfn></td><td><code>canonicalUUID(0x2A35)</code></td></tr>
-          <tr><td><dfn>body_sensor_location</dfn></td><td><code>canonicalUUID(0x2A38)</code></td></tr>
-          <tr><td><dfn>boot_keyboard_input_report</dfn></td><td><code>canonicalUUID(0x2A22)</code></td></tr>
-          <tr><td><dfn>boot_keyboard_output_report</dfn></td><td><code>canonicalUUID(0x2A32)</code></td></tr>
-          <tr><td><dfn>boot_mouse_input_report</dfn></td><td><code>canonicalUUID(0x2A33)</code></td></tr>
-          <tr><td><dfn>csc_feature</dfn></td><td><code>canonicalUUID(0x2A5C)</code></td></tr>
-          <tr><td><dfn>csc_measurement</dfn></td><td><code>canonicalUUID(0x2A5B)</code></td></tr>
-          <tr><td><dfn>current_time</dfn></td><td><code>canonicalUUID(0x2A2B)</code></td></tr>
-          <tr><td><dfn>cycling_power_control_point</dfn></td><td><code>canonicalUUID(0x2A66)</code></td></tr>
-          <tr><td><dfn>cycling_power_feature</dfn></td><td><code>canonicalUUID(0x2A65)</code></td></tr>
-          <tr><td><dfn>cycling_power_measurement</dfn></td><td><code>canonicalUUID(0x2A63)</code></td></tr>
-          <tr><td><dfn>cycling_power_vector</dfn></td><td><code>canonicalUUID(0x2A64)</code></td></tr>
-          <tr><td><dfn>database_change_increment</dfn></td><td><code>canonicalUUID(0x2A99)</code></td></tr>
-          <tr><td><dfn>date_of_birth</dfn></td><td><code>canonicalUUID(0x2A85)</code></td></tr>
-          <tr><td><dfn>date_of_threshold_assessment</dfn></td><td><code>canonicalUUID(0x2A86)</code></td></tr>
-          <tr><td><dfn>date_time</dfn></td><td><code>canonicalUUID(0x2A08)</code></td></tr>
-          <tr><td><dfn>day_date_time</dfn></td><td><code>canonicalUUID(0x2A0A)</code></td></tr>
-          <tr><td><dfn>day_of_week</dfn></td><td><code>canonicalUUID(0x2A09)</code></td></tr>
-          <tr><td><code>gap.<dfn for="BluetoothUUIDsCharacteristicGAP">device_name</dfn></code></td><td><code>canonicalUUID(0x2A00)</code></td></tr>
-          <tr><td><dfn>dst_offset</dfn></td><td><code>canonicalUUID(0x2A0D)</code></td></tr>
-          <tr><td><dfn>email_address</dfn></td><td><code>canonicalUUID(0x2A87)</code></td></tr>
-          <tr><td><dfn>exact_time_256</dfn></td><td><code>canonicalUUID(0x2A0C)</code></td></tr>
-          <tr><td><dfn>fat_burn_heart_rate_lower_limit</dfn></td><td><code>canonicalUUID(0x2A88)</code></td></tr>
-          <tr><td><dfn>fat_burn_heart_rate_upper_limit</dfn></td><td><code>canonicalUUID(0x2A89)</code></td></tr>
-          <tr><td><dfn>firmware_revision_string</dfn></td><td><code>canonicalUUID(0x2A26)</code></td></tr>
-          <tr><td><dfn>first_name</dfn></td><td><code>canonicalUUID(0x2A8A)</code></td></tr>
-          <tr><td><dfn>five_zone_heart_rate_limits</dfn></td><td><code>canonicalUUID(0x2A8B)</code></td></tr>
-          <tr><td><dfn>gender</dfn></td><td><code>canonicalUUID(0x2A8C)</code></td></tr>
-          <tr><td><dfn>glucose_feature</dfn></td><td><code>canonicalUUID(0x2A51)</code></td></tr>
-          <tr><td><dfn>glucose_measurement</dfn></td><td><code>canonicalUUID(0x2A18)</code></td></tr>
-          <tr><td><dfn>glucose_measurement_context</dfn></td><td><code>canonicalUUID(0x2A34)</code></td></tr>
-          <tr><td><dfn>hardware_revision_string</dfn></td><td><code>canonicalUUID(0x2A27)</code></td></tr>
-          <tr><td><dfn>heart_rate_control_point</dfn></td><td><code>canonicalUUID(0x2A39)</code></td></tr>
-          <tr><td><dfn>heart_rate_max</dfn></td><td><code>canonicalUUID(0x2A8D)</code></td></tr>
-          <tr><td><dfn>heart_rate_measurement</dfn></td><td><code>canonicalUUID(0x2A37)</code></td></tr>
-          <tr><td><dfn>height</dfn></td><td><code>canonicalUUID(0x2A8E)</code></td></tr>
-          <tr><td><dfn>hid_control_point</dfn></td><td><code>canonicalUUID(0x2A4C)</code></td></tr>
-          <tr><td><dfn>hid_information</dfn></td><td><code>canonicalUUID(0x2A4A)</code></td></tr>
-          <tr><td><dfn>hip_circumference</dfn></td><td><code>canonicalUUID(0x2A8F)</code></td></tr>
-          <tr><td><dfn>ieee_11073_20601_regulatory_certification_data_list</dfn></td><td><code>canonicalUUID(0x2A2A)</code></td></tr>
-          <tr><td><dfn>intermediate_blood_pressure</dfn></td><td><code>canonicalUUID(0x2A36)</code></td></tr>
-          <tr><td><dfn>intermediate_temperature</dfn></td><td><code>canonicalUUID(0x2A1E)</code></td></tr>
-          <tr><td><dfn>language</dfn></td><td><code>canonicalUUID(0x2AA2)</code></td></tr>
-          <tr><td><dfn>last_name</dfn></td><td><code>canonicalUUID(0x2A90)</code></td></tr>
-          <tr><td><dfn>ln_control_point</dfn></td><td><code>canonicalUUID(0x2A6B)</code></td></tr>
-          <tr><td><dfn>ln_feature</dfn></td><td><code>canonicalUUID(0x2A6A)</code></td></tr>
-          <tr><td><dfn>local_time_information</dfn></td><td><code>canonicalUUID(0x2A0F)</code></td></tr>
-          <tr><td><dfn>location_and_speed</dfn></td><td><code>canonicalUUID(0x2A67)</code></td></tr>
-          <tr><td><dfn>manufacturer_name_string</dfn></td><td><code>canonicalUUID(0x2A29)</code></td></tr>
-          <tr><td><dfn>maximum_recommended_heart_rate</dfn></td><td><code>canonicalUUID(0x2A91)</code></td></tr>
-          <tr><td><dfn>measurement_interval</dfn></td><td><code>canonicalUUID(0x2A21)</code></td></tr>
-          <tr><td><dfn>model_number_string</dfn></td><td><code>canonicalUUID(0x2A24)</code></td></tr>
-          <tr><td><dfn>navigation</dfn></td><td><code>canonicalUUID(0x2A68)</code></td></tr>
-          <tr><td><dfn>new_alert</dfn></td><td><code>canonicalUUID(0x2A46)</code></td></tr>
-          <tr><td><code>gap.<dfn for="BluetoothUUIDsCharacteristicGAP">peripheral_preferred_connection_parameters</dfn></code></td><td><code>canonicalUUID(0x2A04)</code></td></tr>
-          <tr><td><code>gap.<dfn for="BluetoothUUIDsCharacteristicGAP">peripheral_privacy_flag</dfn></code></td><td><code>canonicalUUID(0x2A02)</code></td></tr>
-          <tr><td><dfn>pnp_id</dfn></td><td><code>canonicalUUID(0x2A50)</code></td></tr>
-          <tr><td><dfn>position_quality</dfn></td><td><code>canonicalUUID(0x2A69)</code></td></tr>
-          <tr><td><dfn>protocol_mode</dfn></td><td><code>canonicalUUID(0x2A4E)</code></td></tr>
-          <tr><td><code>gap.<dfn for="BluetoothUUIDsCharacteristicGAP">reconnection_address</dfn></code></td><td><code>canonicalUUID(0x2A03)</code></td></tr>
-          <tr><td><dfn>record_access_control_point</dfn></td><td><code>canonicalUUID(0x2A52)</code></td></tr>
-          <tr><td><dfn>reference_time_information</dfn></td><td><code>canonicalUUID(0x2A14)</code></td></tr>
-          <tr><td><dfn>report</dfn></td><td><code>canonicalUUID(0x2A4D)</code></td></tr>
-          <tr><td><dfn>report_map</dfn></td><td><code>canonicalUUID(0x2A4B)</code></td></tr>
-          <tr><td><dfn>resting_heart_rate</dfn></td><td><code>canonicalUUID(0x2A92)</code></td></tr>
-          <tr><td><dfn>ringer_control_point</dfn></td><td><code>canonicalUUID(0x2A40)</code></td></tr>
-          <tr><td><dfn>ringer_setting</dfn></td><td><code>canonicalUUID(0x2A41)</code></td></tr>
-          <tr><td><dfn>rsc_feature</dfn></td><td><code>canonicalUUID(0x2A54)</code></td></tr>
-          <tr><td><dfn>rsc_measurement</dfn></td><td><code>canonicalUUID(0x2A53)</code></td></tr>
-          <tr><td><dfn>sc_control_point</dfn></td><td><code>canonicalUUID(0x2A55)</code></td></tr>
-          <tr><td><dfn>scan_interval_window</dfn></td><td><code>canonicalUUID(0x2A4F)</code></td></tr>
-          <tr><td><dfn>scan_refresh</dfn></td><td><code>canonicalUUID(0x2A31)</code></td></tr>
-          <tr><td><dfn>sensor_location</dfn></td><td><code>canonicalUUID(0x2A5D)</code></td></tr>
-          <tr><td><dfn>serial_number_string</dfn></td><td><code>canonicalUUID(0x2A25)</code></td></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsCharacteristicGATT">service_changed</dfn></code></td><td><code>canonicalUUID(0x2A05)</code></td></tr>
-          <tr><td><dfn>software_revision_string</dfn></td><td><code>canonicalUUID(0x2A28)</code></td></tr>
-          <tr><td><dfn>sport_type_for_aerobic_and_anaerobic_thresholds</dfn></td><td><code>canonicalUUID(0x2A93)</code></td></tr>
-          <tr><td><dfn>supported_new_alert_category</dfn></td><td><code>canonicalUUID(0x2A47)</code></td></tr>
-          <tr><td><dfn>supported_unread_alert_category</dfn></td><td><code>canonicalUUID(0x2A48)</code></td></tr>
-          <tr><td><dfn>system_id</dfn></td><td><code>canonicalUUID(0x2A23)</code></td></tr>
-          <tr><td><dfn>temperature_measurement</dfn></td><td><code>canonicalUUID(0x2A1C)</code></td></tr>
-          <tr><td><dfn>temperature_type</dfn></td><td><code>canonicalUUID(0x2A1D)</code></td></tr>
-          <tr><td><dfn>three_zone_heart_rate_limits</dfn></td><td><code>canonicalUUID(0x2A94)</code></td></tr>
-          <tr><td><dfn>time_accuracy</dfn></td><td><code>canonicalUUID(0x2A12)</code></td></tr>
-          <tr><td><dfn>time_source</dfn></td><td><code>canonicalUUID(0x2A13)</code></td></tr>
-        </table>
-      </section>
-
-      <section>
-        <h2>Standard GATT Descriptors</h2>
-
-        <p>Each standardized descriptor listed in [[!BLUETOOTH-NUMBERS-DESCRIPTORS]] MUST be reflected into <code>navigator.bluetooth.uuids.descriptor</code> under the name listed under "SpecificationType" with <code>org.bluetooth.descriptor.</code> removed.
-
-        <pre class="idl">
-          [NoInterfaceObject] interface BluetoothUUIDsDescriptor {
-            readonly attribute BluetoothUUIDsDescriptorGATT gatt;
-            readonly attribute UUID valid_range;
-            readonly attribute UUID external_report_reference;
-            readonly attribute UUID report_reference;
-          };
-          [NoInterfaceObject] interface BluetoothUUIDsDescriptorGATT {
-            readonly attribute UUID characteristic_extended_properties;
-            readonly attribute UUID characteristic_user_description;
-            readonly attribute UUID client_characteristic_configuration;
-            readonly attribute UUID server_characteristic_configuration;
-            readonly attribute UUID characteristic_presentation_format;
-            readonly attribute UUID characteristic_aggregate_format;
-          };
-        </pre>
-
-        <p>
-          The <a>BluetoothDescriptorName</a> enumeration allows users to pass the standardized descriptors by name instead of looking up their <a>UUID</a>s inside <code>navigator.bluetooth.uuids.descriptor</code>.
-          When used as a parameter to a function in this specification that accepts a <a>BluetoothDescriptorUUID</a> parameter,
-          these enumeration values MUST be treated as equivalent to the <a>UUID</a> they refer to.
-
-        <pre class="idl">
-          enum BluetoothDescriptorName {
-            "gatt.characteristic_extended_properties",
-            "gatt.characteristic_user_description",
-            "gatt.client_characteristic_configuration",
-            "gatt.server_characteristic_configuration",
-            "gatt.characteristic_presentation_format",
-            "gatt.characteristic_aggregate_format",
-            "valid_range",
-            "external_report_reference",
-            "report_reference"
-          };
-
-          typedef (BluetoothDescriptorName or UUID) BluetoothDescriptorUUID;
-        </pre>
-
-        <table dfn-for="BluetoothUUIDsDescriptor">
-          <tr><th>Enum value or attribute name</th><th>Value</th></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsDescriptorGATT">characteristic_extended_properties</dfn></code></td><td><code>canonicalUUID(0x2900)</code></td></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsDescriptorGATT">characteristic_user_description</dfn></code></td><td><code>canonicalUUID(0x2901)</code></td></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsDescriptorGATT">client_characteristic_configuration</dfn></code></td><td><code>canonicalUUID(0x2902)</code></td></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsDescriptorGATT">server_characteristic_configuration</dfn></code></td><td><code>canonicalUUID(0x2903)</code></td></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsDescriptorGATT">characteristic_presentation_format</dfn></code></td><td><code>canonicalUUID(0x2904)</code></td></tr>
-          <tr><td><code>gatt.<dfn for="BluetoothUUIDsDescriptorGATT">characteristic_aggregate_format</dfn></code></td><td><code>canonicalUUID(0x2905)</code></td></tr>
-          <tr><td><dfn>valid_range</dfn></td><td><code>canonicalUUID(0x2906)</code></td></tr>
-          <tr><td><dfn>external_report_reference</dfn></td><td><code>canonicalUUID(0x2907)</code></td></tr>
-          <tr><td><dfn>report_reference</dfn></td><td><code>canonicalUUID(0x2908)</code></td></tr>
-        </table>
+        <ol>
+          <li>
+            If <var>name</var> is an <code>unsigned long</code>,
+            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+          </li>
+          <li>
+            If <var>name</var> is a <a>valid UUID</a>,
+            return <var>name</var> and abort these steps.
+          </li>
+          <li>
+            If <code>org.bluetooth.descriptor.<var>name</var></code> appears in [[!BLUETOOTH-ASSIGNED-DESCRIPTORS]],
+            let <var>alias</var> be its assigned number,
+            and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
+          </li>
+          <li>
+            Otherwise, throw a <a>SyntaxError</a>.
+          </li>
+        </ol>
+        <aside class="example">
+          <p>
+            <code><a>BluetoothUUID.getDescriptor</a>("<a
+              href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml"
+              >gatt.characteristic_presentation_format</a>")</code>
+            returns <code>"00002904-0000-1000-8000-00805f9b34fb"</code>.
+          </p>
+        </aside>
       </section>
     </section>
 
@@ -2978,6 +2713,25 @@ return navigator.bluetooth.requestDevice({
         we use the notation x@[[\y]] to refer to
         <a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-object-internal-methods-and-internal-slots"
            >internal slots</a> of an object, instead of saying "the [[\y]] internal slot of x."
+      </p>
+
+      <p>
+        When an algorithm in this specification uses a name defined in this or another specification,
+        the name MUST resolve to its initial value,
+        ignoring any changes that have been made to the name in the current execution environment.
+        For example, when the <a for="BluetoothDiscovery">requestDevice</a> algorithm says to call
+        <code>Array.prototype.map.call(<var>filter</var>.services,
+          <a>BluetoothUUID.getService</a>)</code>,
+        this MUST apply the
+        <code><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.prototype.map"
+                 >Array.prototype.map</a></code> algorithm defined in [[ECMAScript]]
+        with <code><var>filter</var>.services</code> as its <code>this</code> parameter and
+        the algorithm defined in <a href="#standardized-uuids"></a> for <a>BluetoothUUID.getService</a>
+        as its <code>callbackfn</code> parameter,
+        regardless of any modifications that have been made to <code>window</code>,
+        <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
+        <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothUUID</code>,
+        <code>BluetoothUUID.getService</code>, or other objects.
       </p>
 
       <p>
@@ -3379,6 +3133,8 @@ return navigator.bluetooth.requestDevice({
         <dt>[[!ECMAScript]]</dt>
         <dd>
           <ul>
+            <li><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array-objects"
+                   ><dfn><code>Array</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-arraybuffer-constructor"
                    ><dfn><code>ArrayBuffer</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-dataview-constructor"
@@ -3386,6 +3142,8 @@ return navigator.bluetooth.requestDevice({
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-map-constructor"
                    ><dfn><code>Map</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-promise-objects"><dfn>Promise</dfn></a></li>
+            <li><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-set-objects"
+                   ><dfn><code>Set</code></dfn></a></li>
             <li><a href="http://people.mozilla.org/~jorendorff/es6-draft.html#sec-typedarray-constructors"
                    ><dfn><code>TypedArray</code></dfn></a></li>
           </ul>
@@ -3420,6 +3178,8 @@ return navigator.bluetooth.requestDevice({
         <dt>[[!WebIDL]]</dt>
         <dd>
           <ul>
+            <li><a href="http://heycam.github.io/webidl/#idl-DOMString"
+                   ><dfn><code>DOMString</code></dfn></a></li>
             <li>Errors
               <ul>
                 <li><a href="https://heycam.github.io/webidl/#aborterror"
@@ -3434,6 +3194,8 @@ return navigator.bluetooth.requestDevice({
                        ><dfn>NotSupportedError</dfn></a></li>
                 <li><a href="https://heycam.github.io/webidl/#securityerror"
                        ><dfn>SecurityError</dfn></a></li>
+                <li><a href="https://heycam.github.io/webidl/#syntaxerror"
+                       ><dfn>SyntaxError</dfn></a></li>
               </ul>
             </li>
             <li><a href="https://heycam.github.io/webidl/#dfn-read-only-array"
