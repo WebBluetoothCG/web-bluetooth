@@ -115,46 +115,45 @@
         Bluetooth "Classic" (<abbr title="Basic Rate">BR</abbr>/<abbr title="Enhanced Data Rate">EDR</abbr>)
         defines a set of binary protocols and supports speeds up to about 24Mbps.
         Bluetooth 4.0 introduced a new "Low Energy" mode known as "Bluetooth Smart",
-        <abbr title="Bluetooth Low Energy">BTLE</abbr>, or just <abbr title="Low Energy">LE</abbr>
+        <abbr title="Bluetooth Low Energy">BLE</abbr>, or just <abbr title="Low Energy">LE</abbr>
         which is limited to about 1Mbps but
         allows devices to leave their transmitters off most of the time.
-        BTLE provides most of its functionality through key/value pairs provided by
+        BLE provides most of its functionality through key/value pairs provided by
         the <a title="Generic Attribute Profile">Generic Attribute Profile
         (<abbr title="Generic Attribute Profile">GATT</abbr>)</a>.
-
-      <p>
-        BTLE defines multiple roles that devices can play.
-        The <dfn>Broadcaster</dfn> and <dfn>Observer</dfn> roles are
-        for transmitter- and receiver-only applications, respectively.
-        Devices acting in the <dfn>Peripheral</dfn> role can receive connections,
-        and devices acting in the <dfn>Central</dfn> role can connect to <a>Peripheral</a> devices.
       </p>
 
       <p>
-        <dfn>GATT</dfn> further defines <dfn>Client</dfn> and <dfn>Server</dfn> roles,
-        which are orthogonal to the <a>Peripheral</a> and <a>Central</a> BTLE roles.
-        GATT allows <a>Server</a>s to expose <a>Service</a>s, whose type is identified by
-        a UUID ([[!RFC4122]]).
-        A <dfn>Service</dfn> exposes a collection of included Services and Characteristics.
-        Each <dfn>Characteristic</dfn> has a type named by a UUID and
-        exposes a value as an array of bytes,
-        some properties to describe how the value can be used, and a collection of Descriptors.
-        Each <dfn>Descriptor</dfn> has a type named by a UUID and
-        contains related information about the Characteristic Value.
+        BLE defines multiple roles that devices can play.
+        The <a>Broadcaster</a> and <a>Observer</a> roles are
+        for transmitter- and receiver-only applications, respectively.
+        Devices acting in the <a>Peripheral</a> role can receive connections,
+        and devices acting in the <a>Central</a> role can connect to <a>Peripheral</a> devices.
+      </p>
 
       <p>
-        Despite being designed to support BTLE transport,
+        A device acting in either the <a>Peripheral</a> or <a>Central</a> role
+        can host a <a>GATT Server</a>,
+        which exposes a hierarchy of <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
+        See <a href="#information-model"></a> for more details about this hierarchy.
+        Despite being designed to support BLE transport,
         the GATT protocol can also run over BR/EDR transport.
-        Both support advertising GATT services without a connection:
-        BTLE through advertising packets, and BR/EDR through the extended inquiry response.
+      </p>
 
       <p>
-        The first version of this specification focuses on the Bluetooth 4 GATT protocol
-        in the <a>Central</a> and <a>Client</a> roles, over either a BR/EDR or LE connection.
+        The first version of this specification allows web pages,
+        running on a UA in the <a>Central</a> role, to connect to <a>GATT Server</a>s
+        over either a BR/EDR or LE connection.
         While this specification cites the [[BLUETOOTH42]] specification,
         it intends to also support communication
-        with devices that only implement Bluetooth 4.0 or 4.1.
+        among devices that only implement Bluetooth 4.0 or 4.1.
       </p>
+
+      <section>
+        <h2>Some examples</h2>
+
+        <p class="issue">Write Me.</p>
+      </section>
     </section>
 
     <section>
@@ -219,7 +218,8 @@
             This makes it more difficult for a website to predict the bits that will be sent over the radio,
             which blocks <a href="https://www.usenix.org/legacy/events/woot11/tech/final_files/Goodspeed.pdf">packet-in-packet injection attacks</a>.
             Unfortunately, this only works over encrypted links,
-            which not all BTLE devices are required to support.
+            which not all BLE devices are required to support.
+          </li>
         </ul>
 
         <p>
@@ -1204,24 +1204,54 @@ return navigator.bluetooth.requestDevice({
       <section id="information-model">
         <h2>GATT Information Model</h2>
 
-        <p class="note">
-          The <a>GATT Profile Hierarchy</a> describes how any device that supports <a>GATT</a>
-          can contain a hierarchy of Profiles, Primary Services, Included Services,
-          Characteristics, and Descriptors.
-          Profiles are purely logical:
-          the specification of a Profile describes the expected interactions between
-          the other GATT entities the Profile contains,
-          but it's impossible to query which Profiles a device supports.
-          On the other hand,
-          GATT defines a set of <a title="GATT procedures">procedures</a> to
-          discover and interact with the Services, Characteristics, and Descriptors on a device.
-          GATT also defines the <a>Service Changed</a> characteristic to allow clients
-          to cache the Services, Characteristics, and Descriptors they have discovered on a device.
-          Services, Characteristics, and Descriptors
-          can be ordered by their <a>Attribute Handle</a>,
-          but while platform interfaces provide these entities in an order,
-          they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
-        </p>
+        <div class="note">
+          <p>
+            The <a>GATT Profile Hierarchy</a> describes how a <a>GATT Server</a>
+            contains a hierarchy of Profiles, Primary <a>Service</a>s,
+            <a>Included Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
+          </p>
+          <p>
+            Profiles are purely logical:
+            the specification of a Profile describes the expected interactions between
+            the other GATT entities the Profile contains,
+            but it's impossible to query which Profiles a device supports.
+          </p>
+          <p>
+            <a>GATT Client</a>s can discover and interact with
+            the Services, Characteristics, and Descriptors on a device
+            using a set of <a>GATT procedures</a>.
+            This spec refers to Services, Characteristics, and Descriptors
+            collectively as <dfn>Attribute</dfn>s.
+            All Attributes have a type that's identified by a <a>UUID</a>.
+            Each Attribute also has a 16-bit <a>Attribute Handle</a>
+            that distinguishes it from other Attributes
+            of the same type on the same <a>GATT Server</a>.
+            Attributes are notionally ordered within their <a>GATT Server</a>
+            by their <a>Attribute Handle</a>,
+            but while platform interfaces provide these entities in some order,
+            they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
+          </p>
+          <p>
+            A <a>Service</a> contains a collection of <a>Included Service</a>s and <a>Characteristic</a>s.
+            The Included Services are references to other Services,
+            and a single Service can be included by more than one other Service.
+            Services are known as
+            Primary Services if they appear directly under the <a>GATT Server</a>,
+            and Secondary Services if they're only included by other Services,
+            but Primary Services can also be included.
+          </p>
+          <p>
+            A <a>Characteristic</a> contains a value, which is an array of bytes,
+            and a collection of <a>Descriptor</a>s.
+            Depending on the properties of the Characteristic,
+            a <a>GATT Client</a> can read or write its value,
+            or register to be notified when the value changes.
+          </p>
+          <p>
+            Finally, a <a>Descriptor</a> contains a value (again an array of bytes)
+            that describes or configures its <a>Characteristic</a>.
+          </p>
+        </div>
 
         <p>
           The UA MUST maintain a <dfn>Bluetooth cache</dfn>
@@ -2193,7 +2223,7 @@ return navigator.bluetooth.requestDevice({
             <li>
               The <a>children</a> of a <a>BluetoothDevice</a>
               are the <a>BluetoothGATTService</a> objects representing
-              Primary and Secondary <a>Service</a>s on its GATT <a>Server</a>
+              Primary and Secondary <a>Service</a>s on its <a>GATT Server</a>
               whose UUIDs are on the origin and device's <a>allowed services list</a>.
               The order of the primary services MUST be consistent with the order returned by
               the <a>Discover Primary Service by Service UUID</a> procedure,
@@ -2858,6 +2888,22 @@ return navigator.bluetooth.requestDevice({
                 </li>
                 <li value="3">Generic Access Profile
                   <ol>
+                    <li value="2">Profile Overview
+                      <ol>
+                        <li value="2">Profile Roles
+                          <ol>
+                            <li value="2">Roles when Operating over an LE Physical Transport
+                              <ol>
+                                <li value="1"><dfn>Broadcaster</dfn> Role</li>
+                                <li value="2"><dfn>Observer</dfn> Role</li>
+                                <li value="3"><dfn>Peripheral</dfn> Role</li>
+                                <li value="4"><dfn>Central</dfn> Role</li>
+                              </ol>
+                            </li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
                     <li value="3">User Interface Aspects
                       <ol>
                         <li value="2">Representation of Bluetooth Parameters
@@ -2952,10 +2998,13 @@ return navigator.bluetooth.requestDevice({
                     </li>
                   </ol>
                 </li>
-                <li value="7">Generic Attribute Profile (GATT)
+                <li value="7"><dfn>Generic Attribute Profile</dfn> (GATT)
                   <ol>
                     <li value="2">Profile Overview
                       <ol>
+                        <li value="2">Configurations and Roles
+                          (defines <dfn>GATT Client</dfn> and <dfn>GATT Server</dfn>)
+                        </li>
                         <li value="4">
                           <dfn>Profile Fundamentals</dfn>,
                           defines the <dfn>ATT Bearer</dfn>
@@ -2965,7 +3014,13 @@ return navigator.bluetooth.requestDevice({
                             <li value="2"><dfn>Attribute Caching</dfn></li>
                           </ol>
                         </li>
-                        <li value="6"><dfn>GATT Profile Hierarchy</dfn></li>
+                        <li value="6"><dfn>GATT Profile Hierarchy</dfn>
+                          <ol>
+                            <li value="2"><dfn>Service</dfn></li>
+                            <li value="3"><dfn>Included Service</dfn>s</li>
+                            <li value="4"><dfn>Characteristic</dfn></li>
+                          </ol>
+                        </li>
                       </ol>
                     </li>
                     <li value="3">Service Interoperability Requirements
@@ -2977,7 +3032,7 @@ return navigator.bluetooth.requestDevice({
                                 <li value="1"><dfn>Characteristic Properties</dfn></li>
                               </ol>
                             </li>
-                            <li value="3">Characteristic Descriptor Declarations
+                            <li value="3">Characteristic <dfn>Descriptor</dfn> Declarations
                               <ol>
                                 <li value="1"><dfn>Characteristic Extended Properties</dfn></li>
                                 <li value="3"><dfn>Client Characteristic Configuration</dfn></li>
