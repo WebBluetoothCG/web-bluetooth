@@ -153,9 +153,142 @@
       </p>
 
       <section>
-        <h2>Some examples</h2>
+        <h2>Examples</h2>
 
-        <p class="issue">Write Me.</p>
+        <aside class="example">
+          <p>
+            To discover and retrieve data from a standard heart rate monitor,
+            a website would use code like the following:
+          </p>
+          <pre class="highlight">navigator.bluetooth.<a for="Bluetooth">requestDevice</a>({
+  filters: [{
+    services: ['heart_rate'],
+  }]
+}).then(device => {
+  window.chosenHeartRateDevice = device;
+  return device.<a for="BluetoothDevice">connectGATT</a>();
+})
+.then(server => server.<a for="BluetoothGATTRemoteServer">getPrimaryService</a>(<a
+href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
+>'heart_rate'</a>))
+.then(service => Promise.all([
+  service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
+href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml"
+>'body_sensor_location'</a>)
+    .then(handleBodySensorLocationCharacteristic),
+  service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
+href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+>'heart_rate_measurement'</a>))
+   .then(handleHeartRateMeasurementCharacteristic),
+]));
+
+function handleBodySensorLocationCharacteristic(characteristic) {
+  if (characteristic === null) {
+    console.log("Unknown sensor location.");
+    return Promise.resolve();
+  }
+  return characteristic.<a for="BluetoothGATTCharacteristic">readValue</a>()
+  .then(sensorLocationArray => {
+    let sensorLocation = new Uint8Array(sensorLocationArray)[0];
+    switch (sensorLocation) {
+      case 0: return 'Other';
+      case 1: return 'Chest';
+      case 2: return 'Wrist';
+      case 3: return 'Finger';
+      case 4: return 'Hand';
+      case 5: return 'Ear Lobe';
+      case 6: return 'Foot';
+      default: return 'Unknown';
+    }
+  }).then(location => console.log(location));
+}
+
+function handleHeartRateMeasurementCharacteristic(characteristic) {
+  characteristic.addEventListener('<a>characteristicvaluechanged</a>', onHeartRateChanged);
+  return characteristic.<a for="BluetoothGATTCharacteristic">startNotifications</a>();
+}
+
+function onHeartRateChanged(event) {
+  let characteristic = event.target;
+  console.log(parseHeartRate(characteristic.<a for="BluetoothGATTCharacteristic">value</a>));
+}</pre>
+
+          <p>
+            <code>parseHeartRate()</code> would be defined using the <a
+            href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+            >heart_rate_measurement documentation</a> to read the <a>ArrayBuffer</a> stored
+            in a <a>BluetoothGATTCharacteristic</a>'s
+            <a for="BluetoothGATTCharacteristic">value</a> field.
+          </p>
+
+          <pre class="highlight">function parseHeartRate(buffer) {
+  let data = new DataView(buffer);
+  let flags = data.getUint8(0);
+  let rate16Bits = flags & 0x1;
+  let result = {};
+  let index = 1;
+  if (rate16Bits) {
+    result.heartRate = data.getUint16(index, /*littleEndian=*/true);
+    index += 2;
+  } else {
+    result.heartRate = data.getUint8(index);
+    index += 1;
+  }
+  let contactDetected = flags & 0x2;
+  let contactSensorPresent = flags & 0x4;
+  if (contactSensorPresent) {
+    result.contactDetected = !!contactDetected;
+  }
+  let energyPresent = flags & 0x8;
+  if (energyPresent) {
+    result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
+    index += 2;
+  }
+  let rrIntervalPresent = flags & 0x10;
+  if (rrIntervalPresent) {
+    let rrIntervals = [];
+    for (; index + 1 < data.byteLength; index += 2) {
+      rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
+    }
+    result.rrIntervals = rrIntervals;
+  }
+  return result;
+}</pre>
+
+          <p>
+            <code>onHeartRateChanged()</code> might log an object like
+          </p>
+          <pre class="highlight">{
+  heartRate: 70,
+  contactDetected: true,
+  energyExpended: 750,     // Meaning 750kJ.
+  rrIntervals: [890, 870]  // Meaning .87s and .85s.
+}</pre>
+
+          <p>
+            If the heart rate sensor reports the <code>energyExpended</code> field,
+            the web application can reset its value to <code>0</code> by writing to the
+            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml"
+               >heart_rate_control_point</a> characteristic:
+          </p>
+
+          <pre class="highlight">function resetEnergyExpended() {
+  if (!window.chosenHeartRateDevice) {
+    return Promise.reject(new Error('No heart rate sensor selected yet.'));
+  }
+  return chosenHeartRateDevice.<a for="BluetoothDevice">connectGATT</a>()
+    .then(server => server.<a for="BluetoothGATTRemoteServer">getPrimaryService</a>(<a
+href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
+>'heart_rate'</a>))
+    .then(service => service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
+href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+>'heart_rate_control_point'</a>))
+    .then(controlPoint => {
+      let resetEnergyExpended = new Uint8Array([1]);
+      return controlPoint.<a for="BluetoothGATTCharacteristic">writeValue</a>(resetEnergyExpended);
+    });
+}</pre>
+        </aside>
       </section>
     </section>
 
