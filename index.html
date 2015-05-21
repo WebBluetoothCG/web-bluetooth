@@ -795,7 +795,7 @@
       </section>
 
       <section dfn-for="BluetoothDevice">
-        <h2><a>BluetoothDevice</a></h2>
+        <h2><dfn>BluetoothDevice</dfn></h2>
 
         <p>
           A <a>BluetoothDevice</a> instance represents a <a>Bluetooth device</a>
@@ -1054,7 +1054,7 @@
         </ol>
 
         <section dfn-for="BluetoothAdvertisingData">
-          <h2><a>BluetoothAdvertisingData</a></h2>
+          <h2><dfn>BluetoothAdvertisingData</dfn></h2>
 
           <pre class="idl">
             [NoInterfaceObject]
@@ -1206,7 +1206,8 @@ return navigator.bluetooth.requestDevice({
 
         <div class="note">
           <p>
-            The <a>GATT Profile Hierarchy</a> describes how a <a>GATT Server</a>
+            The <a>GATT Profile Hierarchy</a> describes how a
+            <a title="BluetoothGATTRemoteServer">GATT Server</a>
             contains a hierarchy of Profiles, Primary <a>Service</a>s,
             <a>Included Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
           </p>
@@ -1231,24 +1232,29 @@ return navigator.bluetooth.requestDevice({
             but while platform interfaces provide these entities in some order,
             they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
           </p>
-          <p>
-            A <a>Service</a> contains a collection of <a>Included Service</a>s and <a>Characteristic</a>s.
+          <p link-for="BluetoothGATTService">
+            A <a title="BluetoothGATTService">Service</a> contains
+            a collection of <a title="getIncludedService">Included Service</a>s
+            and <a title="getCharacteristic">Characteristic</a>s.
             The Included Services are references to other Services,
             and a single Service can be included by more than one other Service.
             Services are known as
-            Primary Services if they appear directly under the <a>GATT Server</a>,
+            <a title="isPrimary">Primary Services</a> if they appear directly under the
+            <a title="BluetoothGATTRemoteServer">GATT Server</a>,
             and Secondary Services if they're only included by other Services,
             but Primary Services can also be included.
           </p>
-          <p>
-            A <a>Characteristic</a> contains a value, which is an array of bytes,
-            and a collection of <a>Descriptor</a>s.
-            Depending on the properties of the Characteristic,
+          <p link-for="BluetoothGATTCharacteristic">
+            A <a title="BluetoothGATTCharacteristic">Characteristic</a>
+            contains a value, which is an array of bytes,
+            and a collection of <a title="getDescriptor">Descriptor</a>s.
+            Depending on the <a title="CharacteristicProperties">properties</a> of the Characteristic,
             a <a>GATT Client</a> can read or write its value,
             or register to be notified when the value changes.
           </p>
           <p>
-            Finally, a <a>Descriptor</a> contains a value (again an array of bytes)
+            Finally, a <a title="BluetoothGATTDescriptor">Descriptor</a>
+            contains a value (again an array of bytes)
             that describes or configures its <a>Characteristic</a>.
           </p>
         </div>
@@ -1397,8 +1403,12 @@ return navigator.bluetooth.requestDevice({
         </section>
       </section>
 
-      <section dfn-for="BluetoothGATTRemoteServer">
-        <h2><a>BluetoothGATTRemoteServer</a></h2>
+      <section dfn-for="BluetoothGATTRemoteServer" id="BluetoothGATTRemoteServer">
+        <h2><dfn>BluetoothGATTRemoteServer</dfn></h2>
+
+        <p>
+          <a>BluetoothGATTRemoteServer</a> represents a <a>GATT Server</a> on a remote device.
+        </p>
 
         <pre class="idl">
           interface BluetoothGATTRemoteServer : ServiceEventHandlers {
@@ -1493,9 +1503,13 @@ return navigator.bluetooth.requestDevice({
       </section>
 
       <section dfn-for="BluetoothGATTService">
-        <h2><a>BluetoothGATTService</a></h2>
+        <h2><dfn>BluetoothGATTService</dfn></h2>
 
-        <p><a>BluetoothGATTService</a> represents a GATT <a>Service</a> within a Bluetooth <a>Peripheral</a>, a collection of characteristics and relationships to other services that encapsulate the behavior of part of a device.</p>
+        <p>
+          <a>BluetoothGATTService</a> represents a GATT <a>Service</a>,
+          a collection of characteristics and relationships to other services
+          that encapsulate the behavior of part of a device.
+        </p>
 
         <pre class="idl">
           interface BluetoothGATTService : ServiceEventHandlers {
@@ -1564,8 +1578,9 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getCharacteristic</dfn>(<var>characteristic</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          The <code><dfn>getCharacteristic</dfn>(<var>characteristic</var>)</code> method
+          retrieves a <a>Characteristic</a> inside this Service.
+          When invoked, it MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -1589,8 +1604,9 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getCharacteristics</dfn>(<var>characteristic</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          The <code><dfn>getCharacteristics</dfn>(<var>characteristic</var>)</code> method
+          retrieves a list of <a>Characteristic</a>s inside this Service.
+          When invoked, it MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -1609,8 +1625,9 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getIncludedService</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          The <code><dfn>getIncludedService</dfn>(<var>service</var>)</code> method
+          retrieves an <a>Included Service</a> inside this Service.
+          When invoked, it MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -1633,8 +1650,9 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getIncludedServices</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          The <code><dfn>getIncludedServices</dfn>(<var>service</var>)</code> method
+          retrieves a list of <a>Included Service</a>s inside this Service.
+          When invoked, it MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -1654,7 +1672,7 @@ return navigator.bluetooth.requestDevice({
       </section>
 
       <section dfn-for="BluetoothGATTCharacteristic">
-        <h2><a>BluetoothGATTCharacteristic</a></h2>
+        <h2><dfn>BluetoothGATTCharacteristic</dfn></h2>
 
         <p><a>BluetoothGATTCharacteristic</a> represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
 
@@ -1737,8 +1755,9 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getDescriptor</dfn>(<var>descriptor</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          The <code><dfn>getDescriptor</dfn>(<var>descriptor</var>)</code> method
+          retrieves a <a>Descriptor</a> inside this Characteristic.
+          When invoked, it MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -1762,8 +1781,9 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getDescriptors</dfn>(<var>descriptor</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          The <code><dfn>getDescriptors</dfn>(<var>descriptor</var>)</code> method
+          retrieves a list of <a>Descriptor</a>s inside this Characteristic.
+          When invoked, it MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -1968,11 +1988,12 @@ return navigator.bluetooth.requestDevice({
         </p>
 
         <section dfn-for="CharacteristicProperties">
-          <h2><a>CharacteristicProperties</a></h2>
+          <h2><dfn>CharacteristicProperties</dfn></h2>
 
           <p>
             Each <a>BluetoothGATTCharacteristic</a> exposes its <a>characteristic properties</a>
             through a <a>CharacteristicProperties</a> object.
+            These properties express what operations are valid on the characteristic.
           </p>
 
           <pre class="idl">
@@ -2060,7 +2081,7 @@ return navigator.bluetooth.requestDevice({
       </section>
 
       <section dfn-for="BluetoothGATTDescriptor">
-        <h2><a>BluetoothGATTDescriptor</a></h2>
+        <h2><dfn>BluetoothGATTDescriptor</dfn></h2>
 
         <p><a>BluetoothGATTDescriptor</a> represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
 
