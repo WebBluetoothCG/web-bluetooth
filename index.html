@@ -160,27 +160,29 @@
             To discover and retrieve data from a standard heart rate monitor,
             a website would use code like the following:
           </p>
-          <pre class="highlight">navigator.bluetooth.<a for="Bluetooth">requestDevice</a>({
+          <pre class="highlight">let chosenHeartRateService = null;
+
+navigator.bluetooth.<a for="Bluetooth">requestDevice</a>({
   filters: [{
     services: ['heart_rate'],
   }]
-}).then(device => {
-  window.chosenHeartRateDevice = device;
-  return device.<a for="BluetoothDevice">connectGATT</a>();
-})
+}).then(device => device.<a for="BluetoothDevice">connectGATT</a>())
 .then(server => server.<a for="BluetoothGATTRemoteServer">getPrimaryService</a>(<a
 href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
 >'heart_rate'</a>))
-.then(service => Promise.all([
-  service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
+.then(service => {
+  chosenHeartRateService = service;
+  return Promise.all([
+    service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
 href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml"
 >'body_sensor_location'</a>)
-    .then(handleBodySensorLocationCharacteristic),
-  service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
+      .then(handleBodySensorLocationCharacteristic),
+    service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
 href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
 >'heart_rate_measurement'</a>))
-   .then(handleHeartRateMeasurementCharacteristic),
-]));
+      .then(handleHeartRateMeasurementCharacteristic),
+  ]);
+});
 
 function handleBodySensorLocationCharacteristic(characteristic) {
   if (characteristic === null) {
@@ -273,15 +275,11 @@ function onHeartRateChanged(event) {
           </p>
 
           <pre class="highlight">function resetEnergyExpended() {
-  if (!window.chosenHeartRateDevice) {
+  if (!chosenHeartRateService) {
     return Promise.reject(new Error('No heart rate sensor selected yet.'));
   }
-  return chosenHeartRateDevice.<a for="BluetoothDevice">connectGATT</a>()
-    .then(server => server.<a for="BluetoothGATTRemoteServer">getPrimaryService</a>(<a
-href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
->'heart_rate'</a>))
-    .then(service => service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
-href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+  return chosenHeartRateService.<a for="BluetoothGATTService">getCharacteristic</a>(<a
+href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml"
 >'heart_rate_control_point'</a>))
     .then(controlPoint => {
       let resetEnergyExpended = new Uint8Array([1]);
