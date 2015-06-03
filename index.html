@@ -1647,9 +1647,9 @@ return navigator.bluetooth.requestDevice({
 
         <pre class="idl">
           interface BluetoothGATTService : ServiceEventHandlers {
+            readonly attribute BluetoothDevice device;
             readonly attribute UUID uuid;
             readonly attribute boolean isPrimary;
-            readonly attribute BluetoothDevice device;
             Promise&lt;BluetoothGATTCharacteristic>
               getCharacteristic(BluetoothCharacteristicUUID characteristic);
             Promise&lt;sequence&lt;BluetoothGATTCharacteristic>>
@@ -1663,6 +1663,10 @@ return navigator.bluetooth.requestDevice({
 
         <div class="note" title="BluetoothGATTService attributes">
           <p>
+            <dfn>device</dfn> is the <a>BluetoothDevice</a> representing
+            the remote peripheral that the GATT service belongs to.
+          </p>
+          <p>
             <dfn>uuid</dfn> is the UUID of the service,
             e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the
             <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
@@ -1670,11 +1674,6 @@ return navigator.bluetooth.requestDevice({
           </p>
           <p>
             <dfn>isPrimary</dfn> indicates whether the type of this service is primary or secondary.
-          </p>
-
-          <p>
-            <dfn>device</dfn> is the <a>BluetoothDevice</a> representing
-            the remote peripheral that the GATT service belongs to.
           </p>
         </div>
 
@@ -1686,14 +1685,6 @@ return navigator.bluetooth.requestDevice({
         </p>
         <ol>
           <li>Let <var>result</var> be a new instance of <a>BluetoothGATTService</a>.</li>
-          <li>
-            Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
-          </li>
-          <li>
-            If <var>service</var> is a Primary Service,
-            initialize <code><var>result</var>.isPrimary</code> to true.
-            Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
-          </li>
           <li>
             <a>Get the <code>BluetoothDevice</code> representing</a>
             the device in which <var>service</var> appears,
@@ -1707,6 +1698,14 @@ return navigator.bluetooth.requestDevice({
           <li>
             Initialize <code><var>result</var>.device</code> from
             the value of <var>devicePromise</var>.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
+          </li>
+          <li>
+            If <var>service</var> is a Primary Service,
+            initialize <code><var>result</var>.isPrimary</code> to true.
+            Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
           </li>
           <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
         </ol>
@@ -1812,8 +1811,8 @@ return navigator.bluetooth.requestDevice({
 
         <pre class="idl">
           interface BluetoothGATTCharacteristic : CharacteristicEventHandlers {
-            readonly attribute UUID uuid;
             readonly attribute BluetoothGATTService service;
+            readonly attribute UUID uuid;
             readonly attribute CharacteristicProperties properties;
             readonly attribute ArrayBuffer? value;
             Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
@@ -1828,13 +1827,13 @@ return navigator.bluetooth.requestDevice({
 
         <div class="note" title="BluetoothGATTCharacteristic attributes">
           <p>
+            <dfn>service</dfn> is the GATT service this characteristic belongs to.
+          </p>
+          <p>
             <dfn>uuid</dfn> is the UUID of the characteristic,
             e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the
             <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
                >Heart Rate Measurement</a> characteristic.
-          </p>
-          <p>
-            <dfn>service</dfn> is the GATT service this characteristic belongs to.
           </p>
           <p>
             <dfn>properties</dfn> holds the properties of this characteristic.
@@ -1854,13 +1853,13 @@ return navigator.bluetooth.requestDevice({
         <ol>
           <li>Let <var>result</var> be a new instance of <a>BluetoothGATTCharacteristic</a>.</li>
           <li>
-            Initialize <code><var>result</var>.uuid</code> from
-            the UUID of <var>characteristic</var>.
-          </li>
-          <li>
             Initialize <code><var>result</var>.service</code> from
             the <a>BluetoothGATTService</a> instance representing
             the Service in which <var>characteristic</var> appears.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.uuid</code> from
+            the UUID of <var>characteristic</var>.
           </li>
           <li>
             <a>Create a <code>CharacteristicProperties</code> instance
@@ -2220,8 +2219,8 @@ return navigator.bluetooth.requestDevice({
 
         <pre class="idl">
           interface BluetoothGATTDescriptor {
-            readonly attribute UUID uuid;
             readonly attribute BluetoothGATTCharacteristic characteristic;
+            readonly attribute UUID uuid;
             readonly attribute ArrayBuffer? value;
             Promise&lt;ArrayBuffer> readValue();
             Promise&lt;void> writeValue(BufferSource value);
@@ -2230,13 +2229,13 @@ return navigator.bluetooth.requestDevice({
 
         <div class="note" title="BluetoothGATTDescriptor attributes">
           <p>
+            <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
+          </p>
+          <p>
             <dfn>uuid</dfn> is the UUID of the characteristic descriptor,
             e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the
             <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml"
                >Client Characteristic Configuration</a> descriptor.
-          </p>
-          <p>
-            <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
           </p>
           <p>
             <dfn>value</dfn> is the currently cached descriptor value.
@@ -2253,12 +2252,12 @@ return navigator.bluetooth.requestDevice({
         <ol>
           <li>Let <var>result</var> be a new instance of <a>BluetoothGATTDescriptor</a>.</li>
           <li>
-            Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
-          </li>
-          <li>
             Initialize <code><var>result</var>.characteristic</code> from
             the <a>BluetoothGATTCharacteristic</a> instance representing
             the Characteristic in which <var>descriptor</var> appears.
+          </li>
+          <li>
+            Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
           </li>
           <li>
             Initialize <code><var>result</var>.value</code> to <code>null</code>.
