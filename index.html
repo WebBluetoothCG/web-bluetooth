@@ -448,6 +448,9 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         interface Bluetooth {
           Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
         };
+        Bluetooth implements EventTarget;
+        Bluetooth implements CharacteristicEventHandlers;
+        Bluetooth implements ServiceEventHandlers;
       </pre>
       <div class="note" title="Bluetooth members">
         <p>
@@ -943,7 +946,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             "usb"
           };
 
-          interface BluetoothDevice : ServiceEventHandlers {
+          interface BluetoothDevice {
             readonly attribute DOMString instanceID;
             readonly attribute DOMString? name;
             readonly attribute BluetoothAdvertisingData adData;
@@ -957,6 +960,9 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             readonly attribute UUID[] uuids;
             Promise&lt;BluetoothGATTRemoteServer> connectGATT();
           };
+          BluetoothDevice implements EventTarget;
+          BluetoothDevice implements CharacteristicEventHandlers;
+          BluetoothDevice implements ServiceEventHandlers;
         </pre>
 
         <div class="note" title="BluetoothDevice attributes">
@@ -1545,7 +1551,7 @@ return navigator.bluetooth.requestDevice({
         </p>
 
         <pre class="idl">
-          interface BluetoothGATTRemoteServer : ServiceEventHandlers {
+          interface BluetoothGATTRemoteServer {
             readonly attribute BluetoothDevice device;
             readonly attribute boolean connected;
             void disconnect();
@@ -1553,6 +1559,9 @@ return navigator.bluetooth.requestDevice({
             Promise&lt;sequence&lt;BluetoothGATTService>>
               getPrimaryServices(optional BluetoothServiceUUID service);
           };
+          BluetoothGATTRemoteServer implements EventTarget;
+          BluetoothGATTRemoteServer implements CharacteristicEventHandlers;
+          BluetoothGATTRemoteServer implements ServiceEventHandlers;
         </pre>
 
         <div class="note" title="BluetoothGATTRemoteServer attributes">
@@ -1646,7 +1655,7 @@ return navigator.bluetooth.requestDevice({
         </p>
 
         <pre class="idl">
-          interface BluetoothGATTService : ServiceEventHandlers {
+          interface BluetoothGATTService {
             readonly attribute BluetoothDevice device;
             readonly attribute UUID uuid;
             readonly attribute boolean isPrimary;
@@ -1659,6 +1668,9 @@ return navigator.bluetooth.requestDevice({
             Promise&lt;sequence&lt;BluetoothGATTService>>
               getIncludedServices(optional BluetoothServiceUUID service);
           };
+          BluetoothGATTService implements EventTarget;
+          BluetoothGATTService implements CharacteristicEventHandlers;
+          BluetoothGATTService implements ServiceEventHandlers;
         </pre>
 
         <div class="note" title="BluetoothGATTService attributes">
@@ -1810,7 +1822,7 @@ return navigator.bluetooth.requestDevice({
         <p><a>BluetoothGATTCharacteristic</a> represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
 
         <pre class="idl">
-          interface BluetoothGATTCharacteristic : CharacteristicEventHandlers {
+          interface BluetoothGATTCharacteristic {
             readonly attribute BluetoothGATTService service;
             readonly attribute UUID uuid;
             readonly attribute CharacteristicProperties properties;
@@ -1823,6 +1835,8 @@ return navigator.bluetooth.requestDevice({
             Promise&lt;void> startNotifications();
             Promise&lt;void> stopNotifications();
           };
+          BluetoothGATTCharacteristic implements EventTarget;
+          BluetoothGATTCharacteristic implements CharacteristicEventHandlers;
         </pre>
 
         <div class="note" title="BluetoothGATTCharacteristic attributes">
@@ -2568,7 +2582,7 @@ return navigator.bluetooth.requestDevice({
 
           <pre class="idl">
             [NoInterfaceObject]
-            interface CharacteristicEventHandlers : EventTarget {
+            interface CharacteristicEventHandlers {
               attribute EventHandler oncharacteristicvaluechanged;
             };
           </pre>
@@ -2580,7 +2594,7 @@ return navigator.bluetooth.requestDevice({
 
           <pre class="idl">
             [NoInterfaceObject]
-            interface ServiceEventHandlers : CharacteristicEventHandlers {
+            interface ServiceEventHandlers {
               attribute EventHandler onserviceadded;
               attribute EventHandler onservicechanged;
               attribute EventHandler onserviceremoved;
@@ -3363,6 +3377,8 @@ return navigator.bluetooth.requestDevice({
           <ul>
             <li><a href="https://dom.spec.whatwg.org/#concept-tree-child"
                    ><dfn>children</dfn></a></li>
+            <li><a href="https://dom.spec.whatwg.org/#interface-eventtarget"
+                   ><dfn><code>EventTarget</code></dfn></a></li>
             <li><a href="https://dom.spec.whatwg.org/#concept-event-fire"
                    ><dfn>fire an event</dfn></a></li>
             <li><a href="https://dom.spec.whatwg.org/#concept-tree-participate"
