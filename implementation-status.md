@@ -4,12 +4,18 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated 2015-06-09.
-* See [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues.
-* [API Implementation](https://code.google.com/p/chromium/issues/detail?id=420275) is underway, with basic versions of devices, services, and characteristics being obtained.
+* Notes updated 2015-07-15.
+* Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
+* [API Implementation](https://code.google.com/p/chromium/issues/detail?id=420275) now supports the basics:
+ * Connect to a device, filtering by service UUIDs.
+ * Get a Service and then Characteristic.
+ * Read and Write values to Characteristic
 * __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
-* [Android](https://code.google.com/p/chromium/issues/detail?id=471536) and [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) Bluetooth GATT libraries are under active development.
-* [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=4980160) is under development.
+ * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
+* [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
+ * Tip of tree can connect to devices and read basic information. 
+ * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=4980160) is under development.
+* [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) under development.
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Latest demo post: [Discovering devices on ChromeOS](https://www.w3.org/community/web-bluetooth/2015/01/07/first-chromium-demo/)
 
