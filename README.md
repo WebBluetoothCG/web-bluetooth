@@ -19,3 +19,4 @@ Communication
   * [public-web-bluetooth](http://lists.w3.org/Archives/Public/public-web-bluetooth/) email list.
 * [Github Issue Tracker](https://github.com/WebBluetoothCG/web-bluetooth/issues)
 * [Google+ Community](https://plus.google.com/communities/108953318610326025178)
+* [#web-bluetooth](http://irc.w3.org/?channels=web-bluetooth) IRC channel on irc.w3.org.
