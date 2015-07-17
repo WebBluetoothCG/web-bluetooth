@@ -18,3 +18,4 @@ Communication
 * [W3C Community Group: web-bluetooth](http://www.w3.org/community/web-bluetooth/)
   * [public-web-bluetooth](http://lists.w3.org/Archives/Public/public-web-bluetooth/) email list.
 * [Github Issue Tracker](https://github.com/WebBluetoothCG/web-bluetooth/issues)
+* [Google+ Community](https://plus.google.com/communities/108953318610326025178)
