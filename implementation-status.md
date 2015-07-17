@@ -14,7 +14,7 @@ Work is in progress:
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
 * [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
  * Tip of tree can connect to devices and read basic information. 
- * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=4980160) is under development.
+ * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=498016) is under development.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) under development.
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Latest demo post: [Discovering devices on ChromeOS](https://www.w3.org/community/web-bluetooth/2015/01/07/first-chromium-demo/)
