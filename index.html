@@ -531,16 +531,11 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
 
       <p>
         A device <dfn>matches a filter</dfn> <var>filter</var> if
+        the UA has received advertising data, an <a>extended inquiry response</a>,
+        or a service discovery response indicating that
+        the device supports each of the <a>Service</a> UUIDs
+        included in <code><var>filter</var>.services</code> as a primary (vs included) service.
       </p>
-      <ul>
-        <li><code><var>filter</var>.services</code> is not empty and</li>
-        <li>
-          the UA has received advertising data, an <a>extended inquiry response</a>,
-          or a service discovery response indicating that
-          the device supports each of the <a>Service</a> UUIDs
-          included in <code><var>filter</var>.services</code> as a primary (vs included) service.
-        </li>
-      </ul>
 
       <p class="note">
         The list of Service UUIDs that a device advertises
@@ -578,6 +573,11 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               For each <var>filter</var> in <code><var>options</var>.filters</code>,
               do the following steps:
               <ol>
+                <li>
+                  If <code><var>filter</var>.services.length === 0</code>,
+                  <a>reject</a> <var>promise</var> with a <a>TypeError</a>
+                  and abort these steps.
+                </li>
                 <li>
                   Let <var>services</var> be
                   <code>Array.prototype.map.call(<var>filter</var>.services,
@@ -3424,6 +3424,8 @@ return navigator.bluetooth.requestDevice({
                    ><dfn><code>Set</code></dfn></a></li>
             <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-typedarray-constructors"
                    ><dfn><code>TypedArray</code></dfn></a></li>
+            <li><a href="http://www.ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror"
+                   ><dfn><code>TypeError</code></dfn></a></li>
           </ul>
         </dd>
         <dt>[[!HTML]]</dt>

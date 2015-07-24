@@ -24,6 +24,20 @@ This document attempts to explain why various decisions were made the way they w
 * While the <a>Server</a> role can work in a <a>Central</a> device,
   <a>Client</a> is more natural and is required for more use cases.
 
+## Why does `requestDevice()` require non-empty filters?
+
+In order to communicate with a device, that device needs to support a GATT
+Service that the web page understands and has permission to access. If the web
+page doesn't filter the devices that appear in the `requestDevice()` dialog,
+users could easily select a device the web page can't use, which is a bad
+experience.
+
+One reason for scanning without service UUID filters is to collect just
+advertising data from several nearby devices. The first version of Web Bluetooth
+is aimed at GATT communication with particular paired devices and doesn't
+support this use case. A subsequent version will most likely include such
+support, likely through a different entry point.
+
 ## Why so many `Get{,All}{Service,Characteristic,Descriptor}()` overloads?
 
 GATT provides two ways of finding primary services:
