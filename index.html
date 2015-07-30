@@ -2896,17 +2896,34 @@ return navigator.bluetooth.requestDevice({
           <code>"deadbeef-0000-1000-8000-00805f9b34fb"</code>.
         </p>
 
-        <p class="note">
-          <dfn>BluetoothServiceUUID</dfn> represents
-          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
-          and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
-          or, equivalently, the values for which
-          <a>BluetoothUUID.getService</a> does not throw an exception.
-        </p>
+        <div class="note">
+          <p>
+            <dfn>BluetoothServiceUUID</dfn> represents
+            16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+            and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
+            or, equivalently, the values for which
+            <a>BluetoothUUID.getService</a> does not throw an exception.
+          </p>
+          <p>
+            <dfn>BluetoothCharacteristicUUID</dfn> represents
+            16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+            and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
+            or, equivalently, the values for which
+            <a>BluetoothUUID.getCharacteristic</a> does not throw an exception.
+          </p>
+          <p>
+            <dfn>BluetoothDescriptorUUID</dfn> represents
+            16- and 32-bit UUID aliases, <a>valid UUID</a>s,
+            and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
+            or, equivalently, the values for which
+            <a>BluetoothUUID.getDescriptor</a> does not throw an exception.
+          </p>
+        </div>
 
         <p>
-          The static <code><dfn>BluetoothUUID.getService</dfn>(<var>name</var>)</code> method, when invoked,
-          MUST run the following steps:
+          To <dfn>ResolveUUIDName</dfn>(<var>name</var>,
+          <var>assigned numbers table</var>, <var>prefix</var>),
+          the UA MUST perform the following steps:
         </p>
         <ol>
           <li>
@@ -2918,7 +2935,8 @@ return navigator.bluetooth.requestDevice({
             return <var>name</var> and abort these steps.
           </li>
           <li>
-            If <code>org.bluetooth.service.<var>name</var></code> appears in [[!BLUETOOTH-ASSIGNED-SERVICES]],
+            If <code><var>prefix</var>.<var>name</var></code>
+            appears in <var>assigned numbers table</var>,
             let <var>alias</var> be its assigned number,
             and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
           </li>
@@ -2926,6 +2944,23 @@ return navigator.bluetooth.requestDevice({
             Otherwise, throw a <a>SyntaxError</a>.
           </li>
         </ol>
+
+        <p>
+          The static <code><dfn>BluetoothUUID.getService</dfn>(<var>name</var>)</code> method, when invoked,
+          MUST return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
+          [[!BLUETOOTH-ASSIGNED-SERVICES]], "org.bluetooth.service").
+        </p>
+        <p>
+          The static <code><dfn>BluetoothUUID.getCharacteristic</dfn>(<var>name</var>)</code> method, when invoked,
+          MUST return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
+          [[!BLUETOOTH-ASSIGNED-CHARACTERISTICS]], "org.bluetooth.characteristic").
+        </p>
+        <p>
+          The static <code><dfn>BluetoothUUID.getDescriptor</dfn>(<var>name</var>)</code> method, when invoked,
+          MUST return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
+          [[!BLUETOOTH-ASSIGNED-DESCRIPTORS]], "org.bluetooth.descriptor").
+        </p>
+
         <aside class="example">
           <p>
             <code><a>BluetoothUUID.getService</a>("<a
@@ -2941,78 +2976,12 @@ return navigator.bluetooth.requestDevice({
             <code><a>BluetoothUUID.getService</a>("unknown-service")</code>
             throws a <a>SyntaxError</a>.
           </p>
-        </aside>
-
-        <p class="note">
-          <dfn>BluetoothCharacteristicUUID</dfn> represents
-          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
-          and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
-          or, equivalently, the values for which
-          <a>BluetoothUUID.getCharacteristic</a> does not throw an exception.
-        </p>
-
-        <p>
-          The static <code><dfn>BluetoothUUID.getCharacteristic</dfn>(<var>name</var>)</code> method, when invoked,
-          MUST run the following steps:
-        </p>
-        <ol>
-          <li>
-            If <var>name</var> is an <code>unsigned long</code>,
-            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
-          </li>
-          <li>
-            If <var>name</var> is a <a>valid UUID</a>,
-            return <var>name</var> and abort these steps.
-          </li>
-          <li>
-            If <code>org.bluetooth.characteristic.<var>name</var></code> appears in [[!BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
-            let <var>alias</var> be its assigned number,
-            and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
-          </li>
-          <li>
-            Otherwise, throw a <a>SyntaxError</a>.
-          </li>
-        </ol>
-        <aside class="example">
           <p>
             <code><a>BluetoothUUID.getCharacteristic</a>("<a
               href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml"
               >ieee_11073-20601_regulatory_certification_data_list</a>")</code>
             returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>.
           </p>
-        </aside>
-
-        <p class="note">
-          <dfn>BluetoothDescriptorUUID</dfn> represents
-          16- and 32-bit UUID aliases, <a>valid UUID</a>s,
-          and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
-          or, equivalently, the values for which
-          <a>BluetoothUUID.getDescriptor</a> does not throw an exception.
-        </p>
-
-        <p>
-          The static <code><dfn>BluetoothUUID.getDescriptor</dfn>(<var>name</var>)</code> method, when invoked,
-          MUST run the following steps:
-        </p>
-        <ol>
-          <li>
-            If <var>name</var> is an <code>unsigned long</code>,
-            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
-          </li>
-          <li>
-            If <var>name</var> is a <a>valid UUID</a>,
-            return <var>name</var> and abort these steps.
-          </li>
-          <li>
-            If <code>org.bluetooth.descriptor.<var>name</var></code> appears in [[!BLUETOOTH-ASSIGNED-DESCRIPTORS]],
-            let <var>alias</var> be its assigned number,
-            and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
-          </li>
-          <li>
-            Otherwise, throw a <a>SyntaxError</a>.
-          </li>
-        </ol>
-        <aside class="example">
           <p>
             <code><a>BluetoothUUID.getDescriptor</a>("<a
               href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml"
