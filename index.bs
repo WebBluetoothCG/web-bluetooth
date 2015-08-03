@@ -1,120 +1,32 @@
-<!DOCTYPE html>
-<html>
-  <head>
-    <title>Web Bluetooth</title>
-    <meta charset='utf-8'>
-    <script src='https://www.w3.org/Tools/respec/respec-w3c-common'
-            async class='remove'></script>
-    <script class='remove'>
-      var respecConfig = {
-          specStatus: "CG-DRAFT",
-          shortName:  "web-bluetooth",
+<pre class='metadata'>
+Title: Web Bluetooth
+Status: CG-DRAFT
+ED: https://webbluetoothcg.github.io/web-bluetooth/
+Shortname: web-bluetooth
+Level: 1
+Editor: See contributors on GitHub, , https://github.com/WebBluetoothCG/web-bluetooth/graphscontributors
+Abstract: This document describes an API to discover and communicate with devices
+Abstract: over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT).
 
-          includePermalinks: true,
+Group: web-bluetooth-cg
+!Participate: <a href="https://www.w3.org/community/web-bluetooth/">Join the W3C Community Group</a>
+!Participate: <a href="https://github.com/WebBluetoothCG/web-bluetooth">Fix the text through GitHub</a>
+!Participate: <a href="mailto:public-web-bluetooth@w3.org">public-web-bluetooth@w3.org</a> (<a href="https://lists.w3.org/Archives/Public/public-web-bluetooth/" rel="discussion">archives</a>)
+!Participate: <a href="irc://irc.w3.org:6665/#web-bluetooth">IRC: #web-bluetooth on W3C's IRC</a>
 
-          editors: [
-            { name: "See contributors on GitHub",
-              url: "https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors"
-            },
-          ],
-          edDraftURI:   "https://webbluetoothcg.github.io/web-bluetooth/",
-          wg:           "Web Bluetooth Community Group",
-          wgURI:        "https://www.w3.org/community/web-bluetooth/",
-          wgPublicList: "public-web-bluetooth",
-          wgPatentURI:  "https://www.w3.org/2004/01/pp-impl/72794/status",
+Markup Shorthands: css no
+Link Defaults: html (dfn) allowed to show a popup/event handler idl attribute/in parallel/incumbent settings object/perform a microtask checkpoint/queue a task/script execution environment
+</pre>
 
-          otherLinks: [{
-            key: "Participate",
-            data: [
-              { value: "Join the W3C Community Group",
-                href: "https://www.w3.org/community/web-bluetooth/",
-              },
-              { value: "File bugs and feature requests",
-                href: "https://github.com/WebBluetoothCG/web-bluetooth/issues",
-              },
-              { value: "Fix the text through GitHub",
-                href: "https://github.com/WebBluetoothCG/web-bluetooth",
-              },
-              { value: "IRC: #web-bluetooth on W3C's IRC",
-                href: "irc://irc.w3.org:6665/#web-bluetooth",
-              },
-              { value: "Public Mailing List",
-                href: "https://lists.w3.org/Archives/Public/public-web-bluetooth/",
-              },
-            ],
-          }],
-
-          localBiblio: {
-            "BLUETOOTH42": {
-              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439",
-              title: "BLUETOOTH SPECIFICATION Version 4.2",
-              publisher: "Bluetooth SIG",
-              date: "2 December 2014",
-            },
-            "BLUETOOTH-GATT-REST": {
-              href: "https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=285910",
-              title: "GATT REST API",
-              publisher: "Bluetooth Internet WG",
-              date: "7 April 2014",
-            },
-            "BLUETOOTH-ASSIGNED": {
-              href: "https://www.bluetooth.org/en-us/specification/assigned-numbers",
-              title: "Assigned Numbers",
-              status: "Living Standard",
-              publisher: "Bluetooth SIG",
-            },
-            "BLUETOOTH-ASSIGNED-BASEBAND": {
-              href: "https://www.bluetooth.org/en-us/specification/assigned-numbers/baseband",
-              title: "Assigned Numbers for Baseband",
-              status: "Living Standard",
-              publisher: "Bluetooth SIG",
-            },
-            "BLUETOOTH-ASSIGNED-SERVICES": {
-              href: "https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx",
-              title: "Bluetooth GATT Specifications > Services",
-              status: "Living Standard",
-              publisher: "Bluetooth SIG",
-            },
-            "BLUETOOTH-ASSIGNED-CHARACTERISTICS": {
-              href: "https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx",
-              title: "Bluetooth GATT Specifications > Characteristics",
-              status: "Living Standard",
-              publisher: "Bluetooth SIG",
-            },
-            "BLUETOOTH-ASSIGNED-DESCRIPTORS": {
-              href: "https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorsHomePage.aspx",
-              title: "Bluetooth GATT Specifications > Descriptors",
-              status: "Living Standard",
-              publisher: "Bluetooth SIG",
-            },
-            "BLUETOOTH-SUPPLEMENT5": {
-              href: "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=291904",
-              title: "Supplement to the Bluetooth Core Specification Version 5",
-              date: "2 December 2014",
-              publisher: "Bluetooth SIG",
-            },
-          },
-      };
-    </script>
     <style>
       .argument-list { display: inline-block; vertical-align: top; }
     </style>
-  </head>
-  <body>
-    <section id='abstract'>
-      <p>
-        This document describes an API to discover and communicate with devices over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT).
-      </p>
-    </section>
 
-    <section id='sotd'>
-      <p>
-        Changes to this document may be tracked at <a href="https://github.com/WebBluetoothCG/web-bluetooth/commits/gh-pages">https://github.com/WebBluetoothCG/web-bluetooth/commits/gh-pages</a>.
-      </p>
-    </section>
+    <section>
+      <h2 id="introduction">Introduction</h2>
 
-    <section class='informative'>
-      <h2>Introduction</h2>
+      <em>This section is non-normative.</em>
+
       <p>
         <a href="https://developer.bluetooth.org/">Bluetooth</a> is
         a standard for short-range wireless communication between devices.
@@ -125,7 +37,7 @@
         which is limited to about 1Mbps but
         allows devices to leave their transmitters off most of the time.
         BLE provides most of its functionality through key/value pairs provided by
-        the <a title="Generic Attribute Profile">Generic Attribute Profile
+        the <a lt="Generic Attribute Profile">Generic Attribute Profile
         (<abbr title="Generic Attribute Profile">GATT</abbr>)</a>.
       </p>
 
@@ -141,7 +53,7 @@
         A device acting in either the <a>Peripheral</a> or <a>Central</a> role
         can host a <a>GATT Server</a>,
         which exposes a hierarchy of <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
-        See <a href="#information-model"></a> for more details about this hierarchy.
+        See [[#information-model]] for more details about this hierarchy.
         Despite being designed to support BLE transport,
         the GATT protocol can also run over BR/EDR transport.
       </p>
@@ -156,32 +68,33 @@
       </p>
 
       <section>
-        <h2>Examples</h2>
+        <h3 id="introduction-examples">Examples</h3>
 
-        <aside class="example">
+        <div class="example">
           <p>
             To discover and retrieve data from a standard heart rate monitor,
             a website would use code like the following:
           </p>
-          <pre class="highlight">let chosenHeartRateService = null;
+          <pre highlight="js">
+let chosenHeartRateService = null;
 
-navigator.bluetooth.<a for="Bluetooth">requestDevice</a>({
+navigator.bluetooth.<a idl for="Bluetooth" lt="requestDevice()">requestDevice</a>({
   filters: [{
     services: ['heart_rate'],
   }]
-}).then(device => device.<a for="BluetoothDevice">connectGATT</a>())
-.then(server => server.<a for="BluetoothGATTRemoteServer">getPrimaryService</a>(<a
-href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
+}).then(device => device.<a for="BluetoothDevice">connectGATT()</a>)
+.then(server => server.<a idl for="BluetoothGATTRemoteServer" lt="getPrimaryService()"
+                          >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate"
 >'heart_rate'</a>))
 .then(service => {
   chosenHeartRateService = service;
   return Promise.all([
-    service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
-href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml"
+    service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+               >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location"
 >'body_sensor_location'</a>)
       .then(handleBodySensorLocationCharacteristic),
-    service.<a for="BluetoothGATTService">getCharacteristic</a>(<a
-href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+    service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+               >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
 >'heart_rate_measurement'</a>))
       .then(handleHeartRateMeasurementCharacteristic),
   ]);
@@ -192,7 +105,7 @@ function handleBodySensorLocationCharacteristic(characteristic) {
     console.log("Unknown sensor location.");
     return Promise.resolve();
   }
-  return characteristic.<a for="BluetoothGATTCharacteristic">readValue</a>()
+  return characteristic.<a for="BluetoothGATTCharacteristic">readValue()</a>
   .then(sensorLocationArray => {
     let sensorLocation = new Uint8Array(sensorLocationArray)[0];
     switch (sensorLocation) {
@@ -209,24 +122,26 @@ function handleBodySensorLocationCharacteristic(characteristic) {
 }
 
 function handleHeartRateMeasurementCharacteristic(characteristic) {
-  characteristic.addEventListener('<a>characteristicvaluechanged</a>', onHeartRateChanged);
-  return characteristic.<a for="BluetoothGATTCharacteristic">startNotifications</a>();
+  characteristic.addEventListener('<a event>characteristicvaluechanged</a>', onHeartRateChanged);
+  return characteristic.<a for="BluetoothGATTCharacteristic">startNotifications()</a>;
 }
 
 function onHeartRateChanged(event) {
   let characteristic = event.target;
-  console.log(parseHeartRate(characteristic.<a for="BluetoothGATTCharacteristic">value</a>));
+  console.log(parseHeartRate(characteristic.<a attribute for="BluetoothGATTCharacteristic">value</a>));
 }</pre>
 
           <p>
-            <code>parseHeartRate()</code> would be defined using the <a
-            href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
-            >heart_rate_measurement documentation</a> to read the <a>ArrayBuffer</a> stored
-            in a <a>BluetoothGATTCharacteristic</a>'s
-            <a for="BluetoothGATTCharacteristic">value</a> field.
+            <code>parseHeartRate()</code> would be defined using the
+            <a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
+               ><code>heart_rate_measurement</code> documentation</a>
+            to read the {{ArrayBuffer}} stored
+            in a {{BluetoothGATTCharacteristic}}'s
+            {{BluetoothGATTCharacteristic/value}} field.
           </p>
 
-          <pre class="highlight">function parseHeartRate(buffer) {
+          <pre highlight="js">
+function parseHeartRate(buffer) {
   let data = new DataView(buffer);
   let flags = data.getUint8(0);
   let rate16Bits = flags & 0x1;
@@ -258,50 +173,54 @@ function onHeartRateChanged(event) {
     result.rrIntervals = rrIntervals;
   }
   return result;
-}</pre>
+}
+</pre>
 
           <p>
             <code>onHeartRateChanged()</code> might log an object like
           </p>
-          <pre class="highlight">{
+          <pre highlight="js">
+{
   heartRate: 70,
   contactDetected: true,
   energyExpended: 750,     // Meaning 750kJ.
   rrIntervals: [890, 870]  // Meaning .87s and .85s.
-}</pre>
+}
+</pre>
 
           <p>
             If the heart rate sensor reports the <code>energyExpended</code> field,
             the web application can reset its value to <code>0</code> by writing to the
-            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml"
-               >heart_rate_control_point</a> characteristic:
+            {{org.bluetooth.characteristic.heart_rate_control_point|heart_rate_control_point}}
+            characteristic:
           </p>
 
-          <pre class="highlight">function resetEnergyExpended() {
+          <pre highlight="js">
+function resetEnergyExpended() {
   if (!chosenHeartRateService) {
     return Promise.reject(new Error('No heart rate sensor selected yet.'));
   }
-  return chosenHeartRateService.<a for="BluetoothGATTService">getCharacteristic</a>(<a
-href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml"
+  return chosenHeartRateService.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+                                   >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point"
 >'heart_rate_control_point'</a>))
     .then(controlPoint => {
       let resetEnergyExpended = new Uint8Array([1]);
-      return controlPoint.<a for="BluetoothGATTCharacteristic">writeValue</a>(resetEnergyExpended);
+      return controlPoint.<a idl for="BluetoothGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
     });
 }</pre>
-        </aside>
+        </div>
       </section>
     </section>
 
     <section>
-      <h2>Security and privacy considerations</h2>
+      <h2 id="security-and-privacy">Security and privacy considerations</h2>
 
       <section>
-        <h2>Device access is powerful</h2>
+        <h3 id="device-access-is-powerful">Device access is powerful</h3>
 
         <p>
           When a website requests access to devices using
-          <code><a for="Bluetooth">requestDevice</a></code>,
+          {{Bluetooth/requestDevice()}},
           it gets the ability to access all GATT services mentioned in the call.
           The UA MUST inform the user what capabilities these services give the website
           before asking which devices to entrust to it.
@@ -325,8 +244,10 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           (<a href="#requestDevice-secure-context">requestDevice</a>).
       </section>
 
-      <section class="informative">
-        <h2>Attacks on devices</h2>
+      <section>
+        <h3 id="attacks-on-devices">Attacks on devices</h3>
+
+        <em>This section is non-normative.</em>
 
         <p>
           Communication from websites can break the security model of some devices,
@@ -381,8 +302,10 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         </ul>
       </section>
 
-      <section class="informative">
-        <h2>Bluetooth device identifiers</h2>
+      <section>
+        <h3 id="bluetooth-device-identifiers">Bluetooth device identifiers</h3>
+
+        <em>This section is non-normative.</em>
 
         <p>
           Each Bluetooth BR/EDR device has a unique 48-bit MAC address
@@ -410,8 +333,10 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           Each Bluetooth device also has a human-readable <a>Bluetooth Device Name</a>.
           These aren't guaranteed to be unique, but may well be, depending on the device type.
 
-        <section class="informative">
-          <h2>Identifiers for remote Bluetooth devices</h2>
+        <section>
+          <h4 id="remote-device-identifiers">Identifiers for remote Bluetooth devices</h4>
+
+          <em>This section is non-normative.</em>
 
           <p>
             If a website can retrieve any of the persistent device IDs,
@@ -426,7 +351,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           </p>
           <p>
             This specification
-            <a title="add an allowed Bluetooth device">generates a new device ID</a>
+            <a lt="add an allowed Bluetooth device">generates a new device ID</a>
             for each origin for a given device,
             which makes it difficult for websites to abuse the device address like this.
             Device makers can still design their devices to help track users,
@@ -434,8 +359,10 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           </p>
         </section>
 
-        <section class="informative">
-          <h2>The UA's Bluetooth address</h2>
+        <section>
+          <h4 id="ua-bluetooth-address">The UA's Bluetooth address</h4>
+
+          <em>This section is non-normative.</em>
 
           <p>
             In BR/EDR mode, or in LE mode during active scanning without the <a>Privacy Feature</a>,
@@ -451,7 +378,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
     </section>
 
     <section>
-      <h2>Device Discovery</h2>
+      <h2 id="device-discovery">Device Discovery</h2>
 
       <pre class="idl">
         dictionary BluetoothScanFilter {
@@ -472,23 +399,23 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
       </pre>
       <div class="note" title="Bluetooth members">
         <p>
-          <code><a for="Bluetooth">requestDevice</a>(options)</code> asks the user
+          {{Bluetooth/requestDevice(options)}} asks the user
           to grant this origin access to a device
-          that <a>matches a filter</a> in <code>options.<dfn for="RequestDeviceOptions">filters</dfn></code>.
+          that <a>matches a filter</a> in <code>options.<dfn dict-member for="RequestDeviceOptions">filters</dfn></code>.
           The user will be shown devices that support
-          <em>all</em> the GATT service UUIDs in the <dfn for="BluetoothScanFilter">services</dfn> list
-          of <em>any</em> <a>BluetoothScanFilter</a> in <code>filters</code>.
+          <em>all</em> the GATT service UUIDs in the <dfn dict-member for="BluetoothScanFilter">services</dfn> list
+          of <em>any</em> {{BluetoothScanFilter}} in <code>filters</code>.
         </p>
         <p>
           After the user selects a device to pair with this origin,
           the origin is allowed to access to any service whose UUID was listed
-          in the <a for="BluetoothScanFilter">services</a> list
+          in the {{BluetoothScanFilter/services}} list
           in any element of <code>options.filters</code>
-          or in <code>options.<dfn for="RequestDeviceOptions">optionalServices</dfn></code>.
+          or in <code>options.<dfn dict-member for="RequestDeviceOptions">optionalServices</dfn></code>.
         </p>
       </div>
 
-      <aside class="example">
+      <div class="example">
         <p>
           Say the UA is close to the following devices:
         </p>
@@ -502,9 +429,11 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         <p>
           If the website calls
         </p>
-        <pre class="highlight">navigator.bluetooth.requestDevice({
+        <pre highlight="js">
+navigator.bluetooth.requestDevice({
   filters: [ {services: [A, B]} ]
-})</pre>
+})
+</pre>
         <p>
           the user will be shown a dialog containing devices D1 and D2.
           If the user selects D1, the website will not be able to access services C or D.
@@ -513,12 +442,14 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         <p>
           On the other hand, if the website calls
         </p>
-        <pre class="highlight">navigator.bluetooth.requestDevice({
+        <pre highlight="js">
+navigator.bluetooth.requestDevice({
   filters: [
     {services: [A, B]},
     {services: [C, D]}
   ]
-})</pre>
+})
+</pre>
         <p>
           the dialog will contain devices D1, D2, and D3,
           and if the user selects D1,
@@ -529,10 +460,12 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           to the dialog the user sees,
           but it does affect which services the website can use from the device the user picks.
         </p>
-        <pre class="highlight">navigator.bluetooth.requestDevice({
+        <pre highlight="js">
+navigator.bluetooth.requestDevice({
   filters: [ {services: [A, B]} ],
-  optionalServices: [E]
-})</pre>
+  optionalServices: \[E]
+})
+</pre>
         <p>
           Shows a dialog containing D1 and D2,
           but not D4, since D4 doesn't contain the required services.
@@ -543,13 +476,13 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           The allowed services also apply if the device changes after the user grants access.
           For example, if the user selects D1 in the previous <code>requestDevice()</code> call,
           and D1 later adds a new E service,
-          that will fire the <code><a>serviceadded</a></code> event,
+          that will fire the {{serviceadded}} event,
           and the web page will be able to access service E.
         </p>
-      </aside>
+      </div>
 
       <p>
-        A device <dfn>matches a filter</dfn> <var>filter</var> if
+        A device <dfn local-lt="match a filter">matches a filter</dfn> <var>filter</var> if
         the UA has received advertising data, an <a>extended inquiry response</a>,
         or a service discovery response indicating that
         the device supports each of the <a>Service</a> UUIDs
@@ -566,27 +499,27 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         which can impair radio performance and cause delays, so this spec doesn't require it.
       </p>
 
-      <p dfn-for="Bluetooth">
-        The <code><dfn>requestDevice</dfn>(<var>options</var>)</code> method,
+      <p>
+        The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)</dfn></code> method,
         when invoked, MUST return <a>a new promise</a> <var>promise</var>
         and run the following steps <a>in parallel</a>:
       </p>
       <ol>
         <li id="requestDevice-secure-context">
           If the <a>incumbent settings object</a> is not a <a>secure context</a>,
-          <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+          <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
         </li>
         <li id="requestDevice-user-gesture">
           If the algorithm is not <a>allowed to show a popup</a>,
-          <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+          <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
         </li>
         <li>
           In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
           do the following substeps:
           <ol>
             <li>
-              Let <var>uuidFilters</var> be a new <a>Array</a> and
-              <var>requiredServiceUUIDs</var> be a new <a>Set</a>.
+              Let <var>uuidFilters</var> be a new {{Array}} and
+              <var>requiredServiceUUIDs</var> be a new {{Set}}.
             </li>
             <li>
               For each <var>filter</var> in <code><var>options</var>.filters</code>,
@@ -594,21 +527,21 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               <ol>
                 <li>
                   If <code><var>filter</var>.services.length === 0</code>,
-                  <a>reject</a> <var>promise</var> with a <a>TypeError</a>
+                  <a>reject</a> <var>promise</var> with a {{TypeError}}
                   and abort these steps.
                 </li>
                 <li>
                   Let <var>services</var> be
-                  <code>Array.prototype.map.call(<var>filter</var>.services,
-                    <a>BluetoothUUID.getService</a>)</code>.
+                  <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
+                    {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
                 </li>
                 <li>
-                  If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+                  If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
                   <a>reject</a> <var>promise</var> with that exception and abort these steps.
                 </li>
                 <li>
                   If any <var>service</var> in <var>services</var> is <a>blacklisted</a>,
-                  <a>reject</a> <var>promise</var> with a <a>SecurityError</a>
+                  <a>reject</a> <var>promise</var> with a {{SecurityError}}
                   and abort these steps.
                 </li>
                 <li>Append <code>{services: <var>services</var>}</code> to <var>uuidFilters</var>.</li>
@@ -617,11 +550,11 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             </li>
             <li>
               Let <var>optionalServiceUUIDs</var> be
-              <code>Array.prototype.map.call(<var>options</var>.optionalServices,
-                <a>BluetoothUUID.getService</a>)</code>.
+              <code>{{Array.prototype.map}}.call(<var>options</var>.optionalServices,
+                {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
             </li>
             <li>
-              If any of the <a>BluetoothUUID.getService</a> calls threw an exception,
+              If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
               <a>reject</a> <var>promise</var> with that exception and abort these steps.
             </li>
             <li>
@@ -637,7 +570,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         </li>
         <li>
           Remove devices from <var>scanResult</var> if
-          they do not <a title="matches a filter">match a filter</a>
+          they do not <a>match a filter</a>
           in <var>uuidFilters</var>.
         </li>
         <li>
@@ -656,10 +589,10 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         </li>
         <li>
           If the user cancels the prompt,
-          <a>reject</a> <var>promise</var> with a <a>NotFoundError</a> and abort these steps.
+          <a>reject</a> <var>promise</var> with a {{NotFoundError}} and abort these steps.
         </li>
         <li>
-          <a title="add an allowed bluetooth device"
+          <a lt="add an allowed bluetooth device"
              >Add <var>device</var> to the origin's allowed devices map.</a>
           with the union of <var>requiredServiceUUIDs</var>
           and <var>optionalServiceUUIDs</var> as <var>allowed services</var>.
@@ -699,7 +632,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           </p>
         </li>
         <li>
-          If the UA supports the BR/EDR transport, perform the <a>Device Discovery</a> procedure
+          If the UA supports the BR/EDR transport, perform the <a>Device Discovery Procedure</a>
           and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
 
           <p class="issue">
@@ -719,7 +652,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               to acquire a complete name.
             </li>
             <li>
-              If <var>device</var>'s advertised <a title="Service UUID Data Type">Service UUIDs</a>
+              If <var>device</var>'s advertised <a>Service UUIDs</a>
               have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
               add <var>device</var> to <var>result</var> and abort these substeps.
 
@@ -778,7 +711,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
     </section>
 
     <section>
-      <h2>Device Representation</h2>
+      <h2 id="device-representation">Device Representation</h2>
 
       <p>
         The UA needs to track Bluetooth device properties at several levels:
@@ -786,7 +719,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
       </p>
 
       <section>
-        <h2>Global Bluetooth device properties</h2>
+        <h3 id="global-device-properties">Global Bluetooth device properties</h3>
 
         <p>
           The physical Bluetooth device may be guaranteed to have
@@ -848,7 +781,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             The following optional elements
             from <a>Advertising Data</a> or the <a>Extended Inquiry Response</a>:
             <ul>
-              <li>A list of advertised <a title="Service UUID Data Type">Service UUID</a>s.</li>
+              <li>A list of advertised <a>Service UUIDs</a>.</li>
               <li>
                 <a>Manufacturer Specific Data</a>,
                 consisting of a map from 16-bit Company Identifier Codes to byte arrays.
@@ -861,7 +794,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               </li>
               <li>
                 An <a>Appearance</a>, one of the values defined by
-                the <a>org.bluetooth.characteristic.gap.appearance</a> characteristic.
+                the {{org.bluetooth.characteristic.gap.appearance}} characteristic.
               </li>
               <li>
                 A <a>Received Signal Strength Indication</a> (RSSI), from -127dBm to 20dBm.
@@ -878,7 +811,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           </li>
 
           <li>
-            A hierarchy of GATT attributes, described in <a href="#information-model"></a>.
+            A hierarchy of GATT attributes, described in [[#information-model]].
           </li>
         </ul>
 
@@ -895,7 +828,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
       </section>
 
       <section>
-        <h2>Per-origin Bluetooth device properties</h2>
+        <h3 id="per-origin-device-properties">Per-origin Bluetooth device properties</h3>
 
         <p>
           For each origin, the UA MUST maintain an <dfn>allowed devices map</dfn>,
@@ -910,15 +843,15 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           based on signals from the user.
           <span class="issue">
             This needs a definition involving
-            removing <a>BluetoothDevice</a> instances from <a>device instance map</a>s
-            and clearing out their [[\representedDevice]] fields.
+            removing {{BluetoothDevice}} instances from <a>device instance map</a>s
+            and clearing out their \[[representedDevice]] fields.
           </span>
           For example, if the user chooses not to remember access,
           the UA might remove a device when the tab that was granted access to it is closed.
           Or the UA might provide a revocation UI that allows the user
           to explicitly remove a device even while a tab is actively using that device.
           If a device is removed from this list while
-          a <a>Promise</a> is pending to do something with the device,
+          a {{Promise}} is pending to do something with the device,
           it MUST be treated the same as if the device moved out of Bluetooth range.
         </p>
 
@@ -957,11 +890,11 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         </ol>
       </section>
 
-      <section dfn-for="BluetoothDevice">
-        <h2><dfn>BluetoothDevice</dfn></h2>
+      <section>
+        <h3 id="bluetoothdevice"><dfn interface>BluetoothDevice</dfn></h3>
 
         <p>
-          A <a>BluetoothDevice</a> instance represents a <a>Bluetooth device</a>
+          A {{BluetoothDevice}} instance represents a <a>Bluetooth device</a>
           inside a particular <a>script execution environment</a>.
         </p>
 
@@ -991,7 +924,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           BluetoothDevice implements ServiceEventHandlers;
         </pre>
 
-        <div class="note" title="BluetoothDevice attributes">
+        <div class="note" title="BluetoothDevice attributes" dfn-for="BluetoothDevice" dfn-type="attribute">
           <p>
             <dfn>id</dfn> uniquely identifies a device to the extent that
             the UA can determine that two Bluetooth connections are to the same device.
@@ -1018,24 +951,24 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           <p>
             <dfn>vendorIDSource</dfn> is
             the Vendor ID Source field
-            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
-            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
+            in the {{org.bluetooth.characteristic.pnp_id|pnp_id}} characteristic
+            in the {{org.bluetooth.service.device_information|device_information}} service.
           </p>
           <p>
             <dfn>vendorID</dfn> is the 16-bit Vendor ID field
-            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
-            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
+            in the {{org.bluetooth.characteristic.pnp_id|pnp_id}} characteristic
+            in the {{org.bluetooth.service.device_information|device_information}} service.
           </p>
           <p>
             <dfn>productID</dfn> is the 16-bit Product ID field
-            in the <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a> characteristic
-            in the <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a> service.
+            in the {{org.bluetooth.characteristic.pnp_id|pnp_id}} characteristic
+            in the {{org.bluetooth.service.device_information|device_information}} service.
           </p>
           <p>
             <dfn>productVersion</dfn> is the 16-bit Product Version field in the
-            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml">pnp_id</a>
+            {{org.bluetooth.characteristic.pnp_id|pnp_id}}
             characteristic in the
-            <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml">device_information</a>
+            {{org.bluetooth.service.device_information|device_information}}
             service.
           </p>
 
@@ -1047,7 +980,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             If the UA is currently connected to this device's GATT server,
             <dfn>gattServer</dfn> provides a way to interact with it.
             While this device is disconnected,
-            <a for="BluetoothDevice">gattServer</a> is <code>null</code>.
+            {{BluetoothDevice/gattServer}} is <code>null</code>.
           </p>
 
           <p>
@@ -1061,7 +994,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           For each <a>script execution environment</a>,
           the UA must maintain a <dfn>device instance map</dfn>
           mapping <a>Bluetooth device</a>s
-          to <code>Promise&lt;<a>BluetoothDevice</a>></code> instances.
+          to <code>Promise&lt;{{BluetoothDevice}}></code> instances.
           To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
           a <a>Bluetooth device</a> <var>device</var>,
           the UA MUST run the following steps:
@@ -1080,22 +1013,22 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           </li>
           <li>Return <var>promise</var>, and run the following steps <a>in parallel</a>.
             <ol>
-              <li>Let <var>result</var> be a new instance of <a>BluetoothDevice</a>.</li>
+              <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
               <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
               <li>
                 Initialize an internal
-                <code><var>result</var>@[[\representedDevice]]</code> field
+                <code><var>result</var>@\[[representedDevice]]</code> field
                 to <var>device</var>.
               </li>
               <li>
                 Find the key in this origin's <a>allowed devices map</a>
                 that is the <a>same device</a> as <var>device</var>.
                 If there is no such key,
-                <a>resolve</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+                <a>resolve</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
                 Otherwise, initialize <code><var>result</var>.id</code>
                 to the <a>device id</a> this key maps to,
                 and initialize an internal
-                <code><var>result</var>@[[\allowedServices]]</code> field
+                <code><var>result</var>@\[[allowedServices]]</code> field
                 to the <a>allowed services list</a> this key maps to.
               </li>
               <li>
@@ -1104,7 +1037,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               </li>
               <li>
                 <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>device</var>
-                and <code><var>result</var>@[[\allowedServices]]</code>,
+                and <code><var>result</var>@\[[allowedServices]]</code>,
                 and set <code><var>result</var>.adData</code> to the result.
               </li>
               <li>
@@ -1113,8 +1046,8 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               </li>
               <li>
                 <a>Populate the Bluetooth cache</a> with
-                the <a>org.bluetooth.characteristic.pnp_id</a> characteristic inside
-                the <a>org.bluetooth.service.device_information</a> service.
+                the {{org.bluetooth.characteristic.pnp_id}} characteristic inside
+                the {{org.bluetooth.service.device_information}} service.
                 Ignore any errors from this step.
               </li>
               <li>
@@ -1124,14 +1057,14 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
                   <li>
                     Use any combination of the sub-procedures in
                     the <a>Characteristic Value Read</a> procedure to retrieve the value
-                    of the <a>org.bluetooth.characteristic.pnp_id</a> characteristic
+                    of the {{org.bluetooth.characteristic.pnp_id}} characteristic
                     into <var>pnp</var>.
                     Handle errors as described in <a href="#error-handling"></a>.
                   </li>
                   <li>If the previous step returned an error, abort these substeps.</li>
                   <li>
                     Parse <var>pnp</var> as specified by
-                    the <a>org.bluetooth.characteristic.pnp_id</a> characteristic definition.
+                    the {{org.bluetooth.characteristic.pnp_id}} characteristic definition.
                     If it's not 7 bytes long or
                     if the Vendor ID Source is not <code>1</code> or <code>2</code>,
                     abort these substeps.
@@ -1165,7 +1098,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               </li>
               <li>
                 Add <var>device</var>'s
-                advertised <a title="Service UUID Data Type">Service UUID</a>s
+                advertised <a>Service UUIDs</a>
                 to <var>uuids</var>.
               </li>
               <li>
@@ -1181,7 +1114,7 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               <li>
                 Initialize <code><var>result</var>.uuids</code> to
                 a <a>read only Array</a> holding the elements of <var>uuids</var>
-                that are also in <code><var>result</var>@[[\allowedServices]]</code>.
+                that are also in <code><var>result</var>@\[[allowedServices]]</code>.
               </li>
               <li>Resolve <var>promise</var> with <var>result</var>.</li>
             </ol>
@@ -1189,26 +1122,26 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
         </ol>
 
         <p>
-          The <code><dfn>connectGATT</dfn>()</code> method, when invoked,
+          The <code><dfn method for="BluetoothDevice">connectGATT()</dfn></code> method, when invoked,
           MUST return <a>a new promise</a> <var>promise</var> and
           run the following steps <a>in parallel</a>:
         </p>
         <ol>
           <li>
-            If <code>this@[[\representedDevice]]</code> has no <a>ATT Bearer</a>,
+            If <code>this@\[[representedDevice]]</code> has no <a>ATT Bearer</a>,
             attempt to create one using the procedures described
             in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
           </li>
           <li>
             If this attempt fails,
-            reject <var>promise</var> with a <a>NetworkError</a> and abort these steps.
+            reject <var>promise</var> with a {{NetworkError}} and abort these steps.
           </li>
           <li>
             <a>Queue a task</a> to do the following steps:
             <ol>
               <li>
                 If <code>this.gattServer</code> is <code>null</code>,
-                set it to a new <a>BluetoothGATTRemoteServer</a> instance
+                set it to a new {{BluetoothGATTRemoteServer}} instance
                 with its <code>device</code> attribute initialized to <code>this</code>
                 and its <code>connected</code> attribute initialized to <code>true</code>.
               </li>
@@ -1219,8 +1152,8 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
           </li>
         </ol>
 
-        <section dfn-for="BluetoothAdvertisingData">
-          <h2><dfn>BluetoothAdvertisingData</dfn></h2>
+        <section>
+          <h4 id="bluetoothadvertisingdata"><dfn interface>BluetoothAdvertisingData</dfn></h4>
 
           <pre class="idl">
             interface BluetoothAdvertisingData {
@@ -1232,10 +1165,11 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             };
           </pre>
 
-          <div class="note" title="BluetoothAdvertisingData attributes">
+          <div class="note" title="BluetoothAdvertisingData attributes"
+               dfn-for="BluetoothAdvertisingData" dfn-type="attribute">
             <p>
               <dfn>appearance</dfn> is an <a>Appearance</a>, one of the values defined by
-              the <a>org.bluetooth.characteristic.gap.appearance</a> characteristic.
+              the {{org.bluetooth.characteristic.gap.appearance}} characteristic.
             </p>
             <p>
               <dfn>txPower</dfn> is
@@ -1249,14 +1183,14 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
             </p>
             <p>
               <dfn>manufacturerData</dfn> maps <code>unsigned short</code> Company Identifier Codes
-              to <a>ArrayBuffer</a>s.
+              to {{ArrayBuffer}}s.
             </p>
             <p>
-              <dfn>serviceData</dfn> maps <a>UUID</a>s to <a>ArrayBuffer</a>s.
+              <dfn>serviceData</dfn> maps {{UUID}}s to {{ArrayBuffer}}s.
             </p>
           </div>
 
-          <aside class="example">
+          <div class="example">
             <p>
               To retrieve a device and read the iBeacon data out of it,
               a developer could use the following code.
@@ -1266,7 +1200,8 @@ href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicV
               in order for users to select this device in the <code>requestDevice</code> dialog.
             </p>
 
-            <pre class="highlight">var known_service = "A service in the iBeacon's GATT server";
+            <pre highlight="js">
+var known_service = "A service in the iBeacon's GATT server";
 return navigator.bluetooth.requestDevice({
   filters: [{services: [known_service]}]
 }).then(device => {
@@ -1287,28 +1222,29 @@ return navigator.bluetooth.requestDevice({
           major,
           minor,
           pathLossVs1m: txPowerAt1m - rssi};
-});</pre>
+});
+</pre>
 
             <p>
               The format of iBeacon advertisements was derived from
               <a href="http://www.warski.org/blog/2014/01/how-ibeacons-work/">How do iBeacons work?</a>
               by Adam Warski.
             </p>
-          </aside>
+          </div>
 
           <p>
-            All fields in <a>BluetoothAdvertisingData</a> return
+            All fields in {{BluetoothAdvertisingData}} return
             the last value they were initialized or set to.
           </p>
 
           <p>
-            To <dfn>create a <a>BluetoothAdvertisingData</a></dfn>
+            To <dfn>create a {{BluetoothAdvertisingData}}</dfn>
             from a <a>Bluetooth device</a> <var>device</var>
             and an <var>allowed services list</var>,
             the UA must perform the following steps:
           </p>
           <ol>
-            <li>Let <var>adData</var> be a new instance of <a>BluetoothAdvertisingData</a>.</li>
+            <li>Let <var>adData</var> be a new instance of {{BluetoothAdvertisingData}}.</li>
             <li>
               If <var>device</var> has an <a>Appearance</a>,
               initialize <code><var>adData</var>.appearance</code> to its value.
@@ -1328,7 +1264,7 @@ return navigator.bluetooth.requestDevice({
               Initialize <code><var>adData</var>.manufacturerData</code> with
               the return value of these substeps:
               <ol>
-                <li>Let <var>mdata</var> be a new <a>Map</a> instance.</li>
+                <li>Let <var>mdata</var> be a new {{Map}} instance.</li>
                 <li>
                   For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
                   make a new <a>read only ArrayBuffer</a> <var>bytes</var>
@@ -1344,7 +1280,7 @@ return navigator.bluetooth.requestDevice({
               Initialize <code><var>adData</var>.serviceData</code> with
               the return value of these substeps:
               <ol>
-                <li>Let <var>sdata</var> be a new <a>Map</a> instance.</li>
+                <li>Let <var>sdata</var> be a new {{Map}} instance.</li>
                 <li>
                   For each mapping in <var>device</var>'s <a>Service Data</a>,
                   if the UUID is in <var>allowed services list</var>,
@@ -2899,7 +2835,7 @@ return navigator.bluetooth.requestDevice({
     </section>
 
     <section>
-      <h2>The GATT Blacklist</h2>
+      <h2 id="gatt-blacklist">The GATT Blacklist</h2>
 
       <p>
         This specification relies on a blacklist file in the
@@ -2979,7 +2915,7 @@ return navigator.bluetooth.requestDevice({
     </section>
 
     <section>
-      <h2>Extensions to the Navigator Interface</h2>
+      <h2 id="navigator-extensions">Extensions to the Navigator Interface</h2>
 
       <pre class="idl">
         partial interface Navigator {
@@ -2989,7 +2925,7 @@ return navigator.bluetooth.requestDevice({
     </section>
 
     <section>
-      <h2>Terminology and Conventions</h2>
+      <h2 id="terminology">Terminology and Conventions</h2>
 
       <p>
         This specification uses a few conventions and several terms from other specifications.
@@ -2999,23 +2935,23 @@ return navigator.bluetooth.requestDevice({
       <p>
         Inspired by
         the <a href="https://streams.spec.whatwg.org/#conventions">Streams specification</a>,
-        we use the notation x@[[\y]] to refer to
+        we use the notation x@\[[y]] to refer to
         <a href="http://ecma-international.org/ecma-262/6.0/#sec-object-internal-methods-and-internal-slots"
-           >internal slots</a> of an object, instead of saying "the [[\y]] internal slot of x."
+           >internal slots</a> of an object, instead of saying "the \[[y]] internal slot of x."
       </p>
 
       <p>
         When an algorithm in this specification uses a name defined in this or another specification,
         the name MUST resolve to its initial value,
         ignoring any changes that have been made to the name in the current execution environment.
-        For example, when the <a for="Bluetooth">requestDevice</a> algorithm says to call
-        <code>Array.prototype.map.call(<var>filter</var>.services,
-          <a>BluetoothUUID.getService</a>)</code>,
+        For example, when the {{Bluetooth/requestDevice()}} algorithm says to call
+        <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
+          {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>,
         this MUST apply the
-        <code><a href="https://people.mozilla.org/~jorendorff/es6-draft.html#sec-array.prototype.map"
-                 >Array.prototype.map</a></code> algorithm defined in [[ECMAScript]]
+        {{Array.prototype.map}} algorithm defined in [[ECMAScript]]
         with <code><var>filter</var>.services</code> as its <code>this</code> parameter and
-        the algorithm defined in <a href="#standardized-uuids"></a> for <a>BluetoothUUID.getService</a>
+        the algorithm defined in <a href="#standardized-uuids"></a>
+        for {{BluetoothUUID/getService()|BluetoothUUID.getService}}
         as its <code>callbackfn</code> parameter,
         regardless of any modifications that have been made to <code>window</code>,
         <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
@@ -3029,16 +2965,16 @@ return navigator.bluetooth.requestDevice({
       </p>
       <ul>
         <li>
-          A <dfn>read only Map</dfn> has <a>Map</a>'s values and interface,
+          A <dfn>read only Map</dfn> has {{Map}}'s values and interface,
           except the <code>clear</code>, <code>delete</code>, and <code>set</code> methods
           are omitted.
         </li>
         <li>
-          A <dfn>read only ArrayBuffer</dfn> has <a>ArrayBuffer</a>'s values and interface,
+          A <dfn>read only ArrayBuffer</dfn> has {{ArrayBuffer}}'s values and interface,
           except that attempting to write to its contents or transfer it
           has the same effect as trying to write to a <a>read only Array</a>'s contents.
-          This applies to <a>TypedArray</a>s and <a>DataView</a>s
-          wrapped around the <a>ArrayBuffer</a> too.
+          This applies to {{TypedArray}}s and {{DataView}}s
+          wrapped around the {{ArrayBuffer}} too.
         </li>
       </ul>
 
@@ -3085,8 +3021,9 @@ return navigator.bluetooth.requestDevice({
                         <li value="5">Status Parameters
                           <ol>
                             <li value="4">
-                              Read <dfn><abbr title="Received Signal Strength Indication"
-                                              >RSSI</abbr></dfn> Command
+                              Read <dfn lt="RSSI|Received Signal Strength Indication"
+                                        ><abbr title="Received Signal Strength Indication"
+                                               >RSSI</abbr></dfn> Command
                             </li>
                           </ol>
                         </li>
@@ -3104,7 +3041,7 @@ return navigator.bluetooth.requestDevice({
                       <ol>
                         <li value="5"><dfn>Searching for Services</dfn>
                           <ol>
-                            <li value="1">UUID
+                            <li value="1"><dfn>UUID</dfn>
                               (defines <dfn>UUID alias</dfn>es and
                               the algorithm to compute <dfn>the 128-bit UUID represented</dfn>
                               by a UUID alias)
@@ -3146,7 +3083,7 @@ return navigator.bluetooth.requestDevice({
                     </li>
                     <li value="6">Idle Mode Procedures &mdash; BR/EDR Physical Transport
                       <ol>
-                        <li value="4"><dfn>Device Discovery</dfn></li>
+                        <li value="4"><dfn>Device Discovery Procedure</dfn></li>
                       </ol>
                     </li>
                     <li value="9">Operational Modes and Procedures &mdash; LE Physical Transport
@@ -3227,7 +3164,7 @@ return navigator.bluetooth.requestDevice({
                     </li>
                   </ol>
                 </li>
-                <li value="7"><dfn>Generic Attribute Profile</dfn> (GATT)
+                <li value="7"><dfn lt="Generic Attribute Profile|GATT">Generic Attribute Profile</dfn> (GATT)
                   <ol>
                     <li value="2">Profile Overview
                       <ol>
@@ -3271,7 +3208,8 @@ return navigator.bluetooth.requestDevice({
                         </li>
                       </ol>
                     </li>
-                    <li value="4">GATT Feature Requirements &mdash; defines the <dfn>GATT procedures</dfn>.
+                    <li value="4">GATT Feature Requirements &mdash; defines the
+                      <dfn lt="GATT procedure|GATT procedures">GATT procedures</dfn>.
                       <ol>
                         <li value="4"><dfn>Primary Service Discovery</dfn>
                           <ol>
@@ -3305,7 +3243,7 @@ return navigator.bluetooth.requestDevice({
                           <ol value="3"><dfn>Write Characteristic Descriptors</dfn></ol>
                           <ol value="4"><dfn>Write Long Characteristic Descriptors</dfn></ol>
                         </li>
-                        <li value="14"><dfn>Procedure Timeouts</dfn></li>
+                        <li value="14"><dfn local-lt="procedure times out">Procedure Timeouts</dfn></li>
                       </ol>
                     </li>
                     <li value="6"><dfn>GAP Interoperability Requirements</dfn>
@@ -3336,7 +3274,8 @@ return navigator.bluetooth.requestDevice({
                         <li value="4">Security in Bluetooth Low Energy
                           <ol>
                             <li value="1"><dfn>Definition of Keys and Values</dfn>,
-                              defines the <dfn>Identity Resolving Key</dfn>
+                              defines the
+                              <dfn lt="Identity Resolving Key|IRK">Identity Resolving Key</dfn>
                               (<abbr title="Identity Resolving Key">IRK</abbr>)
                             </li>
                           </ol>
@@ -3384,37 +3323,6 @@ return navigator.bluetooth.requestDevice({
             </li>
           </ol>
         </dd>
-        <dt>[[!BLUETOOTH-ASSIGNED]]</dt>
-        <dd>
-          <ul>
-            <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx"
-                   >Characteristics</a>
-              <ul>
-                <li>
-                  <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml"
-                     ><dfn>org.bluetooth.characteristic.gap.appearance</dfn></a>
-                </li>
-                <li>
-                  <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml"
-                     ><dfn>org.bluetooth.characteristic.pnp_id</dfn></a>
-                </li>
-              </ul>
-            </li>
-            <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx"
-                   >Services</a>
-              <ul>
-                <li>
-                  <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml"
-                     ><dfn>org.bluetooth.service.device_information</dfn></a>
-                </li>
-              </ul>
-            </li>
-            <li>
-              <a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile"
-                 ><dfn>Shortened Local Name</dfn></a>
-            </li>
-          </ul>
-        </dd>
         <dt>[[!BLUETOOTH-SUPPLEMENT5]]</dt>
         <dd>
           <ol type="A">
@@ -3424,7 +3332,7 @@ return navigator.bluetooth.requestDevice({
                   <!-- The section names here are really general, so I've added
                        "Data Type" to some. -->
                   <ol>
-                    <li value="1"><dfn>Service UUID Data Type</dfn></li>
+                    <li value="1"><dfn local-lt="Service UUIDs">Service UUID Data Type</dfn></li>
                     <li value="2"><dfn>Local Name Data Type</dfn></li>
                     <li value="3"><dfn>Flags Data Type</dfn></li>
                     <li value="4"><dfn>Manufacturer Specific Data</dfn></li>
@@ -3437,120 +3345,5 @@ return navigator.bluetooth.requestDevice({
             </li>
           </ol>
         </dd>
-        <dt>[[!dom]]</dt>
-        <dd>
-          <ul>
-            <li><a href="https://dom.spec.whatwg.org/#concept-tree-child"
-                   ><dfn>children</dfn></a></li>
-            <li><a href="https://dom.spec.whatwg.org/#interface-eventtarget"
-                   ><dfn><code>EventTarget</code></dfn></a></li>
-            <li><a href="https://dom.spec.whatwg.org/#concept-event-fire"
-                   ><dfn>fire an event</dfn></a></li>
-            <li><a href="https://dom.spec.whatwg.org/#concept-tree-participate"
-                   ><dfn>participate in a tree</dfn></a></li>
-            <li><a href="https://dom.spec.whatwg.org/#concept-tree"><dfn>tree</dfn></a></li>
-          </ul>
-        </dd>
-        <dt>[[!ECMAScript]]</dt>
-        <dd>
-          <ul>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-array-objects"
-                   ><dfn><code>Array</code></dfn></a></li>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-arraybuffer-constructor"
-                   ><dfn><code>ArrayBuffer</code></dfn></a></li>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-dataview-constructor"
-                   ><dfn><code>DataView</code></dfn></a></li>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-map-constructor"
-                   ><dfn><code>Map</code></dfn></a></li>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-promise-objects"><dfn>Promise</dfn></a></li>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-set-objects"
-                   ><dfn><code>Set</code></dfn></a></li>
-            <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-typedarray-constructors"
-                   ><dfn><code>TypedArray</code></dfn></a></li>
-            <li><a href="http://www.ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror"
-                   ><dfn><code>TypeError</code></dfn></a></li>
-          </ul>
-        </dd>
-        <dt>[[!HTML]]</dt>
-        <dd>
-          <ul>
-            <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#allowed-to-show-a-popup"
-                   ><dfn>allowed to show a popup</dfn></a></li>
-            <li><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel"
-                   ><dfn>in parallel</dfn></a></li>
-            <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#incumbent-settings-object"
-                   ><dfn>incumbent settings object</dfn></a></li>
-            <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes"
-                   ><dfn>Event handler IDL attribute</dfn></a></li>
-            <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint"
-                   ><dfn>perform a microtask checkpoint</dfn></a></li>
-            <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task"
-                   ><dfn>queue a task</dfn></a></li>
-            <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#script-execution-environment"
-                   ><dfn>script execution environment</dfn></a></li>
-          </ul>
-        </dd>
-        <dt>[[!powerful-features]]</dt>
-        <dd>
-          <ul>
-            <li><a href="https://w3c.github.io/webappsec/specs/powerfulfeatures/#secure-context"
-                   ><dfn>secure context</dfn></a></li>
-          </ul>
-        </dd>
-        <dt>[[!WebIDL]]</dt>
-        <dd>
-          <ul>
-            <li><a href="https://heycam.github.io/webidl/#common-BufferSource"
-                   ><dfn><code>BufferSource</code></dfn></a>
-            <li><a href="http://heycam.github.io/webidl/#idl-DOMString"
-                   ><dfn><code>DOMString</code></dfn></a></li>
-            <li><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy"
-                   >Get <dfn>a copy of the bytes held</dfn> by a <code>BufferSource</code></a></li>
-            <li>Errors
-              <ul>
-                <li><a href="https://heycam.github.io/webidl/#aborterror"
-                       ><dfn>AbortError</dfn></a></li>
-                <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror"
-                       ><dfn>InvalidModificationError</dfn></a></li>
-                <li><a href="https://heycam.github.io/webidl/#networkerror"
-                       ><dfn>NetworkError</dfn></a></li>
-                <li><a href="https://heycam.github.io/webidl/#notfounderror"
-                       ><dfn>NotFoundError</dfn></a></li>
-                <li><a href="https://heycam.github.io/webidl/#notsupportederror"
-                       ><dfn>NotSupportedError</dfn></a></li>
-                <li><a href="https://heycam.github.io/webidl/#securityerror"
-                       ><dfn>SecurityError</dfn></a></li>
-                <li><a href="https://heycam.github.io/webidl/#syntaxerror"
-                       ><dfn>SyntaxError</dfn></a></li>
-              </ul>
-            </li>
-            <li><a href="https://heycam.github.io/webidl/#dfn-read-only-array"
-                   ><dfn>read only Array</dfn></a></li>
-          </ul>
-        </dd>
-        <dt><a href="https://www.w3.org/2001/tag/doc/promises-guide"
-               >Writing Promise-Using Specifications</a></dt>
-        <dd>
-          <ul>
-            <li><a href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise"
-                   ><dfn>A new promise</dfn></a></li>
-            <li><a href="http://www.w3.org/2001/tag/doc/promises-guide#a-promise-rejected-with"
-                   ><dfn>A promise rejected with</dfn> ...</a></li>
-            <li><a href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise"
-                   ><dfn>Reject</dfn> a promise with ...</a></li>
-            <li><a href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise"
-                   ><dfn>Resolve</dfn> a promise with ...</a></li>
-            <li>
-              <a href="https://www.w3.org/2001/tag/doc/promises-guide#transforming-by"
-                 ><dfn>Transforming</dfn> a promise with a fulfillment and/or rejection handler</a>
-            </li>
-            <li>
-              <a href="http://www.w3.org/2001/tag/doc/promises-guide#waiting-for-all"
-                 ><dfn>Waiting for all</dfn> of a collection of promises</a>
-            </li>
-          </ul>
-        </dd>
       </dl>
     </section>
-  </body>
-</html>
