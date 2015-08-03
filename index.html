@@ -96,6 +96,9 @@
           },
       };
     </script>
+    <style>
+      .argument-list { display: inline-block; vertical-align: top; }
+    </style>
   </head>
   <body>
     <section id='abstract'>
@@ -1421,112 +1424,164 @@ return navigator.bluetooth.requestDevice({
           </p>
         </div>
 
-        <p>
-          The UA MUST maintain a <dfn>Bluetooth cache</dfn>
-          of the hierarchy of Services, Characteristics, and Descriptors
-          it has discovered on a device.
-          The UA MAY share this cache between multiple origins accessing the same device.
-          Each potential entity in the cache is either known-present, known-absent, or unknown.
-          The cache MUST NOT contain two entities that are for the <a>same attribute</a>.
-          Each known-present entity in the cache is associated with an optional
-          <code>Promise&lt;<a>BluetoothGATTService</a>></code>,
-          <code>Promise&lt;<a>BluetoothGATTCharacteristic</a>></code>,
-          or <code>Promise&lt;<a>BluetoothGATTDescriptor</a>></code> instance
-          for each <a>script execution environment</a>.
-        </p>
+        <section id="bluetooth-cache">
+          <h2>The Bluetooth cache</h2>
 
-        <p class="note">
-          For example, if a user calls the <code>serviceA.getCharacteristic(uuid1)</code> function
-          with an initially empty <a>Bluetooth cache</a>,
-          the UA uses the <a>Discover Characteristics by UUID</a> procedure
-          to fill the needed cache entries,
-          and the UA ends the procedure early because
-          it only needs one Characteristic to fulfil the returned <a>Promise</a>,
-          then the first Characteristic with UUID <code>uuid1</code> inside <code>serviceA</code>
-          is known-present,
-          and any subsequent Characteristics with that UUID remain unknown.
-          If the user later calls <code>serviceA.getCharacteristics(uuid1)</code>,
-          the UA needs to resume or restart the <a>Discover Characteristics by UUID</a> procedure.
-          If it turns out that
-          <code>serviceA</code> only has one Characteristic with UUID <code>uuid1</code>,
-          then the subsequent Characteristics become known-absent.
-        </p>
+          <p>
+            The UA MUST maintain a <dfn>Bluetooth cache</dfn>
+            of the hierarchy of Services, Characteristics, and Descriptors
+            it has discovered on a device.
+            The UA MAY share this cache between multiple origins accessing the same device.
+            Each potential entity in the cache is either known-present, known-absent, or unknown.
+            The cache MUST NOT contain two entities that are for the <a>same attribute</a>.
+            Each known-present entity in the cache is associated with an optional
+            <code>Promise&lt;<a>BluetoothGATTService</a>></code>,
+            <code>Promise&lt;<a>BluetoothGATTCharacteristic</a>></code>,
+            or <code>Promise&lt;<a>BluetoothGATTDescriptor</a>></code> instance
+            for each <a>script execution environment</a>.
+          </p>
 
-        <p>
-          The known-present entries in the <a>Bluetooth cache</a> are ordered:
-          Primary Services appear in a particular order within a device,
-          Included Services and Characteristics appear in a particular order within Services,
-          and Descriptors appear in a particular order within Characteristics.
-          The order SHOULD match the order of <a>Attribute Handle</a>s on the device,
-          but UAs MAY use another order if the device's order isn't available.
-        </p>
+          <p class="note">
+            For example, if a user calls the <code>serviceA.getCharacteristic(uuid1)</code> function
+            with an initially empty <a>Bluetooth cache</a>,
+            the UA uses the <a>Discover Characteristics by UUID</a> procedure
+            to fill the needed cache entries,
+            and the UA ends the procedure early because
+            it only needs one Characteristic to fulfil the returned <a>Promise</a>,
+            then the first Characteristic with UUID <code>uuid1</code> inside <code>serviceA</code>
+            is known-present,
+            and any subsequent Characteristics with that UUID remain unknown.
+            If the user later calls <code>serviceA.getCharacteristics(uuid1)</code>,
+            the UA needs to resume or restart the <a>Discover Characteristics by UUID</a> procedure.
+            If it turns out that
+            <code>serviceA</code> only has one Characteristic with UUID <code>uuid1</code>,
+            then the subsequent Characteristics become known-absent.
+          </p>
 
-        <p>
-          To <dfn>populate the Bluetooth cache</dfn> with entries matching some description,
-          the UA MUST run the following steps.
-          <span class="note">Note that these steps can block,
-            so uses of this algorithm must be <a>in parallel</a>.</span>
-        </p>
-        <ol>
-          <li>
-            Attempt to make all matching entries in the cache either known-present or known-absent,
-            using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
-            will return enough information.
-            Handle errors as described in <a href="#error-handling"></a>.
-          </li>
-          <li>
-            If the previous step returns an error, return that error from this algorithm.
-          </li>
-        </ol>
+          <p>
+            The known-present entries in the <a>Bluetooth cache</a> are ordered:
+            Primary Services appear in a particular order within a device,
+            Included Services and Characteristics appear in a particular order within Services,
+            and Descriptors appear in a particular order within Characteristics.
+            The order SHOULD match the order of <a>Attribute Handle</a>s on the device,
+            but UAs MAY use another order if the device's order isn't available.
+          </p>
 
-        <p>
-          To <dfn>query the Bluetooth cache</dfn> for entries matching some description,
-          the UA MUST return <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>:
-        </p>
-        <ol>
-          <li>
-            <a>Populate the Bluetooth cache</a> with entries matching the description.
-          </li>
-          <li>
-            If the previous step returns an error,
-            <a>reject</a> <var>promise</var> with that error and abort these steps.
-          </li>
-          <li>
-            Let <var>entries</var> be the sequence
-            of known-present cache entries matching the description.
-          </li>
-          <li>
-            Let <var>result</var> be a new sequence.
-          </li>
-          <li>
-            For each <var>entry</var> in <var>entries</var>:
-            <ol>
-              <li>
-                If <var>entry</var> has no associated <code>BluetoothGATT*</code> instance
-                for the current <a>script execution environment</a>,
-                <a>create a <code>BluetoothGATTService</code>
-                representing</a> <var>entry</var>,
-                <a>create a <code>BluetoothGATTCharacteristic</code>
-                representing</a> <var>entry</var>,
-                or <a>create a <code>BluetoothGATTDescriptor</code>
-                representing</a> <var>entry</var>,
-                depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
-                and associate the resulting <code>Promise</code> with <var>entry</var>.
-              </li>
-              <li>
-                Append to <var>result</var>
-                the <code>Promise&lt;BluetoothGATT*></code> instance
-                associated with <var>entry</var>
-                for the current <a>script execution environment</a>.
-              </li>
-            </ol>
-          </li>
-          <li>
-            <a>Resolve</a> <var>promise</var> with the result of
-            <a>waiting for all</a> elements of <var>result</var>.
-          </li>
-        </ol>
+          <p>
+            To <dfn>populate the Bluetooth cache</dfn> with entries matching some description,
+            the UA MUST run the following steps.
+            <span class="note">Note that these steps can block,
+              so uses of this algorithm must be <a>in parallel</a>.</span>
+          </p>
+          <ol>
+            <li>
+              Attempt to make all matching entries in the cache either known-present or known-absent,
+              using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
+              will return enough information.
+              Handle errors as described in <a href="#error-handling"></a>.
+            </li>
+            <li>
+              If the previous step returns an error, return that error from this algorithm.
+            </li>
+          </ol>
+
+          <p>
+            To <dfn>query the Bluetooth cache</dfn> for entries matching some description,
+            the UA MUST return <a>a new promise</a> <var>promise</var>
+            and run the following steps <a>in parallel</a>:
+          </p>
+          <ol>
+            <li>
+              <a>Populate the Bluetooth cache</a> with entries matching the description.
+            </li>
+            <li>
+              If the previous step returns an error,
+              <a>reject</a> <var>promise</var> with that error and abort these steps.
+            </li>
+            <li>
+              Let <var>entries</var> be the sequence
+              of known-present cache entries matching the description.
+            </li>
+            <li>
+              Let <var>result</var> be a new sequence.
+            </li>
+            <li>
+              For each <var>entry</var> in <var>entries</var>:
+              <ol>
+                <li>
+                  If <var>entry</var> has no associated <code>BluetoothGATT*</code> instance
+                  for the current <a>script execution environment</a>,
+                  <a>create a <code>BluetoothGATTService</code>
+                  representing</a> <var>entry</var>,
+                  <a>create a <code>BluetoothGATTCharacteristic</code>
+                  representing</a> <var>entry</var>,
+                  or <a>create a <code>BluetoothGATTDescriptor</code>
+                  representing</a> <var>entry</var>,
+                  depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
+                  and associate the resulting <code>Promise</code> with <var>entry</var>.
+                </li>
+                <li>
+                  Append to <var>result</var>
+                  the <code>Promise&lt;BluetoothGATT*></code> instance
+                  associated with <var>entry</var>
+                  for the current <a>script execution environment</a>.
+                </li>
+              </ol>
+            </li>
+            <li>
+              <a>Resolve</a> <var>promise</var> with the result of
+              <a>waiting for all</a> elements of <var>result</var>.
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>Navigating the Bluetooth Hierarchy</h2>
+
+          <p>
+            To <dfn>GetGATTChildren</dfn>(<span class="argument-list"><var>attribute</var>: GATT Attribute,<br>
+            <var>single</var>: boolean,<br>
+            <var>uuidCanonicalizer</var>: function,<br>
+            <var>uuid</var>: optional <code>(DOMString or unsigned int)</code>,<br>
+            <var>child type</var>: GATT declaration type),</span><br>
+            the UA MUST perform the following steps:
+          </p>
+          <ol>
+            <li>
+              If <var>uuid</var> is present,
+              set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
+              If <var>uuidCanonicalizer</var> threw an exception,
+              return <a>a promise rejected with</a> that exception and abort these steps.
+            </li>
+            <li>
+              If <var>uuid</var> is present and is <a>blacklisted</a>,
+              return <a>a promise rejected with</a> a <a>SecurityError</a>
+              and abort these steps.
+            </li>
+            <li>
+              <a>Query the Bluetooth cache</a> for entries that:
+              <ul>
+                <li>are within <var>attribute</var>,</li>
+                <li>have a type described by <var>child type</var>,</li>
+                <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>, and</li>
+                <li>if the <var>single</var> flag is set, are the first of these.</li>
+              </ul>
+              Let <var>promise</var> be the result.
+            </li>
+            <li>
+              Return the result of
+              <a>transforming</a> <var>promise</var> with a fulfillment handler that:
+              <ul>
+                <li>If its argument is empty, throws a <a>NotFoundError</a>,</li>
+                <li>
+                  Otherwise, if the <var>single</var> flag is set,
+                  returns the first (only) element of its argument.
+                </li>
+                <li>Otherwise, returns its argument.</li>
+              </ul>
+            </li>
+          </ol>
+        </section>
 
         <section>
           <h2>Identifying Services, Characteristics, and Descriptors</h2>
@@ -1621,66 +1676,27 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           The <code><dfn>getPrimaryService</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          MUST return
         </p>
-        <ol>
-          <li>
-            Set <var>service</var> to
-            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
-            If <a>BluetoothUUID.getService</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>service</var> is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for
-            the first primary GATT service
-            on <code>this@[[\representedDevice]]</code>
-            whose UUID is <var>service</var>
-            and whose UUID is in <code>this@[[\allowedServices]]</code>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns the first (only) element of its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this@[[\representedDevice]]</code>,<br>
+            <var>single</var>=true,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuid</var>=<code><var>service</var></code>,<br>
+            <var>child type</var>="GATT Primary Service")</span>
+        </blockquote>
 
         <p>
           The <code><dfn>getPrimaryServices</dfn>(<var>service</var>)</code> method, when invoked,
-          MUST perform the following steps:
+          MUST return
         </p>
-        <ol>
-          <li>
-            If <var>service</var> is present, set it to
-            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
-            If <a>BluetoothUUID.getService</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>service</var> is present and is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for the primary GATT services
-            on <code>this@[[\representedDevice]]</code>
-            whose UUIDs are in <code>this@[[\allowedServices]]</code>
-            and, if <var>service</var> is present, whose UUIDs are equal to <var>service</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this@[[\representedDevice]]</code>,<br>
+            <var>single</var>=false,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuid</var>=<code><var>service</var></code>,<br>
+            <var>child type</var>="GATT Primary Service")</span>
+        </blockquote>
       </section>
 
       <section dfn-for="BluetoothGATTService">
@@ -1763,127 +1779,54 @@ return navigator.bluetooth.requestDevice({
         <p>
           The <code><dfn>getCharacteristic</dfn>(<var>characteristic</var>)</code> method
           retrieves a <a>Characteristic</a> inside this Service.
-          When invoked, it MUST perform the following steps:
+          When invoked, it MUST return
         </p>
-        <ol>
-          <li>
-            Set <var>characteristic</var> to
-            <code><a>BluetoothUUID.getCharacteristic</a>(<var>characteristic</var>)</code>.
-            If <a>BluetoothUUID.getCharacteristic</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>characteristic</var> is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for
-            the first GATT characteristic within this Service
-            whose UUID is <var>characteristic</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns the first (only) element of its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
+            <var>single</var>=true,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getCharacteristic</a></code>,<br>
+            <var>uuid</var>=<code><var>characteristic</var></code>,<br>
+            <var>child type</var>="GATT Characteristic")</span>
+        </blockquote>
 
         <p>
           The <code><dfn>getCharacteristics</dfn>(<var>characteristic</var>)</code> method
           retrieves a list of <a>Characteristic</a>s inside this Service.
-          When invoked, it MUST perform the following steps:
+          When invoked, it MUST return
         </p>
-        <ol>
-          <li>
-            If <var>characteristic</var> is present, set it to
-            <code><a>BluetoothUUID.getCharacteristic</a>(<var>characteristic</var>)</code>.
-            If <a>BluetoothUUID.getCharacteristic</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>characteristic</var> is present and is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for
-            the GATT characteristics that are within this Service and,
-            if <var>characteristic</var> is present,
-            that have UUIDs equal to <var>characteristic</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
+            <var>single</var>=false,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getCharacteristic</a></code>,<br>
+            <var>uuid</var>=<code><var>characteristic</var></code>,<br>
+            <var>child type</var>="GATT Characteristic")</span>
+        </blockquote>
 
         <p>
           The <code><dfn>getIncludedService</dfn>(<var>service</var>)</code> method
           retrieves an <a>Included Service</a> inside this Service.
-          When invoked, it MUST perform the following steps:
+          When invoked, it MUST return
         </p>
-        <ol>
-          <li>
-            Set <var>service</var> to
-            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
-            If <a>BluetoothUUID.getService</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>service</var> is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for the first GATT included service
-            within this Service whose UUID is <var>service</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns the first (only) element of its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
+            <var>single</var>=true,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuid</var>=<code><var>service</var></code>,<br>
+            <var>child type</var>="GATT Included Service")</span>
+        </blockquote>
 
         <p>
           The <code><dfn>getIncludedServices</dfn>(<var>service</var>)</code> method
           retrieves a list of <a>Included Service</a>s inside this Service.
-          When invoked, it MUST perform the following steps:
+          When invoked, it MUST return
         </p>
-        <ol>
-          <li>
-            If <var>service</var> is present, set it to
-            <code><a>BluetoothUUID.getService</a>(<var>service</var>)</code>.
-            If <a>BluetoothUUID.getService</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>service</var> is present and is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for
-            the GATT Included Services that are within this Service and,
-            if <var>service</var> is present,
-            that have UUIDs equal to <var>service</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
+            <var>single</var>=false,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuid</var>=<code><var>service</var></code>,<br>
+            <var>child type</var>="GATT Included Service")</span>
+        </blockquote>
       </section>
 
       <section dfn-for="BluetoothGATTCharacteristic">
@@ -1973,65 +1916,28 @@ return navigator.bluetooth.requestDevice({
         <p>
           The <code><dfn>getDescriptor</dfn>(<var>descriptor</var>)</code> method
           retrieves a <a>Descriptor</a> inside this Characteristic.
-          When invoked, it MUST perform the following steps:
+          When invoked, it MUST return
         </p>
-        <ol>
-          <li>
-            Set <var>descriptor</var> to
-            <code><a>BluetoothUUID.getDescriptor</a>(<var>descriptor</var>)</code>.
-            If <a>BluetoothUUID.getDescriptor</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>descriptor</var> is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for
-            the first GATT descriptor within this Characteristic
-            whose UUID is <var>descriptor</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns the first (only) element of its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
+            <var>single</var>=true,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getDescriptor</a></code>,<br>
+            <var>uuid</var>=<code><var>descriptor</var></code>,<br>
+            <var>child type</var>="GATT Descriptor")</span>
+        </blockquote>
 
         <p>
           The <code><dfn>getDescriptors</dfn>(<var>descriptor</var>)</code> method
           retrieves a list of <a>Descriptor</a>s inside this Characteristic.
-          When invoked, it MUST perform the following steps:
+          When invoked, it MUST return
         </p>
-        <ol>
-          <li>
-            If <var>descriptor</var> is present, set it to
-            <code><a>BluetoothUUID.getDescriptor</a>(<var>descriptor</var>)</code>.
-            If <a>BluetoothUUID.getDescriptor</a> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>descriptor</var> is present and is <a>blacklisted</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
-            and abort these steps.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> for
-            the GATT descriptors that are within this Characteristic and,
-            if <var>descriptor</var> is present,
-            that have UUIDs equal to <var>descriptor</var>,
-            and let <var>promise</var> be the result.
-          </li>
-          <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that
-            throws a <a>NotFoundError</a> if its argument is empty
-            or returns its argument.
-          </li>
-        </ol>
+        <blockquote>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
+            <var>single</var>=false,<br>
+            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getDescriptor</a></code>,<br>
+            <var>uuid</var>=<code><var>descriptor</var></code>,<br>
+            <var>child type</var>="GATT Descriptor")</span>
+        </blockquote>
 
         <p>
           The <code><dfn>readValue</dfn>()</code> method, when invoked,
