@@ -1300,15 +1300,15 @@ return navigator.bluetooth.requestDevice({
     </section>
 
     <section>
-      <h2>GATT Interaction</h2>
+      <h2 id="gatt-interaction">GATT Interaction</h2>
 
-      <section id="information-model">
-        <h2>GATT Information Model</h2>
+      <section id="">
+        <h3 id="information-model">GATT Information Model</h3>
 
         <div class="note">
           <p>
             The <a>GATT Profile Hierarchy</a> describes how a
-            <a title="BluetoothGATTRemoteServer">GATT Server</a>
+            <a idl lt="BluetoothGATTRemoteServer">GATT Server</a>
             contains a hierarchy of Profiles, Primary <a>Service</a>s,
             <a>Included Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
           </p>
@@ -1333,35 +1333,35 @@ return navigator.bluetooth.requestDevice({
             but while platform interfaces provide these entities in some order,
             they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
           </p>
-          <p link-for="BluetoothGATTService">
-            A <a title="BluetoothGATTService">Service</a> contains
-            a collection of <a title="getIncludedService">Included Service</a>s
-            and <a title="getCharacteristic">Characteristic</a>s.
+          <p link-for-hint="BluetoothGATTService">
+            A <a idl lt="BluetoothGATTService">Service</a> contains
+            a collection of <a idl lt="getIncludedService()">Included Service</a>s
+            and <a idl lt="getCharacteristic()">Characteristic</a>s.
             The Included Services are references to other Services,
             and a single Service can be included by more than one other Service.
             Services are known as
-            <a title="isPrimary">Primary Services</a> if they appear directly under the
-            <a title="BluetoothGATTRemoteServer">GATT Server</a>,
+            <a idl lt="isPrimary">Primary Services</a> if they appear directly under the
+            <a idl lt="BluetoothGATTRemoteServer">GATT Server</a>,
             and Secondary Services if they're only included by other Services,
             but Primary Services can also be included.
           </p>
-          <p link-for="BluetoothGATTCharacteristic">
-            A <a title="BluetoothGATTCharacteristic">Characteristic</a>
+          <p link-for-hint="BluetoothGATTCharacteristic">
+            A <a idl lt="BluetoothGATTCharacteristic">Characteristic</a>
             contains a value, which is an array of bytes,
-            and a collection of <a title="getDescriptor">Descriptor</a>s.
-            Depending on the <a title="CharacteristicProperties">properties</a> of the Characteristic,
+            and a collection of <a idl lt="getDescriptor()">Descriptor</a>s.
+            Depending on the <a idl lt="BluetoothCharacteristicProperties">properties</a> of the Characteristic,
             a <a>GATT Client</a> can read or write its value,
             or register to be notified when the value changes.
           </p>
           <p>
-            Finally, a <a title="BluetoothGATTDescriptor">Descriptor</a>
+            Finally, a <a idl lt="BluetoothGATTDescriptor">Descriptor</a>
             contains a value (again an array of bytes)
             that describes or configures its <a>Characteristic</a>.
           </p>
         </div>
 
-        <section id="bluetooth-cache">
-          <h2>The Bluetooth cache</h2>
+        <section>
+          <h4 id="bluetooth-cache">The Bluetooth cache</h4>
 
           <p>
             The UA MUST maintain a <dfn>Bluetooth cache</dfn>
@@ -1371,9 +1371,9 @@ return navigator.bluetooth.requestDevice({
             Each potential entity in the cache is either known-present, known-absent, or unknown.
             The cache MUST NOT contain two entities that are for the <a>same attribute</a>.
             Each known-present entity in the cache is associated with an optional
-            <code>Promise&lt;<a>BluetoothGATTService</a>></code>,
-            <code>Promise&lt;<a>BluetoothGATTCharacteristic</a>></code>,
-            or <code>Promise&lt;<a>BluetoothGATTDescriptor</a>></code> instance
+            <code>Promise&lt;{{BluetoothGATTService}}></code>,
+            <code>Promise&lt;{{BluetoothGATTCharacteristic}}></code>,
+            or <code>Promise&lt;{{BluetoothGATTDescriptor}}></code> instance
             for each <a>script execution environment</a>.
           </p>
 
@@ -1383,7 +1383,7 @@ return navigator.bluetooth.requestDevice({
             the UA uses the <a>Discover Characteristics by UUID</a> procedure
             to fill the needed cache entries,
             and the UA ends the procedure early because
-            it only needs one Characteristic to fulfil the returned <a>Promise</a>,
+            it only needs one Characteristic to fulfil the returned {{Promise}},
             then the first Characteristic with UUID <code>uuid1</code> inside <code>serviceA</code>
             is known-present,
             and any subsequent Characteristics with that UUID remain unknown.
@@ -1472,7 +1472,7 @@ return navigator.bluetooth.requestDevice({
         </section>
 
         <section>
-          <h2>Navigating the Bluetooth Hierarchy</h2>
+          <h4 id="navigating-bluetooth-hierarchy">Navigating the Bluetooth Hierarchy</h4>
 
           <p>
             To <dfn>GetGATTChildren</dfn>(<span class="argument-list"><var>attribute</var>: GATT Attribute,<br>
@@ -1491,7 +1491,7 @@ return navigator.bluetooth.requestDevice({
             </li>
             <li>
               If <var>uuid</var> is present and is <a>blacklisted</a>,
-              return <a>a promise rejected with</a> a <a>SecurityError</a>
+              return <a>a promise rejected with</a> a {{SecurityError}}
               and abort these steps.
             </li>
             <li>
@@ -1508,7 +1508,7 @@ return navigator.bluetooth.requestDevice({
               Return the result of
               <a>transforming</a> <var>promise</var> with a fulfillment handler that:
               <ul>
-                <li>If its argument is empty, throws a <a>NotFoundError</a>,</li>
+                <li>If its argument is empty, throws a {{NotFoundError}},</li>
                 <li>
                   Otherwise, if the <var>single</var> flag is set,
                   returns the first (only) element of its argument.
@@ -1520,7 +1520,7 @@ return navigator.bluetooth.requestDevice({
         </section>
 
         <section>
-          <h2>Identifying Services, Characteristics, and Descriptors</h2>
+          <h4 id="identifying-attributes">Identifying Services, Characteristics, and Descriptors</h4>
 
           <p>
             When checking whether two Services, Characteristics, or Descriptors
@@ -1556,11 +1556,11 @@ return navigator.bluetooth.requestDevice({
         </section>
       </section>
 
-      <section dfn-for="BluetoothGATTRemoteServer" id="BluetoothGATTRemoteServer">
-        <h2><dfn>BluetoothGATTRemoteServer</dfn></h2>
+      <section>
+        <h3 id="bluetoothgattremoteserver"><dfn interface>BluetoothGATTRemoteServer</dfn></h3>
 
         <p>
-          <a>BluetoothGATTRemoteServer</a> represents a <a>GATT Server</a> on a remote device.
+          {{BluetoothGATTRemoteServer}} represents a <a>GATT Server</a> on a remote device.
         </p>
 
         <pre class="idl">
@@ -1577,7 +1577,8 @@ return navigator.bluetooth.requestDevice({
           BluetoothGATTRemoteServer implements ServiceEventHandlers;
         </pre>
 
-        <div class="note" title="BluetoothGATTRemoteServer attributes">
+        <div class="note" title="BluetoothGATTRemoteServer attributes"
+             dfn-for="BluetoothGATTRemoteServer" dfn-type="attribute">
           <p>
             <dfn>device</dfn> is the device running this server.
           </p>
@@ -1590,7 +1591,7 @@ return navigator.bluetooth.requestDevice({
         </div>
 
         <p>
-          The <code><dfn>disconnect</dfn>()</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTRemoteServer">disconnect()</dfn></code> method, when invoked,
           MUST perform the following steps:
         </p>
         <ol>
@@ -1600,46 +1601,46 @@ return navigator.bluetooth.requestDevice({
           <li>
             <a>In parallel</a>:
             if, for all <a>script execution environment</a>s,
-            all <a>BluetoothDevice</a>s <code><var>device</var></code>
-            with <code><var>device</var>@[[\representedDevice]]</code>
-            the <a>same device</a> as <code>this.device@[[\representedDevice]]</code>,
+            all {{BluetoothDevice}}s <code><var>device</var></code>
+            with <code><var>device</var>@\[[representedDevice]]</code>
+            the <a>same device</a> as <code>this.device@\[[representedDevice]]</code>,
             <code><var>device</var>.gattServer === null</code>
             or <code>!<var>device</var>.gattServer.connected</code>,
             the UA MAY destroy
-            <code><var>device</var>@[[\representedDevice]]</code>'s <a>ATT Bearer</a>.
+            <code><var>device</var>@\[[representedDevice]]</code>'s <a>ATT Bearer</a>.
           </li>
         </ol>
 
         <p>
-          The <code><dfn>getPrimaryService</dfn>(<var>service</var>)</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
           MUST return
         </p>
         <blockquote>
-          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this@[[\representedDevice]]</code>,<br>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this@\[[representedDevice]]</code>,<br>
             <var>single</var>=true,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
             <var>uuid</var>=<code><var>service</var></code>,<br>
             <var>child type</var>="GATT Primary Service")</span>
         </blockquote>
 
         <p>
-          The <code><dfn>getPrimaryServices</dfn>(<var>service</var>)</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
           MUST return
         </p>
         <blockquote>
-          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this@[[\representedDevice]]</code>,<br>
+          <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this@\[[representedDevice]]</code>,<br>
             <var>single</var>=false,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
             <var>uuid</var>=<code><var>service</var></code>,<br>
             <var>child type</var>="GATT Primary Service")</span>
         </blockquote>
       </section>
 
-      <section dfn-for="BluetoothGATTService">
-        <h2><dfn>BluetoothGATTService</dfn></h2>
+      <section>
+        <h3 id="bluetoothgattservice"><dfn interface>BluetoothGATTService</dfn></h3>
 
         <p>
-          <a>BluetoothGATTService</a> represents a GATT <a>Service</a>,
+          {{BluetoothGATTService}} represents a GATT <a>Service</a>,
           a collection of characteristics and relationships to other services
           that encapsulate the behavior of part of a device.
         </p>
@@ -1663,16 +1664,16 @@ return navigator.bluetooth.requestDevice({
           BluetoothGATTService implements ServiceEventHandlers;
         </pre>
 
-        <div class="note" title="BluetoothGATTService attributes">
+        <div class="note" title="BluetoothGATTService attributes"
+             dfn-for="BluetoothGATTService" dfn-type="attribute">
           <p>
-            <dfn>device</dfn> is the <a>BluetoothDevice</a> representing
+            <dfn>device</dfn> is the {{BluetoothDevice}} representing
             the remote peripheral that the GATT service belongs to.
           </p>
           <p>
             <dfn>uuid</dfn> is the UUID of the service,
             e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the
-            <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml"
-               >Heart Rate</a> service.
+            <a idl lt="org.bluetooth.service.heart_rate">Heart Rate</a> service.
           </p>
           <p>
             <dfn>isPrimary</dfn> indicates whether the type of this service is primary or secondary.
@@ -1686,7 +1687,7 @@ return navigator.bluetooth.requestDevice({
           and run the following steps <a>in parallel</a>.
         </p>
         <ol>
-          <li>Let <var>result</var> be a new instance of <a>BluetoothGATTService</a>.</li>
+          <li>Let <var>result</var> be a new instance of {{BluetoothGATTService}}.</li>
           <li>
             <a>Get the <code>BluetoothDevice</code> representing</a>
             the device in which <var>service</var> appears,
@@ -1713,68 +1714,68 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getCharacteristic</dfn>(<var>characteristic</var>)</code> method
+          The <code><dfn method for="BluetoothGATTService">getCharacteristic(<var>characteristic</var>)</dfn></code> method
           retrieves a <a>Characteristic</a> inside this Service.
           When invoked, it MUST return
         </p>
         <blockquote>
           <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
             <var>single</var>=true,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getCharacteristic</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
             <var>uuid</var>=<code><var>characteristic</var></code>,<br>
             <var>child type</var>="GATT Characteristic")</span>
         </blockquote>
 
         <p>
-          The <code><dfn>getCharacteristics</dfn>(<var>characteristic</var>)</code> method
+          The <code><dfn method for="BluetoothGATTService">getCharacteristics(<var>characteristic</var>)</dfn></code> method
           retrieves a list of <a>Characteristic</a>s inside this Service.
           When invoked, it MUST return
         </p>
         <blockquote>
           <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
             <var>single</var>=false,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getCharacteristic</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
             <var>uuid</var>=<code><var>characteristic</var></code>,<br>
             <var>child type</var>="GATT Characteristic")</span>
         </blockquote>
 
         <p>
-          The <code><dfn>getIncludedService</dfn>(<var>service</var>)</code> method
+          The <code><dfn method for="BluetoothGATTService">getIncludedService(<var>service</var>)</dfn></code> method
           retrieves an <a>Included Service</a> inside this Service.
           When invoked, it MUST return
         </p>
         <blockquote>
           <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
             <var>single</var>=true,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
             <var>uuid</var>=<code><var>service</var></code>,<br>
             <var>child type</var>="GATT Included Service")</span>
         </blockquote>
 
         <p>
-          The <code><dfn>getIncludedServices</dfn>(<var>service</var>)</code> method
+          The <code><dfn method for="BluetoothGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
           retrieves a list of <a>Included Service</a>s inside this Service.
           When invoked, it MUST return
         </p>
         <blockquote>
           <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
             <var>single</var>=false,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getService</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
             <var>uuid</var>=<code><var>service</var></code>,<br>
             <var>child type</var>="GATT Included Service")</span>
         </blockquote>
       </section>
 
-      <section dfn-for="BluetoothGATTCharacteristic">
-        <h2><dfn>BluetoothGATTCharacteristic</dfn></h2>
+      <section>
+        <h3 id="bluetoothgattcharacteristic"><dfn interface>BluetoothGATTCharacteristic</dfn></h3>
 
-        <p><a>BluetoothGATTCharacteristic</a> represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
+        <p>{{BluetoothGATTCharacteristic}} represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
 
         <pre class="idl">
           interface BluetoothGATTCharacteristic {
             readonly attribute BluetoothGATTService service;
             readonly attribute UUID uuid;
-            readonly attribute CharacteristicProperties properties;
+            readonly attribute BluetoothCharacteristicProperties properties;
             readonly attribute ArrayBuffer? value;
             Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
             Promise&lt;sequence&lt;BluetoothGATTDescriptor>>
@@ -1788,14 +1789,15 @@ return navigator.bluetooth.requestDevice({
           BluetoothGATTCharacteristic implements CharacteristicEventHandlers;
         </pre>
 
-        <div class="note" title="BluetoothGATTCharacteristic attributes">
+        <div class="note" title="BluetoothGATTCharacteristic attributes"
+             dfn-for="BluetoothGATTCharacteristic" dfn-type="attribute">
           <p>
             <dfn>service</dfn> is the GATT service this characteristic belongs to.
           </p>
           <p>
             <dfn>uuid</dfn> is the UUID of the characteristic,
             e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the
-            <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml"
+            <a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
                >Heart Rate Measurement</a> characteristic.
           </p>
           <p>
@@ -1814,10 +1816,10 @@ return navigator.bluetooth.requestDevice({
           and run the following steps <a>in parallel</a>.
         </p>
         <ol>
-          <li>Let <var>result</var> be a new instance of <a>BluetoothGATTCharacteristic</a>.</li>
+          <li>Let <var>result</var> be a new instance of {{BluetoothGATTCharacteristic}}.</li>
           <li>
             Initialize <code><var>result</var>.service</code> from
-            the <a>BluetoothGATTService</a> instance representing
+            the {{BluetoothGATTService}} instance representing
             the Service in which <var>characteristic</var> appears.
           </li>
           <li>
@@ -1825,7 +1827,7 @@ return navigator.bluetooth.requestDevice({
             the UUID of <var>characteristic</var>.
           </li>
           <li>
-            <a>Create a <code>CharacteristicProperties</code> instance
+            <a>Create a <code>BluetoothCharacteristicProperties</code> instance
             from the Characteristic</a> <var>characteristic</var>,
             and let <var>propertiesPromise</var> be the result.
           </li>
@@ -1850,40 +1852,40 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>getDescriptor</dfn>(<var>descriptor</var>)</code> method
+          The <code><dfn method for="BluetoothGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
           retrieves a <a>Descriptor</a> inside this Characteristic.
           When invoked, it MUST return
         </p>
         <blockquote>
           <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
             <var>single</var>=true,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getDescriptor</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
             <var>uuid</var>=<code><var>descriptor</var></code>,<br>
             <var>child type</var>="GATT Descriptor")</span>
         </blockquote>
 
         <p>
-          The <code><dfn>getDescriptors</dfn>(<var>descriptor</var>)</code> method
+          The <code><dfn method for="BluetoothGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
           retrieves a list of <a>Descriptor</a>s inside this Characteristic.
           When invoked, it MUST return
         </p>
         <blockquote>
           <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
             <var>single</var>=false,<br>
-            <var>uuidCanonicalizer</var>=<code><a>BluetoothUUID.getDescriptor</a></code>,<br>
+            <var>uuidCanonicalizer</var>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
             <var>uuid</var>=<code><var>descriptor</var></code>,<br>
             <var>child type</var>="GATT Descriptor")</span>
         </blockquote>
 
         <p>
-          The <code><dfn>readValue</dfn>()</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTCharacteristic">readValue()</dfn></code> method, when invoked,
           MUST return <a>a new promise</a> <var>promise</var>
           and run the following steps <a>in parallel</a>:
         </p>
         <ol>
           <li>
             If <code>this.uuid</code> is <a>blacklisted for reads</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
+            return <a>a promise rejected with</a> a {{SecurityError}}
             and abort these steps.
           </li>
           <li>
@@ -1892,8 +1894,8 @@ return navigator.bluetooth.requestDevice({
           </li>
           <li>
             If the <code>Read</code> bit is not set
-            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
-            <a>reject</a> <var>promise</var> with a <a>NotSupportedError</a> and abort these steps.
+            in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
+            <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
           </li>
           <li>
             Use any combination of the sub-procedures in
@@ -1916,7 +1918,7 @@ return navigator.bluetooth.requestDevice({
                 <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
               </li>
               <li>
-                <a>Fire an event</a> named <a><code>characteristicvaluechanged</code></a>
+                <a>Fire an event</a> named {{characteristicvaluechanged}}
                 with its <code>bubbles</code> attribute initialized to <code>true</code>
                 at <code>this</code>.
               </li>
@@ -1925,13 +1927,13 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>writeValue</dfn>(<var>value</var>)</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
           MUST run the following steps:
         </p>
         <ol>
           <li>
             If <code>this.uuid</code> is <a>blacklisted for writes</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
+            return <a>a promise rejected with</a> a {{SecurityError}}
             and abort these steps.
           </li>
           <li>
@@ -1945,7 +1947,7 @@ return navigator.bluetooth.requestDevice({
           <li>
             If <var>bytes</var> is more than 512 bytes long
             (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
-            return <a>a promise rejected with</a> an <a>InvalidModificationError</a>
+            return <a>a promise rejected with</a> an {{InvalidModificationError}}
             and abort these steps.
           </li>
           <li>Return <a>a new promise</a> <var>promise</var>
@@ -1966,7 +1968,7 @@ return navigator.bluetooth.requestDevice({
                 <ol>
                   <li>
                     Set <code>this.value</code> to
-                    a new <a>ArrayBuffer</a> containing <var>bytes</var>.
+                    a new {{ArrayBuffer}} containing <var>bytes</var>.
                   </li>
                   <li>
                     <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
@@ -1979,14 +1981,14 @@ return navigator.bluetooth.requestDevice({
 
         <p>
           For each known GATT <a>Characteristic</a>, the UA MUST maintain
-          an <dfn>active notification context set</dfn> of <a>Bluetooth</a> objects.
+          an <dfn>active notification context set</dfn> of {{Bluetooth}} objects.
           This is a single set for the whole UA,
-          pointing to the <a href="#idl-def-navigator-bluetooth"><code>navigator.bluetooth</code></a> object
+          pointing to the {{Navigator/bluetooth|navigator.bluetooth}} object
           for each separate <a>script execution environment</a> that has registered for notifications.
         </p>
 
         <p>
-          The <code><dfn>startNotifications</dfn>()</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTCharacteristic">startNotifications()</dfn></code> method, when invoked,
           MUST return <a>a new promise</a> <var>promise</var>
           and run the following steps <a>in parallel</a>.
           See <a href="#notification-events"></a> for details of receiving notifications.
@@ -1994,7 +1996,7 @@ return navigator.bluetooth.requestDevice({
         <ol>
           <li>
             If <code>this.uuid</code> is <a>blacklisted for reads</a>,
-            <a>reject</a> <var>promise</var> with a <a>SecurityError</a> and abort these steps.
+            <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
           </li>
           <li>
             Let <var>characteristic</var> be
@@ -2002,12 +2004,12 @@ return navigator.bluetooth.requestDevice({
           </li>
           <li>
             If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>,
-            <a>reject</a> <var>promise</var> with a <a>NotSupportedError</a> and abort these steps.
+            in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
+            <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
           </li>
           <li>
             If the <a>active notification context set</a> contains
-            <a href="#idl-def-navigator-bluetooth"><code>navigator.bluetooth</code></a>,
+            {{Navigator/bluetooth|navigator.bluetooth}},
             <a>resolve</a> <var>promise</var> with <code>undefined</code> and abort these steps.
           </li>
           <li>
@@ -2015,7 +2017,7 @@ return navigator.bluetooth.requestDevice({
             to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
             <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
             is set, matching the constraints
-            in <var>characteristic</var>'s <a title="Characteristic Properties">properties</a>.
+            in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>.
             The UA SHOULD avoid setting both bits,
             and MUST deduplicate <a href="#notification-events">value-change events</a>
             if both bits are set.
@@ -2026,7 +2028,7 @@ return navigator.bluetooth.requestDevice({
             <a>reject</a> <var>promise</var> with that error and abort these steps.
           </li>
           <li>
-            Add <a href="#idl-def-navigator-bluetooth"><code>navigator.bluetooth</code></a>
+            Add {{Navigator/bluetooth|navigator.bluetooth}}
             to the <a>active notification context set</a>.
           </li>
           <li>
@@ -2038,13 +2040,13 @@ return navigator.bluetooth.requestDevice({
           After notifications are enabled,
           the resulting <a href="#notification-events">value-change events</a> won't be delivered
           until after the current
-          <a title="perform a microtask checkpoint">microtask checkpoint</a>.
+          <a lt="perform a microtask checkpoint">microtask checkpoint</a>.
           This allows a developer to set up handlers
           in the <code>.then</code> handler of the result promise.
         </p>
 
         <p>
-          The <code><dfn>stopNotifications</dfn>()</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTCharacteristic">stopNotifications()</dfn></code> method, when invoked,
           MUST return <a>a new promise</a> <var>promise</var>
           and run the following steps <a>in parallel</a>:
         </p>
@@ -2055,7 +2057,7 @@ return navigator.bluetooth.requestDevice({
           </li>
           <li>
             If the <a>active notification context set</a> contains
-            <a href="#idl-def-navigator-bluetooth"><code>navigator.bluetooth</code></a>,
+            {{Navigator/bluetooth|navigator.bluetooth}},
             remove it.
           </li>
           <li>
@@ -2075,12 +2077,12 @@ return navigator.bluetooth.requestDevice({
           arrive after the promise resolves.
         </p>
 
-        <section dfn-for="CharacteristicProperties">
-          <h2><dfn>CharacteristicProperties</dfn></h2>
+        <section>
+          <h4 id="characteristicproperties"><dfn interface>BluetoothCharacteristicProperties</dfn></h4>
 
           <p>
-            Each <a>BluetoothGATTCharacteristic</a> exposes its <a>characteristic properties</a>
-            through a <a>CharacteristicProperties</a> object.
+            Each {{BluetoothGATTCharacteristic}} exposes its <a>characteristic properties</a>
+            through a {{BluetoothCharacteristicProperties}} object.
             These properties express what operations are valid on the characteristic.
           </p>
 
@@ -2099,14 +2101,14 @@ return navigator.bluetooth.requestDevice({
           </pre>
 
           <p>
-            To <dfn>create a <code>CharacteristicProperties</code> instance
+            To <dfn>create a <code>BluetoothCharacteristicProperties</code> instance
             from the Characteristic</dfn> <var>characteristic</var>,
             the UA MUST return <a>a new promise</a> <var>promise</var>
             and run the following steps <a>in parallel</a>:
           </p>
           <ol>
             <li>
-              Let <var>propertiesObj</var> be a new instance of <a>CharacteristicProperties</a>.
+              Let <var>propertiesObj</var> be a new instance of {{BluetoothCharacteristicProperties}}.
             </li>
             <li>
               Let <var>properties</var> be
@@ -2136,9 +2138,9 @@ return navigator.bluetooth.requestDevice({
               Otherwise, run the following steps:
               <ol>
                 <li>
-                  <a title="Characteristic Descriptor Discovery">Discover</a> the
+                  <a lt="Characteristic Descriptor Discovery">Discover</a> the
                   <a>Characteristic Extended Properties</a> descriptor for <var>characteristic</var>
-                  and <a title="Read Characteristic Descriptors">read its value</a>
+                  and <a lt="Read Characteristic Descriptors">read its value</a>
                   into <var>extendedProperties</var>.
                   Handle errors as described in <a href="#error-handling"></a>.
                   <p class="issue">
@@ -2168,10 +2170,10 @@ return navigator.bluetooth.requestDevice({
         </section>
       </section>
 
-      <section dfn-for="BluetoothGATTDescriptor">
-        <h2><dfn>BluetoothGATTDescriptor</dfn></h2>
+      <section>
+        <h3 id="bluetoothgattdescriptor"><dfn interface>BluetoothGATTDescriptor</dfn></h3>
 
-        <p><a>BluetoothGATTDescriptor</a> represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
+        <p>{{BluetoothGATTDescriptor}} represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
 
         <pre class="idl">
           interface BluetoothGATTDescriptor {
@@ -2183,14 +2185,15 @@ return navigator.bluetooth.requestDevice({
           };
         </pre>
 
-        <div class="note" title="BluetoothGATTDescriptor attributes">
+        <div class="note" title="BluetoothGATTDescriptor attributes"
+             dfn-for="BluetoothGATTDescriptor" dfn-type="attribute">
           <p>
             <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
           </p>
           <p>
             <dfn>uuid</dfn> is the UUID of the characteristic descriptor,
             e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the
-            <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml"
+            <a idl lt="org.bluetooth.descriptor.gatt.client_characteristic_configuration"
                >Client Characteristic Configuration</a> descriptor.
           </p>
           <p>
@@ -2206,10 +2209,10 @@ return navigator.bluetooth.requestDevice({
           and run the following steps <a>in parallel</a>.
         </p>
         <ol>
-          <li>Let <var>result</var> be a new instance of <a>BluetoothGATTDescriptor</a>.</li>
+          <li>Let <var>result</var> be a new instance of {{BluetoothGATTDescriptor}}.</li>
           <li>
             Initialize <code><var>result</var>.characteristic</code> from
-            the <a>BluetoothGATTCharacteristic</a> instance representing
+            the {{BluetoothGATTCharacteristic}} instance representing
             the Characteristic in which <var>descriptor</var> appears.
           </li>
           <li>
@@ -2226,14 +2229,14 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>readValue</dfn>()</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTDescriptor">readValue()</dfn></code> method, when invoked,
           MUST return <a>a new promise</a> <var>promise</var>
           and run the following steps <a>in parallel</a>:
         </p>
         <ol>
           <li>
             If <code>this.uuid</code> is <a>blacklisted for reads</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
+            return <a>a promise rejected with</a> a {{SecurityError}}
             and abort these steps.
           </li>
           <li>
@@ -2265,13 +2268,13 @@ return navigator.bluetooth.requestDevice({
         </ol>
 
         <p>
-          The <code><dfn>writeValue</dfn>(<var>value</var>)</code> method, when invoked,
+          The <code><dfn method for="BluetoothGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
           MUST  run the following steps:
         </p>
         <ol>
           <li>
             If <code>this.uuid</code> is <a>blacklisted for writes</a>,
-            return <a>a promise rejected with</a> a <a>SecurityError</a>
+            return <a>a promise rejected with</a> a {{SecurityError}}
             and abort these steps.
           </li>
           <li>
@@ -2285,7 +2288,7 @@ return navigator.bluetooth.requestDevice({
           <li>
             If <var>bytes</var> is more than 512 bytes long
             (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
-            return <a>a promise rejected with</a> an <a>InvalidModificationError</a>
+            return <a>a promise rejected with</a> an {{InvalidModificationError}}
             and abort these steps.
           </li>
           <li>Return <a>a new promise</a> <var>promise</var>
@@ -2306,7 +2309,7 @@ return navigator.bluetooth.requestDevice({
                 <ol>
                   <li>
                     Set <code>this.value</code> to
-                    a new <a>ArrayBuffer</a> containing <var>bytes</var>.
+                    a new {{ArrayBuffer}} containing <var>bytes</var>.
                   </li>
                   <li>
                     <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
@@ -2319,29 +2322,29 @@ return navigator.bluetooth.requestDevice({
       </section>
 
       <section>
-        <h2>Events</h2>
+        <h3 id="events">Events</h3>
 
-        <section id="bluetooth-tree">
-          <h2>Bluetooth Tree</h2>
+        <section>
+          <h4 id="bluetooth-tree">Bluetooth Tree</h4>
 
           <p>
-            <a href="#idl-def-navigator-bluetooth"><code>navigator.bluetooth</code></a> and
-            objects implementing the <a>BluetoothDevice</a>, <a>BluetoothGATTService</a>,
-            <a>BluetoothGATTCharacteristic</a>, or <a>BluetoothGATTDescriptor</a> interface
+            {{Navigator/bluetooth|navigator.bluetooth}} and
+            objects implementing the {{BluetoothDevice}}, {{BluetoothGATTService}},
+            {{BluetoothGATTCharacteristic}}, or {{BluetoothGATTDescriptor}} interface
             <a>participate in a tree</a>,
             simply named the <dfn>Bluetooth tree</dfn>.
 
           <ul>
             <li>
               The <a>children</a>
-              of <a href="#idl-def-navigator-bluetooth"><code>navigator.bluetooth</code></a>
-              are the <a>BluetoothDevice</a> objects representing
+              of {{Navigator/bluetooth|navigator.bluetooth}}</code></a>
+              are the {{BluetoothDevice}} objects representing
               devices on the origin's <a>allowed devices map</a>,
               in an unspecified order.
             </li>
             <li>
-              The <a>children</a> of a <a>BluetoothDevice</a>
-              are the <a>BluetoothGATTService</a> objects representing
+              The <a>children</a> of a {{BluetoothDevice}}
+              are the {{BluetoothGATTService}} objects representing
               Primary and Secondary <a>Service</a>s on its <a>GATT Server</a>
               whose UUIDs are on the origin and device's <a>allowed services list</a>.
               The order of the primary services MUST be consistent with the order returned by
@@ -2349,51 +2352,51 @@ return navigator.bluetooth.requestDevice({
               but secondary services and primary services with different UUIDs may be in any order.
             </li>
             <li>
-              The <a>children</a> of a <a>BluetoothGATTService</a> are
-              the <a>BluetoothGATTCharacteristic</a> objects representing its Characteristics.
+              The <a>children</a> of a {{BluetoothGATTService}} are
+              the {{BluetoothGATTCharacteristic}} objects representing its Characteristics.
               The order of the characteristics MUST be consistent with the order returned by
               the <a>Discover Characteristics by UUID</a> procedure,
               but characteristics with different UUIDs may be in any order.
             </li>
             <li>
-              The <a>children</a> of a <a>BluetoothGATTCharacteristic</a> are
-              the <a>BluetoothGATTDescriptor</a> objects representing its Descriptors
+              The <a>children</a> of a {{BluetoothGATTCharacteristic}} are
+              the {{BluetoothGATTDescriptor}} objects representing its Descriptors
               in the order returned by the <a>Discover All Characteristic Descriptors</a> procedure.
             </li>
           </ul>
         </section>
 
-        <section id="event-types">
-          <h2>Event types</h2>
+        <section>
+          <h4 id="event-types">Event types</h4>
 
           <dl>
-            <dt><dfn><code>characteristicvaluechanged</code></dfn></dt>
+            <dt><dfn event for="BluetoothGATTCharacteristic"><code>characteristicvaluechanged</code></dfn></dt>
             <dd>
-              Fired on a <a>BluetoothGATTCharacteristic</a> when its value changes,
+              Fired on a {{BluetoothGATTCharacteristic}} when its value changes,
               either as a result of
-              a <a for="BluetoothGATTCharacteristic" title="readValue">read request</a>,
+              a <a idl for="BluetoothGATTCharacteristic" lt="readValue()">read request</a>,
               or a <a href="#notification-events">value change notification/indication</a>.
             </dd>
 
-            <dt><dfn><code>serviceadded</code></dfn></dt>
+            <dt><dfn event for="BluetoothGATTService"><code>serviceadded</code></dfn></dt>
             <dd>
-              Fired on a new <a>BluetoothGATTService</a>
+              Fired on a new {{BluetoothGATTService}}
               <a href="#service-change-events">when it has been discovered on a remote device</a>,
               just after it is added to the <a>Bluetooth tree</a>.
             </dd>
 
-            <dt><dfn><code>servicechanged</code></dfn></dt>
+            <dt><dfn event for="BluetoothGATTService"><code>servicechanged</code></dfn></dt>
             <dd>
-              Fired on a <a>BluetoothGATTService</a>
+              Fired on a {{BluetoothGATTService}}
               <a href="#service-change-events">when its state changes</a>.
               This involves any characteristics and/or descriptors
               that get added or removed from the service,
               as well as <a>Service Changed</a> indications from the remote device.
             </dd>
 
-            <dt><dfn><code>serviceremoved</code></dfn></dt>
+            <dt><dfn event for="BluetoothGATTService"><code>serviceremoved</code></dfn></dt>
             <dd>
-              Fired on a <a>BluetoothGATTService</a>
+              Fired on a {{BluetoothGATTService}}
               <a href="#service-change-events">when it has been removed from its device</a>,
               just before it is removed from the <a>Bluetooth tree</a>.
             </dd>
@@ -2401,12 +2404,12 @@ return navigator.bluetooth.requestDevice({
           </dl>
         </section>
 
-        <section id="notification-events">
-          <h2>Responding to Notifications and Indications</h2>
+        <section>
+          <h4 id="notification-events">Responding to Notifications and Indications</h4>
 
           <p>
             When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
-            or <a title="Characteristic Value Indications">Indication</a>,
+            or <a lt="Characteristic Value Indications">Indication</a>,
             it must perform the following steps:
 
           <ol>
@@ -2419,16 +2422,16 @@ return navigator.bluetooth.requestDevice({
 
               <ol>
                 <li>
-                  Let <var>characteristicObject</var> be the <a>BluetoothGATTCharacteristic</a> in
+                  Let <var>characteristicObject</var> be the {{BluetoothGATTCharacteristic}} in
                   the <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var>
                   that represents the <a>Characteristic</a>.
                 </li>
                 <li>
                   Set <code><var>characteristicObject</var>.value</code> to
-                  a new <code>ArrayBuffer</code> holding the new value of the <a>Characteristic</a>.
+                  a new {{ArrayBuffer}} holding the new value of the <a>Characteristic</a>.
                 </li>
                 <li>
-                  <a>Fire an event</a> named <a><code>characteristicvaluechanged</code></a>
+                  <a>Fire an event</a> named {{characteristicvaluechanged}}
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
                   at <var>characteristicObject</var>.
                 </li>
@@ -2437,8 +2440,8 @@ return navigator.bluetooth.requestDevice({
           </ol>
         </section>
 
-        <section id="service-change-events">
-          <h2>Responding to Service Changes</h2>
+        <section>
+          <h4 id="service-change-events">Responding to Service Changes</h4>
 
           <p>
             The Bluetooth <a>Attribute Caching</a> system allows clients
@@ -2475,7 +2478,7 @@ return navigator.bluetooth.requestDevice({
               Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
             </li>
             <li>
-              If the <a title="same attribute">same</a> <a>Service</a> appears in
+              If the <a lt="same attribute">same</a> <a>Service</a> appears in
               both <var>removedEntities</var> and <var>addedEntities</var>,
               remove it from both, and add it to <var>changedServices</var>.
             </li>
@@ -2506,23 +2509,23 @@ return navigator.bluetooth.requestDevice({
               <ol>
                 <li>
                   For each <a>Service</a> in <var>removedEntities</var>,
-                  <a>fire an event</a> named <a><code>serviceremoved</code></a>
+                  <a>fire an event</a> named {{serviceremoved}}
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
-                  at the <a>BluetoothGATTService</a> representing the <a>Service</a>.
-                  Then remove this <a>BluetoothGATTService</a> from the <a>Bluetooth tree</a>.
+                  at the {{BluetoothGATTService}} representing the <a>Service</a>.
+                  Then remove this {{BluetoothGATTService}} from the <a>Bluetooth tree</a>.
                 </li>
                 <li>
                   For each <a>Service</a> in <var>addedEntities</var>,
-                  add the <a>BluetoothGATTService</a> representing this <a>Service</a> to the <a>Bluetooth tree</a>.
-                  Then <a>fire an event</a> named <a><code>serviceadded</code></a>
+                  add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>.
+                  Then <a>fire an event</a> named {{serviceadded}}
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
-                  at the <a>BluetoothGATTService</a>.
+                  at the {{BluetoothGATTService}}.
                 </li>
                 <li>
                   For each <a>Service</a> in <var>changedServices</var>,
-                  <a>fire an event</a> named <a><code>servicechanged</code></a>
+                  <a>fire an event</a> named {{servicechanged}}
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
-                  at the <a>BluetoothGATTService</a> representing the <a>Service</a>.
+                  at the {{BluetoothGATTService}} representing the <a>Service</a>.
                 </li>
               </ol>
             </li>
@@ -2530,7 +2533,7 @@ return navigator.bluetooth.requestDevice({
         </section>
 
         <section>
-          <h2>IDL event handlers</h2>
+          <h4 id="idl-event-handlers">IDL event handlers</h4>
 
           <pre class="idl">
             [NoInterfaceObject]
@@ -2539,9 +2542,9 @@ return navigator.bluetooth.requestDevice({
             };
           </pre>
           <p>
-            <dfn for="CharacteristicEventHandlers">oncharacteristicvaluechanged</dfn>
+            <dfn attribute for="CharacteristicEventHandlers">oncharacteristicvaluechanged</dfn>
             is an <a>Event handler IDL attribute</a>
-            for the <a><code>characteristicvaluechanged</code></a> event type.
+            for the {{characteristicvaluechanged}} event type.
           </p>
 
           <pre class="idl">
@@ -2553,25 +2556,25 @@ return navigator.bluetooth.requestDevice({
             };
           </pre>
           <p>
-            <dfn for="ServiceEventHandlers">onserviceadded</dfn>
+            <dfn attribute for="ServiceEventHandlers">onserviceadded</dfn>
             is an <a>Event handler IDL attribute</a>
-            for the <a><code>serviceadded</code></a> event type.
+            for the {{serviceadded}} event type.
           </p>
           <p>
-            <dfn for="ServiceEventHandlers">onservicechanged</dfn>
+            <dfn attribute for="ServiceEventHandlers">onservicechanged</dfn>
             is an <a>Event handler IDL attribute</a>
-            for the <a><code>servicechanged</code></a> event type.
+            for the {{servicechanged}} event type.
           </p>
           <p>
-            <dfn for="ServiceEventHandlers">onserviceremoved</dfn>
+            <dfn attribute for="ServiceEventHandlers">onserviceremoved</dfn>
             is an <a>Event handler IDL attribute</a>
-            for the <a><code>serviceremoved</code></a> event type.
+            for the {{serviceremoved}} event type.
           </p>
         </section>
       </section>
 
-      <section id="error-handling">
-        <h2>Error handling</h2>
+      <section>
+        <h3 id="error-handling">Error handling</h3>
 
         <p class="note">
           This section primarily defines the mapping from system errors to Javascript error names
@@ -2584,7 +2587,7 @@ return navigator.bluetooth.requestDevice({
         </p>
 
         <p>
-          When the UA is using a <a title="GATT procedures">GATT procedure</a>
+          When the UA is using a <a>GATT procedure</a>
           to execute a step in an algorithm or to handle a query to the <a>Bluetooth cache</a>
           (both referred to as a "step", here),
           and the GATT procedure returns an <code><a>Error Response</a></code>,
@@ -2593,9 +2596,9 @@ return navigator.bluetooth.requestDevice({
 
         <ol>
           <li>
-            If the <a title="Procedure timeouts">procedure times out</a> or
+            If the <a>procedure times out</a> or
             the ATT Bearer (described in <a>Profile Fundamentals</a>) is terminated for any reason,
-            return a <a>NetworkError</a> from the step and abort these steps.
+            return a {{NetworkError}} from the step and abort these steps.
           </li>
           <li>
             Take the following actions depending on the <code>Error Code</code>:
@@ -2608,12 +2611,12 @@ return navigator.bluetooth.requestDevice({
               <dd>
                 These error codes indicate that something unexpected happened at the protocol layer,
                 likely either due to a UA or device bug.
-                Return a <a>NotSupportedError</a> from the step.
+                Return a {{NotSupportedError}} from the step.
               </dd>
 
               <dt><code>Invalid Attribute Value Length</code></dt>
               <dd>
-                Return an <a>InvalidModificationError</a> from the step.
+                Return an {{InvalidModificationError}} from the step.
               </dd>
 
               <dt><code>Attribute Not Long</code></dt>
@@ -2621,13 +2624,13 @@ return navigator.bluetooth.requestDevice({
                 <p>
                   If this error code is received without having used a "Long" sub-procedure,
                   this may indicate a device bug.
-                  Return a <a>NotSupportedError</a> from the step.
+                  Return a {{NotSupportedError}} from the step.
                 </p>
 
                 <p>
                   Otherwise, retry the step without using a "Long" sub-procedure.
                   If this is impossible due to the length of the value being written,
-                  return an <a>InvalidModificationError</a> from the step.
+                  return an {{InvalidModificationError}} from the step.
                 </p>
               </dd>
 
@@ -2637,20 +2640,20 @@ return navigator.bluetooth.requestDevice({
               <dd>
                 The UA SHOULD attempt to increase the security level of the connection.
                 If this attempt fails or the UA doesn't support any higher security,
-                Return a <a>SecurityError</a> from the step.
+                Return a {{SecurityError}} from the step.
                 Otherwise, retry the step at the new higher security level.
               </dd>
 
               <dt><code>Insufficient Authorization</code></dt>
               <dd>
-                Return a <a>SecurityError</a> from the step.
+                Return a {{SecurityError}} from the step.
               </dd>
 
               <dt><code>Application Error</code></dt>
               <dd>
                 If the GATT procedure was a Write,
-                return an <a>InvalidModificationError</a> from the step.
-                Otherwise, return a <a>NotSupportedError</a> from the step.
+                return an {{InvalidModificationError}} from the step.
+                Otherwise, return a {{NotSupportedError}} from the step.
               </dd>
 
               <dt><code>Read Not Permitted</code></dt>
@@ -2661,7 +2664,7 @@ return navigator.bluetooth.requestDevice({
               <dt><code>Unlikely Error</code></dt>
               <dt>Anything else</dt>
               <dd>
-                Return a <a>NotSupportedError</a> from the step.
+                Return a {{NotSupportedError}} from the step.
               </dd>
             </dl>
           </li>
@@ -2670,7 +2673,7 @@ return navigator.bluetooth.requestDevice({
     </section>
 
     <section>
-      <h2>UUIDs</h2>
+      <h2 id="uuids">UUIDs</h2>
 
       <pre class="idl">typedef DOMString UUID;</pre>
       <p>
@@ -2690,7 +2693,7 @@ return navigator.bluetooth.requestDevice({
       </p>
       <p class="note">
         This standard provides the
-        <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code> function
+        <code>BluetoothUUID.<a for="BluetoothUUID">canonicalUUID(<var>alias</var>)</a></code> function
         to map a 16- or 32-bit Bluetooth <a>UUID alias</a> to its 128-bit form.
       </p>
       <p class="note">
@@ -2701,8 +2704,8 @@ return navigator.bluetooth.requestDevice({
         it should send other aliases of that UUID back to the device in the same form.
       </p>
 
-      <section id="standardized-uuids">
-        <h2>Standardized UUIDs</h2>
+      <section>
+        <h3 id="standardized-uuids">Standardized UUIDs</h3>
 
         <p>
           The Bluetooth SIG maintains a registry at [[BLUETOOTH-ASSIGNED]] of
@@ -2726,7 +2729,7 @@ return navigator.bluetooth.requestDevice({
         </pre>
 
         <p>
-          The static <code><dfn>BluetoothUUID.canonicalUUID</dfn>(<var>alias</var>)</code> method, when invoked,
+          The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">canonicalUUID(<var>alias</var>)</dfn></code> method, when invoked,
           MUST return <a>the 128-bit UUID represented</a>
           by the 16- or 32-bit UUID alias <var>alias</var>.
         </p>
@@ -2740,25 +2743,25 @@ return navigator.bluetooth.requestDevice({
 
         <div class="note">
           <p>
-            <dfn>BluetoothServiceUUID</dfn> represents
+            <dfn typedef>BluetoothServiceUUID</dfn> represents
             16- and 32-bit UUID aliases, <a>valid UUID</a>s,
             and names defined in [[BLUETOOTH-ASSIGNED-SERVICES]],
             or, equivalently, the values for which
-            <a>BluetoothUUID.getService</a> does not throw an exception.
+            {{BluetoothUUID/getService()|BluetoothUUID.getService()}} does not throw an exception.
           </p>
           <p>
-            <dfn>BluetoothCharacteristicUUID</dfn> represents
+            <dfn typedef>BluetoothCharacteristicUUID</dfn> represents
             16- and 32-bit UUID aliases, <a>valid UUID</a>s,
             and names defined in [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]],
             or, equivalently, the values for which
-            <a>BluetoothUUID.getCharacteristic</a> does not throw an exception.
+            {{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic()}} does not throw an exception.
           </p>
           <p>
-            <dfn>BluetoothDescriptorUUID</dfn> represents
+            <dfn typedef>BluetoothDescriptorUUID</dfn> represents
             16- and 32-bit UUID aliases, <a>valid UUID</a>s,
             and names defined in [[BLUETOOTH-ASSIGNED-DESCRIPTORS]],
             or, equivalently, the values for which
-            <a>BluetoothUUID.getDescriptor</a> does not throw an exception.
+            {{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor()}} does not throw an exception.
           </p>
         </div>
 
@@ -2770,7 +2773,7 @@ return navigator.bluetooth.requestDevice({
         <ol>
           <li>
             If <var>name</var> is an <code>unsigned long</code>,
-            return <code><a>BluetoothUUID.canonicalUUID</a>(name)</code> and abort these steps.
+            return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)</code> and abort these steps.
           </li>
           <li>
             If <var>name</var> is a <a>valid UUID</a>,
@@ -2780,57 +2783,52 @@ return navigator.bluetooth.requestDevice({
             If the string <code><var>prefix</var> + "." + <var>name</var></code>
             appears in <var>assigned numbers table</var>,
             let <var>alias</var> be its assigned number,
-            and return <code><a>BluetoothUUID.canonicalUUID</a>(<var>alias</var>)</code>.
+            and return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(<var>alias</var>)</code>.
           </li>
           <li>
-            Otherwise, throw a <a>SyntaxError</a>.
+            Otherwise, throw a {{SyntaxError}}.
           </li>
         </ol>
 
         <p>
-          The static <code><dfn>BluetoothUUID.getService</dfn>(<var>name</var>)</code> method, when invoked,
+          The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">getService(<var>name</var>)</dfn></code> method, when invoked,
           MUST return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
           [[!BLUETOOTH-ASSIGNED-SERVICES]], "org.bluetooth.service").
         </p>
         <p>
-          The static <code><dfn>BluetoothUUID.getCharacteristic</dfn>(<var>name</var>)</code> method, when invoked,
+          The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">getCharacteristic(<var>name</var>)</dfn></code> method, when invoked,
           MUST return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
           [[!BLUETOOTH-ASSIGNED-CHARACTERISTICS]], "org.bluetooth.characteristic").
         </p>
         <p>
-          The static <code><dfn>BluetoothUUID.getDescriptor</dfn>(<var>name</var>)</code> method, when invoked,
+          The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">getDescriptor(<var>name</var>)</dfn></code> method, when invoked,
           MUST return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
           [[!BLUETOOTH-ASSIGNED-DESCRIPTORS]], "org.bluetooth.descriptor").
         </p>
 
-        <aside class="example">
+        <div class="example">
           <p>
-            <code><a>BluetoothUUID.getService</a>("<a
-              href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml"
+            <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}("<a idl lt="org.bluetooth.service.cycling_power"
               >cycling_power</a>")</code>
             returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>.
           </p>
           <p>
-            <code><a>BluetoothUUID.getService</a>("00001801-0000-1000-8000-00805f9b34fb")</code>
+            <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}("00001801-0000-1000-8000-00805f9b34fb")</code>
             returns <code>"00001801-0000-1000-8000-00805f9b34fb"</code>.
           </p>
           <p>
-            <code><a>BluetoothUUID.getService</a>("unknown-service")</code>
-            throws a <a>SyntaxError</a>.
+            <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}("unknown-service")</code>
+            throws a {{SyntaxError}}.
           </p>
           <p>
-            <code><a>BluetoothUUID.getCharacteristic</a>("<a
-              href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml"
-              >ieee_11073-20601_regulatory_certification_data_list</a>")</code>
+            <code>{{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}}("{{org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list|ieee_11073-20601_regulatory_certification_data_list}}")</code>
             returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>.
           </p>
           <p>
-            <code><a>BluetoothUUID.getDescriptor</a>("<a
-              href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml"
-              >gatt.characteristic_presentation_format</a>")</code>
+            <code>{{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}}("{{org.bluetooth.descriptor.gatt.characteristic_presentation_format|gatt.characteristic_presentation_format}}")</code>
             returns <code>"00002904-0000-1000-8000-00805f9b34fb"</code>.
           </p>
-        </aside>
+        </div>
       </section>
     </section>
 
