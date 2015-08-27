@@ -16,6 +16,15 @@ Work is in progress:
  * Tip of tree can connect to devices and read basic information. 
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=498016) is under development.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) under development.
+ * Can discover devices and report basic information (e.g. name)
+ * Many MacBook's may not work:
+   * Check "About this Mac"
+     * "System Report"
+       * "Bluetooth"
+         * Verify that Low Energy is supported.
+          * Check the Chipset:
+            * Chipset: 20702B0 <<< Works
+            * Chipset: 20702A3 <<< Doesn't work
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Latest demo post: [Discovering devices on ChromeOS](https://www.w3.org/community/web-bluetooth/2015/01/07/first-chromium-demo/)
 
