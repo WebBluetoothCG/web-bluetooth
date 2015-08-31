@@ -28,6 +28,20 @@ Work is in progress:
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Latest demo post: [Discovering devices on ChromeOS](https://www.w3.org/community/web-bluetooth/2015/01/07/first-chromium-demo/)
 
+## Hardware Compatibility List
+
+### Working
+
+Company | System Information | Bluetooth Manufacturer | Bluetooth Chipset
+------- | ------------------ | ---------------------- | -----------------
+Google | Chromebook Pixel 2013 | Qualcomm Atheros, Inc. | AR5BMD22
+
+### Non-Working
+
+Company | System Information | Bluetooth Manufacturer | Bluetooth Chipset
+------- | ------------------ | ---------------------- | -----------------
+Apple | MacBook Air (13-inch, Mid 2012) | Broadcom | 20702A3
+
 ## [Chrome Apps Polyfill](https://github.com/WebBluetoothCG/chrome-app-polyfill)
 A polyfill for the Web Bluetooth API running inside a Chrome App.
 
