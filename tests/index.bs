@@ -34,6 +34,9 @@ spec: BLUETOOTH-ASSIGNED
     type: enum; urlPrefix: https://developer.bluetooth.org/gatt/
         urlPrefix: characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.
             text: org.bluetooth.characteristic.gap.device_name; url: gap.device_name.xml#
+        urlPrefix: descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.
+            text: org.bluetooth.descriptor.gatt.characteristic_user_description; url: gatt.characteristic_user_description.xml#
+            text: org.bluetooth.descriptor.gatt.characteristic_extended_properties; url: gatt.characteristic_extended_properties.xml#
         urlPrefix: services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.
             text: org.bluetooth.service.battery_service; url: battery_service.xml#
             text: org.bluetooth.service.glucose; url: glucose.xml#
@@ -114,12 +117,17 @@ UA's Bluetooth system to respond depending on the {{dataSetName}}:
 :: No devices are nearby.
 : <code>"FailStartDiscoveryAdapter"</code>
 :: The UA fails to start a scan for devices.
+: <code>"FailStopDiscoveryAdapter"</code>
+:: Behaves like a GenericAccessAdapter, but the UA fails to stop the scan for
+    devices.
 : <code>"GlucoseHeartRateAdapter"</code>
 :: The UA discovers a <a>HeartRateDevice</a> and then a <a>GlucoseDevice</a>.
 : <code>"MissingServiceGenericAccessAdapter"</code>
 :: The UA discovers a <a>MissingServiceGenericAccessDevice</a>.
 : <code>"MissingCharacteristicGenericAccessAdapter"</code>
 :: The UA discovers a <a>MissingCharacteristicGenericAccessDevice</a>.
+: <code>"MissingDescriptorGenericAccessAdapter"</code>
+:: The UA discovers a <a>MissingDescriptorGenericAccessDevice</a>.
 : <code>"GenericAccessAdapter"</code>
 :: The UA discovers a <a>GenericAccessDevice</a>.
 : <code>"FailingGATTOperationsAdapter"</code>
@@ -162,7 +170,7 @@ In addition to the properties of a <a>MissingServiceGenericAccessDevice</a>, its
 GATT Server contains a primary {{org.bluetooth.service.generic_access}} service.
 This service contains no characteristics.
 
-<h4 dfn-type="dfn">GenericAccessDevice</h4>
+<h4 dfn-type="dfn">MissingDescriptorGenericAccessDevice</h4>
 
 In addition to the properties of a
 <a>MissingCharacteristicGenericAccessDevice</a>, its
@@ -170,6 +178,18 @@ In addition to the properties of a
 {{org.bluetooth.characteristic.gap.device_name}} characteristic. This
 characteristic returns <code>"GenericAccessDevice"</code> when read, and
 responds that writes have succeeded (without changing the value read).
+
+<h4 dfn-type="dfn">GenericAccessDevice</h4>
+
+In addition to the properties of a
+<a>MissingDescriptorGenericAccessDevice</a>, its
+{{org.bluetooth.characteristic.gap.device_name}} characteristic contains the following descriptors:
+
+: {{org.bluetooth.descriptor.gatt.characteristic_extended_properties}}
+:: Has the Writable Auxiliaries bit set.
+: {{org.bluetooth.descriptor.gatt.characteristic_user_description}}
+:: Returns <code>"Device Name"</code> when read, and responds that writes
+    have succeeded (without changing the value read).
 
 <h4 dfn-type="dfn">FailingGATTOperationsDevice</h4>
 
