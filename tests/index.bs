@@ -250,6 +250,15 @@ encoded as string, as follows:
     <var>device-id</var> is no longer nearby.
 :: <code>"remove-device(<var>device-id</var>)"</code>
 
+Note: {{TestRunner/getBluetoothManualChooserEvents()}} returns a
+<code>sequence&lt;DOMString></code> rather than the
+<code>{{Promise}}&lt;sequence&lt;DOMString>></code> that we'd normally prefer,
+for two reasons. First, the Chromium implementation has trouble returning a
+{{Promise}} from this interface, for bad reasons. Second, we aren't providing a
+function to explicitly wait for an event, and having
+{{TestRunner/getBluetoothManualChooserEvents()}} block until the browser handles
+it avoids using a whole CPU to spin.
+
 
 <h3 dfn-type="method" for="TestRunner">sendBluetoothManualChooserEvent(event, argument)</h3>
 
