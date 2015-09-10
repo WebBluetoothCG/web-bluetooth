@@ -11,6 +11,8 @@ Documents in this repository
 * [Use Cases and Security Requirements](https://webbluetoothcg.github.io/web-bluetooth/use-cases.html)
 * [Specification](https://webbluetoothcg.github.io/web-bluetooth/), which includes code examples.
 * [Implementation Status](implementation-status.md)
+* [Test APIs](https://webbluetoothcg.github.io/web-bluetooth/tests/)
+  * These support [tests that currently live in the Chromium repository](https://code.google.com/p/chromium/codesearch/#chromium/src/third_party/WebKit/LayoutTests/bluetooth/).
 
 Communication
 -------------
