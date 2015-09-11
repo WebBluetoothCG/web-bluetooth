@@ -18,13 +18,13 @@ Work is in progress:
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Can discover devices and report basic information (e.g. name)
  * Many MacBook's may not work:
-   1. Check "About this Mac"
-   2. "System Report"
-   3. "Bluetooth"
-   4. Verify that Low Energy is supported.
-   5. Check the Chipset:
-     * Chipset: 20702B0 <<< Works
-     * Chipset: 20702A3 <<< Doesn't work
+    1. Check "About this Mac"
+    2. "System Report"
+    3. "Bluetooth"
+    4. Verify that Low Energy is supported.
+    5. Check the Chipset:
+      * Chipset: 20702B0 <<< Works
+      * Chipset: 20702A3 <<< Doesn't work
 * Windows will come later. Linux support depends on whether we can find people to maintain the drivers.
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Latest demo post: [Discovering devices on ChromeOS](https://www.w3.org/community/web-bluetooth/2015/01/07/first-chromium-demo/)
