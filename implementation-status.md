@@ -16,7 +16,7 @@ Work is in progress:
  * Tip of tree can connect to devices and read basic information. 
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=498016) is under development.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
- * Can discover devices and report basic information (e.g. name)
+ * Can discover devices and report basic information (e.g. name) (Chrome 46)
  * Many MacBook's may not work:
     1. Check "About this Mac"
     2. "System Report"
