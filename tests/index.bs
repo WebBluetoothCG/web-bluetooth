@@ -93,14 +93,20 @@ code may access them.
 <pre class="idl">
   interface TestRunner {
     void setBluetoothMockDataSet(DOMString dataSetName);
+    void setBluetoothManualChooser();
+    sequence&lt;DOMString> getBluetoothManualChooserEvents();
+    void sendBluetoothManualChooserEvent(DOMString event, DOMString argument);
   };
 </pre>
 
 <h3 id="setBluetoothMockDataSet">setBluetoothMockDataSet</h3>
 
 When invoked, <dfn method
-for="TestRunner">setBluetoothMockDataSet(dataSetName)</dfn> MUST configure the
-UA's Bluetooth system to respond depending on the {{dataSetName}}:
+for="TestRunner">setBluetoothMockDataSet(dataSetName)</dfn> MUST replace the
+user prompt used in {{Bluetooth/requestDevice()}} with one that resolves the
+promise with the first discovered device, or rejects the promise if discovery
+can't start or times out. Then it must configure the UA's Bluetooth system to
+respond depending on the {{dataSetName}}:
 
 : <code>"NotPresentAdapter"</code>
 :: The UA has no Bluetooth implementation at all.
@@ -207,6 +213,68 @@ UUIDs <code>errorUUID(0x101)</code> through <code>errorUUID(0x1ff)</code>. When
 read or written, the characteristic with UUID <code>errorUUID(which)</code>
 returns an Error Response ([[!BLUETOOTH42]] 3.F.3.4.1.1) with an error code of
 <code>which - 0x100</code>.
+
+
+<h3 dfn-type="method" for="TestRunner">setBluetoothManualChooser()</h3>
+
+When invoked, {{TestRunner/setBluetoothManualChooser()}} MUST replace the user
+prompt used in {{Bluetooth/requestDevice()}} with a "<dfn>manual chooser</dfn>"
+that records events that would otherwise be shown to the user (see
+{{TestRunner/getBluetoothManualChooserEvents()}}), and which can simulate user
+interaction with the prompt (see
+{{TestRunner/sendBluetoothManualChooserEvent()}}).
+
+<h3 dfn-type="method" for="TestRunner">getBluetoothManualChooserEvents()</h3>
+
+When invoked, {{TestRunner/getBluetoothManualChooserEvents()}} MUST return the
+list of events that have been recorded by the <a>manual chooser</a> since
+{{TestRunner/getBluetoothManualChooserEvents()}} was last called. Each event is
+encoded as string, as follows:
+
+: The chooser is opened following a request by origin <var>O</var>.
+:: <code>"chooser-opened(<var>O</var>)"</code>
+: The Bluetooth adapter is removed from the UA.
+:: <code>"adapter-removed"</code>
+: The Bluetooth adapter becomes present but disabled.
+:: <code>"adapter-disabled"</code>
+: The Bluetooth adapter becomes present and enabled.
+:: <code>"adapter-enabled"</code>
+: The Bluetooth adapter begins scanning for nearby devices.
+:: <code>"discovering"</code>
+: The Bluetooth adapter stops scanning for nearby devices.
+:: <code>"discovery-idle"</code>
+: The Bluetooth adapter attempts to begin scanning for nearby devices, but fails.
+:: <code>"discovery-failed-to-start"</code>
+: A device is added to the user prompt with {{BluetoothDevice/id}}
+    <var>device-id</var> and {{BluetoothDevice/name}} <var>device-name</var>.
+:: <code>"add-device(<var>device-name</var>)=<var>device-id</var>"</code>
+
+    Note: The <var>device-id</var> might not be the device's MAC address. For
+    example, MacOS and iOS generate a random ID when testing against physical
+    devices.
+
+: The UA discovers that a device with {{BluetoothDevice/id}}
+    <var>device-id</var> is no longer nearby.
+:: <code>"remove-device(<var>device-id</var>)"</code>
+
+Note: {{TestRunner/getBluetoothManualChooserEvents()}} returns a
+<code>sequence&lt;DOMString></code> rather than the
+<code>{{Promise}}&lt;sequence&lt;DOMString>></code> that we'd normally prefer
+because the Chromium implementation has layering issues that make it difficult
+to return a {{Promise}} from this interface.
+
+
+<h3 dfn-type="method" for="TestRunner">sendBluetoothManualChooserEvent(event, argument)</h3>
+
+When invoked, {{TestRunner/sendBluetoothManualChooserEvent(event, argument)}}
+MUST cause the <a>manual chooser</a> to inform the UA that the user has taken an
+action corresponding to the {{event}}:
+
+: <code>"cancelled"</code>
+:: The user cancelled the prompt.
+: <code>"selected"</code>
+:: The user selected the device with an {{BluetoothDevice/id}} of {{argument}}.
+
 
 <h2 id="event-sender">eventSender</h2>
 

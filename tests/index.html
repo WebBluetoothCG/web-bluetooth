@@ -1008,7 +1008,7 @@
   <div class="head">
    <div data-fill-with="logo"></div>
    <h1 class="p-name no-ref" id="title">Testing Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-09-08">8 September 2015</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-09-17">17 September 2015</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1063,6 +1063,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         <li><a href="#genericaccessdevice"><span class="secno">4.1.8</span> <span class="content">GenericAccessDevice</span></a>
         <li><a href="#failinggattoperationsdevice"><span class="secno">4.1.9</span> <span class="content">FailingGATTOperationsDevice</span></a>
        </ul>
+      <li><a href="#dom-testrunner-setbluetoothmanualchooser"><span class="secno">4.2</span> <span class="content">setBluetoothManualChooser()</span></a>
+      <li><a href="#dom-testrunner-getbluetoothmanualchooserevents"><span class="secno">4.3</span> <span class="content">getBluetoothManualChooserEvents()</span></a>
+      <li><a href="#dom-testrunner-sendbluetoothmanualchooserevent"><span class="secno">4.4</span> <span class="content">sendBluetoothManualChooserEvent(event, argument)</span></a>
      </ul>
     <li><a href="#event-sender"><span class="secno">5</span> <span class="content">eventSender</span></a>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
@@ -1102,11 +1105,17 @@ code may access them.</p>
    <h2 class="heading settled" data-level="4" id="test-runner"><span class="secno">4. </span><span class="content">testRunner</span><a class="self-link" href="#test-runner"></a></h2>
 <pre class="idl">interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="testrunner">TestRunner<a class="self-link" href="#testrunner"></a></dfn> {
   void <a class="idl-code" data-link-type="method" href="#dom-testrunner-setbluetoothmockdataset">setBluetoothMockDataSet</a>(DOMString <dfn class="idl-code" data-dfn-for="TestRunner/setBluetoothMockDataSet(dataSetName)" data-dfn-type="argument" data-export="" id="dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">dataSetName<a class="self-link" href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname"></a></dfn>);
+  void <a class="idl-code" data-link-type="method" href="#dom-testrunner-setbluetoothmanualchooser">setBluetoothManualChooser</a>();
+  sequence&lt;DOMString> <a class="idl-code" data-link-type="method" href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents</a>();
+  void <a class="idl-code" data-link-type="method" href="#dom-testrunner-sendbluetoothmanualchooserevent">sendBluetoothManualChooserEvent</a>(DOMString <dfn class="idl-code" data-dfn-for="TestRunner/sendBluetoothManualChooserEvent(event, argument)" data-dfn-type="argument" data-export="" id="dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">event<a class="self-link" href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event"></a></dfn>, DOMString <dfn class="idl-code" data-dfn-for="TestRunner/sendBluetoothManualChooserEvent(event, argument)" data-dfn-type="argument" data-export="" id="dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">argument<a class="self-link" href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument"></a></dfn>);
 };
 </pre>
    <h3 class="heading settled" data-level="4.1" id="setBluetoothMockDataSet"><span class="secno">4.1. </span><span class="content">setBluetoothMockDataSet</span><a class="self-link" href="#setBluetoothMockDataSet"></a></h3>
-   <p>When invoked, <dfn class="idl-code" data-dfn-for="TestRunner" data-dfn-type="method" data-export="" id="dom-testrunner-setbluetoothmockdataset">setBluetoothMockDataSet(dataSetName)<a class="self-link" href="#dom-testrunner-setbluetoothmockdataset"></a></dfn> MUST configure the
-UA’s Bluetooth system to respond depending on the <code class="idl"><a data-link-type="idl" href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">dataSetName</a></code>:</p>
+   <p>When invoked, <dfn class="idl-code" data-dfn-for="TestRunner" data-dfn-type="method" data-export="" id="dom-testrunner-setbluetoothmockdataset">setBluetoothMockDataSet(dataSetName)<a class="self-link" href="#dom-testrunner-setbluetoothmockdataset"></a></dfn> MUST replace the
+user prompt used in <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice">requestDevice()</a></code> with one that resolves the
+promise with the first discovered device, or rejects the promise if discovery
+can’t start or times out. Then it must configure the UA’s Bluetooth system to
+respond depending on the <code class="idl"><a data-link-type="idl" href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">dataSetName</a></code>:</p>
    <dl>
     <dt data-md="">
      <p><code>"NotPresentAdapter"</code></p>
@@ -1203,6 +1212,72 @@ as a type 4 (random) UUID.)</p>
 accepts GATT connections. Its GATT Server contains one service with UUID <code>errorUUID(0x100)</code>. This service contains 255 characteristics with
 UUIDs <code>errorUUID(0x101)</code> through <code>errorUUID(0x1ff)</code>. When
 read or written, the characteristic with UUID <code>errorUUID(which)</code> returns an Error Response (<a data-link-type="biblio" href="#biblio-bluetooth42">[BLUETOOTH42]</a> 3.F.3.4.1.1) with an error code of <code>which - 0x100</code>.</p>
+   <h3 class="heading settled idl-code" data-dfn-for="TestRunner" data-dfn-type="method" data-export="" data-level="4.2" data-lt="setBluetoothManualChooser()" id="dom-testrunner-setbluetoothmanualchooser"><span class="secno">4.2. </span><span class="content">setBluetoothManualChooser()</span><a class="self-link" href="#dom-testrunner-setbluetoothmanualchooser"></a></h3>
+   <p>When invoked, <code class="idl"><a data-link-type="idl" href="#dom-testrunner-setbluetoothmanualchooser">setBluetoothManualChooser()</a></code> MUST replace the user
+prompt used in <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice">requestDevice()</a></code> with a "<dfn data-dfn-type="dfn" data-noexport="" id="manual-chooser">manual chooser<a class="self-link" href="#manual-chooser"></a></dfn>"
+that records events that would otherwise be shown to the user (see <code class="idl"><a data-link-type="idl" href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents()</a></code>), and which can simulate user
+interaction with the prompt (see <code class="idl"><a data-link-type="idl" href="#dom-testrunner-sendbluetoothmanualchooserevent">sendBluetoothManualChooserEvent()</a></code>).</p>
+   <h3 class="heading settled idl-code" data-dfn-for="TestRunner" data-dfn-type="method" data-export="" data-level="4.3" data-lt="getBluetoothManualChooserEvents()" id="dom-testrunner-getbluetoothmanualchooserevents"><span class="secno">4.3. </span><span class="content">getBluetoothManualChooserEvents()</span><a class="self-link" href="#dom-testrunner-getbluetoothmanualchooserevents"></a></h3>
+   <p>When invoked, <code class="idl"><a data-link-type="idl" href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents()</a></code> MUST return the
+list of events that have been recorded by the <a data-link-type="dfn" href="#manual-chooser">manual chooser</a> since <code class="idl"><a data-link-type="idl" href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents()</a></code> was last called. Each event is
+encoded as string, as follows:</p>
+   <dl>
+    <dt data-md="">
+     <p>The chooser is opened following a request by origin <var>O</var>.</p>
+    <dd data-md="">
+     <p><code>"chooser-opened(<var>O</var>)"</code></p>
+    <dt data-md="">
+     <p>The Bluetooth adapter is removed from the UA.</p>
+    <dd data-md="">
+     <p><code>"adapter-removed"</code></p>
+    <dt data-md="">
+     <p>The Bluetooth adapter becomes present but disabled.</p>
+    <dd data-md="">
+     <p><code>"adapter-disabled"</code></p>
+    <dt data-md="">
+     <p>The Bluetooth adapter becomes present and enabled.</p>
+    <dd data-md="">
+     <p><code>"adapter-enabled"</code></p>
+    <dt data-md="">
+     <p>The Bluetooth adapter begins scanning for nearby devices.</p>
+    <dd data-md="">
+     <p><code>"discovering"</code></p>
+    <dt data-md="">
+     <p>The Bluetooth adapter stops scanning for nearby devices.</p>
+    <dd data-md="">
+     <p><code>"discovery-idle"</code></p>
+    <dt data-md="">
+     <p>The Bluetooth adapter attempts to begin scanning for nearby devices, but fails.</p>
+    <dd data-md="">
+     <p><code>"discovery-failed-to-start"</code></p>
+    <dt data-md="">
+     <p>A device is added to the user prompt with <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id">id</a></code> <var>device-id</var> and <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name">name</a></code> <var>device-name</var>.</p>
+    <dd data-md="">
+     <p><code>"add-device(<var>device-name</var>)=<var>device-id</var>"</code></p>
+     <p class="note" role="note">Note: The <var>device-id</var> might not be the device’s MAC address. For
+example, MacOS and iOS generate a random ID when testing against physical
+devices.</p>
+    <dt data-md="">
+     <p>The UA discovers that a device with <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id">id</a></code> <var>device-id</var> is no longer nearby.</p>
+    <dd data-md="">
+     <p><code>"remove-device(<var>device-id</var>)"</code></p>
+   </dl>
+   <p class="note" role="note">Note: <code class="idl"><a data-link-type="idl" href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents()</a></code> returns a <code>sequence&lt;DOMString></code> rather than the <code><code class="idl"><a data-link-type="idl" href="https://drafts.csswg.org/css-font-loading-3/#promise">Promise</a></code>&lt;sequence&lt;DOMString>></code> that we’d normally prefer
+because the Chromium implementation has layering issues that make it difficult
+to return a <code class="idl"><a data-link-type="idl" href="https://drafts.csswg.org/css-font-loading-3/#promise">Promise</a></code> from this interface.</p>
+   <h3 class="heading settled idl-code" data-dfn-for="TestRunner" data-dfn-type="method" data-export="" data-level="4.4" data-lt="sendBluetoothManualChooserEvent(event, argument)" id="dom-testrunner-sendbluetoothmanualchooserevent"><span class="secno">4.4. </span><span class="content">sendBluetoothManualChooserEvent(event, argument)</span><a class="self-link" href="#dom-testrunner-sendbluetoothmanualchooserevent"></a></h3>
+   <p>When invoked, <code class="idl"><a data-link-type="idl" href="#dom-testrunner-sendbluetoothmanualchooserevent">sendBluetoothManualChooserEvent(event, argument)</a></code> MUST cause the <a data-link-type="dfn" href="#manual-chooser">manual chooser</a> to inform the UA that the user has taken an
+action corresponding to the <code class="idl"><a data-link-type="idl" href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">event</a></code>:</p>
+   <dl>
+    <dt data-md="">
+     <p><code>"cancelled"</code></p>
+    <dd data-md="">
+     <p>The user cancelled the prompt.</p>
+    <dt data-md="">
+     <p><code>"selected"</code></p>
+    <dd data-md="">
+     <p>The user selected the device with an <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id">id</a></code> of <code class="idl"><a data-link-type="idl" href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">argument</a></code>.</p>
+   </dl>
    <h2 class="heading settled" data-level="5" id="event-sender"><span class="secno">5. </span><span class="content">eventSender</span><a class="self-link" href="#event-sender"></a></h2>
 <pre class="idl">interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="eventsender">EventSender<a class="self-link" href="#eventsender"></a></dfn> {
   void <a class="idl-code" data-link-type="method" href="#dom-eventsender-keydown">keyDown</a>(DOMString <dfn class="idl-code" data-dfn-for="EventSender/keyDown(code)" data-dfn-type="argument" data-export="" id="dom-eventsender-keydown-code-code">code<a class="self-link" href="#dom-eventsender-keydown-code-code"></a></dfn>);
@@ -1229,24 +1304,30 @@ event</a> named <code class="idl"><a data-link-type="idl" href="https://www.w3.o
   <h2 class="no-num heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="no-num heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="indexlist">
+   <li><a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">argument</a><span>, in §4</span>
    <li><a href="#basedevice">BaseDevice</a><span>, in §4.1</span>
    <li><a href="#batterydevice">BatteryDevice</a><span>, in §4.1.1</span>
    <li><a href="#dom-eventsender-keydown-code-code">code</a><span>, in §5</span>
    <li><a href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">dataSetName</a><span>, in §4</span>
    <li><a href="#erroruuid-unsigned-long-id">errorUUID(unsigned long id)</a><span>, in §4.1.9</span>
+   <li><a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">event</a><span>, in §4</span>
    <li><a href="#dom-window-eventsender">eventSender</a><span>, in §3</span>
    <li><a href="#eventsender">EventSender</a><span>, in §5</span>
    <li><a href="#failinggattoperationsdevice">FailingGATTOperationsDevice</a><span>, in §4.1.8</span>
    <li><a href="#genericaccessdevice">GenericAccessDevice</a><span>, in §4.1.7</span>
+   <li><a href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents()</a><span>, in §4.2</span>
    <li><a href="#glucosedevice">GlucoseDevice</a><span>, in §4.1.2</span>
    <li><a href="#heartratedevice">HeartRateDevice</a><span>, in §4.1.3</span>
    <li><a href="#dom-eventsender-keydown">keyDown(code)</a><span>, in §5</span>
+   <li><a href="#manual-chooser">manual chooser</a><span>, in §4.2</span>
    <li><a href="#missingcharacteristicgenericaccessdevice">MissingCharacteristicGenericAccessDevice</a><span>, in §4.1.5</span>
    <li><a href="#missingdescriptorgenericaccessdevice">MissingDescriptorGenericAccessDevice</a><span>, in §4.1.6</span>
    <li><a href="#missingservicegenericaccessdevice">MissingServiceGenericAccessDevice</a><span>, in §4.1.4</span>
+   <li><a href="#dom-testrunner-sendbluetoothmanualchooserevent">sendBluetoothManualChooserEvent(event, argument)</a><span>, in §4.3</span>
+   <li><a href="#dom-testrunner-setbluetoothmanualchooser">setBluetoothManualChooser()</a><span>, in §4.1.9</span>
    <li><a href="#dom-testrunner-setbluetoothmockdataset">setBluetoothMockDataSet(dataSetName)</a><span>, in §4.1</span>
-   <li><a href="#testrunner">TestRunner</a><span>, in §4</span>
    <li><a href="#dom-window-testrunner">testRunner</a><span>, in §3</span>
+   <li><a href="#testrunner">TestRunner</a><span>, in §4</span>
   </ul>
   <h3 class="no-num heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="indexlist">
@@ -1260,6 +1341,11 @@ event</a> named <code class="idl"><a data-link-type="idl" href="https://www.w3.o
      <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#">org.bluetooth.service.generic_access</a>
      <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#">org.bluetooth.service.glucose</a>
      <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">org.bluetooth.service.heart_rate</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio" href="#biblio-css-font-loading-3">[css-font-loading-3]</a> defines the following terms:
+    <ul>
+     <li><a href="https://drafts.csswg.org/css-font-loading-3/#promise">Promise</a>
     </ul>
    <li>
     <a data-link-type="biblio" href="#biblio-html">[HTML]</a> defines the following terms:
@@ -1277,8 +1363,11 @@ event</a> named <code class="idl"><a data-link-type="idl" href="https://www.w3.o
    <li>
     <a data-link-type="biblio" href="#biblio-web-bluetooth-1">[web-bluetooth]</a> defines the following terms:
     <ul>
+     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id">id</a>
+     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name">name</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-productid">productID</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-productversion">productVersion</a>
+     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice">requestDevice(options)</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#valid-uuid">valid uuid</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-vendorid">vendorID</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-vendoridsource">vendorIDSource</a>
@@ -1295,6 +1384,8 @@ event</a> named <code class="idl"><a data-link-type="idl" href="https://www.w3.o
    <dd>Ian Hickson. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-ui-events"><a class="self-link" href="#biblio-ui-events"></a>[UI-EVENTS]
    <dd>Gary Kacmarcik; Travis Leithead. <a href="http://www.w3.org/TR/uievents/">UI Events (formerly DOM Level 3 Events)</a>. 28 April 2015. WD. URL: <a href="http://www.w3.org/TR/uievents/">http://www.w3.org/TR/uievents/</a>
+   <dt id="biblio-css-font-loading-3"><a class="self-link" href="#biblio-css-font-loading-3"></a>[CSS-FONT-LOADING-3]
+   <dd>Tab Atkins Jr.. <a href="http://www.w3.org/TR/css-font-loading-3/">CSS Font Loading Module Level 3</a>. 22 May 2014. LCWD. URL: <a href="http://www.w3.org/TR/css-font-loading-3/">http://www.w3.org/TR/css-font-loading-3/</a>
    <dt id="biblio-rfc2119"><a class="self-link" href="#biblio-rfc2119"></a>[RFC2119]
    <dd>S. Bradner. <a href="https://tools.ietf.org/html/rfc2119">Key words for use in RFCs to Indicate Requirement Levels</a>. March 1997. Best Current Practice. URL: <a href="https://tools.ietf.org/html/rfc2119">https://tools.ietf.org/html/rfc2119</a>
    <dt id="biblio-web-bluetooth"><a class="self-link" href="#biblio-web-bluetooth"></a>[WEB-BLUETOOTH]
@@ -1308,6 +1399,9 @@ event</a> named <code class="idl"><a data-link-type="idl" href="https://www.w3.o
 
 interface <a href="#testrunner">TestRunner</a> {
   void <a class="idl-code" data-link-type="method" href="#dom-testrunner-setbluetoothmockdataset">setBluetoothMockDataSet</a>(DOMString <a href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">dataSetName</a>);
+  void <a class="idl-code" data-link-type="method" href="#dom-testrunner-setbluetoothmanualchooser">setBluetoothManualChooser</a>();
+  sequence&lt;DOMString> <a class="idl-code" data-link-type="method" href="#dom-testrunner-getbluetoothmanualchooserevents">getBluetoothManualChooserEvents</a>();
+  void <a class="idl-code" data-link-type="method" href="#dom-testrunner-sendbluetoothmanualchooserevent">sendBluetoothManualChooserEvent</a>(DOMString <a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">event</a>, DOMString <a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">argument</a>);
 };
 
 interface <a href="#eventsender">EventSender</a> {
