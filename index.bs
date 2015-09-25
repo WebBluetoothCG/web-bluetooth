@@ -218,61 +218,61 @@ spec: html
         a website would use code like the following:
       </p>
       <pre highlight="js">
-let chosenHeartRateService = null;
+        let chosenHeartRateService = null;
 
-navigator.bluetooth.<a idl for="Bluetooth" lt="requestDevice()">requestDevice</a>({
-filters: [{
-services: ['heart_rate'],
-}]
-}).then(device => device.<a for="BluetoothDevice">connectGATT()</a>)
-.then(server => server.<a idl for="BluetoothGATTRemoteServer" lt="getPrimaryService()"
-                      >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate"
->'heart_rate'</a>))
-.then(service => {
-chosenHeartRateService = service;
-return Promise.all([
-service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
-           >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location"
->'body_sensor_location'</a>)
-  .then(handleBodySensorLocationCharacteristic),
-service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
-           >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
->'heart_rate_measurement'</a>))
-  .then(handleHeartRateMeasurementCharacteristic),
-]);
-});
+        navigator.bluetooth.<a idl for="Bluetooth" lt="requestDevice()">requestDevice</a>({
+          filters: [{
+            services: ['heart_rate'],
+          }]
+        }).then(device => device.<a for="BluetoothDevice">connectGATT()</a>)
+        .then(server => server.<a idl for="BluetoothGATTRemoteServer" lt="getPrimaryService()"
+                              >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate"
+            >'heart_rate'</a>))
+        .then(service => {
+          chosenHeartRateService = service;
+          return Promise.all([
+            service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+                       >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location"
+            >'body_sensor_location'</a>)
+              .then(handleBodySensorLocationCharacteristic),
+            service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+                       >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
+            >'heart_rate_measurement'</a>))
+              .then(handleHeartRateMeasurementCharacteristic),
+          ]);
+        });
 
-function handleBodySensorLocationCharacteristic(characteristic) {
-if (characteristic === null) {
-console.log("Unknown sensor location.");
-return Promise.resolve();
-}
-return characteristic.<a for="BluetoothGATTCharacteristic">readValue()</a>
-.then(sensorLocationArray => {
-let sensorLocation = new Uint8Array(sensorLocationArray)[0];
-switch (sensorLocation) {
-  case 0: return 'Other';
-  case 1: return 'Chest';
-  case 2: return 'Wrist';
-  case 3: return 'Finger';
-  case 4: return 'Hand';
-  case 5: return 'Ear Lobe';
-  case 6: return 'Foot';
-  default: return 'Unknown';
-}
-}).then(location => console.log(location));
-}
+        function handleBodySensorLocationCharacteristic(characteristic) {
+          if (characteristic === null) {
+            console.log("Unknown sensor location.");
+            return Promise.resolve();
+          }
+          return characteristic.<a for="BluetoothGATTCharacteristic">readValue()</a>
+          .then(sensorLocationArray => {
+            let sensorLocation = new Uint8Array(sensorLocationArray)[0];
+            switch (sensorLocation) {
+              case 0: return 'Other';
+              case 1: return 'Chest';
+              case 2: return 'Wrist';
+              case 3: return 'Finger';
+              case 4: return 'Hand';
+              case 5: return 'Ear Lobe';
+              case 6: return 'Foot';
+              default: return 'Unknown';
+            }
+          }).then(location => console.log(location));
+        }
 
-function handleHeartRateMeasurementCharacteristic(characteristic) {
-characteristic.addEventListener('<a event>characteristicvaluechanged</a>', onHeartRateChanged);
-return characteristic.<a for="BluetoothGATTCharacteristic">startNotifications()</a>;
-}
+        function handleHeartRateMeasurementCharacteristic(characteristic) {
+          characteristic.addEventListener('<a event>characteristicvaluechanged</a>', onHeartRateChanged);
+          return characteristic.<a for="BluetoothGATTCharacteristic">startNotifications()</a>;
+        }
 
-function onHeartRateChanged(event) {
-let characteristic = event.target;
-console.log(parseHeartRate(characteristic.<a attribute for="BluetoothGATTCharacteristic">value</a>));
-}
-</pre>
+        function onHeartRateChanged(event) {
+          let characteristic = event.target;
+          console.log(parseHeartRate(characteristic.<a attribute for="BluetoothGATTCharacteristic">value</a>));
+        }
+      </pre>
 
       <p>
         <code>parseHeartRate()</code> would be defined using the
@@ -284,52 +284,52 @@ console.log(parseHeartRate(characteristic.<a attribute for="BluetoothGATTCharact
       </p>
 
       <pre highlight="js">
-function parseHeartRate(buffer) {
-let data = new DataView(buffer);
-let flags = data.getUint8(0);
-let rate16Bits = flags & 0x1;
-let result = {};
-let index = 1;
-if (rate16Bits) {
-result.heartRate = data.getUint16(index, /*littleEndian=*/true);
-index += 2;
-} else {
-result.heartRate = data.getUint8(index);
-index += 1;
-}
-let contactDetected = flags & 0x2;
-let contactSensorPresent = flags & 0x4;
-if (contactSensorPresent) {
-result.contactDetected = !!contactDetected;
-}
-let energyPresent = flags & 0x8;
-if (energyPresent) {
-result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
-index += 2;
-}
-let rrIntervalPresent = flags & 0x10;
-if (rrIntervalPresent) {
-let rrIntervals = [];
-for (; index + 1 < data.byteLength; index += 2) {
-  rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
-}
-result.rrIntervals = rrIntervals;
-}
-return result;
-}
-</pre>
+        function parseHeartRate(buffer) {
+          let data = new DataView(buffer);
+          let flags = data.getUint8(0);
+          let rate16Bits = flags & 0x1;
+          let result = {};
+          let index = 1;
+          if (rate16Bits) {
+            result.heartRate = data.getUint16(index, /*littleEndian=*/true);
+            index += 2;
+          } else {
+            result.heartRate = data.getUint8(index);
+            index += 1;
+          }
+          let contactDetected = flags & 0x2;
+          let contactSensorPresent = flags & 0x4;
+          if (contactSensorPresent) {
+            result.contactDetected = !!contactDetected;
+          }
+          let energyPresent = flags & 0x8;
+          if (energyPresent) {
+            result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
+            index += 2;
+          }
+          let rrIntervalPresent = flags & 0x10;
+          if (rrIntervalPresent) {
+            let rrIntervals = [];
+            for (; index + 1 < data.byteLength; index += 2) {
+              rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
+            }
+            result.rrIntervals = rrIntervals;
+          }
+          return result;
+        }
+      </pre>
 
       <p>
         <code>onHeartRateChanged()</code> might log an object like
       </p>
       <pre highlight="js">
-{
-heartRate: 70,
-contactDetected: true,
-energyExpended: 750,     // Meaning 750kJ.
-rrIntervals: [890, 870]  // Meaning .87s and .85s.
-}
-</pre>
+         {
+           heartRate: 70,
+           contactDetected: true,
+           energyExpended: 750,     // Meaning 750kJ.
+           rrIntervals: [890, 870]  // Meaning .87s and .85s.
+         }
+      </pre>
 
       <p>
         If the heart rate sensor reports the <code>energyExpended</code> field,
@@ -339,19 +339,19 @@ rrIntervals: [890, 870]  // Meaning .87s and .85s.
       </p>
 
       <pre highlight="js">
-function resetEnergyExpended() {
-if (!chosenHeartRateService) {
-return Promise.reject(new Error('No heart rate sensor selected yet.'));
-}
-return chosenHeartRateService.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
-                               >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point"
->'heart_rate_control_point'</a>))
-.then(controlPoint => {
-  let resetEnergyExpended = new Uint8Array([1]);
-  return controlPoint.<a idl for="BluetoothGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
-});
-}
-</pre>
+        function resetEnergyExpended() {
+          if (!chosenHeartRateService) {
+            return Promise.reject(new Error('No heart rate sensor selected yet.'));
+          }
+          return chosenHeartRateService.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+                                         >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point"
+            >'heart_rate_control_point'</a>))
+          .then(controlPoint => {
+            let resetEnergyExpended = new Uint8Array([1]);
+            return controlPoint.<a idl for="BluetoothGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
+          });
+        }
+      </pre>
     </div>
   </section>
 </section>
@@ -574,10 +574,10 @@ return chosenHeartRateService.<a idl for="BluetoothGATTService" lt="getCharacter
       If the website calls
     </p>
     <pre highlight="js">
-navigator.bluetooth.requestDevice({
-filters: [ {services: [A, B]} ]
-});
-</pre>
+      navigator.bluetooth.requestDevice({
+        filters: [ {services: [A, B]} ]
+      });
+    </pre>
     <p>
       the user will be shown a dialog containing devices D1 and D2.
       If the user selects D1, the website will not be able to access services C or D.
@@ -587,13 +587,13 @@ filters: [ {services: [A, B]} ]
       On the other hand, if the website calls
     </p>
     <pre highlight="js">
-navigator.bluetooth.requestDevice({
-filters: [
-{services: [A, B]},
-{services: [C, D]}
-]
-});
-</pre>
+      navigator.bluetooth.requestDevice({
+        filters: [
+          {services: [A, B]},
+          {services: [C, D]}
+        ]
+      });
+    </pre>
     <p>
       the dialog will contain devices D1, D2, and D3,
       and if the user selects D1,
@@ -605,11 +605,11 @@ filters: [
       but it does affect which services the website can use from the device the user picks.
     </p>
     <pre highlight="js">
-navigator.bluetooth.requestDevice({
-filters: [ {services: [A, B]} ],
-optionalServices: \[E]
-});
-</pre>
+      navigator.bluetooth.requestDevice({
+        filters: [ {services: [A, B]} ],
+        optionalServices: \[E]
+      });
+    </pre>
     <p>
       Shows a dialog containing D1 and D2,
       but not D4, since D4 doesn't contain the required services.
@@ -1346,29 +1346,29 @@ optionalServices: \[E]
         </p>
 
         <pre highlight="js">
-var known_service = "A service in the iBeacon's GATT server";
-return navigator.bluetooth.requestDevice({
-filters: [{services: [known_service]}]
-}).then(device => {
-var rssi = device.adData.rssi;
-var appleData = new DataView(device.adData.manufacturerData.get(<a
-           href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
-           title="Apple, Inc.'s Company Identifier">0x004C</a>));
-if (appleData.byteLength != 23 ||
-  appleData.getUint16(0, false) !== 0x0215) {
-return {isBeacon: false};
-}
-var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
-var major = appleData.getUint16(18, false);
-var minor = appleData.getUint16(20, false);
-var txPowerAt1m = -appleData.getInt8(22);
-return {isBeacon: true,
-      uuidArray,
-      major,
-      minor,
-      pathLossVs1m: txPowerAt1m - rssi};
-});
-</pre>
+          var known_service = "A service in the iBeacon's GATT server";
+          return navigator.bluetooth.requestDevice({
+            filters: [{services: [known_service]}]
+          }).then(device => {
+            var rssi = device.adData.rssi;
+            var appleData = new DataView(device.adData.manufacturerData.get(<a
+                       href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
+                       title="Apple, Inc.'s Company Identifier">0x004C</a>));
+            if (appleData.byteLength != 23 ||
+              appleData.getUint16(0, false) !== 0x0215) {
+              return {isBeacon: false};
+            }
+            var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
+            var major = appleData.getUint16(18, false);
+            var minor = appleData.getUint16(20, false);
+            var txPowerAt1m = -appleData.getInt8(22);
+            return {isBeacon: true,
+                    uuidArray,
+                    major,
+                    minor,
+                    pathLossVs1m: txPowerAt1m - rssi};
+          });
+        </pre>
 
         <p>
           The format of iBeacon advertisements was derived from

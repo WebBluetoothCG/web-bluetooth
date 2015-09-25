@@ -1066,7 +1066,7 @@
   <div class="head">
    <div data-fill-with="logo"></div>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-09-24">24 September 2015</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-09-25">25 September 2015</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1225,112 +1225,112 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     among devices that only implement Bluetooth 4.0 or 4.1. </p>
     <section>
      <h3 class="heading settled" data-level="1.1" id="introduction-examples"><span class="secno">1.1. </span><span class="content">Examples</span><a class="self-link" href="#introduction-examples"></a></h3>
-     <div class="example" id="example-fe44175c">
-      <a class="self-link" href="#example-fe44175c"></a> 
+     <div class="example" id="example-a130a116">
+      <a class="self-link" href="#example-a130a116"></a> 
       <p> To discover and retrieve data from a standard heart rate monitor,
         a website would use code like the following: </p>
 <pre>let chosenHeartRateService = null;
 
 navigator.bluetooth.<a data-link-type="idl" href="#dom-bluetooth-requestdevice">requestDevice</a>({
-filters: [{
-services: ['heart_rate'],
-}]
+  filters: [{
+    services: ['heart_rate'],
+  }]
 }).then(device => device.<a data-link-type="functionish" href="#dom-bluetoothdevice-connectgatt">connectGATT()</a>)
 .then(server => server.<a data-link-type="idl" href="#dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">'heart_rate'</a>))
 .then(service => {
-chosenHeartRateService = service;
-return Promise.all([
-service.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">'body_sensor_location'</a>)
-  .then(handleBodySensorLocationCharacteristic),
-service.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">'heart_rate_measurement'</a>))
-  .then(handleHeartRateMeasurementCharacteristic),
-]);
+  chosenHeartRateService = service;
+  return Promise.all([
+    service.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">'body_sensor_location'</a>)
+      .then(handleBodySensorLocationCharacteristic),
+    service.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">'heart_rate_measurement'</a>))
+      .then(handleHeartRateMeasurementCharacteristic),
+  ]);
 });
 
 function handleBodySensorLocationCharacteristic(characteristic) {
-if (characteristic === null) {
-console.log("Unknown sensor location.");
-return Promise.resolve();
-}
-return characteristic.<a data-link-type="functionish" href="#dom-bluetoothgattcharacteristic-readvalue">readValue()</a>
-.then(sensorLocationArray => {
-let sensorLocation = new Uint8Array(sensorLocationArray)[0];
-switch (sensorLocation) {
-  case 0: return 'Other';
-  case 1: return 'Chest';
-  case 2: return 'Wrist';
-  case 3: return 'Finger';
-  case 4: return 'Hand';
-  case 5: return 'Ear Lobe';
-  case 6: return 'Foot';
-  default: return 'Unknown';
-}
-}).then(location => console.log(location));
+  if (characteristic === null) {
+    console.log("Unknown sensor location.");
+    return Promise.resolve();
+  }
+  return characteristic.<a data-link-type="functionish" href="#dom-bluetoothgattcharacteristic-readvalue">readValue()</a>
+  .then(sensorLocationArray => {
+    let sensorLocation = new Uint8Array(sensorLocationArray)[0];
+    switch (sensorLocation) {
+      case 0: return 'Other';
+      case 1: return 'Chest';
+      case 2: return 'Wrist';
+      case 3: return 'Finger';
+      case 4: return 'Hand';
+      case 5: return 'Ear Lobe';
+      case 6: return 'Foot';
+      default: return 'Unknown';
+    }
+  }).then(location => console.log(location));
 }
 
 function handleHeartRateMeasurementCharacteristic(characteristic) {
-characteristic.addEventListener('<a class="idl-code" data-link-type="event" href="#dom-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a>', onHeartRateChanged);
-return characteristic.<a data-link-type="functionish" href="#dom-bluetoothgattcharacteristic-startnotifications">startNotifications()</a>;
+  characteristic.addEventListener('<a class="idl-code" data-link-type="event" href="#dom-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a>', onHeartRateChanged);
+  return characteristic.<a data-link-type="functionish" href="#dom-bluetoothgattcharacteristic-startnotifications">startNotifications()</a>;
 }
 
 function onHeartRateChanged(event) {
-let characteristic = event.target;
-console.log(parseHeartRate(characteristic.<a class="idl-code" data-link-type="attribute" href="#dom-bluetoothgattcharacteristic-value">value</a>));
+  let characteristic = event.target;
+  console.log(parseHeartRate(characteristic.<a class="idl-code" data-link-type="attribute" href="#dom-bluetoothgattcharacteristic-value">value</a>));
 }
 </pre>
       <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><code>heart_rate_measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-arraybuffer-constructor">ArrayBuffer</a></code> stored
         in a <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-value">value</a></code> field. </p>
 <pre class="highlight"><span class="kd">function</span> <span class="nx">parseHeartRate</span><span class="p">(</span><span class="nx">buffer</span><span class="p">)</span> <span class="p">{</span>
-<span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataView</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
-<span class="kd">let</span> <span class="nx">flags</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-<span class="kd">let</span> <span class="nx">rate16Bits</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">;</span>
-<span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{};</span>
-<span class="kd">let</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">rate16Bits</span><span class="p">)</span> <span class="p">{</span>
-<span class="nx">result</span><span class="p">.</span><span class="nx">heartRate</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">);</span>
-<span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-<span class="nx">result</span><span class="p">.</span><span class="nx">heartRate</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="nx">index</span><span class="p">);</span>
-<span class="nx">index</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="kd">let</span> <span class="nx">contactDetected</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x2</span><span class="p">;</span>
-<span class="kd">let</span> <span class="nx">contactSensorPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x4</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">contactSensorPresent</span><span class="p">)</span> <span class="p">{</span>
-<span class="nx">result</span><span class="p">.</span><span class="nx">contactDetected</span> <span class="o">=</span> <span class="o">!!</span><span class="nx">contactDetected</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="kd">let</span> <span class="nx">energyPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x8</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">energyPresent</span><span class="p">)</span> <span class="p">{</span>
-<span class="nx">result</span><span class="p">.</span><span class="nx">energyExpended</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">);</span>
-<span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="kd">let</span> <span class="nx">rrIntervalPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x10</span><span class="p">;</span>
-<span class="k">if</span> <span class="p">(</span><span class="nx">rrIntervalPresent</span><span class="p">)</span> <span class="p">{</span>
-<span class="kd">let</span> <span class="nx">rrIntervals</span> <span class="o">=</span> <span class="p">[];</span>
-<span class="k">for</span> <span class="p">(;</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">byteLength</span><span class="p">;</span> <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-  <span class="nx">rrIntervals</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">));</span>
-<span class="p">}</span>
-<span class="nx">result</span><span class="p">.</span><span class="nx">rrIntervals</span> <span class="o">=</span> <span class="nx">rrIntervals</span><span class="p">;</span>
-<span class="p">}</span>
-<span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">data</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">DataView</span><span class="p">(</span><span class="nx">buffer</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">flags</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
+  <span class="kd">let</span> <span class="nx">rate16Bits</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{};</span>
+  <span class="kd">let</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">rate16Bits</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">heartRate</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">);</span>
+    <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">heartRate</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="nx">index</span><span class="p">);</span>
+    <span class="nx">index</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kd">let</span> <span class="nx">contactDetected</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x2</span><span class="p">;</span>
+  <span class="kd">let</span> <span class="nx">contactSensorPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x4</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">contactSensorPresent</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">contactDetected</span> <span class="o">=</span> <span class="o">!!</span><span class="nx">contactDetected</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kd">let</span> <span class="nx">energyPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x8</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">energyPresent</span><span class="p">)</span> <span class="p">{</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">energyExpended</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">);</span>
+    <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="kd">let</span> <span class="nx">rrIntervalPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x10</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span><span class="nx">rrIntervalPresent</span><span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> <span class="nx">rrIntervals</span> <span class="o">=</span> <span class="p">[];</span>
+    <span class="k">for</span> <span class="p">(;</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">byteLength</span><span class="p">;</span> <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+      <span class="nx">rrIntervals</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">));</span>
+    <span class="p">}</span>
+    <span class="nx">result</span><span class="p">.</span><span class="nx">rrIntervals</span> <span class="o">=</span> <span class="nx">rrIntervals</span><span class="p">;</span>
+  <span class="p">}</span>
+  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
 <span class="p">}</span></pre>
       <p> <code>onHeartRateChanged()</code> might log an object like </p>
 <pre class="highlight"><span class="p">{</span>
-<span class="nx">heartRate</span><span class="o">:</span> <span class="mi">70</span><span class="p">,</span>
-<span class="nx">contactDetected</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-<span class="nx">energyExpended</span><span class="o">:</span> <span class="mi">750</span><span class="p">,</span>     <span class="c1">// Meaning 750kJ.</span>
-<span class="nx">rrIntervals</span><span class="o">:</span> <span class="p">[</span><span class="mi">890</span><span class="p">,</span> <span class="mi">870</span><span class="p">]</span>  <span class="c1">// Meaning .87s and .85s.</span>
+  <span class="nx">heartRate</span><span class="o">:</span> <span class="mi">70</span><span class="p">,</span>
+  <span class="nx">contactDetected</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  <span class="nx">energyExpended</span><span class="o">:</span> <span class="mi">750</span><span class="p">,</span>     <span class="c1">// Meaning 750kJ.</span>
+  <span class="nx">rrIntervals</span><span class="o">:</span> <span class="p">[</span><span class="mi">890</span><span class="p">,</span> <span class="mi">870</span><span class="p">]</span>  <span class="c1">// Meaning .87s and .85s.</span>
 <span class="p">}</span></pre>
       <p> If the heart rate sensor reports the <code>energyExpended</code> field,
         the web application can reset its value to <code>0</code> by writing to the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">heart_rate_control_point</a></code> characteristic: </p>
 <pre>function resetEnergyExpended() {
-if (!chosenHeartRateService) {
-return Promise.reject(new Error('No heart rate sensor selected yet.'));
-}
-return chosenHeartRateService.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">'heart_rate_control_point'</a>))
-.then(controlPoint => {
-  let resetEnergyExpended = new Uint8Array([1]);
-  return controlPoint.<a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-writevalue">writeValue</a>(resetEnergyExpended);
-});
+  if (!chosenHeartRateService) {
+    return Promise.reject(new Error('No heart rate sensor selected yet.'));
+  }
+  return chosenHeartRateService.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">'heart_rate_control_point'</a>))
+  .then(controlPoint => {
+    let resetEnergyExpended = new Uint8Array([1]);
+    return controlPoint.<a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-writevalue">writeValue</a>(resetEnergyExpended);
+  });
 }
 </pre>
      </div>
@@ -1478,8 +1478,8 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothscanfilter-services">services</a></code> list
       in any element of <code>options.filters</code> or in <code>options.<dfn class="idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-optionalservices">optionalServices<a class="self-link" href="#dom-requestdeviceoptions-optionalservices"></a></dfn></code>. </p>
     </div>
-    <div class="example" id="example-e2a0e480">
-     <a class="self-link" href="#example-e2a0e480"></a> 
+    <div class="example" id="example-c95583e2">
+     <a class="self-link" href="#example-c95583e2"></a> 
      <p> Say the UA is close to the following devices: </p>
      <table>
       <tbody>
@@ -1501,17 +1501,17 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
      </table>
      <p> If the website calls </p>
 <pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-<span class="nx">filters</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]}</span> <span class="p">]</span>
+  <span class="nx">filters</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]}</span> <span class="p">]</span>
 <span class="p">});</span></pre>
      <p> the user will be shown a dialog containing devices D1 and D2.
       If the user selects D1, the website will not be able to access services C or D.
       If the user selects D2, the website will not be able to access service E. </p>
      <p> On the other hand, if the website calls </p>
 <pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-<span class="nx">filters</span><span class="o">:</span> <span class="p">[</span>
-<span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]},</span>
-<span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">C</span><span class="p">,</span> <span class="nx">D</span><span class="p">]}</span>
-<span class="p">]</span>
+  <span class="nx">filters</span><span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]},</span>
+    <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">C</span><span class="p">,</span> <span class="nx">D</span><span class="p">]}</span>
+  <span class="p">]</span>
 <span class="p">});</span></pre>
      <p> the dialog will contain devices D1, D2, and D3,
       and if the user selects D1,
@@ -1520,8 +1520,8 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       to the dialog the user sees,
       but it does affect which services the website can use from the device the user picks. </p>
 <pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-<span class="nx">filters</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]}</span> <span class="p">],</span>
-<span class="nx">optionalServices</span><span class="o">:</span> <span class="p">[</span><span class="nx">E</span><span class="p">]</span>
+  <span class="nx">filters</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]}</span> <span class="p">],</span>
+  <span class="nx">optionalServices</span><span class="o">:</span> <span class="p">[</span><span class="nx">E</span><span class="p">]</span>
 <span class="p">});</span></pre>
      <p> Shows a dialog containing D1 and D2,
       but not D4, since D4 doesn’t contain the required services.
@@ -1937,8 +1937,8 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
           to <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-arraybuffer-constructor">ArrayBuffer</a></code>s. </p>
        <p> <dfn class="idl-code" data-dfn-for="BluetoothAdvertisingData" data-dfn-type="attribute" data-export="" id="dom-bluetoothadvertisingdata-servicedata">serviceData<a class="self-link" href="#dom-bluetoothadvertisingdata-servicedata"></a></dfn> maps <code class="idl"><a data-link-type="idl" href="#typedefdef-uuid">UUID</a></code>s to <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-arraybuffer-constructor">ArrayBuffer</a></code>s. </p>
       </div>
-      <div class="example" id="example-f30e5f2b">
-       <a class="self-link" href="#example-f30e5f2b"></a> 
+      <div class="example" id="example-6aec9868">
+       <a class="self-link" href="#example-6aec9868"></a> 
        <p> To retrieve a device and read the iBeacon data out of it,
           a developer could use the following code.
           Note that this API currently doesn’t provide a way
@@ -1947,23 +1947,23 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
           in order for users to select this device in the <code>requestDevice</code> dialog. </p>
 <pre>var known_service = "A service in the iBeacon’s GATT server";
 return navigator.bluetooth.requestDevice({
-filters: [{services: [known_service]}]
+  filters: [{services: [known_service]}]
 }).then(device => {
-var rssi = device.adData.rssi;
-var appleData = new DataView(device.adData.manufacturerData.get(<a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier">0x004C</a>));
-if (appleData.byteLength != 23 ||
-  appleData.getUint16(0, false) !== 0x0215) {
-return {isBeacon: false};
-}
-var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
-var major = appleData.getUint16(18, false);
-var minor = appleData.getUint16(20, false);
-var txPowerAt1m = -appleData.getInt8(22);
-return {isBeacon: true,
-      uuidArray,
-      major,
-      minor,
-      pathLossVs1m: txPowerAt1m - rssi};
+  var rssi = device.adData.rssi;
+  var appleData = new DataView(device.adData.manufacturerData.get(<a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier">0x004C</a>));
+  if (appleData.byteLength != 23 ||
+    appleData.getUint16(0, false) !== 0x0215) {
+    return {isBeacon: false};
+  }
+  var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
+  var major = appleData.getUint16(18, false);
+  var minor = appleData.getUint16(20, false);
+  var txPowerAt1m = -appleData.getInt8(22);
+  return {isBeacon: true,
+          uuidArray,
+          major,
+          minor,
+          pathLossVs1m: txPowerAt1m - rssi};
 });
 </pre>
        <p> The format of iBeacon advertisements was derived from <a href="http://www.warski.org/blog/2014/01/how-ibeacons-work/">How do iBeacons work?</a> by Adam Warski. </p>
