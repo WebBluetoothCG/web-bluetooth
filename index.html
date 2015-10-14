@@ -1065,7 +1065,7 @@
   <div class="head">
    <div data-fill-with="logo"></div>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-10-13">13 October 2015</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-10-14">14 October 2015</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1592,10 +1592,6 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
           so trying to match its whole name fails. 
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span></pre>
-        <td>D1, D2, D3, D4, D5
-       <tr>
-        <td>
 <pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"First"</span><span class="p">},</span>
  <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
         <td>D1, D5
@@ -1605,6 +1601,16 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
   <span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"Device"</span><span class="p">},</span>
  <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
         <td>D3, D5
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{}]</span></pre>
+        <td><i>TypeError</i>
+        <td>A filter must restrict the devices in some way.
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span></pre>
+        <td><i>TypeError</i>
+        <td>A filter must restrict the devices in some way.
      </table>
      <p> Remember to use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices">optionalServices</a></code> to get access to services
       if you only filter by name. </p>
@@ -1616,9 +1622,8 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       and equal to <code><var>filter</var>.name</code>,
       return <code>mismatch</code>. 
      <li> If <code><var>filter</var>.namePrefix</code> is present then
-      let <var>deviceName</var> be <var>device</var>’s partial or complete <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>,
-      or <code>""</code> if <var>device</var>’s <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> is absent.
-      If <code><var>deviceName</var>.<code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-string.prototype.startswith">startsWith</a></code>(<var>filter</var>.namePrefix)</code> is <code>false</code>,
+      if <var>device</var>’s <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> isn’t present
+      or doesn’t start with <code><var>filter</var>.namePrefix</code>,
       return <code>mismatch</code>. 
      <li> For each <var>uuid</var> in <code><var>filter</var>.services</code>,
       if the UA has not received advertising data, an <a data-link-type="dfn" href="#extended-inquiry-response">extended inquiry response</a>,
@@ -1648,6 +1653,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
          For each <var>filter</var> in <code><var>options</var>.filters</code>,
           do the following steps: 
         <ol>
+         <li> If none of <var>filter</var>’s <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
          <li>Let <var>canonicalizedFilter</var> be <code>{}</code>.
          <li>
            If <code><var>filter</var>.services</code> is present, do the following sub-steps: 
@@ -1661,8 +1667,12 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
           </ol>
          <li> If <code><var>filter</var>.name</code> is present,
               set <code><var>canonicalizedFilter</var>.name</code> to <code><var>filter</var>.name</code>. 
-         <li> If <code><var>filter</var>.namePrefix</code> is present,
-              set <code><var>canonicalizedFilter</var>.namePrefix</code> to <code><var>filter</var>.namePrefix</code>. 
+         <li>
+           If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps. 
+          <ol>
+           <li> If <code><var>filter</var>.namePrefix.length === 0</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+           <li> Set <code><var>canonicalizedFilter</var>.namePrefix</code> to <code><var>filter</var>.namePrefix</code>. 
+          </ol>
          <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.
         </ol>
        <li> Let <var>optionalServiceUUIDs</var> be <code><code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>options</var>.optionalServices, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>)</code>. 
@@ -3680,7 +3690,6 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-map-constructor">Map</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-promise-objects">Promise</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-set-objects">Set</a>
-     <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-string.prototype.startswith">String.prototype.startsWith</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-typedarray-constructors">TypedArray</a>
     </ul>

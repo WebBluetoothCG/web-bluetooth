@@ -103,7 +103,6 @@ spec: dom-ls; urlPrefix: http://dom.spec.whatwg.org/#; type: dfn
 spec: ECMAScript; urlPrefix: http://ecma-international.org/ecma-262/6.0/#
     type: method
         text: Array.prototype.map; url: sec-array.prototype.map
-        text: String.prototype.startsWith; url: sec-string.prototype.startswith
     type: interface
         text: Array; url: sec-array-objects
         text: ArrayBuffer; url: sec-arraybuffer-constructor
@@ -699,14 +698,6 @@ spec: html
       <tr>
         <td>
           <pre highlight="js">
-            [{namePrefix: ""}]
-          </pre>
-        </td>
-        <td>D1, D2, D3, D4, D5</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
             [{namePrefix: "First"},
              {name: "Unique Name"}]
           </pre>
@@ -722,6 +713,24 @@ spec: html
           </pre>
         </td>
         <td>D3, D5</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{}]
+          </pre>
+        </td>
+        <td><i>TypeError</i></td>
+        <td>A filter must restrict the devices in some way.</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{namePrefix: ""}]
+          </pre>
+        </td>
+        <td><i>TypeError</i></td>
+        <td>A filter must restrict the devices in some way.</td>
       </tr>
     </table>
 
@@ -745,9 +754,8 @@ spec: html
     </li>
     <li>
       If <code><var>filter</var>.namePrefix</code> is present then
-      let <var>deviceName</var> be <var>device</var>'s partial or complete <a>Bluetooth Device Name</a>,
-      or `""` if <var>device</var>'s <a>Bluetooth Device Name</a> is absent.
-      If <code><var>deviceName</var>.{{String.prototype.startsWith|startsWith}}(<var>filter</var>.namePrefix)</code> is `false`,
+      if <var>device</var>'s <a>Bluetooth Device Name</a> isn't present
+      or doesn't start with <code><var>filter</var>.namePrefix</code>,
       return `mismatch`.
     </li>
     <li>
@@ -796,6 +804,12 @@ spec: html
           For each <var>filter</var> in <code><var>options</var>.filters</code>,
           do the following steps:
           <ol>
+            <li>
+              If none of <var>filter</var>'s
+              <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
+              <a>reject</a> <var>promise</var> with a {{TypeError}}
+              and abort these steps.
+            </li>
             <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
             <li>
               If <code><var>filter</var>.services</code> is present, do the following sub-steps:
@@ -831,9 +845,18 @@ spec: html
               to <code><var>filter</var>.name</code>.
             </li>
             <li>
-              If <code><var>filter</var>.namePrefix</code> is present,
-              set <code><var>canonicalizedFilter</var>.namePrefix</code>
-              to <code><var>filter</var>.namePrefix</code>.
+              If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps.
+              <ol>
+                <li>
+                  If <code><var>filter</var>.namePrefix.length === 0</code>,
+                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  and abort these steps.
+                </li>
+                <li>
+                  Set <code><var>canonicalizedFilter</var>.namePrefix</code>
+                  to <code><var>filter</var>.namePrefix</code>.
+                </li>
+              </ol>
             </li>
             <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.</li>
           </ol>
