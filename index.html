@@ -1451,6 +1451,8 @@ function onHeartRateChanged(event) {
     <h2 class="heading settled" data-level="3" id="device-discovery"><span class="secno">3. </span><span class="content">Device Discovery</span><a class="self-link" href="#device-discovery"></a></h2>
 <pre class="idl">dictionary <dfn class="idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothscanfilter">BluetoothScanFilter<a class="self-link" href="#dictdef-bluetoothscanfilter"></a></dfn> {
   sequence&lt;<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothscanfilter-services">services</a>;
+  DOMString <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothscanfilter-name">name</a>;
+  DOMString <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothscanfilter-nameprefix">namePrefix</a>;
 };
 
 dictionary <dfn class="idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-requestdeviceoptions">RequestDeviceOptions<a class="self-link" href="#dictdef-requestdeviceoptions"></a></dfn> {
@@ -1469,16 +1471,22 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
      <div class="marker">NOTE: Bluetooth members</div>
      <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice">requestDevice(options)</a></code> asks the user
       to grant this origin access to a device
-      that <a data-link-type="dfn" href="#matches-a-filter">matches a filter</a> in <code>options.<dfn class="idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-filters">filters<a class="self-link" href="#dom-requestdeviceoptions-filters"></a></dfn></code>.
-      The user will be shown devices that support <em>all</em> the GATT service UUIDs in the <dfn class="idl-code" data-dfn-for="BluetoothScanFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothscanfilter-services">services<a class="self-link" href="#dom-bluetoothscanfilter-services"></a></dfn> list
-      of <em>any</em> <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothscanfilter">BluetoothScanFilter</a></code> in <code>filters</code>. </p>
+      that <a data-link-type="dfn" href="#matches-a-filter">matches any filter</a> in <code>options.<dfn class="idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-filters">filters<a class="self-link" href="#dom-requestdeviceoptions-filters"></a></dfn></code>.
+      To <a data-link-type="dfn" href="#matches-a-filter">match a filter</a>, the device has to: </p>
+     <ul>
+      <li> support <em>all</em> the GATT service UUIDs
+        in the <dfn class="idl-code" data-dfn-for="BluetoothScanFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothscanfilter-services">services<a class="self-link" href="#dom-bluetoothscanfilter-services"></a></dfn> list
+        if that member is present, 
+      <li> have a name equal to <dfn class="idl-code" data-dfn-for="BluetoothScanFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothscanfilter-name">name<a class="self-link" href="#dom-bluetoothscanfilter-name"></a></dfn> if that member is present, and 
+      <li> have a name starting with <dfn class="idl-code" data-dfn-for="BluetoothScanFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothscanfilter-nameprefix">namePrefix<a class="self-link" href="#dom-bluetoothscanfilter-nameprefix"></a></dfn> if that member is present. 
+     </ul>
      <p> After the user selects a device to pair with this origin,
       the origin is allowed to access to any service whose UUID was listed
       in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothscanfilter-services">services</a></code> list
       in any element of <code>options.filters</code> or in <code>options.<dfn class="idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-optionalservices">optionalServices<a class="self-link" href="#dom-requestdeviceoptions-optionalservices"></a></dfn></code>. </p>
     </div>
-    <div class="example" id="example-c95583e2">
-     <a class="self-link" href="#example-c95583e2"></a> 
+    <div class="example" id="example-filter-by-services">
+     <a class="self-link" href="#example-filter-by-services"></a> 
      <p> Say the UA is close to the following devices: </p>
      <table>
       <tbody>
@@ -1497,6 +1505,9 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
        <tr>
         <td>D4
         <td>E
+       <tr>
+        <td>D5
+        <td><i>&lt;none></i>
      </table>
      <p> If the website calls </p>
 <pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
@@ -1532,11 +1543,90 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       that will fire the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattservice-serviceadded">serviceadded</a></code> event,
       and the web page will be able to access service E. </p>
     </div>
-    <p> A device <dfn data-dfn-type="dfn" data-local-lt="match a filter" data-noexport="" id="matches-a-filter">matches a filter<a class="self-link" href="#matches-a-filter"></a></dfn> <var>filter</var> if
-    the UA has received advertising data, an <a data-link-type="dfn" href="#extended-inquiry-response">extended inquiry response</a>,
-    or a service discovery response indicating that
-    the device supports each of the <a data-link-type="dfn" href="#service">Service</a> UUIDs
-    included in <code><var>filter</var>.services</code> as a primary (vs included) service. </p>
+    <div class="example" id="example-filter-by-name">
+     <a class="self-link" href="#example-filter-by-name"></a> 
+     <p> Say the devices in the <a href="#example-filter-by-services">previous example</a> also advertise names as follows: </p>
+     <table>
+      <tbody>
+       <tr>
+        <th>Device
+        <th>Advertised Device Name
+       <tr>
+        <td>D1
+        <td>First De…
+       <tr>
+        <td>D2
+        <td><i>&lt;none></i>
+       <tr>
+        <td>D3
+        <td>Device Third
+       <tr>
+        <td>D4
+        <td>Device Fourth
+       <tr>
+        <td>D5
+        <td>Unique Name
+     </table>
+     <p> The following table shows which devices the user can select between
+      for several values of <var>filters</var> passed to <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>. </p>
+     <table>
+      <tbody>
+       <tr>
+        <th><var>filters</var>
+        <th>Devices
+        <th>Notes
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
+        <td>D5
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"Device"</span><span class="p">}]</span></pre>
+        <td>D3, D4
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"First De"</span><span class="p">},</span>
+ <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"First Device"</span><span class="p">}]</span></pre>
+        <td><i>&lt;none></i>
+        <td> D1 only advertises a prefix of its name,
+          so trying to match its whole name fails. 
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span></pre>
+        <td>D1, D2, D3, D4, D5
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"First"</span><span class="p">},</span>
+ <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
+        <td>D1, D5
+       <tr>
+        <td>
+<pre class="highlight"><span class="p">[{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">C</span><span class="p">],</span>
+  <span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"Device"</span><span class="p">},</span>
+ <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
+        <td>D3, D5
+     </table>
+     <p> Remember to use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices">optionalServices</a></code> to get access to services
+      if you only filter by name. </p>
+    </div>
+    <p> A <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> <var>device</var> <dfn data-dfn-type="dfn" data-local-lt="match a filter|matches any filter" data-noexport="" id="matches-a-filter">matches a filter<a class="self-link" href="#matches-a-filter"></a></dfn> <var>filter</var> if the following steps return <code>match</code>: </p>
+    <ol>
+     <li> If <code><var>filter</var>.name</code> is present then,
+      if <var>device</var>’s <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> isn’t complete
+      and equal to <code><var>filter</var>.name</code>,
+      return <code>mismatch</code>. 
+     <li> If <code><var>filter</var>.namePrefix</code> is present then
+      let <var>deviceName</var> be <var>device</var>’s partial or complete <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>,
+      or <code>""</code> if <var>device</var>’s <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> is absent.
+      If <code><var>deviceName</var>.<code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-string.prototype.startswith">startsWith</a></code>(<var>filter</var>.namePrefix)</code> is <code>false</code>,
+      return <code>mismatch</code>. 
+     <li> For each <var>uuid</var> in <code><var>filter</var>.services</code>,
+      if the UA has not received advertising data, an <a data-link-type="dfn" href="#extended-inquiry-response">extended inquiry response</a>,
+      or a service discovery response indicating that
+      the device supports a primary (vs included) service with UUID <var>uuid</var>,
+      return <code>mismatch</code>. 
+     <li>Return <code>match</code>. 
+    </ol>
     <p class="note" role="note"> The list of Service UUIDs that a device advertises
     might not include all the UUIDs the device supports.
     The advertising data does specify whether this list is complete.
@@ -1558,12 +1648,22 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
          For each <var>filter</var> in <code><var>options</var>.filters</code>,
           do the following steps: 
         <ol>
-         <li> If <code><var>filter</var>.services.length === 0</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
-         <li> Let <var>services</var> be <code><code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>)</code>. 
-         <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService()</a></code> calls threw an exception, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with that exception and abort these steps. 
-         <li> If any <var>service</var> in <var>services</var> is <a data-link-type="dfn" href="#blacklisted">blacklisted</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
-         <li>Append <code>{services: <var>services</var>}</code> to <var>uuidFilters</var>.
-         <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.
+         <li>Let <var>canonicalizedFilter</var> be <code>{}</code>.
+         <li>
+           If <code><var>filter</var>.services</code> is present, do the following sub-steps: 
+          <ol>
+           <li> If <code><var>filter</var>.services.length === 0</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+           <li> Let <var>services</var> be <code><code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>)</code>. 
+           <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService()</a></code> calls threw an exception, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with that exception and abort these steps. 
+           <li> If any <var>service</var> in <var>services</var> is <a data-link-type="dfn" href="#blacklisted">blacklisted</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
+           <li> Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>. 
+           <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.
+          </ol>
+         <li> If <code><var>filter</var>.name</code> is present,
+              set <code><var>canonicalizedFilter</var>.name</code> to <code><var>filter</var>.name</code>. 
+         <li> If <code><var>filter</var>.namePrefix</code> is present,
+              set <code><var>canonicalizedFilter</var>.namePrefix</code> to <code><var>filter</var>.namePrefix</code>. 
+         <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.
         </ol>
        <li> Let <var>optionalServiceUUIDs</var> be <code><code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>options</var>.optionalServices, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>)</code>. 
        <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService()</a></code> calls threw an exception, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with that exception and abort these steps. 
@@ -1677,7 +1777,9 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       <li>An optional 128-bit <a data-link-type="dfn" href="#identity-resolving-key">Identity Resolving Key</a>.
       <li> An optional partial or complete <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>.
         A device has a partial name when the <a data-link-type="dfn" href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#">Shortened Local Name</a> AD data was received,
-        but the full name hasn’t been read yet. 
+        but the full name hasn’t been read yet.
+        When the <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> is encoded as UTF-8 and
+        converted to a DOMString using the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without BOM</a> algorithm. 
       <li> An <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>, over which all GATT communication happens.
         The <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a> is created by procedures described in
         "Connection Establishment" under <a data-link-type="dfn" href="#gap-interoperability-requirements">GAP Interoperability Requirements</a>.
@@ -3420,15 +3522,18 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#manufacturer-specific-data">Manufacturer Specific Data</a><span>, in §9</span>
    <li><a href="#matches-a-filter">match a filter</a><span>, in §3</span>
    <li><a href="#matches-a-filter">matches a filter</a><span>, in §3</span>
+   <li><a href="#matches-a-filter">matches any filter</a><span>, in §3</span>
    <li>
     name
     <ul>
+     <li><a href="#dom-bluetoothscanfilter-name">dict-member for BluetoothScanFilter</a><span>, in §3</span>
      <li><a href="#dom-bluetoothdevice-name">attribute for BluetoothDevice</a><span>, in §4.3</span>
      <li><a href="#dom-bluetoothuuid-getservice-name-name">argument for BluetoothUUID/getService(name)</a><span>, in §6.1</span>
      <li><a href="#dom-bluetoothuuid-getcharacteristic-name-name">argument for BluetoothUUID/getCharacteristic(name)</a><span>, in §6.1</span>
      <li><a href="#dom-bluetoothuuid-getdescriptor-name-name">argument for BluetoothUUID/getDescriptor(name)</a><span>, in §6.1</span>
     </ul>
    <li><a href="#name-discovery-procedure">Name Discovery Procedure</a><span>, in §9</span>
+   <li><a href="#dom-bluetoothscanfilter-nameprefix">namePrefix</a><span>, in §3</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-notify">notify</a><span>, in §5.4.1</span>
    <li><a href="#observation-procedure">Observation Procedure</a><span>, in §9</span>
    <li><a href="#observer">Observer</a><span>, in §9</span>
@@ -3575,6 +3680,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-map-constructor">Map</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-promise-objects">Promise</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-set-objects">Set</a>
+     <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-string.prototype.startswith">String.prototype.startsWith</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
      <li><a href="http://ecma-international.org/ecma-262/6.0/#sec-typedarray-constructors">TypedArray</a>
     </ul>
@@ -3598,6 +3704,11 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
      <li><a href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a>
      <li><a href="http://dom.spec.whatwg.org/#concept-tree-participate">participate in a tree</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio" href="#biblio-encoding">[encoding]</a> defines the following terms:
+    <ul>
+     <li><a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without bom</a>
     </ul>
    <li>
     <a data-link-type="biblio" href="#biblio-html">[HTML]</a> defines the following terms:
@@ -3653,6 +3764,8 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <dd>Cameron McCormack; Boris Zbarsky. <a href="http://www.w3.org/TR/WebIDL-1/">WebIDL Level 1</a>. 4 August 2015. WD. URL: <a href="http://www.w3.org/TR/WebIDL-1/">http://www.w3.org/TR/WebIDL-1/</a>
    <dt id="biblio-dom-ls"><a class="self-link" href="#biblio-dom-ls"></a>[DOM-LS]
    <dd>Document Object Model URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
+   <dt id="biblio-encoding"><a class="self-link" href="#biblio-encoding"></a>[ENCODING]
+   <dd>Anne van Kesteren; Joshua Bell; Addison Phillips. <a href="http://www.w3.org/TR/encoding/">Encoding</a>. 16 September 2014. CR. URL: <a href="http://www.w3.org/TR/encoding/">http://www.w3.org/TR/encoding/</a>
    <dt id="biblio-powerful-features"><a class="self-link" href="#biblio-powerful-features"></a>[POWERFUL-FEATURES]
    <dd>Mike West; Yan Zhu. <a href="http://www.w3.org/TR/powerful-features/">Privileged Contexts</a>. 24 April 2015. WD. URL: <a href="http://www.w3.org/TR/powerful-features/">http://www.w3.org/TR/powerful-features/</a>
    <dt id="biblio-promises-guide"><a class="self-link" href="#biblio-promises-guide"></a>[PROMISES-GUIDE]
@@ -3665,6 +3778,8 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
   <h2 class="no-num heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl">dictionary <a href="#dictdef-bluetoothscanfilter">BluetoothScanFilter</a> {
   sequence&lt;<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothscanfilter-services">services</a>;
+  DOMString <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothscanfilter-name">name</a>;
+  DOMString <a class="idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothscanfilter-nameprefix">namePrefix</a>;
 };
 
 dictionary <a href="#dictdef-requestdeviceoptions">RequestDeviceOptions</a> {
