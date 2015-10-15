@@ -8,7 +8,7 @@ Level: 1
 Editor: See contributors on GitHub, , https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors
 Abstract: This document describes functions used in testing the Web Bluetooth API.
 Status Text: <strong class="advisement">This specification does not yet reflect the consensus of the Web Bluetooth CG. It is presented by the Chromium developers in the hope that other implementers will find it useful. It may be withdrawn if they don't.</strong>
-Markup Shorthands: css no
+Markup Shorthands: css no, markdown yes
 Link Defaults: html (dfn) trusted event/the body element
 Link Defaults: web-bluetooth (dfn) valid uuid
 </pre>
@@ -91,10 +91,12 @@ code may access them.
 <h2 id="test-runner">testRunner</h2>
 
 <pre class="idl">
+  callback BluetoothManualChooserEventsCallback = void(sequence&lt;DOMString> events);
+
   interface TestRunner {
     void setBluetoothMockDataSet(DOMString dataSetName);
     void setBluetoothManualChooser();
-    sequence&lt;DOMString> getBluetoothManualChooserEvents();
+    void getBluetoothManualChooserEvents(BluetoothManualChooserEventsCallback callback);
     void sendBluetoothManualChooserEvent(DOMString event, DOMString argument);
   };
 </pre>
@@ -229,7 +231,7 @@ interaction with the prompt (see
 
 <h3 dfn-type="method" for="TestRunner">getBluetoothManualChooserEvents()</h3>
 
-When invoked, {{TestRunner/getBluetoothManualChooserEvents()}} MUST return the
+When invoked, {{TestRunner/getBluetoothManualChooserEvents(callback)}} MUST call `callback` with the
 list of events that have been recorded by the <a>manual chooser</a> since
 {{TestRunner/getBluetoothManualChooserEvents()}} was last called. Each event is
 encoded as string, as follows:
@@ -259,12 +261,6 @@ encoded as string, as follows:
 : The UA discovers that a device with {{BluetoothDevice/id}}
     <var>device-id</var> is no longer nearby.
 :: <code>"remove-device(<var>device-id</var>)"</code>
-
-Note: {{TestRunner/getBluetoothManualChooserEvents()}} returns a
-<code>sequence&lt;DOMString></code> rather than the
-<code>{{Promise}}&lt;sequence&lt;DOMString>></code> that we'd normally prefer
-because the Chromium implementation has layering issues that make it difficult
-to return a {{Promise}} from this interface.
 
 
 <h3 dfn-type="method" for="TestRunner">sendBluetoothManualChooserEvent(event, argument)</h3>
