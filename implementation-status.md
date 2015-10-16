@@ -13,8 +13,11 @@ Work is in progress:
 * __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
 * [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
- * Tip of tree can connect to devices and read basic information. 
- * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=498016) is under development.
+ * Tip of tree can requestDevice, connectGATT, getPrimaryService (NOT getCharacteristic onward). 
+  * Requires Android 6, Lollipop or later.
+  * Location permission must be enabled, currently this must be done with a work around.
+   * Visit a web site that requests location, e.g. https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation.
+ * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Can discover devices and report basic information (e.g. name) (Chrome 46)
  * Many MacBook's may not work:
