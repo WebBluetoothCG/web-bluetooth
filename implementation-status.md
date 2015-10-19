@@ -13,8 +13,9 @@ Work is in progress:
 * __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
 * [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
- * Tip of tree can requestDevice, connectGATT, getPrimaryService (NOT getCharacteristic onward). 
-  * Requires Android 6, Lollipop or later.
+ * Can requestDevice, connectGATT, getPrimaryService (NOT getCharacteristic onward). 
+  * Chrome builds requires Android 6, Marshmallow or later.
+  * Tip of tree Chromium builds work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
   * Location permission must be enabled, currently this must be done with a work around.
    * Visit a web site that requests location, e.g. https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation.
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
