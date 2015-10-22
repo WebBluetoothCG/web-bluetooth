@@ -4,7 +4,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated 2015-07-15.
+* Notes updated 2015-10-22.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * [API Implementation](https://code.google.com/p/chromium/issues/detail?id=420275) now supports the basics:
  * Connect to a device, filtering by service UUIDs.
@@ -12,12 +12,13 @@ Work is in progress:
  * Read and Write values to Characteristic
 * __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
+ * Chrome 48: Characteristic notifications and properties
 * [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
- * Can requestDevice, connectGATT, getPrimaryService (NOT getCharacteristic onward). 
+ * Can `requestDevice`, `connectGATT`, `getPrimaryService` (NOT `getCharacteristic` onward). 
   * Chrome builds requires Android 6, Marshmallow or later.
   * Tip of tree Chromium builds work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
   * Location permission must be enabled, currently this must be done with a work around.
-   * Visit a web site that requests location, e.g. https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation.
+    * Visit a web site that requests location, e.g. https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation.
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Can discover devices and report basic information (e.g. name) (Chrome 46)
