@@ -962,6 +962,13 @@
 		font-weight: bold;
 	}
 
+/** Extra-large Elements ******************************************************/
+
+	.big-element-wrapper {
+		max-width: 50em;
+		overflow-x: auto;
+	}
+
 /******************************************************************************/
 /*                                    Print                                   */
 /******************************************************************************/
@@ -1065,7 +1072,7 @@
   <div class="head">
    <div data-fill-with="logo"></div>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-10-14">14 October 2015</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2015-10-30">30 October 2015</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1484,6 +1491,8 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       the origin is allowed to access to any service whose UUID was listed
       in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothscanfilter-services">services</a></code> list
       in any element of <code>options.filters</code> or in <code>options.<dfn class="idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-optionalservices">optionalServices<a class="self-link" href="#dom-requestdeviceoptions-optionalservices"></a></dfn></code>. </p>
+     <p> This implies that if developers filter just by name,
+      they must use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices">optionalServices</a></code> to get access to any services. </p>
     </div>
     <div class="example" id="example-filter-by-services">
      <a class="self-link" href="#example-filter-by-services"></a> 
@@ -1610,10 +1619,8 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
         <td>
 <pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span></pre>
         <td><i>TypeError</i>
-        <td>A filter must restrict the devices in some way.
+        <td><code>namePrefix</code>, if present, must be non-empty to filter devices.
      </table>
-     <p> Remember to use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices">optionalServices</a></code> to get access to services
-      if you only filter by name. </p>
     </div>
     <p> A <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> <var>device</var> <dfn data-dfn-type="dfn" data-local-lt="match a filter|matches any filter" data-noexport="" id="matches-a-filter">matches a filter<a class="self-link" href="#matches-a-filter"></a></dfn> <var>filter</var> if the following steps return <code>match</code>: </p>
     <ol>
@@ -1788,7 +1795,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       <li> An optional partial or complete <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>.
         A device has a partial name when the <a data-link-type="dfn" href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#">Shortened Local Name</a> AD data was received,
         but the full name hasn’t been read yet.
-        When the <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> is encoded as UTF-8 and
+        The <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a> is encoded as UTF-8 and
         converted to a DOMString using the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without BOM</a> algorithm. 
       <li> An <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>, over which all GATT communication happens.
         The <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a> is created by procedures described in
@@ -3766,7 +3773,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <dt id="biblio-bluetooth42"><a class="self-link" href="#biblio-bluetooth42"></a>[BLUETOOTH42]
    <dd><a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439">BLUETOOTH SPECIFICATION Version 4.2</a>. 2 December 2014. URL: <a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439">https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439</a>
    <dt id="biblio-ecmascript"><a class="self-link" href="#biblio-ecmascript"></a>[ECMASCRIPT]
-   <dd>Allen Wirfs-Brock. <a href="http://www.ecma-international.org/ecma-262/6.0/">ECMA-262 6th Edition, The ECMAScript 2015 Language Specification</a>. June 2015. Standard. URL: <a href="http://www.ecma-international.org/ecma-262/6.0/">http://www.ecma-international.org/ecma-262/6.0/</a>
+   <dd><a href="https://tc39.github.io/ecma262/">ECMAScript Language Specification</a>. URL: <a href="https://tc39.github.io/ecma262/">https://tc39.github.io/ecma262/</a>
    <dt id="biblio-html"><a class="self-link" href="#biblio-html"></a>[HTML]
    <dd>Ian Hickson. <a href="https://html.spec.whatwg.org/multipage/">HTML Standard</a>. Living Standard. URL: <a href="https://html.spec.whatwg.org/multipage/">https://html.spec.whatwg.org/multipage/</a>
    <dt id="biblio-webidl"><a class="self-link" href="#biblio-webidl"></a>[WebIDL]
@@ -3774,7 +3781,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <dt id="biblio-dom-ls"><a class="self-link" href="#biblio-dom-ls"></a>[DOM-LS]
    <dd>Document Object Model URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-encoding"><a class="self-link" href="#biblio-encoding"></a>[ENCODING]
-   <dd>Anne van Kesteren; Joshua Bell; Addison Phillips. <a href="http://www.w3.org/TR/encoding/">Encoding</a>. 16 September 2014. CR. URL: <a href="http://www.w3.org/TR/encoding/">http://www.w3.org/TR/encoding/</a>
+   <dd>Anne van Kesteren; Joshua Bell; Addison Phillips. <a href="http://www.w3.org/TR/encoding/">Encoding</a>. 20 October 2015. CR. URL: <a href="http://www.w3.org/TR/encoding/">http://www.w3.org/TR/encoding/</a>
    <dt id="biblio-powerful-features"><a class="self-link" href="#biblio-powerful-features"></a>[POWERFUL-FEATURES]
    <dd>Mike West; Yan Zhu. <a href="http://www.w3.org/TR/powerful-features/">Privileged Contexts</a>. 24 April 2015. WD. URL: <a href="http://www.w3.org/TR/powerful-features/">http://www.w3.org/TR/powerful-features/</a>
    <dt id="biblio-promises-guide"><a class="self-link" href="#biblio-promises-guide"></a>[PROMISES-GUIDE]
