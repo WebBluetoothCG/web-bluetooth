@@ -1672,12 +1672,22 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
            <li> Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>. 
            <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.
           </ol>
-         <li> If <code><var>filter</var>.name</code> is present,
-              set <code><var>canonicalizedFilter</var>.name</code> to <code><var>filter</var>.name</code>. 
+         <li>
+           If <code><var>filter</var>.name</code> is present, do the following sub-steps. 
+          <ol>
+           <li>
+             If the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-encode">UTF-8 encoding</a> of <code><var>filter</var>.name</code> is more than 248 bytes long, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+            <p class="note" role="note"> 248 is the maximum number of UTF-8 code units in
+                    a <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>. </p>
+           <li> Set <code><var>canonicalizedFilter</var>.name</code> to <code><var>filter</var>.name</code>. 
+          </ol>
          <li>
            If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps. 
           <ol>
-           <li> If <code><var>filter</var>.namePrefix.length === 0</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+           <li>
+             If <code><var>filter</var>.namePrefix.length === 0</code> or if the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-encode">UTF-8 encoding</a> of <code><var>filter</var>.namePrefix</code> is more than 248 bytes long, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="http://ecma-international.org/ecma-262/6.0/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+            <p class="note" role="note"> 248 is the maximum number of UTF-8 code units in
+                    a <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>. </p>
            <li> Set <code><var>canonicalizedFilter</var>.namePrefix</code> to <code><var>filter</var>.namePrefix</code>. 
           </ol>
          <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.
@@ -3725,6 +3735,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
     <a data-link-type="biblio" href="#biblio-encoding">[encoding]</a> defines the following terms:
     <ul>
      <li><a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without bom</a>
+     <li><a href="https://encoding.spec.whatwg.org/#utf-8-encode">utf-8 encode</a>
     </ul>
    <li>
     <a data-link-type="biblio" href="#biblio-html">[HTML]</a> defines the following terms:

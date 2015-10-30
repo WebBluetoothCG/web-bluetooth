@@ -116,6 +116,7 @@ spec: ECMAScript; urlPrefix: http://ecma-international.org/ecma-262/6.0/#
 spec: encoding; urlPrefix: https://encoding.spec.whatwg.org/#
     type: dfn
         text: utf-8 decode without BOM; url: utf-8-decode-without-bom
+        text: utf-8 encode; url: utf-8-encode
 
 spec: powerful-features; urlPrefix: https://w3c.github.io/webappsec/specs/powerfulfeatures/#
     type: dfn
@@ -840,17 +841,41 @@ spec: html
               </ol>
             </li>
             <li>
-              If <code><var>filter</var>.name</code> is present,
-              set <code><var>canonicalizedFilter</var>.name</code>
-              to <code><var>filter</var>.name</code>.
+              If <code><var>filter</var>.name</code> is present, do the following sub-steps.
+              <ol>
+                <li>
+                  If the <a lt="utf-8 encode">UTF-8 encoding</a>
+                  of <code><var>filter</var>.name</code>
+                  is more than 248 bytes long,
+                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  and abort these steps.
+
+                  <p class="note">
+                    248 is the maximum number of UTF-8 code units in
+                    a <a>Bluetooth Device Name</a>.
+                  </p>
+                </li>
+                <li>
+                  Set <code><var>canonicalizedFilter</var>.name</code>
+                  to <code><var>filter</var>.name</code>.
+                </li>
+              </ol>
             </li>
             <li>
               If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps.
               <ol>
                 <li>
-                  If <code><var>filter</var>.namePrefix.length === 0</code>,
+                  If <code><var>filter</var>.namePrefix.length === 0</code>
+                  or if the <a lt="utf-8 encode">UTF-8 encoding</a>
+                  of <code><var>filter</var>.namePrefix</code>
+                  is more than 248 bytes long,
                   <a>reject</a> <var>promise</var> with a {{TypeError}}
                   and abort these steps.
+
+                  <p class="note">
+                    248 is the maximum number of UTF-8 code units in
+                    a <a>Bluetooth Device Name</a>.
+                  </p>
                 </li>
                 <li>
                   Set <code><var>canonicalizedFilter</var>.namePrefix</code>
