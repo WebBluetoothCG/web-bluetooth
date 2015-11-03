@@ -113,6 +113,11 @@ spec: ECMAScript; urlPrefix: http://ecma-international.org/ecma-262/6.0/#
         text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
         text: TypedArray; url: sec-typedarray-constructors
 
+spec: encoding; urlPrefix: https://encoding.spec.whatwg.org/#
+    type: dfn
+        text: utf-8 decode without BOM; url: utf-8-decode-without-bom
+        text: utf-8 encode; url: utf-8-encode
+
 spec: powerful-features; urlPrefix: https://w3c.github.io/webappsec/specs/powerfulfeatures/#
     type: dfn
         text: secure context; url: secure-context
@@ -527,6 +532,8 @@ spec: html
   <pre class="idl">
     dictionary BluetoothScanFilter {
       sequence&lt;BluetoothServiceUUID> services;
+      DOMString name;
+      DOMString namePrefix;
     };
 
     dictionary RequestDeviceOptions {
@@ -545,11 +552,24 @@ spec: html
     <p>
       {{Bluetooth/requestDevice(options)}} asks the user
       to grant this origin access to a device
-      that <a>matches a filter</a> in <code>options.<dfn dict-member for="RequestDeviceOptions">filters</dfn></code>.
-      The user will be shown devices that support
-      <em>all</em> the GATT service UUIDs in the <dfn dict-member for="BluetoothScanFilter">services</dfn> list
-      of <em>any</em> {{BluetoothScanFilter}} in <code>filters</code>.
+      that <a>matches any filter</a> in <code>options.<dfn dict-member for="RequestDeviceOptions">filters</dfn></code>.
+      To <a>match a filter</a>, the device has to:
     </p>
+    <ul>
+      <li>
+        support <em>all</em> the GATT service UUIDs
+        in the <dfn dict-member for="BluetoothScanFilter">services</dfn> list
+        if that member is present,
+      </li>
+      <li>
+        have a name equal to <dfn dict-member for="BluetoothScanFilter">name</dfn>
+        if that member is present, and
+      </li>
+      <li>
+        have a name starting with <dfn dict-member for="BluetoothScanFilter">namePrefix</dfn>
+        if that member is present.
+      </li>
+    </ul>
     <p>
       After the user selects a device to pair with this origin,
       the origin is allowed to access to any service whose UUID was listed
@@ -557,9 +577,14 @@ spec: html
       in any element of <code>options.filters</code>
       or in <code>options.<dfn dict-member for="RequestDeviceOptions">optionalServices</dfn></code>.
     </p>
+
+    <p>
+      This implies that if developers filter just by name,
+      they must use {{RequestDeviceOptions/optionalServices}} to get access to any services.
+    </p>
   </div>
 
-  <div class="example">
+  <div class="example" id="example-filter-by-services">
     <p>
       Say the UA is close to the following devices:
     </p>
@@ -569,6 +594,7 @@ spec: html
       <tr><td>D2</td><td>A, B, E</td></tr>
       <tr><td>D3</td><td>C, D</td></tr>
       <tr><td>D4</td><td>E</td></tr>
+      <tr><td>D5</td><td><i>&lt;none></i></td></tr>
     </table>
     <p>
       If the website calls
@@ -624,14 +650,124 @@ spec: html
       and the web page will be able to access service E.
     </p>
   </div>
+  <div class="example" id="example-filter-by-name">
+    <p>
+      Say the devices in the <a href="#example-filter-by-services">previous example</a>
+      also advertise names as follows:
+    </p>
+    <table>
+      <tr><th>Device</th><th>Advertised Device Name</th></tr>
+      <tr><td>D1</td><td>First De…</td></tr>
+      <tr><td>D2</td><td><i>&lt;none></i></td></tr>
+      <tr><td>D3</td><td>Device Third</td></tr>
+      <tr><td>D4</td><td>Device Fourth</td></tr>
+      <tr><td>D5</td><td>Unique Name</td></tr>
+    </table>
+
+    <p>
+      The following table shows which devices the user can select between
+      for several values of <var>filters</var> passed to
+      <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
+    </p>
+
+    <table>
+      <tr><th><var>filters</var></th><th>Devices</th><th>Notes</th></tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{name: "Unique Name"}]
+          </pre>
+        </td>
+        <td>D5</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{namePrefix: "Device"}]
+          </pre>
+        </td>
+        <td>D3, D4</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{name: "First De"},
+             {name: "First Device"}]
+          </pre>
+        </td>
+        <td><i>&lt;none></i></td>
+        <td>
+          D1 only advertises a prefix of its name,
+          so trying to match its whole name fails.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{namePrefix: "First"},
+             {name: "Unique Name"}]
+          </pre>
+        </td>
+        <td>D1, D5</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{services: \[C],
+              namePrefix: "Device"},
+             {name: "Unique Name"}]
+          </pre>
+        </td>
+        <td>D3, D5</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{}]
+          </pre>
+        </td>
+        <td><i>TypeError</i></td>
+        <td>A filter must restrict the devices in some way.</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{namePrefix: ""}]
+          </pre>
+        </td>
+        <td><i>TypeError</i></td>
+        <td>`namePrefix`, if present, must be non-empty to filter devices.</td>
+      </tr>
+    </table>
+  </div>
 
   <p>
-    A device <dfn local-lt="match a filter">matches a filter</dfn> <var>filter</var> if
-    the UA has received advertising data, an <a>extended inquiry response</a>,
-    or a service discovery response indicating that
-    the device supports each of the <a>Service</a> UUIDs
-    included in <code><var>filter</var>.services</code> as a primary (vs included) service.
+    A <a>Bluetooth device</a> <var>device</var>
+    <dfn local-lt="match a filter|matches any filter">matches a filter</dfn> <var>filter</var>
+    if the following steps return `match`:
   </p>
+  <ol>
+    <li>
+      If <code><var>filter</var>.name</code> is present then,
+      if <var>device</var>'s <a>Bluetooth Device Name</a> isn't complete
+      and equal to <code><var>filter</var>.name</code>,
+      return `mismatch`.
+    </li>
+    <li>
+      If <code><var>filter</var>.namePrefix</code> is present then
+      if <var>device</var>'s <a>Bluetooth Device Name</a> isn't present
+      or doesn't start with <code><var>filter</var>.namePrefix</code>,
+      return `mismatch`.
+    </li>
+    <li>
+      For each <var>uuid</var> in <code><var>filter</var>.services</code>,
+      if the UA has not received advertising data, an <a>extended inquiry response</a>,
+      or a service discovery response indicating that
+      the device supports a primary (vs included) service with UUID <var>uuid</var>,
+      return `mismatch`.
+    </li>
+    <li>Return `match`.
+  </ol>
 
   <p class="note">
     The list of Service UUIDs that a device advertises
@@ -670,26 +806,84 @@ spec: html
           do the following steps:
           <ol>
             <li>
-              If <code><var>filter</var>.services.length === 0</code>,
+              If none of <var>filter</var>'s
+              <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
               <a>reject</a> <var>promise</var> with a {{TypeError}}
               and abort these steps.
             </li>
+            <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
             <li>
-              Let <var>services</var> be
-              <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
+              If <code><var>filter</var>.services</code> is present, do the following sub-steps:
+              <ol>
+                <li>
+                  If <code><var>filter</var>.services.length === 0</code>,
+                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  and abort these steps.
+                </li>
+                <li>
+                  Let <var>services</var> be
+                  <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
                 {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+                </li>
+                <li>
+                  If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
+                  <a>reject</a> <var>promise</var> with that exception and abort these steps.
+                </li>
+                <li>
+                  If any <var>service</var> in <var>services</var> is <a>blacklisted</a>,
+                  <a>reject</a> <var>promise</var> with a {{SecurityError}}
+                  and abort these steps.
+                </li>
+                <li>
+                  Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.
+                </li>
+                <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
+              </ol>
             </li>
             <li>
-              If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-              <a>reject</a> <var>promise</var> with that exception and abort these steps.
+              If <code><var>filter</var>.name</code> is present, do the following sub-steps.
+              <ol>
+                <li>
+                  If the <a lt="utf-8 encode">UTF-8 encoding</a>
+                  of <code><var>filter</var>.name</code>
+                  is more than 248 bytes long,
+                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  and abort these steps.
+
+                  <p class="note">
+                    248 is the maximum number of UTF-8 code units in
+                    a <a>Bluetooth Device Name</a>.
+                  </p>
+                </li>
+                <li>
+                  Set <code><var>canonicalizedFilter</var>.name</code>
+                  to <code><var>filter</var>.name</code>.
+                </li>
+              </ol>
             </li>
             <li>
-              If any <var>service</var> in <var>services</var> is <a>blacklisted</a>,
-              <a>reject</a> <var>promise</var> with a {{SecurityError}}
-              and abort these steps.
+              If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps.
+              <ol>
+                <li>
+                  If <code><var>filter</var>.namePrefix.length === 0</code>
+                  or if the <a lt="utf-8 encode">UTF-8 encoding</a>
+                  of <code><var>filter</var>.namePrefix</code>
+                  is more than 248 bytes long,
+                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  and abort these steps.
+
+                  <p class="note">
+                    248 is the maximum number of UTF-8 code units in
+                    a <a>Bluetooth Device Name</a>.
+                  </p>
+                </li>
+                <li>
+                  Set <code><var>canonicalizedFilter</var>.namePrefix</code>
+                  to <code><var>filter</var>.namePrefix</code>.
+                </li>
+              </ol>
             </li>
-            <li>Append <code>{services: <var>services</var>}</code> to <var>uuidFilters</var>.</li>
-            <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
+            <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.</li>
           </ol>
         </li>
         <li>
@@ -898,6 +1092,8 @@ spec: html
         An optional partial or complete <a>Bluetooth Device Name</a>.
         A device has a partial name when the <a>Shortened Local Name</a> AD data was received,
         but the full name hasn't been read yet.
+        The <a>Bluetooth Device Name</a> is encoded as UTF-8 and
+        converted to a DOMString using the <a>utf-8 decode without BOM</a> algorithm.
       </li>
 
       <li>
