@@ -40,7 +40,11 @@ Work is in progress:
 
 Company | System Information | Bluetooth Manufacturer | Bluetooth Chipset
 ------- | ------------------ | ---------------------- | -----------------
-Google | Chromebook Pixel 2013 | Qualcomm Atheros, Inc. | AR5BMD22
+Google  | Chromebook Pixel 2013 | Qualcomm Atheros, Inc. | AR5BMD22
+Google  | Chromebook Pixel 2015 | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
+Dell    | Chromebook 15      | Intel Inc. | Intel® Dual Band Wireless-AC 7260
+Toshiba | Chromebook 2 - 2015 Edition | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
+Acer    | Chromebook 15 | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
 
 ### Non-Working
 
