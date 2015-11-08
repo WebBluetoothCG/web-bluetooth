@@ -4,7 +4,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated 2015-10-22.
+* Notes updated 2015-11-07.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * [API Implementation](https://code.google.com/p/chromium/issues/detail?id=420275) now supports the basics:
  * Connect to a device, filtering by service UUIDs.
@@ -14,7 +14,7 @@ Work is in progress:
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
  * Chrome 48: Characteristic notifications and properties
 * [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
- * Can `requestDevice`, `connectGATT`, `getPrimaryService` (NOT `getCharacteristic` onward). 
+ * Can `getCharacteristic` then read and write values. Notifications can be enabled, but don't yet generate `characteristicvaluechanged` events. 
   * Chrome builds requires Android 6, Marshmallow or later.
   * Tip of tree Chromium builds work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
   * Location permission must be enabled, currently this must be done with a work around.
