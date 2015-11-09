@@ -720,14 +720,31 @@ spec: html
         </td>
         <td>D3, D5</td>
       </tr>
+    </table>
+  </div>
+
+  <div class="example" id="example-disallowed-filters">
+    <p>
+      Filters that either accept or reject all possible devices cause {{TypeError}}s.
+    </p>
+
+    <table>
+      <tr><th><var>filters</var></th><th>Notes</th></tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            []
+          </pre>
+        </td>
+        <td>An empty list of filters doesn't accept any devices.</td>
+      </tr>
       <tr>
         <td>
           <pre highlight="js">
             [{}]
           </pre>
         </td>
-        <td><i>TypeError</i></td>
-        <td>A filter must restrict the devices in some way.</td>
+        <td>An empty filter accepts all devices, and so isn't allowed either.</td>
       </tr>
       <tr>
         <td>
@@ -735,7 +752,6 @@ spec: html
             [{namePrefix: ""}]
           </pre>
         </td>
-        <td><i>TypeError</i></td>
         <td>`namePrefix`, if present, must be non-empty to filter devices.</td>
       </tr>
     </table>
@@ -797,6 +813,11 @@ spec: html
       In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
       do the following substeps:
       <ol>
+        <li>
+          If <code><var>options</var>.filters.length === 0</code>,
+          <a>reject</a> <var>promise</var> with a {{TypeError}}
+          and abort these steps.
+        </li>
         <li>
           Let <var>uuidFilters</var> be a new {{Array}} and
           <var>requiredServiceUUIDs</var> be a new {{Set}}.
