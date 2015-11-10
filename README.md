@@ -1,18 +1,22 @@
 web-bluetooth
 =============
 
-Toward Bluetooth support for the Open Web.
+Bluetooth support for the Web.
 
-This is a project of the [Web Bluetooth Community Group](http://www.w3.org/community/web-bluetooth/). We have a [charter](charter.md).
+This is a project of the W3C [Web Bluetooth Community Group](http://www.w3.org/community/web-bluetooth/). We have a [charter](charter.md).
 
-Documents in this repository
-----------------------------
-
-* [Use Cases and Security Requirements](https://webbluetoothcg.github.io/web-bluetooth/use-cases.html)
-* [Specification](https://webbluetoothcg.github.io/web-bluetooth/), which includes code examples.
-* [Implementation Status](implementation-status.md)
+Specification
+-------------
+* [Specification](https://webbluetoothcg.github.io/web-bluetooth/), including code samples.
+* [Use Cases and Security Requirements](https://webbluetoothcg.github.io/web-bluetooth/use-cases.html) motivating specification decisions.
 * [Test APIs](https://webbluetoothcg.github.io/web-bluetooth/tests/)
-  * These support [tests that currently live in the Chromium repository](https://code.google.com/p/chromium/codesearch/#chromium/src/third_party/WebKit/LayoutTests/bluetooth/).
+  * These support [testharness.js based tests](https://code.google.com/p/chromium/codesearch/#chromium/src/third_party/WebKit/LayoutTests/bluetooth/) that currently live in the Chromium repository.
+
+Try it out
+----------
+
+* [Implementation Status](implementation-status.md) describes various browser support on platforms, hardware compatibility, polyfills.
+* [Android BLE Peripheral App](https://github.com/WebBluetoothCG/ble-test-peripheral-android) Simulates BLE peripherals easing experiments with the Web Bluetooth API by providing another device to connet to.
 
 Communication
 -------------
