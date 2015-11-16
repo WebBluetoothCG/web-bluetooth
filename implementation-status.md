@@ -14,11 +14,9 @@ Work is in progress:
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
  * Chrome 48: Characteristic notifications and properties
 * [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
- * Can `getCharacteristic` then read and write values. Notifications can be enabled, but don't yet generate `characteristicvaluechanged` events. 
+ * Chrome 48: Up to `getCharacteristic` then read and write values. Notifications can be enabled, but don't yet generate `characteristicvaluechanged` events. 
   * Chrome builds requires Android 6, Marshmallow or later.
-  * Tip of tree Chromium builds work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
-  * Location permission must be enabled, currently this must be done with a work around.
-    * Visit a web site that requests location, e.g. https://developer.mozilla.org/en-US/docs/Web/API/Geolocation/Using_geolocation.
+  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Can discover devices and report basic information (e.g. name) (Chrome 46)
