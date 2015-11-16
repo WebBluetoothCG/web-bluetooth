@@ -5,11 +5,8 @@ different browsers.
 # Chrome
 Work is in progress:
 * Notes updated 2015-11-16.
+* The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
-* [API Implementation](https://code.google.com/p/chromium/issues/detail?id=420275) now supports the basics:
- * Connect to a device, filtering by service UUIDs.
- * Get a Service and then Characteristic.
- * Read and Write values to Characteristic
 * __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
  * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
  * Chrome 48: Characteristic notifications and properties
@@ -29,7 +26,6 @@ Work is in progress:
       * Chipset: 20702B0 <<< Works
       * Chipset: 20702A3 <<< Doesn't work
 * Windows will come later. Linux support depends on whether we can find people to maintain the drivers.
-* The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Latest demo post: [Discovering devices on ChromeOS](https://www.w3.org/community/web-bluetooth/2015/01/07/first-chromium-demo/)
 
 ## Hardware Compatibility List
