@@ -4,7 +4,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated 2015-11-07.
+* Notes updated 2015-11-16.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * [API Implementation](https://code.google.com/p/chromium/issues/detail?id=420275) now supports the basics:
  * Connect to a device, filtering by service UUIDs.
