@@ -4,7 +4,8 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated 2015-11-16.
+* Notes updated **2015-11-16**.
+* Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
