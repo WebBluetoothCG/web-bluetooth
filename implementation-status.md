@@ -26,7 +26,8 @@ Work is in progress:
     5. Check the Chipset:
       * Chipset: 20702B0 <<< Works
       * Chipset: 20702A3 <<< Doesn't work
-* Windows will come later. Linux support depends on whether we can find people to maintain the drivers.
+* Windows: Not started.
+* Linux: Not started.
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
 
 ## Hardware Compatibility List
