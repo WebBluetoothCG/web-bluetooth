@@ -18,14 +18,11 @@ Work is in progress:
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
 * [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Can discover devices and report basic information (e.g. name) (Chrome 46)
- * Many MacBook's may not work:
+ * Some MacBook's may not work:
     1. Check "About this Mac"
     2. "System Report"
     3. "Bluetooth"
     4. Verify that Low Energy is supported.
-    5. Check the Chipset:
-      * Chipset: 20702B0 <<< Works
-      * Chipset: 20702A3 <<< Doesn't work
 * Windows: Not started.
 * Linux: Not started.
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
