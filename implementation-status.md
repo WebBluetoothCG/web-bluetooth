@@ -16,7 +16,7 @@ Work is in progress:
   * Chrome builds requires Android 6, Marshmallow or later.
   * Tip of tree [Chromium builds](https://download-chromium.appspot.com/) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
  * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
-* [Mac OSX](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
+* [Mac OS X](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Can discover devices and report basic information (e.g. name) (Chrome 46)
  * Some MacBook's may not work:
     1. Check "About this Mac"
