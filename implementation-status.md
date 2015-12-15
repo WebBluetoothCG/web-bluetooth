@@ -4,25 +4,34 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2015-11-16**.
+* Notes updated **2015-12-15**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
-* __ChromeOS__ has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
- * Chrome 45: Connect to device with filters, no UI, Read and Write Characteristics.
- * Chrome 48: Characteristic notifications and properties
-* [Android](https://code.google.com/p/chromium/issues/detail?id=471536) under development.
- * Chrome 48: Up to `getCharacteristic` then read and write values. Notifications can be enabled, but don't yet generate `characteristicvaluechanged` events. 
+
+Feature                   | Chrome OS | Chrome for Android M | Chrome for Mac OS X
+------------------------- | :-------: | :------------------: | :-----------------:
+Discovery                 | 45        | 48                   | 46
+Chooser UI                |           | 48                   |
+Read Characteristic       | 45        | 48                   |
+Write Characteristic      | 45        | 48                   |
+Characteristic Properties | 48        | 48                   |
+GATT Notifications        | 48        |                      |
+
+### Notes
+
+* Chrome OS has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
+* [Android](https://crbug.com/471536) under development.
+ * Chrome 48: Notifications can be enabled, but don't yet generate `characteristicvaluechanged` events. 
   * Chrome builds requires Android 6, Marshmallow or later.
-  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
- * [Android Chooser UI](https://code.google.com/p/chromium/issues/detail?id=436280) works but has some bugs.
-* [Mac OS X](https://code.google.com/p/chromium/issues/detail?id=364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
- * Can discover devices and report basic information (e.g. name) (Chrome 46)
+  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later.
+ * [Android Chooser UI](https://crbug.com/436280) works but has some bugs.
+* [Mac OS X](https://crbug.com/364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Some MacBook's may not work:
-    1. Check "About this Mac"
-    2. "System Report"
-    3. "Bluetooth"
-    4. Verify that Low Energy is supported.
+  1. Check "About this Mac"
+  2. "System Report"
+  3. "Bluetooth"
+  4. Verify that Low Energy is supported.
 * Windows: Not started.
 * Linux: Not started.
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
