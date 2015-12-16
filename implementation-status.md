@@ -32,7 +32,7 @@ GATT Notifications        | 48        |                      |
   2. "System Report"
   3. "Bluetooth"
   4. Verify that Low Energy is supported.
-* Windows: Not started.
+* [Windows](https://crbug.com/507419): Not started.
 * [Linux](https://crbug.com/570344): Not started.
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
 
