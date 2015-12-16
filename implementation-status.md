@@ -47,14 +47,14 @@ Google  | Chromebook Pixel 2015 | Intel Inc. | Intel® Dual Band Wireless-AC 726
 Dell    | Chromebook 15      | Intel Inc. | Intel® Dual Band Wireless-AC 7260
 Toshiba | Chromebook 2 - 2015 Edition | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
 Acer    | Chromebook 15 | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
-Apple   | MacBook Air (13-inch, Mid 2012) - OS X 10.11 | Broadcom | 20702A3
-Apple   | MacBook Air (13-inch, Early 2015) - OS X 10.11 | Broadcom | 20702B0
+Apple   | MacBook Air (13-inch, Mid 2012) <br/> OS X 10.11 | Broadcom | 20702A3
+Apple   | MacBook Air (13-inch, Early 2015) <br/> OS X 10.11 | Broadcom | 20702B0
 
 ### Non-Working
 
 Company | System Information | Bluetooth Manufacturer | Bluetooth Chipset
 ------- | ------------------ | ---------------------- | -----------------
-Apple   | MacBook Air (13-inch, Mid 2012) - OS X 10.10 | Broadcom | 20702A3
+Apple   | MacBook Air (13-inch, Mid 2012) <br/> OS X 10.10 | Broadcom | 20702A3
 
 ## [Chrome Apps Polyfill](https://github.com/WebBluetoothCG/chrome-app-polyfill)
 A polyfill for the Web Bluetooth API running inside a Chrome App.
