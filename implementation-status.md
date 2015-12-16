@@ -51,12 +51,6 @@ Asus    | Chromebook Flip <br/> 49| Broadcom | BCM4354
 Apple   | MacBook Air (13-inch, Mid 2012) <br/> OS X 10.11 | Broadcom | 20702A3
 Apple   | MacBook Air (13-inch, Early 2015) <br/> OS X 10.11 | Broadcom | 20702B0
 
-### Non-Working
-
-Company | System Information | Bluetooth Manufacturer | Bluetooth Chipset
-------- | ------------------ | ---------------------- | -----------------
-Apple   | MacBook Air (13-inch, Mid 2012) <br/> OS X 10.10 | Broadcom | 20702A3
-
 ## [Chrome Apps Polyfill](https://github.com/WebBluetoothCG/chrome-app-polyfill)
 A polyfill for the Web Bluetooth API running inside a Chrome App.
 
