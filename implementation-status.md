@@ -12,6 +12,7 @@ Work is in progress:
 Feature                   | Chrome OS | Chrome for Android M | Chrome for Mac OS X
 ------------------------- | :-------: | :------------------: | :-----------------:
 Discovery                 | 45        | 48                   | 46
+└ Name or prefix          | 48        | 48                   | 48
 Chooser UI                |           | 48                   |
 Read Characteristic       | 45        | 48                   |
 Write Characteristic      | 45        | 48                   |
