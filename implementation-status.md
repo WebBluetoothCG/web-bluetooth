@@ -59,8 +59,8 @@ Developers can embed the Polyfill into a Chrome App to get a feel of how the
 Web Bluetooth API will work. Note: Only works on ChromeOS.
 
 # Firefox
-https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
-https://bugzilla.mozilla.org/buglist.cgi?quicksearch=%5Bweb-bluetooth%5D
+- https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
+- https://bugzilla.mozilla.org/buglist.cgi?quicksearch=%5Bweb-bluetooth%5D
 
 # Microsoft Edge
 https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
