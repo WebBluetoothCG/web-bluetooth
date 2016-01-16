@@ -2309,12 +2309,21 @@ spec: html
           <li>
             <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
           </li>
-          <li>
-            <a>Fire an event</a> named {{characteristicvaluechanged}}
-            with its <code>bubbles</code> attribute initialized to <code>true</code>
-            at <code>this</code>.
-          </li>
         </ol>
+      </li>
+      <li>
+        <p>
+          <a>Queue a task</a> to <a>fire an event</a> named {{characteristicvaluechanged}}
+          with its <code>bubbles</code> attribute initialized to <code>true</code>
+          at <code>this</code>.
+        </p>
+        <p class="note">
+          This is a separate task from the previous one to ensure
+          the event handlers run after any `<var>promise</var>.then()` handlers
+          that react to the new value.
+          The second task is queued right after the first
+          to prevent {{BluetoothGATTCharacteristic/value}} from changing between them.
+        </p>
       </li>
     </ol>
 
