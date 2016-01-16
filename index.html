@@ -1072,7 +1072,7 @@
   <div class="head">
    <div data-fill-with="logo"></div>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-13">13 January 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-15">15 January 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1644,12 +1644,12 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
        <th>Description (non-normative)
      <tbody>
       <tr>
-       <td><dfn data-dfn-type="dfn" data-noexport="" id="deviceinstancemap">[[deviceInstanceMap]]<a class="self-link" href="#deviceinstancemap"></a></dfn>
+       <td><dfn class="idl-code" data-dfn-for="Bluetooth" data-dfn-type="attribute" data-export="" id="dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]<a class="self-link" href="#dom-bluetooth-deviceinstancemap-slot"></a></dfn>
        <td> An empty map from <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a>s
         to <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>></code> instances. 
        <td>
       <tr>
-       <td><dfn data-dfn-type="dfn" data-noexport="" id="attributeinstancemap">[[attributeInstanceMap]]<a class="self-link" href="#attributeinstancemap"></a></dfn>
+       <td><dfn class="idl-code" data-dfn-for="Bluetooth" data-dfn-type="attribute" data-export="" id="dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]<a class="self-link" href="#dom-bluetooth-attributeinstancemap-slot"></a></dfn>
        <td> An empty map from <a data-link-type="dfn" href="#bluetooth-cache">Bluetooth cache</a> entries to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>s. 
        <td> The <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>s resolve to either <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>, or <code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code> instances. 
     </table>
@@ -1891,8 +1891,8 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       an <dfn data-dfn-type="dfn" data-noexport="" id="allowed-services-list">allowed services list<a class="self-link" href="#allowed-services-list"></a></dfn> consisting of UUIDs
       for GATT Primary <a data-link-type="dfn" href="#service">Service</a>s the origin is allowed to access on the device. </p>
      <p> The UA MAY remove devices from the <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a> at any time
-      based on signals from the user. <span class="issue" id="issue-7afe38b8"><a class="self-link" href="#issue-7afe38b8"></a> This needs a definition involving
-        removing <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> instances from <a data-link-type="dfn" href="#deviceinstancemap">[[deviceInstanceMap]]</a>s
+      based on signals from the user. <span class="issue" id="issue-e6b72ee9"><a class="self-link" href="#issue-e6b72ee9"></a> This needs a definition involving
+        removing <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> instances from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a></code>s
         and clearing out their [[representedDevice]] fields. </span> For example, if the user chooses not to remember access,
       the UA might remove a device when the tab that was granted access to it is closed.
       Or the UA might provide a revocation UI that allows the user
@@ -1973,10 +1973,10 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
      <p> To <dfn data-dfn-type="dfn" data-noexport="" id="get-the-bluetoothdevice-representing">get the <code>BluetoothDevice</code> representing<a class="self-link" href="#get-the-bluetoothdevice-representing"></a></dfn> a <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> <var>device</var> inside a <code class="idl"><a data-link-type="idl" href="#bluetooth">Bluetooth</a></code> instance <var>context</var>,
       the UA MUST run the following steps: </p>
      <ol>
-      <li> If there is a key in <var>context</var>@<a data-link-type="dfn" href="#deviceinstancemap">[[deviceInstanceMap]]</a> that is the <a data-link-type="dfn" href="#same-device">same device</a> as <var>device</var>,
+      <li> If there is a key in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a></code> that is the <a data-link-type="dfn" href="#same-device">same device</a> as <var>device</var>,
         return its value and abort these steps. 
       <li>Let <var>promise</var> be <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a>.
-      <li> Add a mapping from <var>device</var> to <var>promise</var> in <var>context</var>@<a data-link-type="dfn" href="#deviceinstancemap">[[deviceInstanceMap]]</a>. 
+      <li> Add a mapping from <var>device</var> to <var>promise</var> in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a></code>. 
       <li>
        Return <var>promise</var>, and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>. 
        <ol>
@@ -2250,12 +2250,12 @@ return navigator.bluetooth.requestDevice({
          For each <var>entry</var> in <var>entries</var>: 
         <ol>
          <li> If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
-              in <var>context</var>@<a data-link-type="dfn" href="#attributeinstancemap">[[attributeInstanceMap]]</a>, <a data-link-type="dfn" href="#create-a-bluetoothgattservice-representing">create a <code>BluetoothGATTService</code> representing</a> <var>entry</var>, <a data-link-type="dfn" href="#create-a-bluetoothgattcharacteristic-representing">create a <code>BluetoothGATTCharacteristic</code> representing</a> <var>entry</var>,
+              in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a></code>, <a data-link-type="dfn" href="#create-a-bluetoothgattservice-representing">create a <code>BluetoothGATTService</code> representing</a> <var>entry</var>, <a data-link-type="dfn" href="#create-a-bluetoothgattcharacteristic-representing">create a <code>BluetoothGATTCharacteristic</code> representing</a> <var>entry</var>,
               or <a data-link-type="dfn" href="#create-a-bluetoothgattdescriptor-representing">create a <code>BluetoothGATTDescriptor</code> representing</a> <var>entry</var>,
               depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
-              and add a mapping from <var>entry</var> to the resulting <code>Promise</code> in <var>context</var>@<a data-link-type="dfn" href="#attributeinstancemap">[[attributeInstanceMap]]</a>. 
+              and add a mapping from <var>entry</var> to the resulting <code>Promise</code> in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a></code>. 
          <li> Append to <var>result</var> the <code>Promise&lt;BluetoothGATT*></code> instance
-              associated with <var>entry</var> in <var>context</var>@<a data-link-type="dfn" href="#attributeinstancemap">[[attributeInstanceMap]]</a>. 
+              associated with <var>entry</var> in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a></code>. 
         </ol>
        <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#waiting-for-all">waiting for all</a> elements of <var>result</var>. 
       </ol>
@@ -3459,7 +3459,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#attribute">Attribute</a><span>, in §5.1</span>
    <li><a href="#attribute-caching">Attribute Caching</a><span>, in §9</span>
    <li><a href="#attribute-handle">Attribute Handle</a><span>, in §9</span>
-   <li><a href="#attributeinstancemap">[[attributeInstanceMap]]</a><span>, in §3</span>
+   <li><a href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a><span>, in §3</span>
    <li><a href="#attribute-type">Attribute Type</a><span>, in §9</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-authenticatedsignedwrites">authenticatedSignedWrites</a><span>, in §5.4.1</span>
    <li><a href="#bd_addr">BD_ADDR</a><span>, in §9</span>
@@ -3525,7 +3525,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#dom-bluetoothdevice-deviceclass">deviceClass</a><span>, in §4.3</span>
    <li><a href="#device-discovery-procedure">Device Discovery Procedure</a><span>, in §9</span>
    <li><a href="#device-id">device id</a><span>, in §4.2</span>
-   <li><a href="#deviceinstancemap">[[deviceInstanceMap]]</a><span>, in §3</span>
+   <li><a href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a><span>, in §3</span>
    <li><a href="#dom-bluetoothgattremoteserver-disconnect">disconnect()</a><span>, in §5.2</span>
    <li><a href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a><span>, in §9</span>
    <li><a href="#discover-all-characteristics-of-a-service">Discover All Characteristics of a Service</a><span>, in §9</span>
@@ -3973,8 +3973,8 @@ partial interface <a class="idl-code" data-link-type="interface" href="https://h
    <div class="issue"> We need a way for a site to register to receive an event
     when an interesting device comes within range. <a href="#issue-e5c688d4"> ↵ </a></div>
    <div class="issue"> This needs a definition involving
-        removing <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> instances from <a data-link-type="dfn" href="#deviceinstancemap">[[deviceInstanceMap]]</a>s
-        and clearing out their [[representedDevice]] fields. <a href="#issue-7afe38b8"> ↵ </a></div>
+        removing <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> instances from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a></code>s
+        and clearing out their [[representedDevice]] fields. <a href="#issue-e6b72ee9"> ↵ </a></div>
    <div class="issue">TODO: Write the algorithm to update this
           when an advertising packet is received.<a href="#issue-3f22f137"> ↵ </a></div>
    <div class="issue"> <a data-link-type="dfn" href="#characteristic-extended-properties">Characteristic Extended Properties</a> isn’t clear whether
