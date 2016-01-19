@@ -256,8 +256,8 @@ spec: html
             return Promise.resolve();
           }
           return characteristic.<a for="BluetoothGATTCharacteristic">readValue()</a>
-          .then(sensorLocationArray => {
-            let sensorLocation = new Uint8Array(sensorLocationArray)[0];
+          .then(sensorLocationData => {
+            let sensorLocation = sensorLocationData.getUint8(0);
             switch (sensorLocation) {
               case 0: return 'Other';
               case 1: return 'Chest';
@@ -286,14 +286,13 @@ spec: html
         <code>parseHeartRate()</code> would be defined using the
         <a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
            ><code>heart_rate_measurement</code> documentation</a>
-        to read the {{ArrayBuffer}} stored
+        to read the {{DataView}} stored
         in a {{BluetoothGATTCharacteristic}}'s
         {{BluetoothGATTCharacteristic/value}} field.
       </p>
 
       <pre highlight="js">
-        function parseHeartRate(buffer) {
-          let data = new DataView(buffer);
+        function parseHeartRate(data) {
           let flags = data.getUint8(0);
           let rate16Bits = flags & 0x1;
           let result = {};
@@ -1560,10 +1559,10 @@ spec: html
         </p>
         <p>
           <dfn>manufacturerData</dfn> maps <code>unsigned short</code> Company Identifier Codes
-          to {{ArrayBuffer}}s.
+          to {{DataView}}s.
         </p>
         <p>
-          <dfn>serviceData</dfn> maps {{UUID}}s to {{ArrayBuffer}}s.
+          <dfn>serviceData</dfn> maps {{UUID}}s to {{DataView}}s.
         </p>
       </div>
 
@@ -1583,9 +1582,9 @@ spec: html
             filters: [{services: [known_service]}]
           }).then(device => {
             var rssi = device.adData.rssi;
-            var appleData = new DataView(device.adData.manufacturerData.get(<a
+            var appleData = device.adData.manufacturerData.get(<a
                        href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
-                       title="Apple, Inc.'s Company Identifier">0x004C</a>));
+                       title="Apple, Inc.'s Company Identifier">0x004C</a>);
             if (appleData.byteLength != 23 ||
               appleData.getUint16(0, false) !== 0x0215) {
               return {isBeacon: false};
@@ -1646,7 +1645,8 @@ spec: html
               For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
               make a new <a>read only ArrayBuffer</a> <var>bytes</var>
               containing the contents of its byte array,
-              and add a mapping from the 16-bit code to <var>bytes</var> in <var>mdata</var>.
+              and add a mapping from the 16-bit code to <code>new DataView(<var>bytes</var>)</code>
+              in <var>mdata</var>.
             </li>
             <li>
               Return a <a>read only Map</a> whose value is <var>mdata</var>.
@@ -1663,7 +1663,8 @@ spec: html
               if the UUID is in <var>allowed services list</var>,
               make a new <a>read only ArrayBuffer</a> <var>bytes</var>
               containing the contents of its byte array,
-              and add a mapping from the <a>UUID</a> to <var>bytes</var> in <var>sdata</var>.
+              and add a mapping from the <a>UUID</a> to <code>new DataView(<var>bytes</var>)</code>
+              in <var>sdata</var>.
             </li>
             <li>
               Return a <a>read only Map</a> whose value is <var>sdata</var>.
@@ -2163,11 +2164,11 @@ spec: html
         readonly attribute BluetoothGATTService service;
         readonly attribute UUID uuid;
         readonly attribute BluetoothCharacteristicProperties properties;
-        readonly attribute ArrayBuffer? value;
+        readonly attribute DataView? value;
         Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
         Promise&lt;sequence&lt;BluetoothGATTDescriptor>>
           getDescriptors(optional BluetoothDescriptorUUID descriptor);
-        Promise&lt;ArrayBuffer> readValue();
+        Promise&lt;DataView> readValue();
         Promise&lt;void> writeValue(BufferSource value);
         Promise&lt;void> startNotifications();
         Promise&lt;void> stopNotifications();
@@ -2236,7 +2237,7 @@ spec: html
       <li>
         Initialize <code><var>result</var>.value</code> to <code>null</code>.
         The UA MAY initialize <code><var>result</var>.value</code> to
-        a new <code>ArrayBuffer</code> containing
+        a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
         the most recently read value from <var>characteristic</var>
         if this value is available.
       </li>
@@ -2303,8 +2304,8 @@ spec: html
         <a>Queue a task</a> to perform the following steps:
         <ol>
           <li>
-            Create an <code>ArrayBuffer</code> holding the retrieved value,
-            and assign it to <code>this.value</code>.
+            Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
+            and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
           </li>
           <li>
             <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
@@ -2369,7 +2370,7 @@ spec: html
             <ol>
               <li>
                 Set <code>this.value</code> to
-                a new {{ArrayBuffer}} containing <var>bytes</var>.
+                a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
               </li>
               <li>
                 <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
@@ -2583,8 +2584,8 @@ spec: html
       interface BluetoothGATTDescriptor {
         readonly attribute BluetoothGATTCharacteristic characteristic;
         readonly attribute UUID uuid;
-        readonly attribute ArrayBuffer? value;
-        Promise&lt;ArrayBuffer> readValue();
+        readonly attribute DataView? value;
+        Promise&lt;DataView> readValue();
         Promise&lt;void> writeValue(BufferSource value);
       };
     </pre>
@@ -2630,7 +2631,7 @@ spec: html
       <li>
         Initialize <code><var>result</var>.value</code> to <code>null</code>.
         The UA MAY initialize <code><var>result</var>.value</code> to
-        a new <code>ArrayBuffer</code> containing
+        a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
         the most recently read value from <var>descriptor</var>
         if this value is available.
       </li>
@@ -2666,8 +2667,8 @@ spec: html
         <a>Queue a task</a> to perform the following steps:
         <ol>
           <li>
-            Create an <code>ArrayBuffer</code> holding the retrieved value,
-            and assign it to <code>this.value</code>.
+            Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
+            and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
           </li>
           <li>
             <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
@@ -2718,7 +2719,7 @@ spec: html
             <ol>
               <li>
                 Set <code>this.value</code> to
-                a new {{ArrayBuffer}} containing <var>bytes</var>.
+                a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
               </li>
               <li>
                 <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
@@ -2837,7 +2838,8 @@ spec: html
             </li>
             <li>
               Set <code><var>characteristicObject</var>.value</code> to
-              a new {{ArrayBuffer}} holding the new value of the <a>Characteristic</a>.
+              a new {{DataView}} wrapping a new {{ArrayBuffer}} holding
+              the new value of the <a>Characteristic</a>.
             </li>
             <li>
               <a>Fire an event</a> named {{characteristicvaluechanged}}
