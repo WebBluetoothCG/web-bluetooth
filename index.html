@@ -2486,8 +2486,14 @@ return navigator.bluetooth.requestDevice({
         <li> Create an <code>ArrayBuffer</code> holding the retrieved value,
             and assign it to <code>this.value</code>. 
         <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <code>this.value</code>. 
-        <li> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">Fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <code>this</code>. 
        </ol>
+      <li>
+       <p> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <code>this</code>. </p>
+       <p class="note" role="note"> This is a separate task from the previous one to ensure
+          the event handlers run after any <code>&lt;var>promise&lt;/var>.then()</code> handlers
+          that react to the new value.
+          The second task is queued right after the first
+          to prevent <code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-value">value</a></code> from changing between them. </p>
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-writevalue">writeValue(<var>value</var>)<a class="self-link" href="#dom-bluetoothgattcharacteristic-writevalue"></a></dfn></code> method, when invoked,
       MUST run the following steps: </p>
