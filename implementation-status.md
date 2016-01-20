@@ -17,7 +17,7 @@ Chooser UI                |           | 48                   |
 Read Characteristic       | 45        | 48                   |
 Write Characteristic      | 45        | 48                   |
 Characteristic Properties | 48        | 48                   |
-GATT Notifications        | 48        | 49                   |
+GATT Notifications        | 48        | (49 start only)      |
 
 ### Notes
 
