@@ -2188,12 +2188,27 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       If a device is removed from this list while
       a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code> is pending to do something with the device,
       it MUST be treated the same as if the device moved out of Bluetooth range. </p>
-     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="add-an-allowed-bluetooth-device">add an allowed <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a><a class="self-link" href="#add-an-allowed-bluetooth-device"></a></dfn> <var>device</var> to an origin’s <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a> with an optional <var>allowed services</var> list of <a data-link-type="dfn" href="#uuid">UUID</a>s,
+     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="add-an-allowed-bluetooth-device">add an allowed <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a><a class="self-link" href="#add-an-allowed-bluetooth-device"></a></dfn> <var>device</var> to <var>origin</var>’s <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a> with an optional <var>allowed services</var> list of <a data-link-type="dfn" href="#uuid">UUID</a>s,
       the UA MUST run the following steps. </p>
      <ol class="algorithm">
-      <li> If <var>device</var> is the <a data-link-type="dfn" href="#same-device">same device</a> as
+      <li>
+        If <var>device</var> is the <a data-link-type="dfn" href="#same-device">same device</a> as
         an existing key in the <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a>,
-        abort these steps. 
+        run the following sub-steps: 
+       <ol>
+        <li> Update the mapped <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a> to be
+            the set-union of its old value and <var>allowed services</var>,
+            and let <var>newServices</var> be this value. 
+        <li>
+          For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> <var>deviceObj</var> in the UA: 
+         <ol>
+          <li> Let <var>settings</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object-for-a-global-object">relevant settings object</a> for <var>deviceObj</var>’s global object. 
+          <li> If <var>settings</var>’ <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">origin</a> is <var>origin</var> and <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> is
+                the <a data-link-type="dfn" href="#same-device">same device</a> as <var>device</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on <var>settings</var>’ <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to
+                set <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code> to <var>newServices</var>. 
+         </ol>
+        <li> Abort these steps. 
+       </ol>
       <li> Let <var>id</var> be a new <code>DOMString</code> that
         isn’t equal to any of the <a data-link-type="dfn" href="#device-id">device id</a>s in the origin’s <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a> and isn’t equal to or derived from any of <var>device</var>’s <a data-link-type="dfn" href="#public-bluetooth-address">Public Bluetooth Address</a>, <a data-link-type="dfn" href="#static-address">Static Address</a>,
         or <a data-link-type="dfn" href="#identity-resolving-key">Identity Resolving Key</a>. <var>id</var> MUST, with very high probability,
@@ -2222,7 +2237,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productid">productID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productversion">productVersion</a>;
   readonly attribute <a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a>? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTRemoteServer? " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>[] <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID[] " href="#dom-bluetoothdevice-uuids">uuids</a>;
+  readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID> " href="#dom-bluetoothdevice-uuids">uuids</a>;
   Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-connectgatt">connectGATT</a>();
 };
 <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
@@ -2254,7 +2269,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
       <p> <dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-productversion">productVersion<a class="self-link" href="#dom-bluetoothdevice-productversion"></a></dfn> is the 16-bit Product Version field in the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml#">pnp_id</a></code> characteristic in the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml#">device_information</a></code> service. </p>
       <p> If the UA is currently connected to this device’s GATT server, <dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-gattserver">gattServer<a class="self-link" href="#dom-bluetoothdevice-gattserver"></a></dfn> provides a way to interact with it.
         While this device is disconnected, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-gattserver">gattServer</a></code> is <code>null</code>. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-uuids">uuids<a class="self-link" href="#dom-bluetoothdevice-uuids"></a></dfn> lists
+      <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-uuids">uuids</a></code> lists
         the UUIDs of GATT services known to be on the device,
         that the current origin is allowed to access. </p>
      </div>
@@ -2264,17 +2279,35 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
       <thead>
        <tr>
         <th>Internal Slot
+        <th>Initial Value
         <th>Description (non-normative)
       <tbody>
        <tr>
         <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-context-slot">[[context]]<a class="self-link" href="#dom-bluetoothdevice-context-slot"></a></dfn>
+        <td><code>undefined</code>
         <td> The <code class="idl"><a data-link-type="idl" href="#bluetooth">Bluetooth</a></code> object that returned this <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>. 
        <tr>
         <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]<a class="self-link" href="#dom-bluetoothdevice-representeddevice-slot"></a></dfn>
+        <td><code>undefined</code>
         <td> The <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> this object represents. 
        <tr>
         <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]<a class="self-link" href="#dom-bluetoothdevice-allowedservices-slot"></a></dfn>
-        <td> A reference to this device’s <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a> for this origin. 
+        <td><code>undefined</code>
+        <td> This device’s <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a> for this origin. 
+       <tr>
+        <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]<a class="self-link" href="#dom-bluetoothdevice-unfiltereduuids-slot"></a></dfn>
+        <td><code>new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-set-objects">Set</a></code>()</code>
+        <td> Service UUIDs known to be in this device’s <a data-link-type="dfn" href="#gatt-server">GATT Server</a>.
+          This set may be incomplete if the UA hasn’t run a full service discovery. 
+       <tr>
+        <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]<a class="self-link" href="#dom-bluetoothdevice-cachedallowedservices-slot"></a></dfn>
+        <td><code>undefined</code>
+        <td> Value of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code> the last time <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code> was updated. 
+       <tr>
+        <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]<a class="self-link" href="#dom-bluetoothdevice-filtereduuids-slot"></a></dfn>
+        <td><code>undefined</code>
+        <td> Cached value of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-uuids">uuids</a></code>.
+          Up to date if <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a></code> is equal to <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>. 
      </table>
      <p> To <dfn data-dfn-type="dfn" data-noexport="" id="get-the-bluetoothdevice-representing">get the <code>BluetoothDevice</code> representing<a class="self-link" href="#get-the-bluetoothdevice-representing"></a></dfn> a <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> <var>device</var> inside a <code class="idl"><a data-link-type="idl" href="#bluetooth">Bluetooth</a></code> instance <var>context</var>,
       the UA MUST run the following steps: </p>
@@ -2293,10 +2326,10 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
         <li> Find the key in this origin’s <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a> that is the <a data-link-type="dfn" href="#same-device">same device</a> as <var>device</var>.
             If there is no such key, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">resolve</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps.
             Otherwise, initialize <code><var>result</var>.id</code> to the <a data-link-type="dfn" href="#device-id">device id</a> this key maps to,
-            and initialize <code><var>result</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code> as a reference to the <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a> this key maps to. 
+            and initialize <code><var>result</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code> as the <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a> this key maps to. 
         <li> If <var>device</var> has a partial or complete <a data-link-type="dfn" href="#bluetooth-device-name">Bluetooth Device Name</a>,
             set <code><var>result</var>.name</code> to that string. 
-        <li> <a data-link-type="dfn" href="#create-a-bluetoothadvertisingdata">Create a <code>BluetoothAdvertisingData</code></a> from <var>device</var> and <code><var>result</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,
+        <li> <a data-link-type="dfn" href="#create-a-bluetoothadvertisingdata">Create a <code>BluetoothAdvertisingData</code></a> from <var>result</var> and <code><var>result</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,
             and set <code><var>result</var>.adData</code> to the result. 
         <li> If <var>device</var> has a <a data-link-type="dfn" href="#class-of-device">Class of Device</a>,
             set <code><var>result</var>.deviceClass</code> to that value. 
@@ -2339,19 +2372,28 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
           <li> Set <code><var>result</var>.productVersion</code> to
                 the value parsed for Product Version. 
          </ol>
-        <li> Let <var>uuids</var> be an empty set of UUIDs. 
         <li> Add <var>device</var>’s
-            advertised <a data-link-type="dfn" href="#service-uuid-data-type">Service UUIDs</a> to <var>uuids</var>. 
+            advertised <a data-link-type="dfn" href="#service-uuid-data-type">Service UUIDs</a> to <code>result@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>. 
         <li> The UA MAY <a data-link-type="dfn" href="#populate-the-bluetooth-cache">populate the Bluetooth cache</a> with
             all Services inside <var>device</var>.
             Ignore any errors from this step. 
         <li> If the <a data-link-type="dfn" href="#bluetooth-cache">Bluetooth cache</a> contains
             known-present Services inside <var>device</var>,
-            add the UUIDs of those Services to <var>uuids</var>. 
-        <li> Initialize <code><var>result</var>.uuids</code> to
-            a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-read-only-array">read only Array</a> holding the elements of <var>uuids</var> that are also in <code><var>result</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>. 
+            add the UUIDs of those Services to <code>result@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>. 
         <li>Resolve <var>promise</var> with <var>result</var>.
        </ol>
+     </ol>
+     <p> Getting the <code><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-uuids">uuids<a class="self-link" href="#dom-bluetoothdevice-uuids"></a></dfn></code> attribute
+      MUST perform the following steps: </p>
+     <ol class="algorithm">
+      <li>
+        If <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a></code> is not equal to <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>,
+        perform the following sub-steps: 
+       <ol>
+        <li> Set <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a></code> to a copy of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>. 
+        <li> Set <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a></code> consisting of the intersection of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>. 
+       </ol>
+      <li> Return <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code>. 
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="method" data-export="" id="dom-bluetoothdevice-connectgatt">connectGATT()<a class="self-link" href="#dom-bluetoothdevice-connectgatt"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and
@@ -2434,9 +2476,9 @@ return navigator.bluetooth.requestDevice({
       </div>
       <p> All fields in <code class="idl"><a data-link-type="idl" href="#bluetoothadvertisingdata">BluetoothAdvertisingData</a></code> return
         the last value they were initialized or set to. </p>
-      <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothadvertisingdata">create a <code class="idl"><a data-link-type="idl" href="#bluetoothadvertisingdata">BluetoothAdvertisingData</a></code><a class="self-link" href="#create-a-bluetoothadvertisingdata"></a></dfn> from a <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> <var>device</var> and an <var>allowed services list</var>,
-        the UA must perform the following steps: </p>
+      <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothadvertisingdata">create a <code class="idl"><a data-link-type="idl" href="#bluetoothadvertisingdata">BluetoothAdvertisingData</a></code><a class="self-link" href="#create-a-bluetoothadvertisingdata"></a></dfn> from a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> <var>deviceObj</var> the UA must perform the following steps: </p>
       <ol class="algorithm">
+       <li> Let <var>device</var> be <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>. 
        <li>Let <var>adData</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothadvertisingdata">BluetoothAdvertisingData</a></code>.
        <li> If <var>device</var> has an <a data-link-type="dfn" href="#appearance">Appearance</a>,
           initialize <code><var>adData</var>.appearance</code> to its value.
@@ -2453,7 +2495,7 @@ return navigator.bluetooth.requestDevice({
        <li> For each mapping in <var>device</var>’s <a data-link-type="dfn" href="#service-data">Service Data</a>,
           make a new <a data-link-type="dfn" href="#read-only-arraybuffer">read only ArrayBuffer</a> <var>bytes</var> containing the contents of its byte array,
           and add a mapping from the <a data-link-type="dfn" href="#uuid">UUID</a> to <code>new DataView(<var>bytes</var>)</code> in <code><var>adData</var>.serviceData@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-unfiltereddata-slot">[[unfilteredData]]</a></code></code>. 
-       <li> Set <code><var>adData</var>.serviceData@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-allowedservices-slot">[[allowedServices]]</a></code></code> to <var>allowed services list</var>. 
+       <li> Set <code><var>adData</var>.serviceData@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-deviceobj-slot">[[deviceObj]]</a></code></code> to <var>deviceObj</var>. 
        <li>Return <var>adData</var>.
       </ol>
       <section>
@@ -2487,16 +2529,16 @@ return navigator.bluetooth.requestDevice({
           <th>Description (non-normative)
         <tbody>
          <tr>
+          <td><dfn class="idl-code" data-dfn-for="BluetoothServiceDataMap" data-dfn-type="attribute" data-export="" id="dom-bluetoothservicedatamap-deviceobj-slot">[[deviceObj]]<a class="self-link" href="#dom-bluetoothservicedatamap-deviceobj-slot"></a></dfn>
+          <td><code>undefined</code>
+          <td> The <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> within which this map represents service data. 
+         <tr>
           <td><dfn class="idl-code" data-dfn-for="BluetoothServiceDataMap" data-dfn-type="attribute" data-export="" id="dom-bluetoothservicedatamap-unfiltereddata-slot">[[unfilteredData]]<a class="self-link" href="#dom-bluetoothservicedatamap-unfiltereddata-slot"></a></dfn>
           <td><code>new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-map-constructor">Map</a></code>()</code>
           <td> The advertised service data, converted to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code>s. 
-         <tr>
-          <td><dfn class="idl-code" data-dfn-for="BluetoothServiceDataMap" data-dfn-type="attribute" data-export="" id="dom-bluetoothservicedatamap-allowedservices-slot">[[allowedServices]]<a class="self-link" href="#dom-bluetoothservicedatamap-allowedservices-slot"></a></dfn>
-          <td><code>undefined</code>
-          <td> A reference to the device’s <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a> for the current origin. 
        </table>
        <p> The <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothservicedatamap">BluetoothServiceDataMap</a></code> instance are
-          the entries in <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-unfiltereddata-slot">[[unfilteredData]]</a></code></code> whose keys also appear in <code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-allowedservices-slot">[[allowedServices]]</a></code>. </p>
+          the entries in <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-unfiltereddata-slot">[[unfilteredData]]</a></code></code> whose keys also appear in <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothservicedatamap-deviceobj-slot">[[deviceObj]]</a></code>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>. </p>
       </section>
      </section>
     </section>
@@ -3425,11 +3467,11 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
     the algorithm defined in <a href="#standardized-uuids">§6.1 Standardized UUIDs</a> for <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code> as its <code>callbackfn</code> parameter,
     regardless of any modifications that have been made to <code>window</code>, <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>, <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothUUID</code>, <code>BluetoothUUID.getService</code>, or other objects. </p>
     <p> This specification uses a read-only type
-    that is similar to WebIDL’s <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-read-only-array">read only Array</a>. </p>
+    that is similar to WebIDL’s <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a></code>. </p>
     <ul>
      <li> A <dfn data-dfn-type="dfn" data-noexport="" id="read-only-arraybuffer">read only ArrayBuffer<a class="self-link" href="#read-only-arraybuffer"></a></dfn> has <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a></code>'s values and interface,
       except that attempting to write to its contents or transfer it
-      has the same effect as trying to write to a <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-read-only-array">read only Array</a>’s contents.
+      has the same effect as trying to write to a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a></code>'s contents.
       This applies to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-typedarray-constructors">TypedArray</a></code>s and <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code>s
       wrapped around the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a></code> too. 
     </ul>
@@ -3802,12 +3844,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#dom-bluetoothdevice-addata">adData</a><span>, in §4.3</span>
    <li><a href="#advertising-data">Advertising Data</a><span>, in §9</span>
    <li><a href="#allowed-devices-map">allowed devices map</a><span>, in §4.2</span>
-   <li>
-    [[allowedServices]]
-    <ul>
-     <li><a href="#dom-bluetoothdevice-allowedservices-slot">attribute for BluetoothDevice</a><span>, in §4.3</span>
-     <li><a href="#dom-bluetoothservicedatamap-allowedservices-slot">attribute for BluetoothServiceDataMap</a><span>, in §4.3.1.2</span>
-    </ul>
+   <li><a href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a><span>, in §4.3</span>
    <li><a href="#allowed-services-list">allowed services list</a><span>, in §4.2</span>
    <li><a href="#appearance">Appearance</a><span>, in §9</span>
    <li><a href="#dom-bluetoothadvertisingdata-appearance">appearance</a><span>, in §4.3.1</span>
@@ -3844,6 +3881,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#bluetoothuuid">BluetoothUUID</a><span>, in §6.1</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-broadcast">broadcast</a><span>, in §5.4.1</span>
    <li><a href="#broadcaster">Broadcaster</a><span>, in §9</span>
+   <li><a href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a><span>, in §4.3</span>
    <li><a href="#dom-bluetoothuuid-canonicaluuid">canonicalUUID(alias)</a><span>, in §6.1</span>
    <li><a href="#central">Central</a><span>, in §9</span>
    <li><a href="#dom-bluetoothgattdescriptor-characteristic">characteristic</a><span>, in §5.5</span>
@@ -3884,6 +3922,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#device-discovery-procedure">Device Discovery Procedure</a><span>, in §9</span>
    <li><a href="#device-id">device id</a><span>, in §4.2</span>
    <li><a href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a><span>, in §3</span>
+   <li><a href="#dom-bluetoothservicedatamap-deviceobj-slot">[[deviceObj]]</a><span>, in §4.3.1.2</span>
    <li><a href="#dom-bluetoothgattremoteserver-disconnect">disconnect()</a><span>, in §5.2</span>
    <li><a href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a><span>, in §9</span>
    <li><a href="#discover-all-characteristics-of-a-service">Discover All Characteristics of a Service</a><span>, in §9</span>
@@ -3892,6 +3931,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#discover-primary-service-by-service-uuid">Discover Primary Service by Service UUID</a><span>, in §9</span>
    <li><a href="#error-response">Error Response</a><span>, in §9</span>
    <li><a href="#extended-inquiry-response">Extended Inquiry Response</a><span>, in §9</span>
+   <li><a href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a><span>, in §4.3</span>
    <li><a href="#dom-requestdeviceoptions-filters">filters</a><span>, in §3</span>
    <li><a href="#find-included-services">Find Included Services</a><span>, in §9</span>
    <li><a href="#flags-data-type">Flags Data Type</a><span>, in §9</span>
@@ -4010,6 +4050,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#dom-bluetoothadvertisingdata-txpower">txPower</a><span>, in §4.3.1</span>
    <li><a href="#tx-power-level">TX Power Level</a><span>, in §9</span>
    <li><a href="#dom-bluetoothservicedatamap-unfiltereddata-slot">[[unfilteredData]]</a><span>, in §4.3.1.2</span>
+   <li><a href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a><span>, in §4.3</span>
    <li>
     uuid
     <ul>
@@ -4083,6 +4124,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
     <a data-link-type="biblio" href="#biblio-webidl">[WebIDL]</a> defines the following terms:
     <ul>
      <li><a href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a>
+     <li><a href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a>
      <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror">InvalidModificationError</a>
      <li><a href="https://heycam.github.io/webidl/#networkerror">NetworkError</a>
      <li><a href="https://heycam.github.io/webidl/#notfounderror">NotFoundError</a>
@@ -4090,7 +4132,6 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://heycam.github.io/webidl/#securityerror">SecurityError</a>
      <li><a href="https://heycam.github.io/webidl/#syntaxerror">SyntaxError</a>
      <li><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-read-only-array">read only array</a>
     </ul>
    <li>
     <a data-link-type="biblio" href="#biblio-dom-ls">[dom-ls]</a> defines the following terms:
@@ -4113,12 +4154,14 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#navigator">Navigator</a>
      <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#allowed-to-show-a-popup">allowed to show a popup</a>
+     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment settings object</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">event handler idl attribute</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#execution-context&apos;s-global-object">global object</a>
      <li><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#incumbent-settings-object">incumbent settings object</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint">perform a microtask checkpoint</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a>
+     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object-for-a-global-object">relevant settings object for a global object</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a>
     </ul>
    <li>
@@ -4213,7 +4256,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productid">productID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productversion">productVersion</a>;
   readonly attribute <a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a>? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTRemoteServer? " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>[] <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID[] " href="#dom-bluetoothdevice-uuids">uuids</a>;
+  readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID> " href="#dom-bluetoothdevice-uuids">uuids</a>;
   Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-connectgatt">connectGATT</a>();
 };
 <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
