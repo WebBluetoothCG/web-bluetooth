@@ -1229,7 +1229,7 @@ spec: html
       <span class="issue">
         This needs a definition involving
         removing {{BluetoothDevice}} instances from {{Bluetooth/[[deviceInstanceMap]]}}s
-        and clearing out their \[[representedDevice]] fields.
+        and clearing out their {{[[representedDevice]]}} fields.
       </span>
       For example, if the user chooses not to remember access,
       the UA might remove a device when the tab that was granted access to it is closed.
@@ -1373,6 +1373,35 @@ spec: html
     </div>
 
     <p>
+      Instances of {{BluetoothDevice}} are created with the internal slots
+      described in the following table:
+    </p>
+    <table class="data" dfn-for="BluetoothDevice" dfn-type="attribute">
+      <thead>
+        <th>Internal Slot</th>
+        <th>Description (non-normative)</th>
+      </thead>
+      <tr>
+        <td><dfn>\[[context]]</dfn></td>
+        <td>
+          The {{Bluetooth}} object that returned this {{BluetoothDevice}}.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[representedDevice]]</dfn></td>
+        <td>
+          The <a>Bluetooth device</a> this object represents.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[allowedServices]]</dfn></td>
+        <td>
+          A reference to this device's <a>allowed services list</a> for this origin.
+        </td>
+      </tr>
+    </table>
+
+    <p>
       To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
       a <a>Bluetooth device</a> <var>device</var>
       inside a {{Bluetooth}} instance <var>context</var>,
@@ -1395,13 +1424,11 @@ spec: html
           <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
           <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
           <li>
-            Initialize an internal
-            <code><var>result</var>@\[[context]]</code> field
+            Initialize <code><var>result</var>@{{[[context]]}}</code>
             to <var>context</var>.
           </li>
           <li>
-            Initialize an internal
-            <code><var>result</var>@\[[representedDevice]]</code> field
+            Initialize <code><var>result</var>@{{[[representedDevice]]}}</code>
             to <var>device</var>.
           </li>
           <li>
@@ -1411,9 +1438,8 @@ spec: html
             <a>resolve</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
             Otherwise, initialize <code><var>result</var>.id</code>
             to the <a>device id</a> this key maps to,
-            and initialize an internal
-            <code><var>result</var>@\[[allowedServices]]</code> field
-            to the <a>allowed services list</a> this key maps to.
+            and initialize <code><var>result</var>@{{[[allowedServices]]}}</code>
+            as a reference to the <a>allowed services list</a> this key maps to.
           </li>
           <li>
             If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
@@ -1421,7 +1447,7 @@ spec: html
           </li>
           <li>
             <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>device</var>
-            and <code><var>result</var>@\[[allowedServices]]</code>,
+            and <code><var>result</var>@{{[[allowedServices]]}}</code>,
             and set <code><var>result</var>.adData</code> to the result.
           </li>
           <li>
@@ -1494,7 +1520,7 @@ spec: html
           <li>
             Initialize <code><var>result</var>.uuids</code> to
             a <a>read only Array</a> holding the elements of <var>uuids</var>
-            that are also in <code><var>result</var>@\[[allowedServices]]</code>.
+            that are also in <code><var>result</var>@{{[[allowedServices]]}}</code>.
           </li>
           <li>Resolve <var>promise</var> with <var>result</var>.</li>
         </ol>
@@ -1508,7 +1534,7 @@ spec: html
     </p>
     <ol class="algorithm">
       <li>
-        If <code>this@\[[representedDevice]]</code> has no <a>ATT Bearer</a>,
+        If <code>this@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
         attempt to create one using the procedures described
         in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
       </li>
@@ -1991,12 +2017,12 @@ spec: html
       <li>
         <a>In parallel</a>:
         if, for all {{BluetoothDevice}}s <code><var>device</var></code> in the whole UA
-        with <code><var>device</var>@\[[representedDevice]]</code>
-        the <a>same device</a> as <code>this.device@\[[representedDevice]]</code>,
+        with <code><var>device</var>@{{[[representedDevice]]}}</code>
+        the <a>same device</a> as <code>this.device@{{[[representedDevice]]}}</code>,
         <code><var>device</var>.gattServer === null</code>
         or <code>!<var>device</var>.gattServer.connected</code>,
         the UA MAY destroy
-        <code><var>device</var>@\[[representedDevice]]</code>'s <a>ATT Bearer</a>.
+        <code><var>device</var>@{{[[representedDevice]]}}</code>'s <a>ATT Bearer</a>.
       </li>
     </ol>
 
@@ -2006,15 +2032,16 @@ spec: html
     </p>
     <ol class="algorithm">
       <li>
-        If <var>service</var> is not in <code>this.device@\[[allowedServices]]</code>,
+        If <var>service</var> is not in
+        <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
       </li>
       <li>
-      Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
+      Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
         <var>single</var>=true,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@\[[allowedServices]]</code>,<br>
+        <var>allowedUuids</var>=<code>this.device@{{[[allowedServices]]}}</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
       </li>
     </ol>
@@ -2025,15 +2052,16 @@ spec: html
     </p>
     <ol class="algorithm">
       <li>
-        If <var>service</var> is present and not in <code>this.device@\[[allowedServices]]</code>,
+        If <var>service</var> is present
+        and not in <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
       </li>
       <li>
-        Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
+        Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
         <var>single</var>=false,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@\[[allowedServices]]</code>,<br>
+        <var>allowedUuids</var>=<code>this.device@{{[[allowedServices]]}}</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
       </li>
     </ol>
