@@ -1356,7 +1356,7 @@
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-22">22 January 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-25">25 January 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2619,11 +2619,19 @@ return navigator.bluetooth.requestDevice({
         the UA MAY destroy <code><var>device</var>@[[representedDevice]]</code>’s <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>. 
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservice"></a></dfn></code> method, when invoked,
-      MUST return </p>
-     <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@[[representedDevice]]</code>,<br> <var>single</var>=true,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>this.device@[[allowedServices]]</code>,<br> <var>child type</var>="GATT Primary Service")</span> </blockquote>
+      MUST perform the following steps: </p>
+     <ol>
+      <li> If <var>service</var> is not in <code>this.device@[[allowedServices]]</code>,
+        return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
+      <li> Return <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@[[representedDevice]]</code>,<br> <var>single</var>=true,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>this.device@[[allowedServices]]</code>,<br> <var>child type</var>="GATT Primary Service")</span> 
+     </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-getprimaryservices">getPrimaryServices(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservices"></a></dfn></code> method, when invoked,
-      MUST return </p>
-     <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@[[representedDevice]]</code>,<br> <var>single</var>=false,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>this.device@[[allowedServices]]</code>,<br> <var>child type</var>="GATT Primary Service")</span> </blockquote>
+      MUST perform the following steps: </p>
+     <ol>
+      <li> If <var>service</var> is present and not in <code>this.device@[[allowedServices]]</code>,
+        return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
+      <li> Return <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@[[representedDevice]]</code>,<br> <var>single</var>=false,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>this.device@[[allowedServices]]</code>,<br> <var>child type</var>="GATT Primary Service")</span> 
+     </ol>
     </section>
     <section>
      <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.3" data-lt="BluetoothGATTService" id="bluetoothgattservice"><span class="secno">5.3. </span><span class="content">BluetoothGATTService</span><a class="self-link" href="#bluetoothgattservice"></a></h3>

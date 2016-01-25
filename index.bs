@@ -1998,29 +1998,41 @@ spec: html
 
     <p>
       The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
-      MUST return
+      MUST perform the following steps:
     </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
+    <ol>
+      <li>
+        If <var>service</var> is not in <code>this.device@\[[allowedServices]]</code>,
+        return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+      </li>
+      <li>
+      Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
         <var>single</var>=true,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
         <var>allowedUuids</var>=<code>this.device@\[[allowedServices]]</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
-    </blockquote>
+      </li>
+    </ol>
 
     <p>
       The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
-      MUST return
+      MUST perform the following steps:
     </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
+    <ol>
+      <li>
+        If <var>service</var> is present and not in <code>this.device@\[[allowedServices]]</code>,
+        return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+      </li>
+      <li>
+        Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
         <var>single</var>=false,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
         <var>allowedUuids</var>=<code>this.device@\[[allowedServices]]</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
-    </blockquote>
+      </li>
+    </ol>
   </section>
 
   <section>
