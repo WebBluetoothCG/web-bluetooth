@@ -164,6 +164,9 @@ spec: html
         text: perform a microtask checkpoint
         text: queue a task
         text: responsible event loop
+spec: webidl
+    type: dfn
+        text: map entries
 </pre>
 
 <style>
@@ -769,9 +772,9 @@ spec: html
   </p>
   <table class="data" dfn-for="Bluetooth" dfn-type="attribute">
     <thead>
-        <th>Internal Slot</th>
-        <th>Initial Value</th>
-        <th>Description (non-normative)</th>
+      <th>Internal Slot</th>
+      <th>Initial Value</th>
+      <th>Description (non-normative)</th>
     </thead>
     <tr>
       <td><dfn>\[[deviceInstanceMap]]</dfn></td>
@@ -1438,7 +1441,7 @@ spec: html
             <a>resolve</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
             Otherwise, initialize <code><var>result</var>.id</code>
             to the <a>device id</a> this key maps to,
-            and initialize <code><var>result</var>@{{[[allowedServices]]}}</code>
+            and initialize <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
             as a reference to the <a>allowed services list</a> this key maps to.
           </li>
           <li>
@@ -1447,7 +1450,7 @@ spec: html
           </li>
           <li>
             <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>device</var>
-            and <code><var>result</var>@{{[[allowedServices]]}}</code>,
+            and <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
             and set <code><var>result</var>.adData</code> to the result.
           </li>
           <li>
@@ -1520,7 +1523,7 @@ spec: html
           <li>
             Initialize <code><var>result</var>.uuids</code> to
             a <a>read only Array</a> holding the elements of <var>uuids</var>
-            that are also in <code><var>result</var>@{{[[allowedServices]]}}</code>.
+            that are also in <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>.
           </li>
           <li>Resolve <var>promise</var> with <var>result</var>.</li>
         </ol>
@@ -1562,12 +1565,18 @@ spec: html
       <h4 id="bluetoothadvertisingdata" dfn-type="interface">BluetoothAdvertisingData</h4>
 
       <pre class="idl">
+        interface BluetoothManufacturerDataMap {
+          readonly maplike&lt;unsigned short, DataView>;
+        };
+        interface BluetoothServiceDataMap {
+          readonly maplike&lt;UUID, DataView>;
+        };
         interface BluetoothAdvertisingData {
           readonly attribute unsigned short? appearance;
           readonly attribute byte? txPower;
           readonly attribute byte? rssi;
-          readonly attribute Map manufacturerData;
-          readonly attribute Map serviceData;
+          readonly attribute BluetoothManufacturerDataMap manufacturerData;
+          readonly attribute BluetoothServiceDataMap serviceData;
         };
       </pre>
 
@@ -1667,42 +1676,91 @@ spec: html
           Otherwise initialize it to <code>null</code>.
         </li>
         <li>
-          Initialize <code><var>adData</var>.manufacturerData</code> with
-          the return value of these substeps:
-          <ol>
-            <li>Let <var>mdata</var> be a new {{Map}} instance.</li>
-            <li>
-              For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
-              make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-              containing the contents of its byte array,
-              and add a mapping from the 16-bit code to <code>new DataView(<var>bytes</var>)</code>
-              in <var>mdata</var>.
-            </li>
-            <li>
-              Return a <a>read only Map</a> whose value is <var>mdata</var>.
-            </li>
-          </ol>
+          For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
+          make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+          containing the contents of its byte array,
+          and add a mapping from the 16-bit code to <code>new DataView(<var>bytes</var>)</code>
+          in <code><var>adData</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
         </li>
         <li>
-          Initialize <code><var>adData</var>.serviceData</code> with
-          the return value of these substeps:
-          <ol>
-            <li>Let <var>sdata</var> be a new {{Map}} instance.</li>
-            <li>
-              For each mapping in <var>device</var>'s <a>Service Data</a>,
-              if the UUID is in <var>allowed services list</var>,
-              make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-              containing the contents of its byte array,
-              and add a mapping from the <a>UUID</a> to <code>new DataView(<var>bytes</var>)</code>
-              in <var>sdata</var>.
-            </li>
-            <li>
-              Return a <a>read only Map</a> whose value is <var>sdata</var>.
-            </li>
-          </ol>
+          For each mapping in <var>device</var>'s <a>Service Data</a>,
+          make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+          containing the contents of its byte array,
+          and add a mapping from the <a>UUID</a> to <code>new DataView(<var>bytes</var>)</code>
+          in <code><var>adData</var>.serviceData@{{BluetoothServiceDataMap/[[unfilteredData]]}}</code>.
+        </li>
+        <li>
+          Set <code><var>adData</var>.serviceData@{{BluetoothServiceDataMap/[[allowedServices]]}}</code>
+          to <var>allowed services list</var>.
         </li>
         <li>Return <var>adData</var>.</li>
       </ol>
+
+      <section>
+        <h5 dfn-type="interface">BluetoothManufacturerDataMap</h5>
+
+        <p>
+          Instances of {{BluetoothManufacturerDataMap}} are created with the internal slots
+          described in the following table:
+        </p>
+
+        <table class="data" dfn-for="BluetoothManufacturerDataMap" dfn-type="attribute">
+          <thead>
+            <th>Internal Slot</th>
+            <th>Initial Value</th>
+            <th>Description (non-normative)</th>
+          </thead>
+          <tr>
+            <td><dfn>\[[data]]</dfn></td>
+            <td><code>new {{Map}}()</code></td>
+            <td>
+              The advertised manufacturer data, converted to {{DataView}}s.
+            </td>
+          </tr>
+        </table>
+
+        <p>
+          The <a>map entries</a> of a {{BluetoothManufacturerDataMap}} instance are
+          the entries in <code>{{BluetoothManufacturerDataMap/[[data]]}}</code>.
+        </p>
+      </section>
+
+      <section>
+        <h5 dfn-type="interface">BluetoothServiceDataMap</h5>
+
+        <p>
+          Instances of {{BluetoothServiceDataMap}} are created with the internal slots
+          described in the following table:
+        </p>
+
+        <table class="data" dfn-for="BluetoothServiceDataMap" dfn-type="attribute">
+          <thead>
+            <th>Internal Slot</th>
+            <th>Initial Value</th>
+            <th>Description (non-normative)</th>
+          </thead>
+          <tr>
+            <td><dfn>\[[unfilteredData]]</dfn></td>
+            <td><code>new {{Map}}()</code></td>
+            <td>
+              The advertised service data, converted to {{DataView}}s.
+            </td>
+          </tr>
+          <tr>
+            <td><dfn>\[[allowedServices]]</dfn></td>
+            <td>`undefined`</td>
+            <td>
+              A reference to the device's <a>allowed services list</a> for the current origin.
+            </td>
+          </tr>
+        </table>
+
+        <p>
+          The <a>map entries</a> of a {{BluetoothServiceDataMap}} instance are
+          the entries in <code>{{BluetoothServiceDataMap/[[unfilteredData]]}}</code>
+          whose keys also appear in {{BluetoothServiceDataMap/[[allowedServices]]}}.
+        </p>
+      </section>
     </section>
   </section>
 </section>
@@ -2041,7 +2099,7 @@ spec: html
         <var>single</var>=true,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@{{[[allowedServices]]}}</code>,<br>
+        <var>allowedUuids</var>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
       </li>
     </ol>
@@ -2061,7 +2119,7 @@ spec: html
         <var>single</var>=false,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@{{[[allowedServices]]}}</code>,<br>
+        <var>allowedUuids</var>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
       </li>
     </ol>
@@ -3424,15 +3482,10 @@ spec: html
   </p>
 
   <p>
-    This specification uses a few read-only types
-    that are similar to WebIDL's <a>read only Array</a>.
+    This specification uses a read-only type
+    that is similar to WebIDL's <a>read only Array</a>.
   </p>
   <ul>
-    <li>
-      A <dfn>read only Map</dfn> has {{Map}}'s values and interface,
-      except the <code>clear</code>, <code>delete</code>, and <code>set</code> methods
-      are omitted.
-    </li>
     <li>
       A <dfn>read only ArrayBuffer</dfn> has {{ArrayBuffer}}'s values and interface,
       except that attempting to write to its contents or transfer it
