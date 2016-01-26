@@ -4,7 +4,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2015-12-15**.
+* Notes updated **2016-01-26**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
@@ -13,11 +13,12 @@ Feature                   | Chrome OS | Chrome for Android M | Chrome for Mac OS
 ------------------------- | :-------: | :------------------: | :-----------------:
 Discovery                 | 45        | 48                   | 46
 └ Name or prefix          | 48        | 48                   | 48
-Chooser UI                |           | 48                   |
+Chooser UI                | 49        | 48                   | 49
 Read Characteristic       | 45        | 48                   |
 Write Characteristic      | 45        | 48                   |
 Characteristic Properties | 48        | 48                   |
 GATT Notifications        | 48        | (49 start only)      |
+GATT Server Disconnect    |           | 50                   |
 
 ### Notes
 
