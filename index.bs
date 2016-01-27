@@ -237,7 +237,7 @@ spec: webidl
           filters: [{
             services: ['heart_rate'],
           }]
-        }).then(device => device.<a for="BluetoothDevice">connectGATT()</a>)
+        }).then(device => device.gattServer.<a for="BluetoothGATTRemoteServer">connect()</a>)
         .then(server => server.<a idl for="BluetoothGATTRemoteServer" lt="getPrimaryService()"
                               >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate"
             >'heart_rate'</a>))
@@ -1339,9 +1339,8 @@ spec: webidl
         readonly attribute unsigned long? vendorID;
         readonly attribute unsigned long? productID;
         readonly attribute unsigned long? productVersion;
-        readonly attribute BluetoothGATTRemoteServer? gattServer;
+        readonly attribute BluetoothGATTRemoteServer gattServer;
         readonly attribute FrozenArray&lt;UUID> uuids;
-        Promise&lt;BluetoothGATTRemoteServer> connectGATT();
       };
       BluetoothDevice implements EventTarget;
       BluetoothDevice implements CharacteristicEventHandlers;
@@ -1398,10 +1397,7 @@ spec: webidl
       </p>
 
       <p>
-        If the UA is currently connected to this device's GATT server,
-        <dfn>gattServer</dfn> provides a way to interact with it.
-        While this device is disconnected,
-        {{BluetoothDevice/gattServer}} is <code>null</code>.
+        <dfn>gattServer</dfn> provides a way to interact with this device's GATT server.
       </p>
 
       <p>
@@ -1566,6 +1562,12 @@ spec: webidl
             </ol>
           </li>
           <li>
+            Set <code><var>result</var>.gattServer.device</code> to <var>result</var>.
+          </li>
+          <li>
+            Set <code><var>result</var>.gattServer.connected</code> to `false`.
+          </li>
+          <li>
             Add <var>device</var>'s
             advertised <a>Service UUIDs</a>
             to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
@@ -1605,37 +1607,6 @@ spec: webidl
       </li>
       <li>
         Return {{[[filteredUuids]]}}.
-      </li>
-    </ol>
-
-    <p>
-      The <code><dfn method for="BluetoothDevice">connectGATT()</dfn></code> method, when invoked,
-      MUST return <a>a new promise</a> <var>promise</var> and
-      run the following steps <a>in parallel</a>:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
-        attempt to create one using the procedures described
-        in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
-      </li>
-      <li>
-        If this attempt fails,
-        reject <var>promise</var> with a {{NetworkError}} and abort these steps.
-      </li>
-      <li>
-        <a>Queue a task</a> to do the following steps:
-        <ol>
-          <li>
-            If <code>this.gattServer</code> is <code>null</code>,
-            set it to a new {{BluetoothGATTRemoteServer}} instance
-            with its <code>device</code> attribute initialized to <code>this</code>
-            and its <code>connected</code> attribute initialized to <code>true</code>.
-          </li>
-          <li>
-            Resolve <var>promise</var> with <code>this.gattServer</code>.
-          </li>
-        </ol>
       </li>
     </ol>
 
@@ -2121,6 +2092,7 @@ spec: webidl
       interface BluetoothGATTRemoteServer {
         readonly attribute BluetoothDevice device;
         readonly attribute boolean connected;
+        Promise&lt;BluetoothGATTRemoteServer> connect();
         void disconnect();
         Promise&lt;BluetoothGATTService> getPrimaryService(BluetoothServiceUUID service);
         Promise&lt;sequence&lt;BluetoothGATTService>>
@@ -2145,6 +2117,26 @@ spec: webidl
         for other <a>global object</a>s.
       </p>
     </div>
+
+    <p>
+      The <code><dfn method for="BluetoothGATTRemoteServer">connect()</dfn></code> method, when invoked,
+      MUST return <a>a new promise</a> <var>promise</var> and
+      run the following steps <a>in parallel</a>:
+    </p>
+    <ol class="algorithm">
+      <li>
+        If <code>this.device@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
+        attempt to create one using the procedures described
+        in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
+      </li>
+      <li>
+        If this attempt fails,
+        <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+      </li>
+      <li>
+        <a>Resolve</a> <var>promise</var> with <code>this</code>.
+      </li>
+    </ol>
 
     <p>
       The <code><dfn method for="BluetoothGATTRemoteServer">disconnect()</dfn></code> method, when invoked,
