@@ -225,7 +225,7 @@ spec: webidl
   <section>
     <h3 id="introduction-examples">Examples</h3>
 
-    <div class="example">
+    <div class="example" id="example-heart-rate-monitor">
       <p>
         To discover and retrieve data from a standard heart rate monitor,
         a website would use code like the following:
@@ -2144,7 +2144,15 @@ spec: webidl
         <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
       </li>
       <li>
-        <a>Resolve</a> <var>promise</var> with <code>this</code>.
+        <a>Queue a task</a> to perform the following sub-steps:
+        <ol>
+          <li>
+            Set `this.connected` to `true`.
+          </li>
+          <li>
+            <a>Resolve</a> <var>promise</var> with <code>this</code>.
+          </li>
+        </ol>
       </li>
     </ol>
 
@@ -2161,8 +2169,7 @@ spec: webidl
         if, for all {{BluetoothDevice}}s <code><var>device</var></code> in the whole UA
         with <code><var>device</var>@{{[[representedDevice]]}}</code>
         the <a>same device</a> as <code>this.device@{{[[representedDevice]]}}</code>,
-        <code><var>device</var>.gattServer === null</code>
-        or <code>!<var>device</var>.gattServer.connected</code>,
+        <code>!<var>device</var>.gattServer.connected</code>,
         the UA MAY destroy
         <code><var>device</var>@{{[[representedDevice]]}}</code>'s <a>ATT Bearer</a>.
       </li>

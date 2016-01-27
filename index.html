@@ -1358,7 +1358,7 @@
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-28">28 January 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-29">29 January 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1522,8 +1522,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     among devices that only implement Bluetooth 4.0 or 4.1. </p>
     <section>
      <h3 class="heading settled" data-level="1.1" id="introduction-examples"><span class="secno">1.1. </span><span class="content">Examples</span><a class="self-link" href="#introduction-examples"></a></h3>
-     <div class="example" id="example-ca38970c">
-      <a class="self-link" href="#example-ca38970c"></a> 
+     <div class="example" id="example-heart-rate-monitor">
+      <a class="self-link" href="#example-heart-rate-monitor"></a> 
       <p> To discover and retrieve data from a standard heart rate monitor,
         a website would use code like the following: </p>
 <pre>let chosenHeartRateService = null;
@@ -2715,7 +2715,12 @@ return navigator.bluetooth.requestDevice({
         attempt to create one using the procedures described
         in "Connection Establishment" under <a data-link-type="dfn" href="#gap-interoperability-requirements">GAP Interoperability Requirements</a>. 
       <li> If this attempt fails, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
-      <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <code>this</code>. 
+      <li>
+        <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to perform the following sub-steps: 
+       <ol>
+        <li> Set <code>this.connected</code> to <code>true</code>. 
+        <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <code>this</code>. 
+       </ol>
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-disconnect">disconnect()<a class="self-link" href="#dom-bluetoothgattremoteserver-disconnect"></a></dfn></code> method, when invoked,
       MUST perform the following steps: </p>
@@ -2723,7 +2728,7 @@ return navigator.bluetooth.requestDevice({
       <li> Set <code>this.connected</code> to <code>false</code>. 
       <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">In parallel</a>:
         if, for all <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>s <code><var>device</var></code> in the whole UA
-        with <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-device">same device</a> as <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>, <code><var>device</var>.gattServer === null</code> or <code>!<var>device</var>.gattServer.connected</code>,
+        with <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-device">same device</a> as <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>, <code>!<var>device</var>.gattServer.connected</code>,
         the UA MAY destroy <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>’s <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>. 
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservice"></a></dfn></code> method, when invoked,
