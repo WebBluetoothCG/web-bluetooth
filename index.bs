@@ -590,8 +590,8 @@ spec: html
     <p>
       Say the UA is close to the following devices:
     </p>
-    <table>
-      <tr><th>Device</th><th>Advertised Services</th></tr>
+    <table class="data">
+      <thead><th>Device</th><th>Advertised Services</th></thead>
       <tr><td>D1</td><td>A, B, C, D</td></tr>
       <tr><td>D2</td><td>A, B, E</td></tr>
       <tr><td>D3</td><td>C, D</td></tr>
@@ -657,8 +657,8 @@ spec: html
       Say the devices in the <a href="#example-filter-by-services">previous example</a>
       also advertise names as follows:
     </p>
-    <table>
-      <tr><th>Device</th><th>Advertised Device Name</th></tr>
+    <table class="data">
+      <thead><th>Device</th><th>Advertised Device Name</th></thead>
       <tr><td>D1</td><td>First De…</td></tr>
       <tr><td>D2</td><td><i>&lt;none></i></td></tr>
       <tr><td>D3</td><td>Device Third</td></tr>
@@ -672,8 +672,8 @@ spec: html
       <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
     </p>
 
-    <table>
-      <tr><th><var>filters</var></th><th>Devices</th><th>Notes</th></tr>
+    <table class="data">
+      <thead><th><var>filters</var></th><th>Devices</th><th>Notes</th></thead>
       <tr>
         <td>
           <pre highlight="js">
@@ -681,6 +681,7 @@ spec: html
           </pre>
         </td>
         <td>D5</td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -689,6 +690,7 @@ spec: html
           </pre>
         </td>
         <td>D3, D4</td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -711,6 +713,7 @@ spec: html
           </pre>
         </td>
         <td>D1, D5</td>
+        <td></td>
       </tr>
       <tr>
         <td>
@@ -721,6 +724,7 @@ spec: html
           </pre>
         </td>
         <td>D3, D5</td>
+        <td></td>
       </tr>
     </table>
   </div>
@@ -730,8 +734,8 @@ spec: html
       Filters that either accept or reject all possible devices cause {{TypeError}}s.
     </p>
 
-    <table>
-      <tr><th><var>filters</var></th><th>Notes</th></tr>
+    <table class="data">
+      <thead><th><var>filters</var></th><th>Notes</th></thead>
       <tr>
         <td>
           <pre highlight="js">
@@ -795,7 +799,7 @@ spec: html
     <dfn local-lt="match a filter|matches any filter">matches a filter</dfn> <var>filter</var>
     if the following steps return `match`:
   </p>
-  <ol>
+  <ol class="algorithm">
     <li>
       If <code><var>filter</var>.name</code> is present then,
       if <var>device</var>'s <a>Bluetooth Device Name</a> isn't complete
@@ -833,7 +837,7 @@ spec: html
     when invoked, MUST return <a>a new promise</a> <var>promise</var>
     and run the following steps <a>in parallel</a>:
   </p>
-  <ol>
+  <ol class="algorithm">
     <li id="requestDevice-secure-context">
       If the <a>incumbent settings object</a> is not a <a>secure context</a>,
       <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
@@ -1000,8 +1004,8 @@ spec: html
     To <dfn>scan for devices</dfn> with
     an optional <var>set of <a>Service</a> UUIDs</var>, defaulting to the set of all UUIDs,
     the UA MUST perform the following steps:
-
-  <ol>
+  </p>
+  <ol class="algorithm">
     <li>
       If the UA has scanned for devices recently
       <span class="issue">TODO: Nail down the amount of time.</span>
@@ -1242,7 +1246,7 @@ spec: html
       with an optional <var>allowed services</var> list of <a>UUID</a>s,
       the UA MUST run the following steps.
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <var>device</var> is the <a>same device</a> as
         an existing key in the <a>allowed devices map</a>,
@@ -1374,7 +1378,7 @@ spec: html
       inside a {{Bluetooth}} instance <var>context</var>,
       the UA MUST run the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If there is a key in
         <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
@@ -1451,8 +1455,8 @@ spec: html
               </li>
               <li>
                 Set <code><var>result</var>.vendorIDSource</code> according to the following table:
-                <table>
-                  <tr><th>Parsed Vendor Id Source</th><th><code>vendorIDSource</code></th></tr>
+                <table class="data">
+                  <thead><th>Parsed Vendor Id Source</th><th><code>vendorIDSource</code></th></thead>
                   <tr><td>1</td><td><code>"bluetooth"</code></td></tr>
                   <tr><td>2</td><td><code>"usb"</code></td></tr>
                 </table>
@@ -1502,7 +1506,7 @@ spec: html
       MUST return <a>a new promise</a> <var>promise</var> and
       run the following steps <a>in parallel</a>:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <code>this@\[[representedDevice]]</code> has no <a>ATT Bearer</a>,
         attempt to create one using the procedures described
@@ -1619,7 +1623,7 @@ spec: html
         and an <var>allowed services list</var>,
         the UA must perform the following steps:
       </p>
-      <ol>
+      <ol class="algorithm">
         <li>Let <var>adData</var> be a new instance of {{BluetoothAdvertisingData}}.</li>
         <li>
           If <var>device</var> has an <a>Appearance</a>,
@@ -1787,7 +1791,7 @@ spec: html
         <span class="note">Note that these steps can block,
           so uses of this algorithm must be <a>in parallel</a>.</span>
       </p>
-      <ol>
+      <ol class="algorithm">
         <li>
           Attempt to make all matching entries in the cache either known-present or known-absent,
           using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
@@ -1805,7 +1809,7 @@ spec: html
         the UA MUST return <a>a new promise</a> <var>promise</var>
         and run the following steps <a>in parallel</a>:
       </p>
-      <ol>
+      <ol class="algorithm">
         <li>
           <a>Populate the Bluetooth cache</a> with entries matching the description.
         </li>
@@ -1863,7 +1867,7 @@ spec: html
         <var>child type</var>: GATT declaration type),</span><br>
         the UA MUST perform the following steps:
       </p>
-      <ol>
+      <ol class="algorithm">
         <li>
           If <var>uuid</var> is present,
           set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
@@ -1980,7 +1984,7 @@ spec: html
       The <code><dfn method for="BluetoothGATTRemoteServer">disconnect()</dfn></code> method, when invoked,
       MUST perform the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         Set <code>this.connected</code> to <code>false</code>.
       </li>
@@ -2000,7 +2004,7 @@ spec: html
       The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
       MUST perform the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <var>service</var> is not in <code>this.device@\[[allowedServices]]</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
@@ -2019,7 +2023,7 @@ spec: html
       The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
       MUST perform the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <var>service</var> is present and not in <code>this.device@\[[allowedServices]]</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
@@ -2085,7 +2089,7 @@ spec: html
       the UA must return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>Let <var>result</var> be a new instance of {{BluetoothGATTService}}.</li>
       <li>
         <a>Get the <code>BluetoothDevice</code> representing</a>
@@ -2223,7 +2227,7 @@ spec: html
       the UA must return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>Let <var>result</var> be a new instance of {{BluetoothGATTCharacteristic}}.</li>
       <li>
         Initialize <code><var>result</var>.service</code> from
@@ -2297,7 +2301,7 @@ spec: html
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <code>this.uuid</code> is <a>blacklisted for reads</a>,
         return <a>a promise rejected with</a> a {{SecurityError}}
@@ -2354,7 +2358,7 @@ spec: html
       The <code><dfn method for="BluetoothGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
       MUST run the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <code>this.uuid</code> is <a>blacklisted for writes</a>,
         return <a>a promise rejected with</a> a {{SecurityError}}
@@ -2420,7 +2424,7 @@ spec: html
       and run the following steps <a>in parallel</a>.
       See <a href="#notification-events"></a> for details of receiving notifications.
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <code>this.uuid</code> is <a>blacklisted for reads</a>,
         <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
@@ -2477,7 +2481,7 @@ spec: html
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         Let <var>characteristic</var> be
         the GATT <a>Characteristic</a> that <code>this</code> represents.
@@ -2533,7 +2537,7 @@ spec: html
         the UA MUST return <a>a new promise</a> <var>promise</var>
         and run the following steps <a>in parallel</a>:
       </p>
-      <ol>
+      <ol class="algorithm">
         <li>
           Let <var>propertiesObj</var> be a new instance of {{BluetoothCharacteristicProperties}}.
         </li>
@@ -2544,8 +2548,8 @@ spec: html
         <li>
           Initialize the attributes of <var>propertiesObj</var> from
           the corresponding bits in <var>properties</var>:
-          <table>
-            <tr><th>Attribute</th><th>Bit</th></tr>
+          <table class="data">
+            <thead><th>Attribute</th><th>Bit</th></thead>
             <tr><td><code>broadcast</code></td><td>Broadcast</td></tr>
             <tr><td><code>read</code></td><td>Read</td></tr>
             <tr><td><code>writeWithoutResponse</code></td><td>Write Without Response</td></tr>
@@ -2635,7 +2639,7 @@ spec: html
       the UA must return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>Let <var>result</var> be a new instance of {{BluetoothGATTDescriptor}}.</li>
       <li>
         Initialize <code><var>result</var>.characteristic</code> from
@@ -2665,7 +2669,7 @@ spec: html
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <code>this.uuid</code> is <a>blacklisted for reads</a>,
         return <a>a promise rejected with</a> a {{SecurityError}}
@@ -2703,7 +2707,7 @@ spec: html
       The <code><dfn method for="BluetoothGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
       MUST  run the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <code>this.uuid</code> is <a>blacklisted for writes</a>,
         return <a>a promise rejected with</a> a {{SecurityError}}
@@ -2843,8 +2847,8 @@ spec: html
         When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
         or <a lt="Characteristic Value Indications">Indication</a>,
         it must perform the following steps:
-
-      <ol>
+      </p>
+      <ol class="algorithm">
         <li>
           For each <var>bluetoothGlobal</var> in
           the Characteristic's <a>active notification context set</a>,
@@ -2884,8 +2888,8 @@ spec: html
         <a>Service Changed</a> characteristic, if it exists.
         When the UA receives an Indication on the Service Changed characteristic,
         it MUST perform the following steps.
-
-      <ol>
+      </p>
+      <ol class="algorithm">
         <li>
           Let <var>removedEntities</var> be the list of entities in
           the range indicated by the Service Changed characteristic
@@ -3028,7 +3032,7 @@ spec: html
       the UA MUST perform the following steps:
     </p>
 
-    <ol>
+    <ol class="algorithm">
       <li>
         If the <a>procedure times out</a> or
         the ATT Bearer (described in <a>Profile Fundamentals</a>) is terminated for any reason,
@@ -3036,7 +3040,7 @@ spec: html
       </li>
       <li>
         Take the following actions depending on the <code>Error Code</code>:
-        <dl>
+        <dl class="switch">
           <dt><code>Invalid Handle</code></dt>
           <dt><code>Invalid PDU</code></dt>
           <dt><code>Invalid Offset</code></dt>
@@ -3204,7 +3208,7 @@ spec: html
       <var>assigned numbers table</var>, <var>prefix</var>),
       the UA MUST perform the following steps:
     </p>
-    <ol>
+    <ol class="algorithm">
       <li>
         If <var>name</var> is an <code>unsigned long</code>,
         return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)</code> and abort these steps.
@@ -3281,7 +3285,7 @@ spec: html
     is a map from <a>valid UUID</a>s to tokens, or an error,
     produced by the following algorithm:
   </p>
-  <ol>
+  <ol class="algorithm">
     <li>Fetch <var>url</var>, and let <var>contents</var> be its body, decoded as UTF-8.</li>
     <li>Let <var>lines</var> be <var>contents</var> split on <code>'\n'</code>.</li>
     <li>
