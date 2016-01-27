@@ -24,9 +24,8 @@ GATT Server Disconnect    |           | 50                   |
 
 * Chrome OS has the most features working currently, as the low level libraries for Bluetooth GATT are already implemented.
 * [Android](https://crbug.com/471536) under development.
- * Chrome 48: Notifications can be enabled, but don't yet generate `characteristicvaluechanged` events. 
-  * Chrome builds requires Android 6, Marshmallow or later.
-  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
+ * Chrome builds requires Android 6, Marshmallow or later.
+ * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
  * [Android Chooser UI](https://crbug.com/436280) works but has some bugs.
 * [Mac OS X](https://crbug.com/364359) is partially working, but not under active development. It's next on the list after ChromeOS and Android.
  * Some MacBook's may not work:
