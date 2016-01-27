@@ -1458,6 +1458,13 @@ spec: webidl
         </td>
       </tr>
       <tr>
+        <td><dfn>\[[cachedUnfilteredUuids]]</dfn></td>
+        <td><code>undefined</code></td>
+        <td>
+          Value of {{[[unfilteredUuids]]}} the last time {{[[filteredUuids]]}} was updated.
+        </td>
+      </tr>
+      <tr>
         <td><dfn>\[[filteredUuids]]</dfn></td>
         <td><code>undefined</code></td>
         <td>
@@ -1591,11 +1598,15 @@ spec: webidl
     </p>
     <ol class="algorithm">
       <li>
-        If {{[[cachedAllowedServices]]}} is not equal to {{[[allowedServices]]}},
+        If {{[[cachedAllowedServices]]}} is not equal to {{[[allowedServices]]}}
+        or {{[[cachedUnfilteredUuids]]}} is not equal to {{[[unfilteredUuids]]}},
         perform the following sub-steps:
         <ol>
           <li>
             Set {{[[cachedAllowedServices]]}} to a copy of {{[[allowedServices]]}}.
+          </li>
+          <li>
+            Set {{[[cachedUnfilteredUuids]]}} to a copy of {{[[unfilteredUuids]]}}.
           </li>
           <li>
             Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of the intersection of
@@ -3114,20 +3125,35 @@ spec: webidl
           to do the following steps:
           <ol>
             <li>
-              For each <a>Service</a> in <var>removedEntities</var>,
-              if the Service's UUID is in
-              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
-              <a>fire an event</a> named {{serviceremoved}}
-              with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at the {{BluetoothGATTService}} representing the <a>Service</a>.
-              Then remove this {{BluetoothGATTService}} from the <a>Bluetooth tree</a>.
+              For each <a>Service</a> <var>service</var> in <var>removedEntities</var>:
+              <ol>
+                <li>
+                  If no remaining <a>Service</a> in
+                  <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+                  has the same UUID as <var>service</var>,
+                  remove the UUID from
+                  <code><var>deviceObj</var>@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+                </li>
+                <li>
+                  If the Service's UUID is in
+                  <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
+                  <a>fire an event</a> named {{serviceremoved}}
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at the {{BluetoothGATTService}} representing the <a>Service</a>.
+                </li>
+                <li>
+                  Remove this {{BluetoothGATTService}} from the <a>Bluetooth tree</a>.
+                </li>
+              </ol>
             </li>
             <li>
               For each <a>Service</a> in <var>addedEntities</var>,
-              if the Service's UUID is in
+              add the Service's UUID to
+              <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+              If the Service's UUID is in
               <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
-              add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>.
-              Then <a>fire an event</a> named {{serviceadded}}
+              add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
+              and then <a>fire an event</a> named {{serviceadded}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
               at the {{BluetoothGATTService}}.
             </li>

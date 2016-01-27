@@ -1358,7 +1358,7 @@
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-26">26 January 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-01-27">27 January 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2306,6 +2306,10 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
         <td><code>undefined</code>
         <td> Value of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code> the last time <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code> was updated. 
        <tr>
+        <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-cachedunfiltereduuids-slot">[[cachedUnfilteredUuids]]<a class="self-link" href="#dom-bluetoothdevice-cachedunfiltereduuids-slot"></a></dfn>
+        <td><code>undefined</code>
+        <td> Value of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code> the last time <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code> was updated. 
+       <tr>
         <td><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]<a class="self-link" href="#dom-bluetoothdevice-filtereduuids-slot"></a></dfn>
         <td><code>undefined</code>
         <td> Cached value of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-uuids">uuids</a></code>.
@@ -2389,10 +2393,11 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
       MUST perform the following steps: </p>
      <ol class="algorithm">
       <li>
-        If <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a></code> is not equal to <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>,
+        If <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a></code> is not equal to <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code> or <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedunfiltereduuids-slot">[[cachedUnfilteredUuids]]</a></code> is not equal to <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code>,
         perform the following sub-steps: 
        <ol>
         <li> Set <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a></code> to a copy of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>. 
+        <li> Set <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-cachedunfiltereduuids-slot">[[cachedUnfilteredUuids]]</a></code> to a copy of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code>. 
         <li> Set <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a></code> consisting of the intersection of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code> and <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code>. 
        </ol>
       <li> Return <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-filtereduuids-slot">[[filteredUuids]]</a></code>. 
@@ -3228,13 +3233,18 @@ return navigator.bluetooth.requestDevice({
        <li>
          For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> <var>deviceObj</var> that is connected to a device in <var>changedDevices</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#execution-context&apos;s-global-object">global object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to do the following steps: 
         <ol>
-         <li> For each <a data-link-type="dfn" href="#service">Service</a> in <var>removedEntities</var>,
-              if the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceremoved">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>.
-              Then remove this <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> from the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. 
+         <li>
+           For each <a data-link-type="dfn" href="#service">Service</a> <var>service</var> in <var>removedEntities</var>: 
+          <ol>
+           <li> If no remaining <a data-link-type="dfn" href="#service">Service</a> in <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> has the same UUID as <var>service</var>,
+                  remove the UUID from <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>. 
+           <li> If the Service’s UUID is in <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceremoved">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>. 
+           <li> Remove this <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> from the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. 
+          </ol>
          <li> For each <a data-link-type="dfn" href="#service">Service</a> in <var>addedEntities</var>,
-              if the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,
-              add the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing this <a data-link-type="dfn" href="#service">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>.
-              Then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>. 
+              add the Service’s UUID to <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>.
+              If the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,
+              add the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing this <a data-link-type="dfn" href="#service">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a> and then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>. 
          <li> For each <a data-link-type="dfn" href="#service">Service</a> in <var>changedServices</var>,
               if the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-servicechanged">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>. 
         </ol>
@@ -3887,6 +3897,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#dom-bluetoothcharacteristicproperties-broadcast">broadcast</a><span>, in §5.4.1</span>
    <li><a href="#broadcaster">Broadcaster</a><span>, in §9</span>
    <li><a href="#dom-bluetoothdevice-cachedallowedservices-slot">[[cachedAllowedServices]]</a><span>, in §4.3</span>
+   <li><a href="#dom-bluetoothdevice-cachedunfiltereduuids-slot">[[cachedUnfilteredUuids]]</a><span>, in §4.3</span>
    <li><a href="#dom-bluetoothuuid-canonicaluuid">canonicalUUID(alias)</a><span>, in §6.1</span>
    <li><a href="#central">Central</a><span>, in §9</span>
    <li><a href="#dom-bluetoothgattdescriptor-characteristic">characteristic</a><span>, in §5.5</span>
