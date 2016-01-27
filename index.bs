@@ -1278,6 +1278,11 @@ spec: webidl
                 <a>queue a task</a> on <var>settings</var>' <a>responsible event loop</a> to
                 set <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
                 to <var>newServices</var>.
+                <p class="note">
+                  There's no need to fire {{serviceadded}} for these new services because
+                  <a href="#only-notify-for-requested-services"
+                  >none of them could have been returned from a previous service query</a>.
+                </p>
               </li>
             </ol>
           </li>
@@ -3089,7 +3094,7 @@ spec: webidl
           and add its parent <a>Service</a> to <var>changedServices</var>.
           <span class="note">After this point, <var>removedEntities</var> and <var>addedEntities</var> contain only <a>Service</a>s.</span>
         </li>
-        <li>
+        <li id="only-notify-for-requested-services">
           If a <a>Service</a> in <var>addedEntities</var>
           would not have been returned from any previous call to
           <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
@@ -3103,13 +3108,15 @@ spec: webidl
           <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
         </li>
         <li>
-          For each {{BluetoothDevice}}
+          For each {{BluetoothDevice}} <var>deviceObj</var>
           that is connected to a device in <var>changedDevices</var>,
           <a>queue a task</a> on its <a>global object</a>'s <a>responsible event loop</a>
           to do the following steps:
           <ol>
             <li>
               For each <a>Service</a> in <var>removedEntities</var>,
+              if the Service's UUID is in
+              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
               <a>fire an event</a> named {{serviceremoved}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
               at the {{BluetoothGATTService}} representing the <a>Service</a>.
@@ -3117,6 +3124,8 @@ spec: webidl
             </li>
             <li>
               For each <a>Service</a> in <var>addedEntities</var>,
+              if the Service's UUID is in
+              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
               add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>.
               Then <a>fire an event</a> named {{serviceadded}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
@@ -3124,6 +3133,8 @@ spec: webidl
             </li>
             <li>
               For each <a>Service</a> in <var>changedServices</var>,
+              if the Service's UUID is in
+              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
               <a>fire an event</a> named {{servicechanged}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
               at the {{BluetoothGATTService}} representing the <a>Service</a>.
