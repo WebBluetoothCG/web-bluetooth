@@ -136,7 +136,6 @@ spec: promises-guide; urlPrefix: https://www.w3.org/2001/tag/doc/promises-guide#
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
-        text: read only Array; url: dfn-read-only-array
     type: exception
         text: AbortError; url: aborterror
         text: InvalidModificationError; url: invalidmodificationerror
@@ -147,6 +146,7 @@ spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
         text: SyntaxError; url: syntaxerror
     type: interface
         text: DOMString; url: idl-DOMString
+        text: FrozenArray; url: idl-frozen-array
     type: typedef
         text: BufferSource; url: common-BufferSource
 </pre>
@@ -157,13 +157,18 @@ spec: dom-ls
 spec: html
     type: dfn
         text: allowed to show a popup
+        text: environment settings object
         text: event handler idl attribute
         text: global object
         text: in parallel
         text: incumbent settings object
         text: perform a microtask checkpoint
         text: queue a task
+        text: relevant settings object for a global object
         text: responsible event loop
+spec: webidl
+    type: dfn
+        text: map entries
 </pre>
 
 <style>
@@ -769,9 +774,9 @@ spec: html
   </p>
   <table class="data" dfn-for="Bluetooth" dfn-type="attribute">
     <thead>
-        <th>Internal Slot</th>
-        <th>Initial Value</th>
-        <th>Description (non-normative)</th>
+      <th>Internal Slot</th>
+      <th>Initial Value</th>
+      <th>Description (non-normative)</th>
     </thead>
     <tr>
       <td><dfn>\[[deviceInstanceMap]]</dfn></td>
@@ -1229,7 +1234,7 @@ spec: html
       <span class="issue">
         This needs a definition involving
         removing {{BluetoothDevice}} instances from {{Bluetooth/[[deviceInstanceMap]]}}s
-        and clearing out their \[[representedDevice]] fields.
+        and clearing out their {{[[representedDevice]]}} fields.
       </span>
       For example, if the user chooses not to remember access,
       the UA might remove a device when the tab that was granted access to it is closed.
@@ -1242,7 +1247,7 @@ spec: html
 
     <p>
       To <dfn>add an allowed <a>Bluetooth device</a></dfn> <var>device</var>
-      to an origin's <a>allowed devices map</a>
+      to <var>origin</var>'s <a>allowed devices map</a>
       with an optional <var>allowed services</var> list of <a>UUID</a>s,
       the UA MUST run the following steps.
     </p>
@@ -1250,7 +1255,41 @@ spec: html
       <li>
         If <var>device</var> is the <a>same device</a> as
         an existing key in the <a>allowed devices map</a>,
-        abort these steps.
+        run the following sub-steps:
+        <ol>
+          <li>
+            Update the mapped <a>allowed services list</a> to be
+            the set-union of its old value and <var>allowed services</var>,
+            and let <var>newServices</var> be this value.
+          </li>
+          <li>
+            For each {{BluetoothDevice}} <var>deviceObj</var> in the UA:
+            <ol>
+              <li>
+                Let <var>settings</var> be the
+                <a lt="relevant settings object for a global object">relevant settings object</a>
+                for <var>deviceObj</var>'s global object.
+              </li>
+              <li>
+                If <var>settings</var>' <a lt="environment settings object">origin</a>
+                is <var>origin</var> and
+                <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code> is
+                the <a>same device</a> as <var>device</var>,
+                <a>queue a task</a> on <var>settings</var>' <a>responsible event loop</a> to
+                set <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+                to <var>newServices</var>.
+                <p class="note">
+                  There's no need to fire {{serviceadded}} for these new services because
+                  <a href="#only-notify-for-requested-services"
+                  >none of them could have been returned from a previous service query</a>.
+                </p>
+              </li>
+            </ol>
+          </li>
+          <li>
+            Abort these steps.
+          </li>
+        </ol>
       </li>
       <li>
         Let <var>id</var> be a new <code>DOMString</code> that
@@ -1301,7 +1340,7 @@ spec: html
         readonly attribute unsigned long? productID;
         readonly attribute unsigned long? productVersion;
         readonly attribute BluetoothGATTRemoteServer? gattServer;
-        readonly attribute UUID[] uuids;
+        readonly attribute FrozenArray&lt;UUID> uuids;
         Promise&lt;BluetoothGATTRemoteServer> connectGATT();
       };
       BluetoothDevice implements EventTarget;
@@ -1366,11 +1405,74 @@ spec: html
       </p>
 
       <p>
-        <dfn>uuids</dfn> lists
+        {{uuids}} lists
         the UUIDs of GATT services known to be on the device,
         that the current origin is allowed to access.
       </p>
     </div>
+
+    <p>
+      Instances of {{BluetoothDevice}} are created with the internal slots
+      described in the following table:
+    </p>
+    <table class="data" dfn-for="BluetoothDevice" dfn-type="attribute">
+      <thead>
+        <th>Internal Slot</th>
+        <th>Initial Value</th>
+        <th>Description (non-normative)</th>
+      </thead>
+      <tr>
+        <td><dfn>\[[context]]</dfn></td>
+        <td>`undefined`</td>
+        <td>
+          The {{Bluetooth}} object that returned this {{BluetoothDevice}}.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[representedDevice]]</dfn></td>
+        <td>`undefined`</td>
+        <td>
+          The <a>Bluetooth device</a> this object represents.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[allowedServices]]</dfn></td>
+        <td>`undefined`</td>
+        <td>
+          This device's <a>allowed services list</a> for this origin.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[unfilteredUuids]]</dfn></td>
+        <td><code>new {{Set}}()</code></td>
+        <td>
+          Service UUIDs known to be in this device's <a>GATT Server</a>.
+          This set may be incomplete if the UA hasn't run a full service discovery.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[cachedAllowedServices]]</dfn></td>
+        <td><code>undefined</code></td>
+        <td>
+          Value of {{[[allowedServices]]}} the last time {{[[filteredUuids]]}} was updated.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[cachedUnfilteredUuids]]</dfn></td>
+        <td><code>undefined</code></td>
+        <td>
+          Value of {{[[unfilteredUuids]]}} the last time {{[[filteredUuids]]}} was updated.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[filteredUuids]]</dfn></td>
+        <td><code>undefined</code></td>
+        <td>
+          Cached value of {{uuids}}.
+          Up to date if {{[[cachedAllowedServices]]}} is equal to {{[[allowedServices]]}}.
+        </td>
+      </tr>
+    </table>
 
     <p>
       To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
@@ -1395,13 +1497,11 @@ spec: html
           <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
           <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
           <li>
-            Initialize an internal
-            <code><var>result</var>@\[[context]]</code> field
+            Initialize <code><var>result</var>@{{[[context]]}}</code>
             to <var>context</var>.
           </li>
           <li>
-            Initialize an internal
-            <code><var>result</var>@\[[representedDevice]]</code> field
+            Initialize <code><var>result</var>@{{[[representedDevice]]}}</code>
             to <var>device</var>.
           </li>
           <li>
@@ -1411,17 +1511,16 @@ spec: html
             <a>resolve</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
             Otherwise, initialize <code><var>result</var>.id</code>
             to the <a>device id</a> this key maps to,
-            and initialize an internal
-            <code><var>result</var>@\[[allowedServices]]</code> field
-            to the <a>allowed services list</a> this key maps to.
+            and initialize <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+            as the <a>allowed services list</a> this key maps to.
           </li>
           <li>
             If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
             set <code><var>result</var>.name</code> to that string.
           </li>
           <li>
-            <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>device</var>
-            and <code><var>result</var>@\[[allowedServices]]</code>,
+            <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>result</var>
+            and <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
             and set <code><var>result</var>.adData</code> to the result.
           </li>
           <li>
@@ -1474,12 +1573,9 @@ spec: html
             </ol>
           </li>
           <li>
-            Let <var>uuids</var> be an empty set of UUIDs.
-          </li>
-          <li>
             Add <var>device</var>'s
             advertised <a>Service UUIDs</a>
-            to <var>uuids</var>.
+            to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
           </li>
           <li>
             The UA MAY <a>populate the Bluetooth cache</a> with
@@ -1489,15 +1585,37 @@ spec: html
           <li>
             If the <a>Bluetooth cache</a> contains
             known-present Services inside <var>device</var>,
-            add the UUIDs of those Services to <var>uuids</var>.
-          </li>
-          <li>
-            Initialize <code><var>result</var>.uuids</code> to
-            a <a>read only Array</a> holding the elements of <var>uuids</var>
-            that are also in <code><var>result</var>@\[[allowedServices]]</code>.
+            add the UUIDs of those Services to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
           </li>
           <li>Resolve <var>promise</var> with <var>result</var>.</li>
         </ol>
+      </li>
+    </ol>
+
+    <p>
+      Getting the <code><dfn attribute for="BluetoothDevice">uuids</dfn></code> attribute
+      MUST perform the following steps:
+    </p>
+    <ol class="algorithm">
+      <li>
+        If {{[[cachedAllowedServices]]}} is not equal to {{[[allowedServices]]}}
+        or {{[[cachedUnfilteredUuids]]}} is not equal to {{[[unfilteredUuids]]}},
+        perform the following sub-steps:
+        <ol>
+          <li>
+            Set {{[[cachedAllowedServices]]}} to a copy of {{[[allowedServices]]}}.
+          </li>
+          <li>
+            Set {{[[cachedUnfilteredUuids]]}} to a copy of {{[[unfilteredUuids]]}}.
+          </li>
+          <li>
+            Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of the intersection of
+            {{BluetoothDevice/[[unfilteredUuids]]}} and {{BluetoothDevice/[[allowedServices]]}}.
+          </li>
+        </ol>
+      </li>
+      <li>
+        Return {{[[filteredUuids]]}}.
       </li>
     </ol>
 
@@ -1508,7 +1626,7 @@ spec: html
     </p>
     <ol class="algorithm">
       <li>
-        If <code>this@\[[representedDevice]]</code> has no <a>ATT Bearer</a>,
+        If <code>this@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
         attempt to create one using the procedures described
         in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
       </li>
@@ -1536,12 +1654,18 @@ spec: html
       <h4 id="bluetoothadvertisingdata" dfn-type="interface">BluetoothAdvertisingData</h4>
 
       <pre class="idl">
+        interface BluetoothManufacturerDataMap {
+          readonly maplike&lt;unsigned short, DataView>;
+        };
+        interface BluetoothServiceDataMap {
+          readonly maplike&lt;UUID, DataView>;
+        };
         interface BluetoothAdvertisingData {
           readonly attribute unsigned short? appearance;
           readonly attribute byte? txPower;
           readonly attribute byte? rssi;
-          readonly attribute Map manufacturerData;
-          readonly attribute Map serviceData;
+          readonly attribute BluetoothManufacturerDataMap manufacturerData;
+          readonly attribute BluetoothServiceDataMap serviceData;
         };
       </pre>
 
@@ -1619,11 +1743,14 @@ spec: html
 
       <p>
         To <dfn>create a {{BluetoothAdvertisingData}}</dfn>
-        from a <a>Bluetooth device</a> <var>device</var>
-        and an <var>allowed services list</var>,
+        from a {{BluetoothDevice}} <var>deviceObj</var>
         the UA must perform the following steps:
       </p>
       <ol class="algorithm">
+        <li>
+          Let <var>device</var> be
+          <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>.
+        </li>
         <li>Let <var>adData</var> be a new instance of {{BluetoothAdvertisingData}}.</li>
         <li>
           If <var>device</var> has an <a>Appearance</a>,
@@ -1641,42 +1768,92 @@ spec: html
           Otherwise initialize it to <code>null</code>.
         </li>
         <li>
-          Initialize <code><var>adData</var>.manufacturerData</code> with
-          the return value of these substeps:
-          <ol>
-            <li>Let <var>mdata</var> be a new {{Map}} instance.</li>
-            <li>
-              For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
-              make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-              containing the contents of its byte array,
-              and add a mapping from the 16-bit code to <code>new DataView(<var>bytes</var>)</code>
-              in <var>mdata</var>.
-            </li>
-            <li>
-              Return a <a>read only Map</a> whose value is <var>mdata</var>.
-            </li>
-          </ol>
+          For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
+          make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+          containing the contents of its byte array,
+          and add a mapping from the 16-bit code to <code>new DataView(<var>bytes</var>)</code>
+          in <code><var>adData</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
         </li>
         <li>
-          Initialize <code><var>adData</var>.serviceData</code> with
-          the return value of these substeps:
-          <ol>
-            <li>Let <var>sdata</var> be a new {{Map}} instance.</li>
-            <li>
-              For each mapping in <var>device</var>'s <a>Service Data</a>,
-              if the UUID is in <var>allowed services list</var>,
-              make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-              containing the contents of its byte array,
-              and add a mapping from the <a>UUID</a> to <code>new DataView(<var>bytes</var>)</code>
-              in <var>sdata</var>.
-            </li>
-            <li>
-              Return a <a>read only Map</a> whose value is <var>sdata</var>.
-            </li>
-          </ol>
+          For each mapping in <var>device</var>'s <a>Service Data</a>,
+          make a new <a>read only ArrayBuffer</a> <var>bytes</var>
+          containing the contents of its byte array,
+          and add a mapping from the <a>UUID</a> to <code>new DataView(<var>bytes</var>)</code>
+          in <code><var>adData</var>.serviceData@{{BluetoothServiceDataMap/[[unfilteredData]]}}</code>.
+        </li>
+        <li>
+          Set <code><var>adData</var>.serviceData@{{BluetoothServiceDataMap/[[deviceObj]]}}</code>
+          to <var>deviceObj</var>.
         </li>
         <li>Return <var>adData</var>.</li>
       </ol>
+
+      <section>
+        <h5 dfn-type="interface">BluetoothManufacturerDataMap</h5>
+
+        <p>
+          Instances of {{BluetoothManufacturerDataMap}} are created with the internal slots
+          described in the following table:
+        </p>
+
+        <table class="data" dfn-for="BluetoothManufacturerDataMap" dfn-type="attribute">
+          <thead>
+            <th>Internal Slot</th>
+            <th>Initial Value</th>
+            <th>Description (non-normative)</th>
+          </thead>
+          <tr>
+            <td><dfn>\[[data]]</dfn></td>
+            <td><code>new {{Map}}()</code></td>
+            <td>
+              The advertised manufacturer data, converted to {{DataView}}s.
+            </td>
+          </tr>
+        </table>
+
+        <p>
+          The <a>map entries</a> of a {{BluetoothManufacturerDataMap}} instance are
+          the entries in <code>{{BluetoothManufacturerDataMap/[[data]]}}</code>.
+        </p>
+      </section>
+
+      <section>
+        <h5 dfn-type="interface">BluetoothServiceDataMap</h5>
+
+        <p>
+          Instances of {{BluetoothServiceDataMap}} are created with the internal slots
+          described in the following table:
+        </p>
+
+        <table class="data" dfn-for="BluetoothServiceDataMap" dfn-type="attribute">
+          <thead>
+            <th>Internal Slot</th>
+            <th>Initial Value</th>
+            <th>Description (non-normative)</th>
+          </thead>
+          <tr>
+            <td><dfn>\[[deviceObj]]</dfn></td>
+            <td><code>undefined</code></td>
+            <td>
+              The {{BluetoothDevice}} within which this map represents service data.
+            </td>
+          </tr>
+          <tr>
+            <td><dfn>\[[unfilteredData]]</dfn></td>
+            <td><code>new {{Map}}()</code></td>
+            <td>
+              The advertised service data, converted to {{DataView}}s.
+            </td>
+          </tr>
+        </table>
+
+        <p>
+          The <a>map entries</a> of a {{BluetoothServiceDataMap}} instance are
+          the entries in <code>{{BluetoothServiceDataMap/[[unfilteredData]]}}</code>
+          whose keys also appear in
+          <code>{{BluetoothServiceDataMap/[[deviceObj]]}}@{{BluetoothDevice/[[allowedServices]]}}</code>.
+        </p>
+      </section>
     </section>
   </section>
 </section>
@@ -1991,12 +2168,12 @@ spec: html
       <li>
         <a>In parallel</a>:
         if, for all {{BluetoothDevice}}s <code><var>device</var></code> in the whole UA
-        with <code><var>device</var>@\[[representedDevice]]</code>
-        the <a>same device</a> as <code>this.device@\[[representedDevice]]</code>,
+        with <code><var>device</var>@{{[[representedDevice]]}}</code>
+        the <a>same device</a> as <code>this.device@{{[[representedDevice]]}}</code>,
         <code><var>device</var>.gattServer === null</code>
         or <code>!<var>device</var>.gattServer.connected</code>,
         the UA MAY destroy
-        <code><var>device</var>@\[[representedDevice]]</code>'s <a>ATT Bearer</a>.
+        <code><var>device</var>@{{[[representedDevice]]}}</code>'s <a>ATT Bearer</a>.
       </li>
     </ol>
 
@@ -2006,15 +2183,16 @@ spec: html
     </p>
     <ol class="algorithm">
       <li>
-        If <var>service</var> is not in <code>this.device@\[[allowedServices]]</code>,
+        If <var>service</var> is not in
+        <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
       </li>
       <li>
-      Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
+      Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
         <var>single</var>=true,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@\[[allowedServices]]</code>,<br>
+        <var>allowedUuids</var>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
       </li>
     </ol>
@@ -2025,15 +2203,16 @@ spec: html
     </p>
     <ol class="algorithm">
       <li>
-        If <var>service</var> is present and not in <code>this.device@\[[allowedServices]]</code>,
+        If <var>service</var> is present
+        and not in <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
       </li>
       <li>
-        Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@\[[representedDevice]]</code>,<br>
+        Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
         <var>single</var>=false,<br>
         <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
         <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@\[[allowedServices]]</code>,<br>
+        <var>allowedUuids</var>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
         <var>child type</var>="GATT Primary Service")</span>
       </li>
     </ol>
@@ -2926,7 +3105,7 @@ spec: html
           and add its parent <a>Service</a> to <var>changedServices</var>.
           <span class="note">After this point, <var>removedEntities</var> and <var>addedEntities</var> contain only <a>Service</a>s.</span>
         </li>
-        <li>
+        <li id="only-notify-for-requested-services">
           If a <a>Service</a> in <var>addedEntities</var>
           would not have been returned from any previous call to
           <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
@@ -2940,27 +3119,48 @@ spec: html
           <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
         </li>
         <li>
-          For each {{BluetoothDevice}}
+          For each {{BluetoothDevice}} <var>deviceObj</var>
           that is connected to a device in <var>changedDevices</var>,
           <a>queue a task</a> on its <a>global object</a>'s <a>responsible event loop</a>
           to do the following steps:
           <ol>
             <li>
-              For each <a>Service</a> in <var>removedEntities</var>,
-              <a>fire an event</a> named {{serviceremoved}}
-              with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at the {{BluetoothGATTService}} representing the <a>Service</a>.
-              Then remove this {{BluetoothGATTService}} from the <a>Bluetooth tree</a>.
+              For each <a>Service</a> <var>service</var> in <var>removedEntities</var>:
+              <ol>
+                <li>
+                  If no remaining <a>Service</a> in
+                  <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+                  has the same UUID as <var>service</var>,
+                  remove the UUID from
+                  <code><var>deviceObj</var>@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+                </li>
+                <li>
+                  If the Service's UUID is in
+                  <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
+                  <a>fire an event</a> named {{serviceremoved}}
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at the {{BluetoothGATTService}} representing the <a>Service</a>.
+                </li>
+                <li>
+                  Remove this {{BluetoothGATTService}} from the <a>Bluetooth tree</a>.
+                </li>
+              </ol>
             </li>
             <li>
               For each <a>Service</a> in <var>addedEntities</var>,
-              add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>.
-              Then <a>fire an event</a> named {{serviceadded}}
+              add the Service's UUID to
+              <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+              If the Service's UUID is in
+              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
+              add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
+              and then <a>fire an event</a> named {{serviceadded}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
               at the {{BluetoothGATTService}}.
             </li>
             <li>
               For each <a>Service</a> in <var>changedServices</var>,
+              if the Service's UUID is in
+              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
               <a>fire an event</a> named {{servicechanged}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
               at the {{BluetoothGATTService}} representing the <a>Service</a>.
@@ -3396,19 +3596,14 @@ spec: html
   </p>
 
   <p>
-    This specification uses a few read-only types
-    that are similar to WebIDL's <a>read only Array</a>.
+    This specification uses a read-only type
+    that is similar to WebIDL's {{FrozenArray}}.
   </p>
   <ul>
     <li>
-      A <dfn>read only Map</dfn> has {{Map}}'s values and interface,
-      except the <code>clear</code>, <code>delete</code>, and <code>set</code> methods
-      are omitted.
-    </li>
-    <li>
       A <dfn>read only ArrayBuffer</dfn> has {{ArrayBuffer}}'s values and interface,
       except that attempting to write to its contents or transfer it
-      has the same effect as trying to write to a <a>read only Array</a>'s contents.
+      has the same effect as trying to write to a {{FrozenArray}}'s contents.
       This applies to {{TypedArray}}s and {{DataView}}s
       wrapped around the {{ArrayBuffer}} too.
     </li>
