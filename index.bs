@@ -552,6 +552,7 @@ spec: webidl
       Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
     };
     Bluetooth implements EventTarget;
+    Bluetooth implements BluetoothDeviceEventHandlers;
     Bluetooth implements CharacteristicEventHandlers;
     Bluetooth implements ServiceEventHandlers;
   </pre>
@@ -1342,6 +1343,7 @@ spec: webidl
         readonly attribute FrozenArray&lt;UUID> uuids;
       };
       BluetoothDevice implements EventTarget;
+      BluetoothDevice implements BluetoothDeviceEventHandlers;
       BluetoothDevice implements CharacteristicEventHandlers;
       BluetoothDevice implements ServiceEventHandlers;
     </pre>
@@ -2108,9 +2110,6 @@ spec: webidl
         Promise&lt;sequence&lt;BluetoothGATTService>>
           getPrimaryServices(optional BluetoothServiceUUID service);
       };
-      BluetoothGATTRemoteServer implements EventTarget;
-      BluetoothGATTRemoteServer implements CharacteristicEventHandlers;
-      BluetoothGATTRemoteServer implements ServiceEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothGATTRemoteServer}} attributes"
@@ -2991,6 +2990,12 @@ spec: webidl
           or a <a href="#notification-events">value change notification/indication</a>.
         </dd>
 
+        <dt><dfn event for="BluetoothDevice"><code>gattserverdisconnected</code></dfn></dt>
+        <dd>
+          Fired on a {{BluetoothDevice}} when
+          <a href="#disconnection-events">an active GATT connection is lost</a>.
+        </dd>
+
         <dt><dfn event for="BluetoothGATTService"><code>serviceadded</code></dfn></dt>
         <dd>
           Fired on a new {{BluetoothGATTService}}
@@ -3015,6 +3020,43 @@ spec: webidl
         </dd>
 
       </dl>
+    </section>
+
+    <section>
+      <h4 id="disconnection-events">Responding to Disconnection</h4>
+
+      <p>
+        When a <a>Bluetooth device</a> <var>device</var>'s <a>ATT Bearer</a> is lost
+        (e.g. because the remote device moved out of range
+        or the user used a platform feature to disconnect it),
+        for each {{BluetoothDevice}} <var>deviceObj</var> the UA MUST
+        <a>queue a task</a> on <var>deviceObj</var>'s <a>relevant settings object</a>'s
+        <a>responsible event loop</a>
+        to perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>
+          If <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+          is not the <a>same device</a> as <var>device</var>,
+          abort these steps.
+        </li>
+        <li>
+          If <code>!<var>deviceObj</var>.gattServer.{{BluetoothGATTRemoteServer/connected}}</code>,
+          abort these steps.
+        </li>
+        <li>
+          Set <code><var>deviceObj</var>.gattServer.{{BluetoothGATTRemoteServer/connected}}</code>
+          to `false`.
+        </li>
+        <li>
+          <a>Fire an event</a> named {{gattserverdisconnected}}
+          with its {{Event/bubbles}} attribute initialized to `true`
+          at <code><var>deviceObj</var></code>.
+          <p class="note">
+            This event is <em>not</em> fired at the {{BluetoothGATTRemoteServer}}.
+          </p>
+        </li>
+      </ol>
     </section>
 
     <section>
@@ -3181,6 +3223,18 @@ spec: webidl
         <dfn attribute for="CharacteristicEventHandlers">oncharacteristicvaluechanged</dfn>
         is an <a>Event handler IDL attribute</a>
         for the {{characteristicvaluechanged}} event type.
+      </p>
+
+      <pre class="idl">
+        [NoInterfaceObject]
+        interface BluetoothDeviceEventHandlers {
+          attribute EventHandler ongattserverdisconnected;
+        };
+      </pre>
+      <p>
+        <dfn attribute for="BluetoothDeviceEventHandlers">ongattserverdisconnected</dfn>
+        is an <a>Event handler IDL attribute</a>
+        for the {{gattserverdisconnected}} event type.
       </p>
 
       <pre class="idl">
