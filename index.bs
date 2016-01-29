@@ -157,6 +157,7 @@ spec: dom-ls
 spec: html
     type: dfn
         text: allowed to show a popup
+        text: browsing context
         text: environment settings object
         text: event handler idl attribute
         text: global object
@@ -785,7 +786,10 @@ spec: webidl
         An empty map from <a>Bluetooth device</a>s
         to <code>Promise&lt;{{BluetoothDevice}}></code> instances.
       </td>
-      <td></td>
+      <td>
+        Ensures only one {{BluetoothDevice}} instance represents each <a>Bluetooth device</a>
+        inside a single global object.
+      </td>
     </tr>
     <tr>
       <td><dfn>\[[attributeInstanceMap]]</dfn></td>
@@ -2129,6 +2133,22 @@ spec: webidl
     </div>
 
     <p>
+      When no ECMAScript code can
+      observe an instance of {{BluetoothRemoteGATTServer}} <var>server</var> anymore,
+      the UA SHOULD run <code><var>server</var>.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
+      <span class="note">
+        Because {{BluetoothDevice}} instances are stored in
+        <code>navigator.bluetooth.{{Bluetooth/[[deviceInstanceMap]]}}</code>,
+        this can't happen at least until navigation releases the global object or
+        closing the tab or window destroys the <a>browsing context</a>.
+      </span>
+      <span class="note">
+        Disconnecting on garbage collection ensures that
+        the UA doesn't keep consuming resources on the remote device unnecessarily.
+      </span>
+    </p>
+
+    <p>
       The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code> method, when invoked,
       MUST return <a>a new promise</a> <var>promise</var> and
       run the following steps <a>in parallel</a>:
@@ -2170,7 +2190,7 @@ spec: webidl
         with <code><var>device</var>@{{[[representedDevice]]}}</code>
         the <a>same device</a> as <code>this.device@{{[[representedDevice]]}}</code>,
         <code>!<var>device</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>,
-        the UA MAY destroy
+        the UA SHOULD destroy
         <code><var>device</var>@{{[[representedDevice]]}}</code>'s <a>ATT Bearer</a>.
       </li>
     </ol>
