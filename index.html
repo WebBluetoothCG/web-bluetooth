@@ -1533,7 +1533,7 @@ navigator.bluetooth.<a data-link-type="idl" href="#dom-bluetooth-requestdevice">
   filters: [{
     services: ['heart_rate'],
   }]
-}).then(device => device.gattServer.<a data-link-type="functionish" href="#dom-bluetoothremotegattserver-connect">connect()</a>)
+}).then(device => device.gatt.<a data-link-type="functionish" href="#dom-bluetoothremotegattserver-connect">connect()</a>)
 .then(server => server.<a data-link-type="idl" href="#dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">'heart_rate'</a>))
 .then(service => {
   chosenHeartRateService = service;
@@ -2241,7 +2241,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-vendorid">vendorID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productid">productID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productversion">productVersion</a>;
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer " href="#dom-bluetoothdevice-gatt">gatt</a>;
   readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID> " href="#dom-bluetoothdevice-uuids">uuids</a>;
 };
 <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
@@ -2272,7 +2272,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
         in the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml#">pnp_id</a></code> characteristic
         in the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml#">device_information</a></code> service. </p>
       <p> <dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-productversion">productVersion<a class="self-link" href="#dom-bluetoothdevice-productversion"></a></dfn> is the 16-bit Product Version field in the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.pnp_id.xml#">pnp_id</a></code> characteristic in the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.device_information.xml#">device_information</a></code> service. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-gattserver">gattServer<a class="self-link" href="#dom-bluetoothdevice-gattserver"></a></dfn> provides a way to interact with this device’s GATT server. </p>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-gatt">gatt<a class="self-link" href="#dom-bluetoothdevice-gatt"></a></dfn> provides a way to interact with this device’s GATT server. </p>
       <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-uuids">uuids</a></code> lists
         the UUIDs of GATT services known to be on the device,
         that the current origin is allowed to access. </p>
@@ -2380,8 +2380,8 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
           <li> Set <code><var>result</var>.productVersion</code> to
                 the value parsed for Product Version. 
          </ol>
-        <li> Set <code><var>result</var>.gattServer.device</code> to <var>result</var>. 
-        <li> Set <code><var>result</var>.gattServer.connected</code> to <code>false</code>. 
+        <li> Set <code><var>result</var>.gatt.device</code> to <var>result</var>. 
+        <li> Set <code><var>result</var>.gatt.connected</code> to <code>false</code>. 
         <li> Add <var>device</var>’s
             advertised <a data-link-type="dfn" href="#service-uuid-data-type">Service UUIDs</a> to <code>result@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>. 
         <li> The UA MAY <a data-link-type="dfn" href="#populate-the-bluetooth-cache">populate the Bluetooth cache</a> with
@@ -2728,7 +2728,7 @@ return navigator.bluetooth.requestDevice({
       <li> Set <code>this.connected</code> to <code>false</code>. 
       <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">In parallel</a>:
         if, for all <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>s <code><var>device</var></code> in the whole UA
-        with <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-device">same device</a> as <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>, <code>!<var>device</var>.gattServer.connected</code>,
+        with <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-device">same device</a> as <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>, <code>!<var>device</var>.gatt.connected</code>,
         the UA MAY destroy <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>’s <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>. 
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService(<var>service</var>)<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservice"></a></dfn></code> method, when invoked,
@@ -3978,12 +3978,12 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#flags-data-type">Flags Data Type</a><span>, in §9</span>
    <li><a href="#gap-interoperability-requirements">GAP Interoperability Requirements</a><span>, in §9</span>
    <li><a href="#generic-attribute-profile">GATT</a><span>, in §9</span>
+   <li><a href="#dom-bluetoothdevice-gatt">gatt</a><span>, in §4.3</span>
    <li><a href="#gatt-blacklist">GATT blacklist</a><span>, in §7</span>
    <li><a href="#gatt-client">GATT Client</a><span>, in §9</span>
    <li><a href="#gatt-procedure">GATT procedure</a><span>, in §9</span>
    <li><a href="#gatt-procedure">GATT procedures</a><span>, in §9</span>
    <li><a href="#gatt-profile-hierarchy">GATT Profile Hierarchy</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothdevice-gattserver">gattServer</a><span>, in §4.3</span>
    <li><a href="#gatt-server">GATT Server</a><span>, in §9</span>
    <li><a href="#eventdef-bluetoothdevice-gattserverdisconnected">gattserverdisconnected</a><span>, in §5.6.2</span>
    <li><a href="#general-discovery-procedure">General Discovery Procedure</a><span>, in §9</span>
@@ -4301,7 +4301,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-vendorid">vendorID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productid">productID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productversion">productVersion</a>;
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer " href="#dom-bluetoothdevice-gatt">gatt</a>;
   readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID> " href="#dom-bluetoothdevice-uuids">uuids</a>;
 };
 <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
