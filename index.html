@@ -1447,14 +1447,14 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <li><a href="#navigating-bluetooth-hierarchy"><span class="secno">5.1.2</span> <span class="content">Navigating the Bluetooth Hierarchy</span></a>
         <li><a href="#identifying-attributes"><span class="secno">5.1.3</span> <span class="content">Identifying Services, Characteristics, and Descriptors</span></a>
        </ol>
-      <li><a href="#bluetoothgattremoteserver"><span class="secno">5.2</span> <span class="content">BluetoothGATTRemoteServer</span></a>
-      <li><a href="#bluetoothgattservice"><span class="secno">5.3</span> <span class="content">BluetoothGATTService</span></a>
+      <li><a href="#bluetoothremotegattserver"><span class="secno">5.2</span> <span class="content">BluetoothRemoteGATTServer</span></a>
+      <li><a href="#bluetoothremotegattservice"><span class="secno">5.3</span> <span class="content">BluetoothRemoteGATTService</span></a>
       <li>
-       <a href="#bluetoothgattcharacteristic"><span class="secno">5.4</span> <span class="content">BluetoothGATTCharacteristic</span></a>
+       <a href="#bluetoothremotegattcharacteristic"><span class="secno">5.4</span> <span class="content">BluetoothRemoteGATTCharacteristic</span></a>
        <ol class="toc">
         <li><a href="#characteristicproperties"><span class="secno">5.4.1</span> <span class="content"><span>BluetoothCharacteristicProperties</span></span></a>
        </ol>
-      <li><a href="#bluetoothgattdescriptor"><span class="secno">5.5</span> <span class="content">BluetoothGATTDescriptor</span></a>
+      <li><a href="#bluetoothremotegattdescriptor"><span class="secno">5.5</span> <span class="content">BluetoothRemoteGATTDescriptor</span></a>
       <li>
        <a href="#events"><span class="secno">5.6</span> <span class="content">Events</span></a>
        <ol class="toc">
@@ -1533,14 +1533,14 @@ navigator.bluetooth.<a data-link-type="idl" href="#dom-bluetooth-requestdevice">
   filters: [{
     services: ['heart_rate'],
   }]
-}).then(device => device.gattServer.<a data-link-type="functionish" href="#dom-bluetoothgattremoteserver-connect">connect()</a>)
-.then(server => server.<a data-link-type="idl" href="#dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">'heart_rate'</a>))
+}).then(device => device.gattServer.<a data-link-type="functionish" href="#dom-bluetoothremotegattserver-connect">connect()</a>)
+.then(server => server.<a data-link-type="idl" href="#dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">'heart_rate'</a>))
 .then(service => {
   chosenHeartRateService = service;
   return Promise.all([
-    service.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">'body_sensor_location'</a>)
+    service.<a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">'body_sensor_location'</a>)
       .then(handleBodySensorLocationCharacteristic),
-    service.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">'heart_rate_measurement'</a>))
+    service.<a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">'heart_rate_measurement'</a>))
       .then(handleHeartRateMeasurementCharacteristic),
   ]);
 });
@@ -1550,7 +1550,7 @@ function handleBodySensorLocationCharacteristic(characteristic) {
     console.log("Unknown sensor location.");
     return Promise.resolve();
   }
-  return characteristic.<a data-link-type="functionish" href="#dom-bluetoothgattcharacteristic-readvalue">readValue()</a>
+  return characteristic.<a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-readvalue">readValue()</a>
   .then(sensorLocationData => {
     let sensorLocation = sensorLocationData.getUint8(0);
     switch (sensorLocation) {
@@ -1567,17 +1567,17 @@ function handleBodySensorLocationCharacteristic(characteristic) {
 }
 
 function handleHeartRateMeasurementCharacteristic(characteristic) {
-  characteristic.addEventListener('<a class="idl-code" data-link-type="event" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a>', onHeartRateChanged);
-  return characteristic.<a data-link-type="functionish" href="#dom-bluetoothgattcharacteristic-startnotifications">startNotifications()</a>;
+  characteristic.addEventListener('<a class="idl-code" data-link-type="event" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a>', onHeartRateChanged);
+  return characteristic.<a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-startnotifications">startNotifications()</a>;
 }
 
 function onHeartRateChanged(event) {
   let characteristic = event.target;
-  console.log(parseHeartRate(characteristic.<a class="idl-code" data-link-type="attribute" href="#dom-bluetoothgattcharacteristic-value">value</a>));
+  console.log(parseHeartRate(characteristic.<a class="idl-code" data-link-type="attribute" href="#dom-bluetoothremotegattcharacteristic-value">value</a>));
 }
 </pre>
       <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><code>heart_rate_measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code> stored
-        in a <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-value">value</a></code> field. </p>
+        in a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-value">value</a></code> field. </p>
 <pre class="highlight"><span class="kd">function</span> <span class="nx">parseHeartRate</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
   <span class="kd">let</span> <span class="nx">flags</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
   <span class="kd">let</span> <span class="nx">rate16Bits</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">;</span>
@@ -1623,10 +1623,10 @@ function onHeartRateChanged(event) {
   if (!chosenHeartRateService) {
     return Promise.reject(new Error('No heart rate sensor selected yet.'));
   }
-  return chosenHeartRateService.<a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">'heart_rate_control_point'</a>))
+  return chosenHeartRateService.<a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">'heart_rate_control_point'</a>))
   .then(controlPoint => {
     let resetEnergyExpended = new Uint8Array([1]);
-    return controlPoint.<a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-writevalue">writeValue</a>(resetEnergyExpended);
+    return controlPoint.<a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-writevalue">writeValue</a>(resetEnergyExpended);
   });
 }
 </pre>
@@ -1842,7 +1842,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
      <p> The allowed services also apply if the device changes after the user grants access.
       For example, if the user selects D1 in the previous <code>requestDevice()</code> call,
       and D1 later adds a new E service,
-      that will fire the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a></code> event,
+      that will fire the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded">serviceadded</a></code> event,
       and the web page will be able to access service E. </p>
     </div>
     <div class="example" id="example-filter-by-name">
@@ -1951,7 +1951,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
       <tr>
        <td><dfn class="idl-code" data-dfn-for="Bluetooth" data-dfn-type="attribute" data-export="" id="dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]<a class="self-link" href="#dom-bluetooth-attributeinstancemap-slot"></a></dfn>
        <td> An empty map from <a data-link-type="dfn" href="#bluetooth-cache">Bluetooth cache</a> entries to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>s. 
-       <td> The <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>s resolve to either <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>, or <code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code> instances. 
+       <td> The <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>s resolve to either <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>, or <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code> instances. 
     </table>
     <p> A <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> <var>device</var> <dfn data-dfn-type="dfn" data-local-lt="match a filter|matches any filter" data-noexport="" id="matches-a-filter">matches a filter<a class="self-link" href="#matches-a-filter"></a></dfn> <var>filter</var> if the following steps return <code>match</code>: </p>
     <ol class="algorithm">
@@ -2210,7 +2210,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
             If <var>settings</var>’ <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">origin</a> is <var>origin</var> and <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> is
                 the <a data-link-type="dfn" href="#same-device">same device</a> as <var>device</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on <var>settings</var>’ <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to
                 set <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code> to <var>newServices</var>. 
-           <p class="note" role="note"> There’s no need to fire <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a></code> for these new services because <a href="#only-notify-for-requested-services">none of them could have been returned from a previous service query</a>. </p>
+           <p class="note" role="note"> There’s no need to fire <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded">serviceadded</a></code> for these new services because <a href="#only-notify-for-requested-services">none of them could have been returned from a previous service query</a>. </p>
          </ol>
         <li> Abort these steps. 
        </ol>
@@ -2241,7 +2241,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-vendorid">vendorID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productid">productID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productversion">productVersion</a>;
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTRemoteServer " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
   readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID> " href="#dom-bluetoothdevice-uuids">uuids</a>;
 };
 <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
@@ -2541,7 +2541,7 @@ return navigator.bluetooth.requestDevice({
     <section id="">
      <h3 class="heading settled" data-level="5.1" id="information-model"><span class="secno">5.1. </span><span class="content">GATT Information Model</span><a class="self-link" href="#information-model"></a></h3>
      <div class="note" role="note">
-      <p> The <a data-link-type="dfn" href="#gatt-profile-hierarchy">GATT Profile Hierarchy</a> describes how a <a data-link-type="idl" href="#bluetoothgattremoteserver">GATT Server</a> contains a hierarchy of Profiles, Primary <a data-link-type="dfn" href="#service">Service</a>s, <a data-link-type="dfn" href="#included-service">Included Service</a>s, <a data-link-type="dfn" href="#characteristic">Characteristic</a>s, and <a data-link-type="dfn" href="#descriptor">Descriptor</a>s. </p>
+      <p> The <a data-link-type="dfn" href="#gatt-profile-hierarchy">GATT Profile Hierarchy</a> describes how a <a data-link-type="idl" href="#bluetoothremotegattserver">GATT Server</a> contains a hierarchy of Profiles, Primary <a data-link-type="dfn" href="#service">Service</a>s, <a data-link-type="dfn" href="#included-service">Included Service</a>s, <a data-link-type="dfn" href="#characteristic">Characteristic</a>s, and <a data-link-type="dfn" href="#descriptor">Descriptor</a>s. </p>
       <p> Profiles are purely logical:
         the specification of a Profile describes the expected interactions between
         the other GATT entities the Profile contains,
@@ -2557,20 +2557,20 @@ return navigator.bluetooth.requestDevice({
         Attributes are notionally ordered within their <a data-link-type="dfn" href="#gatt-server">GATT Server</a> by their <a data-link-type="dfn" href="#attribute-handle">Attribute Handle</a>,
         but while platform interfaces provide these entities in some order,
         they do not guarantee that it’s consistent with the <a data-link-type="dfn" href="#attribute-handle">Attribute Handle</a> order. </p>
-      <p data-link-for-hint="BluetoothGATTService"> A <a data-link-type="idl" href="#bluetoothgattservice">Service</a> contains
-        a collection of <a data-link-type="idl" href="#dom-bluetoothgattservice-getincludedservice">Included Service</a>s
-        and <a data-link-type="idl" href="#dom-bluetoothgattservice-getcharacteristic">Characteristic</a>s.
+      <p data-link-for-hint="BluetoothRemoteGATTService"> A <a data-link-type="idl" href="#bluetoothremotegattservice">Service</a> contains
+        a collection of <a data-link-type="idl" href="#dom-bluetoothremotegattservice-getincludedservice">Included Service</a>s
+        and <a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic">Characteristic</a>s.
         The Included Services are references to other Services,
         and a single Service can be included by more than one other Service.
-        Services are known as <a data-link-type="idl" href="#dom-bluetoothgattservice-isprimary">Primary Services</a> if they appear directly under the <a data-link-type="idl" href="#bluetoothgattremoteserver">GATT Server</a>,
+        Services are known as <a data-link-type="idl" href="#dom-bluetoothremotegattservice-isprimary">Primary Services</a> if they appear directly under the <a data-link-type="idl" href="#bluetoothremotegattserver">GATT Server</a>,
         and Secondary Services if they’re only included by other Services,
         but Primary Services can also be included. </p>
-      <p data-link-for-hint="BluetoothGATTCharacteristic"> A <a data-link-type="idl" href="#bluetoothgattcharacteristic">Characteristic</a> contains a value, which is an array of bytes,
-        and a collection of <a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-getdescriptor">Descriptor</a>s.
+      <p data-link-for-hint="BluetoothRemoteGATTCharacteristic"> A <a data-link-type="idl" href="#bluetoothremotegattcharacteristic">Characteristic</a> contains a value, which is an array of bytes,
+        and a collection of <a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-getdescriptor">Descriptor</a>s.
         Depending on the <a data-link-type="idl" href="#bluetoothcharacteristicproperties">properties</a> of the Characteristic,
         a <a data-link-type="dfn" href="#gatt-client">GATT Client</a> can read or write its value,
         or register to be notified when the value changes. </p>
-      <p> Finally, a <a data-link-type="idl" href="#bluetoothgattdescriptor">Descriptor</a> contains a value (again an array of bytes)
+      <p> Finally, a <a data-link-type="idl" href="#bluetoothremotegattdescriptor">Descriptor</a> contains a value (again an array of bytes)
         that describes or configures its <a data-link-type="dfn" href="#characteristic">Characteristic</a>. </p>
      </div>
      <section>
@@ -2580,8 +2580,8 @@ return navigator.bluetooth.requestDevice({
         The UA MAY share this cache between multiple origins accessing the same device.
         Each potential entity in the cache is either known-present, known-absent, or unknown.
         The cache MUST NOT contain two entities that are for the <a data-link-type="dfn" href="#same-attribute">same attribute</a>.
-        Each known-present entity in the cache is associated with an optional <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>></code>, <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>></code>,
-        or <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code>></code> instance
+        Each known-present entity in the cache is associated with an optional <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code>></code>, <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>></code>,
+        or <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code>></code> instance
         for each <code class="idl"><a data-link-type="idl" href="#bluetooth">Bluetooth</a></code> instance. </p>
       <p class="note" role="note"> For example, if a user calls the <code>serviceA.getCharacteristic(uuid1)</code> function
         with an initially empty <a data-link-type="dfn" href="#bluetooth-cache">Bluetooth cache</a>,
@@ -2623,8 +2623,8 @@ return navigator.bluetooth.requestDevice({
          For each <var>entry</var> in <var>entries</var>: 
         <ol>
          <li> If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
-              in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a></code>, <a data-link-type="dfn" href="#create-a-bluetoothgattservice-representing">create a <code>BluetoothGATTService</code> representing</a> <var>entry</var>, <a data-link-type="dfn" href="#create-a-bluetoothgattcharacteristic-representing">create a <code>BluetoothGATTCharacteristic</code> representing</a> <var>entry</var>,
-              or <a data-link-type="dfn" href="#create-a-bluetoothgattdescriptor-representing">create a <code>BluetoothGATTDescriptor</code> representing</a> <var>entry</var>,
+              in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a></code>, <a data-link-type="dfn" href="#create-a-bluetoothremotegattservice-representing">create a <code>BluetoothRemoteGATTService</code> representing</a> <var>entry</var>, <a data-link-type="dfn" href="#create-a-bluetoothremotegattcharacteristic-representing">create a <code>BluetoothRemoteGATTCharacteristic</code> representing</a> <var>entry</var>,
+              or <a data-link-type="dfn" href="#create-a-bluetoothremotegattdescriptor-representing">create a <code>BluetoothRemoteGATTDescriptor</code> representing</a> <var>entry</var>,
               depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
               and add a mapping from <var>entry</var> to the resulting <code>Promise</code> in <var>context</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a></code>. 
          <li> Append to <var>result</var> the <code>Promise&lt;BluetoothGATT*></code> instance
@@ -2686,28 +2686,28 @@ return navigator.bluetooth.requestDevice({
      </section>
     </section>
     <section>
-     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.2" data-lt="BluetoothGATTRemoteServer" id="bluetoothgattremoteserver"><span class="secno">5.2. </span><span class="content">BluetoothGATTRemoteServer</span><a class="self-link" href="#bluetoothgattremoteserver"></a></h3>
-     <p> <code class="idl"><a data-link-type="idl" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a></code> represents a <a data-link-type="dfn" href="#gatt-server">GATT Server</a> on a remote device. </p>
-<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothgattremoteserver-device">device</a>;
-  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothgattremoteserver-connected">connected</a>;
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-connect">connect</a>();
-  void <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-disconnect">disconnect</a>();
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer/getPrimaryService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothgattremoteserver-getprimaryservice-service-service">service<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservice-service-service"></a></dfn>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-getprimaryservices">getPrimaryServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer/getPrimaryServices(service), BluetoothGATTRemoteServer/getPrimaryServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothgattremoteserver-getprimaryservices-service-service">service<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservices-service-service"></a></dfn>);
+     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.2" data-lt="BluetoothRemoteGATTServer" id="bluetoothremotegattserver"><span class="secno">5.2. </span><span class="content">BluetoothRemoteGATTServer</span><span id="bluetoothgattremoteserver"></span><a class="self-link" href="#bluetoothremotegattserver"></a></h3>
+     <p> <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a></code> represents a <a data-link-type="dfn" href="#gatt-server">GATT Server</a> on a remote device. </p>
+<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothremotegattserver-device">device</a>;
+  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothremotegattserver-connected">connected</a>;
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-connect">connect</a>();
+  void <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-disconnect">disconnect</a>();
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer/getPrimaryService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice-service-service">service<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservice-service-service"></a></dfn>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservices">getPrimaryServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer/getPrimaryServices(service), BluetoothRemoteGATTServer/getPrimaryServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattserver-getprimaryservices-service-service">service<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservices-service-service"></a></dfn>);
 };
 </pre>
      <div class="note no-marker" role="note">
-      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a></code> attributes</div>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattremoteserver-device">device<a class="self-link" href="#dom-bluetoothgattremoteserver-device"></a></dfn> is the device running this server. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattremoteserver-connected">connected<a class="self-link" href="#dom-bluetoothgattremoteserver-connected"></a></dfn> is true while this instance
+      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a></code> attributes</div>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattserver-device">device<a class="self-link" href="#dom-bluetoothremotegattserver-device"></a></dfn> is the device running this server. </p>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattserver-connected">connected<a class="self-link" href="#dom-bluetoothremotegattserver-connected"></a></dfn> is true while this instance
         is connected to <code>this.device</code>.
         It can be false while the UA is physically connected,
-        for example when there are other connected <code class="idl"><a data-link-type="idl" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a></code> instances
+        for example when there are other connected <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a></code> instances
         for other <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#execution-context&apos;s-global-object">global object</a>s. </p>
      </div>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-connect">connect()<a class="self-link" href="#dom-bluetoothgattremoteserver-connect"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-connect">connect()<a class="self-link" href="#dom-bluetoothremotegattserver-connect"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and
       run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
@@ -2722,7 +2722,7 @@ return navigator.bluetooth.requestDevice({
         <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <code>this</code>. 
        </ol>
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-disconnect">disconnect()<a class="self-link" href="#dom-bluetoothgattremoteserver-disconnect"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-disconnect">disconnect()<a class="self-link" href="#dom-bluetoothremotegattserver-disconnect"></a></dfn></code> method, when invoked,
       MUST perform the following steps: </p>
      <ol class="algorithm">
       <li> Set <code>this.connected</code> to <code>false</code>. 
@@ -2731,14 +2731,14 @@ return navigator.bluetooth.requestDevice({
         with <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-device">same device</a> as <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>, <code>!<var>device</var>.gattServer.connected</code>,
         the UA MAY destroy <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>’s <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>. 
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" id="dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservice"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService(<var>service</var>)<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservice"></a></dfn></code> method, when invoked,
       MUST perform the following steps: </p>
      <ol class="algorithm">
       <li> If <var>service</var> is not in <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,
         return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
       <li> Return <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>,<br> <var>single</var>=true,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,<br> <var>child type</var>="GATT Primary Service")</span> 
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTRemoteServer" data-dfn-type="method" data-export="" data-lt="getPrimaryServices(service)|getPrimaryServices()" id="dom-bluetoothgattremoteserver-getprimaryservices">getPrimaryServices(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattremoteserver-getprimaryservices"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" data-lt="getPrimaryServices(service)|getPrimaryServices()" id="dom-bluetoothremotegattserver-getprimaryservices">getPrimaryServices(<var>service</var>)<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservices"></a></dfn></code> method, when invoked,
       MUST perform the following steps: </p>
      <ol class="algorithm">
       <li> If <var>service</var> is present
@@ -2748,39 +2748,39 @@ return navigator.bluetooth.requestDevice({
      </ol>
     </section>
     <section>
-     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.3" data-lt="BluetoothGATTService" id="bluetoothgattservice"><span class="secno">5.3. </span><span class="content">BluetoothGATTService</span><a class="self-link" href="#bluetoothgattservice"></a></h3>
-     <p> <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> represents a GATT <a data-link-type="dfn" href="#service">Service</a>,
+     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.3" data-lt="BluetoothRemoteGATTService" id="bluetoothremotegattservice"><span class="secno">5.3. </span><span class="content">BluetoothRemoteGATTService</span><span id="bluetoothgattservice"></span><a class="self-link" href="#bluetoothremotegattservice"></a></h3>
+     <p> <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> represents a GATT <a data-link-type="dfn" href="#service">Service</a>,
       a collection of characteristics and relationships to other services
       that encapsulate the behavior of part of a device. </p>
-<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattservice">BluetoothGATTService</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothgattservice-device">device</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothgattservice-uuid">uuid</a>;
-  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothgattservice-isprimary">isPrimary</a>;
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTService/getCharacteristic(characteristic)" data-dfn-type="argument" data-export="" id="dom-bluetoothgattservice-getcharacteristic-characteristic-characteristic">characteristic<a class="self-link" href="#dom-bluetoothgattservice-getcharacteristic-characteristic-characteristic"></a></dfn>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getcharacteristics">getCharacteristics</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTService/getCharacteristics(characteristic), BluetoothGATTService/getCharacteristics()" data-dfn-type="argument" data-export="" id="dom-bluetoothgattservice-getcharacteristics-characteristic-characteristic">characteristic<a class="self-link" href="#dom-bluetoothgattservice-getcharacteristics-characteristic-characteristic"></a></dfn>);
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getincludedservice">getIncludedService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTService/getIncludedService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothgattservice-getincludedservice-service-service">service<a class="self-link" href="#dom-bluetoothgattservice-getincludedservice-service-service"></a></dfn>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getincludedservices">getIncludedServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTService/getIncludedServices(service), BluetoothGATTService/getIncludedServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothgattservice-getincludedservices-service-service">service<a class="self-link" href="#dom-bluetoothgattservice-getincludedservices-service-service"></a></dfn>);
+<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothremotegattservice-device">device</a>;
+  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothremotegattservice-uuid">uuid</a>;
+  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothremotegattservice-isprimary">isPrimary</a>;
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService/getCharacteristic(characteristic)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getcharacteristic-characteristic-characteristic">characteristic<a class="self-link" href="#dom-bluetoothremotegattservice-getcharacteristic-characteristic-characteristic"></a></dfn>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getcharacteristics">getCharacteristics</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService/getCharacteristics(characteristic), BluetoothRemoteGATTService/getCharacteristics()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getcharacteristics-characteristic-characteristic">characteristic<a class="self-link" href="#dom-bluetoothremotegattservice-getcharacteristics-characteristic-characteristic"></a></dfn>);
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservice">getIncludedService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService/getIncludedService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getincludedservice-service-service">service<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservice-service-service"></a></dfn>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservices">getIncludedServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService/getIncludedServices(service), BluetoothRemoteGATTService/getIncludedServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getincludedservices-service-service">service<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservices-service-service"></a></dfn>);
 };
-<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
-<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
-<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> implements <a data-link-type="idl-name" href="#serviceeventhandlers">ServiceEventHandlers</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> implements <a data-link-type="idl-name" href="#serviceeventhandlers">ServiceEventHandlers</a>;
 </pre>
      <div class="note no-marker" role="note">
-      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> attributes</div>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattservice-device">device<a class="self-link" href="#dom-bluetoothgattservice-device"></a></dfn> is the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> representing
+      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> attributes</div>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattservice-device">device<a class="self-link" href="#dom-bluetoothremotegattservice-device"></a></dfn> is the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> representing
         the remote peripheral that the GATT service belongs to. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattservice-uuid">uuid<a class="self-link" href="#dom-bluetoothgattservice-uuid"></a></dfn> is the UUID of the service,
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattservice-uuid">uuid<a class="self-link" href="#dom-bluetoothremotegattservice-uuid"></a></dfn> is the UUID of the service,
         e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">Heart Rate</a> service. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattservice-isprimary">isPrimary<a class="self-link" href="#dom-bluetoothgattservice-isprimary"></a></dfn> indicates whether the type of this service is primary or secondary. </p>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattservice-isprimary">isPrimary<a class="self-link" href="#dom-bluetoothremotegattservice-isprimary"></a></dfn> indicates whether the type of this service is primary or secondary. </p>
      </div>
-     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothgattservice-representing">create a <code>BluetoothGATTService</code> representing<a class="self-link" href="#create-a-bluetoothgattservice-representing"></a></dfn> a Service <var>service</var>,
+     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothremotegattservice-representing">create a <code>BluetoothRemoteGATTService</code> representing<a class="self-link" href="#create-a-bluetoothremotegattservice-representing"></a></dfn> a Service <var>service</var>,
       the UA must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>. </p>
      <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>.
+      <li>Let <var>result</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code>.
       <li> <a data-link-type="dfn" href="#get-the-bluetoothdevice-representing">Get the <code>BluetoothDevice</code> representing</a> the device in which <var>service</var> appears,
         and let <var>devicePromise</var> be the result. 
       <li>Wait for <var>devicePromise</var> to settle.
@@ -2795,57 +2795,57 @@ return navigator.bluetooth.requestDevice({
         Otherwise initialize <code><var>result</var>.isPrimary</code> to false. 
       <li><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <var>result</var>.
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothgattservice-getcharacteristic">getCharacteristic(<var>characteristic</var>)<a class="self-link" href="#dom-bluetoothgattservice-getcharacteristic"></a></dfn></code> method
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic(<var>characteristic</var>)<a class="self-link" href="#dom-bluetoothremotegattservice-getcharacteristic"></a></dfn></code> method
       retrieves a <a data-link-type="dfn" href="#characteristic">Characteristic</a> inside this Service.
       When invoked, it MUST return </p>
      <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br> <var>single</var>=true,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getcharacteristic">BluetoothUUID.getCharacteristic</a></code>,<br> <var>uuid</var>=<code><var>characteristic</var></code>,<br> <var>allowedUuids</var>=<code>undefined</code>,<br> <var>child type</var>="GATT Characteristic")</span> </blockquote>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothgattservice-getcharacteristics">getCharacteristics(<var>characteristic</var>)<a class="self-link" href="#dom-bluetoothgattservice-getcharacteristics"></a></dfn></code> method
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattservice-getcharacteristics">getCharacteristics(<var>characteristic</var>)<a class="self-link" href="#dom-bluetoothremotegattservice-getcharacteristics"></a></dfn></code> method
       retrieves a list of <a data-link-type="dfn" href="#characteristic">Characteristic</a>s inside this Service.
       When invoked, it MUST return </p>
      <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br> <var>single</var>=false,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getcharacteristic">BluetoothUUID.getCharacteristic</a></code>,<br> <var>uuid</var>=<code><var>characteristic</var></code>,<br> <var>allowedUuids</var>=<code>undefined</code>,<br> <var>child type</var>="GATT Characteristic")</span> </blockquote>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothgattservice-getincludedservice">getIncludedService(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattservice-getincludedservice"></a></dfn></code> method
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattservice-getincludedservice">getIncludedService(<var>service</var>)<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservice"></a></dfn></code> method
       retrieves an <a data-link-type="dfn" href="#included-service">Included Service</a> inside this Service.
       When invoked, it MUST return </p>
      <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br> <var>single</var>=true,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>undefined</code>,<br> <var>child type</var>="GATT Included Service")</span> </blockquote>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothgattservice-getincludedservices">getIncludedServices(<var>service</var>)<a class="self-link" href="#dom-bluetoothgattservice-getincludedservices"></a></dfn></code> method
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattservice-getincludedservices">getIncludedServices(<var>service</var>)<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservices"></a></dfn></code> method
       retrieves a list of <a data-link-type="dfn" href="#included-service">Included Service</a>s inside this Service.
       When invoked, it MUST return </p>
      <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br> <var>single</var>=false,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>,<br> <var>uuid</var>=<code><var>service</var></code>,<br> <var>allowedUuids</var>=<code>undefined</code>,<br> <var>child type</var>="GATT Included Service")</span> </blockquote>
     </section>
     <section>
-     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.4" data-lt="BluetoothGATTCharacteristic" id="bluetoothgattcharacteristic"><span class="secno">5.4. </span><span class="content">BluetoothGATTCharacteristic</span><a class="self-link" href="#bluetoothgattcharacteristic"></a></h3>
-     <p><code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> represents a GATT <a data-link-type="dfn" href="#characteristic">Characteristic</a>, which is a basic data element that provides further information about a peripheral’s service.</p>
-<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTService " href="#dom-bluetoothgattcharacteristic-service">service</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothgattcharacteristic-uuid">uuid</a>;
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothCharacteristicProperties " href="#dom-bluetoothgattcharacteristic-properties">properties</a>;
-  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothgattcharacteristic-value">value</a>;
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-getdescriptor">getDescriptor</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic/getDescriptor(descriptor)" data-dfn-type="argument" data-export="" id="dom-bluetoothgattcharacteristic-getdescriptor-descriptor-descriptor">descriptor<a class="self-link" href="#dom-bluetoothgattcharacteristic-getdescriptor-descriptor-descriptor"></a></dfn>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-getdescriptors">getDescriptors</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic/getDescriptors(descriptor), BluetoothGATTCharacteristic/getDescriptors()" data-dfn-type="argument" data-export="" id="dom-bluetoothgattcharacteristic-getdescriptors-descriptor-descriptor">descriptor<a class="self-link" href="#dom-bluetoothgattcharacteristic-getdescriptors-descriptor-descriptor"></a></dfn>);
-  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-readvalue">readValue</a>();
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic/writeValue(value)" data-dfn-type="argument" data-export="" id="dom-bluetoothgattcharacteristic-writevalue-value-value">value<a class="self-link" href="#dom-bluetoothgattcharacteristic-writevalue-value-value"></a></dfn>);
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-startnotifications">startNotifications</a>();
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-stopnotifications">stopNotifications</a>();
+     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.4" data-lt="BluetoothRemoteGATTCharacteristic" id="bluetoothremotegattcharacteristic"><span class="secno">5.4. </span><span class="content">BluetoothRemoteGATTCharacteristic</span><span id="bluetoothgattcharacteristic"></span><a class="self-link" href="#bluetoothremotegattcharacteristic"></a></h3>
+     <p><code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> represents a GATT <a data-link-type="dfn" href="#characteristic">Characteristic</a>, which is a basic data element that provides further information about a peripheral’s service.</p>
+<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTService " href="#dom-bluetoothremotegattcharacteristic-service">service</a>;
+  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothremotegattcharacteristic-uuid">uuid</a>;
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothCharacteristicProperties " href="#dom-bluetoothremotegattcharacteristic-properties">properties</a>;
+  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothremotegattcharacteristic-value">value</a>;
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-getdescriptor">getDescriptor</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/getDescriptor(descriptor)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattcharacteristic-getdescriptor-descriptor-descriptor">descriptor<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-getdescriptor-descriptor-descriptor"></a></dfn>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-getdescriptors">getDescriptors</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/getDescriptors(descriptor), BluetoothRemoteGATTCharacteristic/getDescriptors()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattcharacteristic-getdescriptors-descriptor-descriptor">descriptor<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-getdescriptors-descriptor-descriptor"></a></dfn>);
+  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-readvalue">readValue</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/writeValue(value)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattcharacteristic-writevalue-value-value">value<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-writevalue-value-value"></a></dfn>);
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-startnotifications">startNotifications</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-stopnotifications">stopNotifications</a>();
 };
-<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
-<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
 </pre>
      <div class="note no-marker" role="note">
-      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> attributes</div>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattcharacteristic-service">service<a class="self-link" href="#dom-bluetoothgattcharacteristic-service"></a></dfn> is the GATT service this characteristic belongs to. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattcharacteristic-uuid">uuid<a class="self-link" href="#dom-bluetoothgattcharacteristic-uuid"></a></dfn> is the UUID of the characteristic,
+      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> attributes</div>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-service">service<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-service"></a></dfn> is the GATT service this characteristic belongs to. </p>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-uuid">uuid<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-uuid"></a></dfn> is the UUID of the characteristic,
         e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">Heart Rate Measurement</a> characteristic. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattcharacteristic-properties">properties<a class="self-link" href="#dom-bluetoothgattcharacteristic-properties"></a></dfn> holds the properties of this characteristic. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattcharacteristic-value">value<a class="self-link" href="#dom-bluetoothgattcharacteristic-value"></a></dfn> is the currently cached characteristic value.
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-properties">properties<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-properties"></a></dfn> holds the properties of this characteristic. </p>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-value">value<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-value"></a></dfn> is the currently cached characteristic value.
         This value gets updated when the value of the characteristic is read or updated via a notification or indication. </p>
      </div>
-     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothgattcharacteristic-representing">create a <code>BluetoothGATTCharacteristic</code> representing<a class="self-link" href="#create-a-bluetoothgattcharacteristic-representing"></a></dfn> a Characteristic <var>characteristic</var>,
+     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothremotegattcharacteristic-representing">create a <code>BluetoothRemoteGATTCharacteristic</code> representing<a class="self-link" href="#create-a-bluetoothremotegattcharacteristic-representing"></a></dfn> a Characteristic <var>characteristic</var>,
       the UA must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>. </p>
      <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>.
+      <li>Let <var>result</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>.
       <li> Initialize <code><var>result</var>.service</code> from
-        the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> instance representing
+        the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> instance representing
         the Service in which <var>characteristic</var> appears. 
       <li> Initialize an internal <code><var>result</var>@[[context]]</code> field
         to <code><var>result</var>.service@[[context]]</code>. 
@@ -2865,15 +2865,15 @@ return navigator.bluetooth.requestDevice({
         the most recently read value from <var>characteristic</var> if this value is available. 
       <li><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <var>result</var>.
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-getdescriptor">getDescriptor(<var>descriptor</var>)<a class="self-link" href="#dom-bluetoothgattcharacteristic-getdescriptor"></a></dfn></code> method
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-getdescriptor">getDescriptor(<var>descriptor</var>)<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-getdescriptor"></a></dfn></code> method
       retrieves a <a data-link-type="dfn" href="#descriptor">Descriptor</a> inside this Characteristic.
       When invoked, it MUST return </p>
      <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br> <var>single</var>=true,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getdescriptor">BluetoothUUID.getDescriptor</a></code>,<br> <var>uuid</var>=<code><var>descriptor</var></code>,<br> <var>allowedUuids</var>=<code>undefined</code>,<br> <var>child type</var>="GATT Descriptor")</span> </blockquote>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-getdescriptors">getDescriptors(<var>descriptor</var>)<a class="self-link" href="#dom-bluetoothgattcharacteristic-getdescriptors"></a></dfn></code> method
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-getdescriptors">getDescriptors(<var>descriptor</var>)<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-getdescriptors"></a></dfn></code> method
       retrieves a list of <a data-link-type="dfn" href="#descriptor">Descriptor</a>s inside this Characteristic.
       When invoked, it MUST return </p>
      <blockquote> <a data-link-type="dfn" href="#getgattchildren">GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br> <var>single</var>=false,<br> <var>uuidCanonicalizer</var>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getdescriptor">BluetoothUUID.getDescriptor</a></code>,<br> <var>uuid</var>=<code><var>descriptor</var></code>,<br> <var>allowedUuids</var>=<code>undefined</code>,<br> <var>child type</var>="GATT Descriptor")</span> </blockquote>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-readvalue">readValue()<a class="self-link" href="#dom-bluetoothgattcharacteristic-readvalue"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-readvalue">readValue()<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-readvalue"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-reads">blacklisted for reads</a>,
@@ -2894,14 +2894,14 @@ return navigator.bluetooth.requestDevice({
         <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <code>this.value</code>. 
        </ol>
       <li>
-       <p> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <code>this</code>. </p>
+       <p> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <code>this</code>. </p>
        <p class="note" role="note"> This is a separate task from the previous one to ensure
           the event handlers run after any <code>&lt;var>promise&lt;/var>.then()</code> handlers
           that react to the new value.
           The second task is queued right after the first
-          to prevent <code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-value">value</a></code> from changing between them. </p>
+          to prevent <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-value">value</a></code> from changing between them. </p>
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-writevalue">writeValue(<var>value</var>)<a class="self-link" href="#dom-bluetoothgattcharacteristic-writevalue"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-writevalue">writeValue(<var>value</var>)<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-writevalue"></a></dfn></code> method, when invoked,
       MUST run the following steps: </p>
      <ol class="algorithm">
       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-writes">blacklisted for writes</a>,
@@ -2933,7 +2933,7 @@ return navigator.bluetooth.requestDevice({
       the characteristic’s <dfn data-dfn-type="dfn" data-noexport="" id="active-notification-context-set">active notification context set<a class="self-link" href="#active-notification-context-set"></a></dfn>. <span class="note" role="note"> The set for a given characteristic holds
         the <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth">navigator.bluetooth</a></code> objects for
         each <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-code-realms">Realm</a> that has registered for notifications. </span> </p>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-startnotifications">startNotifications()<a class="self-link" href="#dom-bluetoothgattcharacteristic-startnotifications"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-startnotifications">startNotifications()<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-startnotifications"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>.
       See <a href="#notification-events">§5.6.4 Responding to Notifications and Indications</a> for details of receiving notifications. </p>
      <ol class="algorithm">
@@ -2959,7 +2959,7 @@ return navigator.bluetooth.requestDevice({
       until after the current <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint">microtask checkpoint</a>.
       This allows a developer to set up handlers
       in the <code>.then</code> handler of the result promise. </p>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothgattcharacteristic-stopnotifications">stopNotifications()<a class="self-link" href="#dom-bluetoothgattcharacteristic-stopnotifications"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-stopnotifications">stopNotifications()<a class="self-link" href="#dom-bluetoothremotegattcharacteristic-stopnotifications"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
       <li> Let <var>characteristic</var> be
@@ -2976,7 +2976,7 @@ return navigator.bluetooth.requestDevice({
       arrive after the promise resolves. </p>
      <section>
       <h4 class="heading settled" data-level="5.4.1" id="characteristicproperties"><span class="secno">5.4.1. </span><span class="content"><dfn class="idl-code" data-dfn-type="interface" data-export="" id="bluetoothcharacteristicproperties">BluetoothCharacteristicProperties<a class="self-link" href="#bluetoothcharacteristicproperties"></a></dfn></span><a class="self-link" href="#characteristicproperties"></a></h4>
-      <p> Each <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> exposes its <a data-link-type="dfn" href="#characteristic-properties">characteristic properties</a> through a <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a></code> object.
+      <p> Each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> exposes its <a data-link-type="dfn" href="#characteristic-properties">characteristic properties</a> through a <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a></code> object.
         These properties express what operations are valid on the characteristic. </p>
 <pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a> {
   readonly attribute boolean <dfn class="idl-code" data-dfn-for="BluetoothCharacteristicProperties" data-dfn-type="attribute" data-export="" data-readonly="" data-type="boolean " id="dom-bluetoothcharacteristicproperties-broadcast">broadcast<a class="self-link" href="#dom-bluetoothcharacteristicproperties-broadcast"></a></dfn>;
@@ -3050,30 +3050,30 @@ return navigator.bluetooth.requestDevice({
      </section>
     </section>
     <section>
-     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.5" data-lt="BluetoothGATTDescriptor" id="bluetoothgattdescriptor"><span class="secno">5.5. </span><span class="content">BluetoothGATTDescriptor</span><a class="self-link" href="#bluetoothgattdescriptor"></a></h3>
-     <p><code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code> represents a GATT <a data-link-type="dfn" href="#descriptor">Descriptor</a>, which provides further information about a <a data-link-type="dfn" href="#characteristic">Characteristic</a>’s value.</p>
-<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTCharacteristic " href="#dom-bluetoothgattdescriptor-characteristic">characteristic</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothgattdescriptor-uuid">uuid</a>;
-  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothgattdescriptor-value">value</a>;
-  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattdescriptor-readvalue">readValue</a>();
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattdescriptor-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <dfn class="idl-code" data-dfn-for="BluetoothGATTDescriptor/writeValue(value)" data-dfn-type="argument" data-export="" id="dom-bluetoothgattdescriptor-writevalue-value-value">value<a class="self-link" href="#dom-bluetoothgattdescriptor-writevalue-value-value"></a></dfn>);
+     <h3 class="heading settled idl-code" data-dfn-type="interface" data-export="" data-level="5.5" data-lt="BluetoothRemoteGATTDescriptor" id="bluetoothremotegattdescriptor"><span class="secno">5.5. </span><span class="content">BluetoothRemoteGATTDescriptor</span><span id="bluetoothgattdescriptor"></span><a class="self-link" href="#bluetoothremotegattdescriptor"></a></h3>
+     <p><code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code> represents a GATT <a data-link-type="dfn" href="#descriptor">Descriptor</a>, which provides further information about a <a data-link-type="dfn" href="#characteristic">Characteristic</a>’s value.</p>
+<pre class="idl">interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTCharacteristic " href="#dom-bluetoothremotegattdescriptor-characteristic">characteristic</a>;
+  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothremotegattdescriptor-uuid">uuid</a>;
+  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothremotegattdescriptor-value">value</a>;
+  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-readvalue">readValue</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor/writeValue(value)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattdescriptor-writevalue-value-value">value<a class="self-link" href="#dom-bluetoothremotegattdescriptor-writevalue-value-value"></a></dfn>);
 };
 </pre>
      <div class="note no-marker" role="note">
-      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code> attributes</div>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattdescriptor-characteristic">characteristic<a class="self-link" href="#dom-bluetoothgattdescriptor-characteristic"></a></dfn> is the GATT characteristic this descriptor belongs to. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattdescriptor-uuid">uuid<a class="self-link" href="#dom-bluetoothgattdescriptor-uuid"></a></dfn> is the UUID of the characteristic descriptor,
+      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code> attributes</div>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattdescriptor-characteristic">characteristic<a class="self-link" href="#dom-bluetoothremotegattdescriptor-characteristic"></a></dfn> is the GATT characteristic this descriptor belongs to. </p>
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattdescriptor-uuid">uuid<a class="self-link" href="#dom-bluetoothremotegattdescriptor-uuid"></a></dfn> is the UUID of the characteristic descriptor,
         e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml#">Client Characteristic Configuration</a> descriptor. </p>
-      <p> <dfn class="idl-code" data-dfn-for="BluetoothGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothgattdescriptor-value">value<a class="self-link" href="#dom-bluetoothgattdescriptor-value"></a></dfn> is the currently cached descriptor value.
+      <p> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattdescriptor-value">value<a class="self-link" href="#dom-bluetoothremotegattdescriptor-value"></a></dfn> is the currently cached descriptor value.
         This value gets updated when the value of the descriptor is read. </p>
      </div>
-     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothgattdescriptor-representing">create a <code>BluetoothGATTDescriptor</code> representing<a class="self-link" href="#create-a-bluetoothgattdescriptor-representing"></a></dfn> a Descriptor <var>descriptor</var>,
+     <p> To <dfn data-dfn-type="dfn" data-noexport="" id="create-a-bluetoothremotegattdescriptor-representing">create a <code>BluetoothRemoteGATTDescriptor</code> representing<a class="self-link" href="#create-a-bluetoothremotegattdescriptor-representing"></a></dfn> a Descriptor <var>descriptor</var>,
       the UA must return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>. </p>
      <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code>.
+      <li>Let <var>result</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code>.
       <li> Initialize <code><var>result</var>.characteristic</code> from
-        the <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> instance representing
+        the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> instance representing
         the Characteristic in which <var>descriptor</var> appears. 
       <li> Initialize an internal <code><var>result</var>@[[context]]</code> field
         to <code><var>result</var>.characteristic@[[context]]</code>. 
@@ -3084,7 +3084,7 @@ return navigator.bluetooth.requestDevice({
         the most recently read value from <var>descriptor</var> if this value is available. 
       <li><a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <var>result</var>.
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTDescriptor" data-dfn-type="method" data-export="" id="dom-bluetoothgattdescriptor-readvalue">readValue()<a class="self-link" href="#dom-bluetoothgattdescriptor-readvalue"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattdescriptor-readvalue">readValue()<a class="self-link" href="#dom-bluetoothremotegattdescriptor-readvalue"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-reads">blacklisted for reads</a>,
@@ -3103,7 +3103,7 @@ return navigator.bluetooth.requestDevice({
         <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#resolve-promise">Resolve</a> <var>promise</var> with <code>this.value</code>. 
        </ol>
      </ol>
-     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothGATTDescriptor" data-dfn-type="method" data-export="" id="dom-bluetoothgattdescriptor-writevalue">writeValue(<var>value</var>)<a class="self-link" href="#dom-bluetoothgattdescriptor-writevalue"></a></dfn></code> method, when invoked,
+     <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattdescriptor-writevalue">writeValue(<var>value</var>)<a class="self-link" href="#dom-bluetoothremotegattdescriptor-writevalue"></a></dfn></code> method, when invoked,
       MUST  run the following steps: </p>
      <ol class="algorithm">
       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-writes">blacklisted for writes</a>,
@@ -3136,47 +3136,47 @@ return navigator.bluetooth.requestDevice({
      <section>
       <h4 class="heading settled" data-dfn-type="dfn" data-level="5.6.1" data-lt="Bluetooth Tree" data-noexport="" id="bluetooth-tree"><span class="secno">5.6.1. </span><span class="content">Bluetooth Tree</span><a class="self-link" href="#bluetooth-tree"></a></h4>
       <p> <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth">navigator.bluetooth</a></code> and
-        objects implementing the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code>, or <code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code> interface <a data-link-type="dfn" href="http://dom.spec.whatwg.org/#concept-tree-participate">participate in a tree</a>,
+        objects implementing the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code>, <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>, or <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code> interface <a data-link-type="dfn" href="http://dom.spec.whatwg.org/#concept-tree-participate">participate in a tree</a>,
         simply named the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. </p>
       <ul>
        <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth">navigator.bluetooth</a></code> are the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> objects representing
           devices on the origin’s <a data-link-type="dfn" href="#allowed-devices-map">allowed devices map</a>,
           in an unspecified order. 
-       <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> are the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> objects representing
+       <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> are the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> objects representing
           Primary and Secondary <a data-link-type="dfn" href="#service">Service</a>s on its <a data-link-type="dfn" href="#gatt-server">GATT Server</a> whose UUIDs are on the origin and device’s <a data-link-type="dfn" href="#allowed-services-list">allowed services list</a>.
           The order of the primary services MUST be consistent with the order returned by
           the <a data-link-type="dfn" href="#discover-primary-service-by-service-uuid">Discover Primary Service by Service UUID</a> procedure,
           but secondary services and primary services with different UUIDs may be in any order. 
-       <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> are
-          the <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> objects representing its Characteristics.
+       <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> are
+          the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> objects representing its Characteristics.
           The order of the characteristics MUST be consistent with the order returned by
           the <a data-link-type="dfn" href="#discover-characteristics-by-uuid">Discover Characteristics by UUID</a> procedure,
           but characteristics with different UUIDs may be in any order. 
-       <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> are
-          the <code class="idl"><a data-link-type="idl" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a></code> objects representing its Descriptors
+       <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> are
+          the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a></code> objects representing its Descriptors
           in the order returned by the <a data-link-type="dfn" href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a> procedure. 
       </ul>
      </section>
      <section>
       <h4 class="heading settled" data-level="5.6.2" id="event-types"><span class="secno">5.6.2. </span><span class="content">Event types</span><a class="self-link" href="#event-types"></a></h4>
       <dl>
-       <dt><dfn class="idl-code" data-dfn-for="BluetoothGATTCharacteristic" data-dfn-type="event" data-export="" id="eventdef-bluetoothgattcharacteristic-characteristicvaluechanged"><code>characteristicvaluechanged</code><a class="self-link" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged"></a></dfn>
-       <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> when its value changes,
+       <dt><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="event" data-export="" id="eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged"><code>characteristicvaluechanged</code><a class="self-link" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged"></a></dfn>
+       <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> when its value changes,
           either as a result of
-          a <a data-link-type="idl" href="#dom-bluetoothgattcharacteristic-readvalue">read request</a>,
+          a <a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-readvalue">read request</a>,
           or a <a href="#notification-events">value change notification/indication</a>. 
        <dt><dfn class="idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="event" data-export="" id="eventdef-bluetoothdevice-gattserverdisconnected"><code>gattserverdisconnected</code><a class="self-link" href="#eventdef-bluetoothdevice-gattserverdisconnected"></a></dfn>
        <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> when <a href="#disconnection-events">an active GATT connection is lost</a>. 
-       <dt><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="event" data-export="" id="eventdef-bluetoothgattservice-serviceadded"><code>serviceadded</code><a class="self-link" href="#eventdef-bluetoothgattservice-serviceadded"></a></dfn>
-       <dd> Fired on a new <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> <a href="#service-change-events">when it has been discovered on a remote device</a>,
+       <dt><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="event" data-export="" id="eventdef-bluetoothremotegattservice-serviceadded"><code>serviceadded</code><a class="self-link" href="#eventdef-bluetoothremotegattservice-serviceadded"></a></dfn>
+       <dd> Fired on a new <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> <a href="#service-change-events">when it has been discovered on a remote device</a>,
           just after it is added to the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. 
-       <dt><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="event" data-export="" id="eventdef-bluetoothgattservice-servicechanged"><code>servicechanged</code><a class="self-link" href="#eventdef-bluetoothgattservice-servicechanged"></a></dfn>
-       <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> <a href="#service-change-events">when its state changes</a>.
+       <dt><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="event" data-export="" id="eventdef-bluetoothremotegattservice-servicechanged"><code>servicechanged</code><a class="self-link" href="#eventdef-bluetoothremotegattservice-servicechanged"></a></dfn>
+       <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> <a href="#service-change-events">when its state changes</a>.
           This involves any characteristics and/or descriptors
           that get added or removed from the service,
           as well as <a data-link-type="dfn" href="#service-changed">Service Changed</a> indications from the remote device. 
-       <dt><dfn class="idl-code" data-dfn-for="BluetoothGATTService" data-dfn-type="event" data-export="" id="eventdef-bluetoothgattservice-serviceremoved"><code>serviceremoved</code><a class="self-link" href="#eventdef-bluetoothgattservice-serviceremoved"></a></dfn>
-       <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> <a href="#service-change-events">when it has been removed from its device</a>,
+       <dt><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="event" data-export="" id="eventdef-bluetoothremotegattservice-serviceremoved"><code>serviceremoved</code><a class="self-link" href="#eventdef-bluetoothremotegattservice-serviceremoved"></a></dfn>
+       <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> <a href="#service-change-events">when it has been removed from its device</a>,
           just before it is removed from the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. 
       </dl>
      </section>
@@ -3189,12 +3189,12 @@ return navigator.bluetooth.requestDevice({
       <ol class="algorithm">
        <li> If <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> is not the <a data-link-type="dfn" href="#same-device">same device</a> as <var>device</var>,
           abort these steps. 
-       <li> If <code>!<var>deviceObj</var>.gattServer.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattremoteserver-connected">connected</a></code></code>,
+       <li> If <code>!<var>deviceObj</var>.gattServer.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected">connected</a></code></code>,
           abort these steps. 
-       <li> Set <code><var>deviceObj</var>.gattServer.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothgattremoteserver-connected">connected</a></code></code> to <code>false</code>. 
+       <li> Set <code><var>deviceObj</var>.gattServer.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected">connected</a></code></code> to <code>false</code>. 
        <li>
          <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">Fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothdevice-gattserverdisconnected">gattserverdisconnected</a></code> with its <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#dom-event-bubbles">bubbles</a></code> attribute initialized to <code>true</code> at <code><var>deviceObj</var></code>. 
-        <p class="note" role="note"> This event is <em>not</em> fired at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a></code>. </p>
+        <p class="note" role="note"> This event is <em>not</em> fired at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a></code>. </p>
       </ol>
      </section>
      <section>
@@ -3206,12 +3206,12 @@ return navigator.bluetooth.requestDevice({
          For each <var>bluetoothGlobal</var> in
           the Characteristic’s <a data-link-type="dfn" href="#active-notification-context-set">active notification context set</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on the event loop of the script settings object of <var>bluetoothGlobal</var> to do the following steps: 
         <ol>
-         <li> Let <var>characteristicObject</var> be the <code class="idl"><a data-link-type="idl" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a></code> in
+         <li> Let <var>characteristicObject</var> be the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code> in
               the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a> rooted at <var>bluetoothGlobal</var> that represents the <a data-link-type="dfn" href="#characteristic">Characteristic</a>. 
          <li> Set <code><var>characteristicObject</var>.value</code> to
               a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a></code> holding
               the new value of the <a data-link-type="dfn" href="#characteristic">Characteristic</a>. 
-         <li> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">Fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <var>characteristicObject</var>. 
+         <li> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">Fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <var>characteristicObject</var>. 
         </ol>
       </ol>
      </section>
@@ -3256,15 +3256,15 @@ return navigator.bluetooth.requestDevice({
           <ol>
            <li> If no remaining <a data-link-type="dfn" href="#service">Service</a> in <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> has the same UUID as <var>service</var>,
                   remove the UUID from <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>. 
-           <li> If the Service’s UUID is in <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceremoved">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>. 
-           <li> Remove this <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> from the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. 
+           <li> If the Service’s UUID is in <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>. 
+           <li> Remove this <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> from the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a>. 
           </ol>
          <li> For each <a data-link-type="dfn" href="#service">Service</a> in <var>addedEntities</var>,
               add the Service’s UUID to <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</a></code></code>.
               If the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>,
-              add the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing this <a data-link-type="dfn" href="#service">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a> and then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code>. 
+              add the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> representing this <a data-link-type="dfn" href="#service">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree">Bluetooth tree</a> and then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code>. 
          <li> For each <a data-link-type="dfn" href="#service">Service</a> in <var>changedServices</var>,
-              if the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-servicechanged">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothgattservice">BluetoothGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>. 
+              if the Service’s UUID is in <code>deviceObj@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a></code></code>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service">Service</a>. 
         </ol>
       </ol>
      </section>
@@ -3275,7 +3275,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="cha
   attribute <a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a> <a class="idl-code" data-link-type="attribute" data-type="EventHandler " href="#dom-characteristiceventhandlers-oncharacteristicvaluechanged">oncharacteristicvaluechanged</a>;
 };
 </pre>
-      <p> <dfn class="idl-code" data-dfn-for="CharacteristicEventHandlers" data-dfn-type="attribute" data-export="" id="dom-characteristiceventhandlers-oncharacteristicvaluechanged">oncharacteristicvaluechanged<a class="self-link" href="#dom-characteristiceventhandlers-oncharacteristicvaluechanged"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> event type. </p>
+      <p> <dfn class="idl-code" data-dfn-for="CharacteristicEventHandlers" data-dfn-type="attribute" data-export="" id="dom-characteristiceventhandlers-oncharacteristicvaluechanged">oncharacteristicvaluechanged<a class="self-link" href="#dom-characteristiceventhandlers-oncharacteristicvaluechanged"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a></code> event type. </p>
 <pre class="idl">[NoInterfaceObject]
 interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="bluetoothdeviceeventhandlers">BluetoothDeviceEventHandlers<a class="self-link" href="#bluetoothdeviceeventhandlers"></a></dfn> {
   attribute <a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a> <a class="idl-code" data-link-type="attribute" data-type="EventHandler " href="#dom-bluetoothdeviceeventhandlers-ongattserverdisconnected">ongattserverdisconnected</a>;
@@ -3289,9 +3289,9 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="ser
   attribute <a data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a> <a class="idl-code" data-link-type="attribute" data-type="EventHandler " href="#dom-serviceeventhandlers-onserviceremoved">onserviceremoved</a>;
 };
 </pre>
-      <p> <dfn class="idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceadded">onserviceadded<a class="self-link" href="#dom-serviceeventhandlers-onserviceadded"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a></code> event type. </p>
-      <p> <dfn class="idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onservicechanged">onservicechanged<a class="self-link" href="#dom-serviceeventhandlers-onservicechanged"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-servicechanged">servicechanged</a></code> event type. </p>
-      <p> <dfn class="idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceremoved">onserviceremoved<a class="self-link" href="#dom-serviceeventhandlers-onserviceremoved"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothgattservice-serviceremoved">serviceremoved</a></code> event type. </p>
+      <p> <dfn class="idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceadded">onserviceadded<a class="self-link" href="#dom-serviceeventhandlers-onserviceadded"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded">serviceadded</a></code> event type. </p>
+      <p> <dfn class="idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onservicechanged">onservicechanged<a class="self-link" href="#dom-serviceeventhandlers-onservicechanged"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged">servicechanged</a></code> event type. </p>
+      <p> <dfn class="idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceremoved">onserviceremoved<a class="self-link" href="#dom-serviceeventhandlers-onserviceremoved"></a></dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved">serviceremoved</a></code> event type. </p>
      </section>
     </section>
     <section>
@@ -3909,11 +3909,11 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#bluetooth-device">Bluetooth device</a><span>, in §4.1</span>
    <li><a href="#bluetoothdeviceeventhandlers">BluetoothDeviceEventHandlers</a><span>, in §5.6.6</span>
    <li><a href="#bluetooth-device-name">Bluetooth Device Name</a><span>, in §9</span>
-   <li><a href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a><span>, in §5</span>
-   <li><a href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a><span>, in §5</span>
-   <li><a href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a><span>, in §5</span>
-   <li><a href="#bluetoothgattservice">BluetoothGATTService</a><span>, in §5</span>
    <li><a href="#bluetoothmanufacturerdatamap">BluetoothManufacturerDataMap</a><span>, in §4.3.1</span>
+   <li><a href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a><span>, in §5</span>
+   <li><a href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a><span>, in §5</span>
+   <li><a href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a><span>, in §5</span>
+   <li><a href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a><span>, in §5</span>
    <li><a href="#dictdef-bluetoothscanfilter">BluetoothScanFilter</a><span>, in §3</span>
    <li><a href="#bluetoothservicedatamap">BluetoothServiceDataMap</a><span>, in §4.3.1</span>
    <li><a href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a><span>, in §6.1</span>
@@ -3925,7 +3925,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#dom-bluetoothdevice-cachedunfiltereduuids-slot">[[cachedUnfilteredUuids]]</a><span>, in §4.3</span>
    <li><a href="#dom-bluetoothuuid-canonicaluuid">canonicalUUID(alias)</a><span>, in §6.1</span>
    <li><a href="#central">Central</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattdescriptor-characteristic">characteristic</a><span>, in §5.5</span>
+   <li><a href="#dom-bluetoothremotegattdescriptor-characteristic">characteristic</a><span>, in §5.5</span>
    <li><a href="#characteristic">Characteristic</a><span>, in §9</span>
    <li><a href="#characteristic-descriptor-discovery">Characteristic Descriptor Discovery</a><span>, in §9</span>
    <li><a href="#characteristic-descriptors">Characteristic Descriptors</a><span>, in §9</span>
@@ -3933,38 +3933,38 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#characteristiceventhandlers">CharacteristicEventHandlers</a><span>, in §5.6.6</span>
    <li><a href="#characteristic-extended-properties">Characteristic Extended Properties</a><span>, in §9</span>
    <li><a href="#characteristic-properties">Characteristic Properties</a><span>, in §9</span>
-   <li><a href="#eventdef-bluetoothgattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a><span>, in §5.6.2</span>
+   <li><a href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a><span>, in §5.6.2</span>
    <li><a href="#characteristic-value-indications">Characteristic Value Indications</a><span>, in §9</span>
    <li><a href="#characteristic-value-notification">Characteristic Value Notification</a><span>, in §9</span>
    <li><a href="#characteristic-value-read">Characteristic Value Read</a><span>, in §9</span>
    <li><a href="#characteristic-value-write">Characteristic Value Write</a><span>, in §9</span>
    <li><a href="#class-of-device">Class of Device</a><span>, in §9</span>
    <li><a href="#client-characteristic-configuration">Client Characteristic Configuration</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattremoteserver-connect">connect()</a><span>, in §5.2</span>
-   <li><a href="#dom-bluetoothgattremoteserver-connected">connected</a><span>, in §5.2</span>
+   <li><a href="#dom-bluetoothremotegattserver-connect">connect()</a><span>, in §5.2</span>
+   <li><a href="#dom-bluetoothremotegattserver-connected">connected</a><span>, in §5.2</span>
    <li><a href="#connection-modes-and-procedures">Connection Modes and Procedures</a><span>, in §9</span>
    <li><a href="#dom-bluetoothdevice-context-slot">[[context]]</a><span>, in §4.3</span>
    <li><a href="#create-a-bluetoothadvertisingdata">create a BluetoothAdvertisingData</a><span>, in §4.3.1</span>
    <li><a href="#create-a-bluetoothcharacteristicproperties-instance-from-the-characteristic">create a BluetoothCharacteristicProperties instance
         from the Characteristic</a><span>, in §5.4.1</span>
-   <li><a href="#create-a-bluetoothgattcharacteristic-representing">create a BluetoothGATTCharacteristic representing</a><span>, in §5.4</span>
-   <li><a href="#create-a-bluetoothgattdescriptor-representing">create a BluetoothGATTDescriptor representing</a><span>, in §5.5</span>
-   <li><a href="#create-a-bluetoothgattservice-representing">create a BluetoothGATTService representing</a><span>, in §5.3</span>
+   <li><a href="#create-a-bluetoothremotegattcharacteristic-representing">create a BluetoothRemoteGATTCharacteristic representing</a><span>, in §5.4</span>
+   <li><a href="#create-a-bluetoothremotegattdescriptor-representing">create a BluetoothRemoteGATTDescriptor representing</a><span>, in §5.5</span>
+   <li><a href="#create-a-bluetoothremotegattservice-representing">create a BluetoothRemoteGATTService representing</a><span>, in §5.3</span>
    <li><a href="#dom-bluetoothmanufacturerdatamap-data-slot">[[data]]</a><span>, in §4.3.1.1</span>
    <li><a href="#definition-of-keys-and-values">Definition of Keys and Values</a><span>, in §9</span>
    <li><a href="#descriptor">Descriptor</a><span>, in §9</span>
    <li>
     device
     <ul>
-     <li><a href="#dom-bluetoothgattremoteserver-device">attribute for BluetoothGATTRemoteServer</a><span>, in §5.2</span>
-     <li><a href="#dom-bluetoothgattservice-device">attribute for BluetoothGATTService</a><span>, in §5.3</span>
+     <li><a href="#dom-bluetoothremotegattserver-device">attribute for BluetoothRemoteGATTServer</a><span>, in §5.2</span>
+     <li><a href="#dom-bluetoothremotegattservice-device">attribute for BluetoothRemoteGATTService</a><span>, in §5.3</span>
     </ul>
    <li><a href="#dom-bluetoothdevice-deviceclass">deviceClass</a><span>, in §4.3</span>
    <li><a href="#device-discovery-procedure">Device Discovery Procedure</a><span>, in §9</span>
    <li><a href="#device-id">device id</a><span>, in §4.2</span>
    <li><a href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a><span>, in §3</span>
    <li><a href="#dom-bluetoothservicedatamap-deviceobj-slot">[[deviceObj]]</a><span>, in §4.3.1.2</span>
-   <li><a href="#dom-bluetoothgattremoteserver-disconnect">disconnect()</a><span>, in §5.2</span>
+   <li><a href="#dom-bluetoothremotegattserver-disconnect">disconnect()</a><span>, in §5.2</span>
    <li><a href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a><span>, in §9</span>
    <li><a href="#discover-all-characteristics-of-a-service">Discover All Characteristics of a Service</a><span>, in §9</span>
    <li><a href="#discover-all-primary-services">Discover All Primary Services</a><span>, in §9</span>
@@ -3988,18 +3988,18 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#eventdef-bluetoothdevice-gattserverdisconnected">gattserverdisconnected</a><span>, in §5.6.2</span>
    <li><a href="#general-discovery-procedure">General Discovery Procedure</a><span>, in §9</span>
    <li><a href="#generic-attribute-profile">Generic Attribute Profile</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic(characteristic)</a><span>, in §5.3</span>
+   <li><a href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic(characteristic)</a><span>, in §5.3</span>
    <li><a href="#dom-bluetoothuuid-getcharacteristic">getCharacteristic(name)</a><span>, in §6.1</span>
-   <li><a href="#dom-bluetoothgattservice-getcharacteristics">getCharacteristics(characteristic)</a><span>, in §5.3</span>
-   <li><a href="#dom-bluetoothgattcharacteristic-getdescriptor">getDescriptor(descriptor)</a><span>, in §5.4</span>
+   <li><a href="#dom-bluetoothremotegattservice-getcharacteristics">getCharacteristics(characteristic)</a><span>, in §5.3</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-getdescriptor">getDescriptor(descriptor)</a><span>, in §5.4</span>
    <li><a href="#dom-bluetoothuuid-getdescriptor">getDescriptor(name)</a><span>, in §6.1</span>
-   <li><a href="#dom-bluetoothgattcharacteristic-getdescriptors">getDescriptors(descriptor)</a><span>, in §5.4</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-getdescriptors">getDescriptors(descriptor)</a><span>, in §5.4</span>
    <li><a href="#getgattchildren">GetGATTChildren</a><span>, in §5.1.2</span>
-   <li><a href="#dom-bluetoothgattservice-getincludedservice">getIncludedService(service)</a><span>, in §5.3</span>
-   <li><a href="#dom-bluetoothgattservice-getincludedservices">getIncludedServices(service)</a><span>, in §5.3</span>
-   <li><a href="#dom-bluetoothgattremoteserver-getprimaryservices">getPrimaryServices()</a><span>, in §5.2</span>
-   <li><a href="#dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService(service)</a><span>, in §5.2</span>
-   <li><a href="#dom-bluetoothgattremoteserver-getprimaryservices">getPrimaryServices(service)</a><span>, in §5.2</span>
+   <li><a href="#dom-bluetoothremotegattservice-getincludedservice">getIncludedService(service)</a><span>, in §5.3</span>
+   <li><a href="#dom-bluetoothremotegattservice-getincludedservices">getIncludedServices(service)</a><span>, in §5.3</span>
+   <li><a href="#dom-bluetoothremotegattserver-getprimaryservices">getPrimaryServices()</a><span>, in §5.2</span>
+   <li><a href="#dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService(service)</a><span>, in §5.2</span>
+   <li><a href="#dom-bluetoothremotegattserver-getprimaryservices">getPrimaryServices(service)</a><span>, in §5.2</span>
    <li><a href="#dom-bluetoothuuid-getservice">getService(name)</a><span>, in §6.1</span>
    <li><a href="#get-the-bluetoothdevice-representing">get the BluetoothDevice representing</a><span>, in §4.3</span>
    <li><a href="#dom-bluetoothdevice-id">id</a><span>, in §4.3</span>
@@ -4007,7 +4007,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#included-service">Included Service</a><span>, in §9</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-indicate">indicate</a><span>, in §5.4.1</span>
    <li><a href="#identity-resolving-key">IRK</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattservice-isprimary">isPrimary</a><span>, in §5.3</span>
+   <li><a href="#dom-bluetoothremotegattservice-isprimary">isPrimary</a><span>, in §5.3</span>
    <li><a href="#local-name-data-type">Local Name Data Type</a><span>, in §9</span>
    <li><a href="#long-attribute-values">Long Attribute Values</a><span>, in §9</span>
    <li><a href="#dom-bluetoothadvertisingdata-manufacturerdata">manufacturerData</a><span>, in §4.3.1</span>
@@ -4044,7 +4044,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#dom-bluetoothdevice-productid">productID</a><span>, in §4.3</span>
    <li><a href="#dom-bluetoothdevice-productversion">productVersion</a><span>, in §4.3</span>
    <li><a href="#profile-fundamentals">Profile Fundamentals</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattcharacteristic-properties">properties</a><span>, in §5.4</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-properties">properties</a><span>, in §5.4</span>
    <li><a href="#public-bluetooth-address">Public Bluetooth Address</a><span>, in §9</span>
    <li><a href="#public-device-address">Public Device Address</a><span>, in §9</span>
    <li><a href="#query-the-bluetooth-cache">query the Bluetooth cache</a><span>, in §5.1.1</span>
@@ -4056,8 +4056,8 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li>
     readValue()
     <ul>
-     <li><a href="#dom-bluetoothgattcharacteristic-readvalue">method for BluetoothGATTCharacteristic</a><span>, in §5.4</span>
-     <li><a href="#dom-bluetoothgattdescriptor-readvalue">method for BluetoothGATTDescriptor</a><span>, in §5.5</span>
+     <li><a href="#dom-bluetoothremotegattcharacteristic-readvalue">method for BluetoothRemoteGATTCharacteristic</a><span>, in §5.4</span>
+     <li><a href="#dom-bluetoothremotegattdescriptor-readvalue">method for BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
     </ul>
    <li><a href="#rssi">Received Signal Strength Indication</a><span>, in §9</span>
    <li><a href="#relationship-discovery">Relationship Discovery</a><span>, in §9</span>
@@ -4074,21 +4074,21 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li><a href="#scan-for-devices">scan for devices</a><span>, in §3</span>
    <li><a href="#searching-for-services">Searching for Services</a><span>, in §9</span>
    <li><a href="#service">Service</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattcharacteristic-service">service</a><span>, in §5.4</span>
-   <li><a href="#eventdef-bluetoothgattservice-serviceadded">serviceadded</a><span>, in §5.6.2</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-service">service</a><span>, in §5.4</span>
+   <li><a href="#eventdef-bluetoothremotegattservice-serviceadded">serviceadded</a><span>, in §5.6.2</span>
    <li><a href="#service-changed">Service Changed</a><span>, in §9</span>
-   <li><a href="#eventdef-bluetoothgattservice-servicechanged">servicechanged</a><span>, in §5.6.2</span>
+   <li><a href="#eventdef-bluetoothremotegattservice-servicechanged">servicechanged</a><span>, in §5.6.2</span>
    <li><a href="#dom-bluetoothadvertisingdata-servicedata">serviceData</a><span>, in §4.3.1</span>
    <li><a href="#service-data">Service Data</a><span>, in §9</span>
    <li><a href="#serviceeventhandlers">ServiceEventHandlers</a><span>, in §5.6.6</span>
-   <li><a href="#eventdef-bluetoothgattservice-serviceremoved">serviceremoved</a><span>, in §5.6.2</span>
+   <li><a href="#eventdef-bluetoothremotegattservice-serviceremoved">serviceremoved</a><span>, in §5.6.2</span>
    <li><a href="#dom-bluetoothscanfilter-services">services</a><span>, in §3</span>
    <li><a href="#service-uuid-data-type">Service UUID Data Type</a><span>, in §9</span>
    <li><a href="#service-uuid-data-type">Service UUIDs</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattcharacteristic-startnotifications">startNotifications()</a><span>, in §5.4</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-startnotifications">startNotifications()</a><span>, in §5.4</span>
    <li><a href="#static-address">Static Address</a><span>, in §9</span>
    <li><a href="#static-device-address">Static Device Address</a><span>, in §9</span>
-   <li><a href="#dom-bluetoothgattcharacteristic-stopnotifications">stopNotifications()</a><span>, in §5.4</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-stopnotifications">stopNotifications()</a><span>, in §5.4</span>
    <li><a href="#supported-physical-transports">supported physical transports</a><span>, in §4.1</span>
    <li><a href="#the-128-bit-uuid-represented">the 128-bit UUID represented</a><span>, in §9</span>
    <li><a href="#dom-bluetoothadvertisingdata-txpower">txPower</a><span>, in §4.3.1</span>
@@ -4098,9 +4098,9 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li>
     uuid
     <ul>
-     <li><a href="#dom-bluetoothgattservice-uuid">attribute for BluetoothGATTService</a><span>, in §5.3</span>
-     <li><a href="#dom-bluetoothgattcharacteristic-uuid">attribute for BluetoothGATTCharacteristic</a><span>, in §5.4</span>
-     <li><a href="#dom-bluetoothgattdescriptor-uuid">attribute for BluetoothGATTDescriptor</a><span>, in §5.5</span>
+     <li><a href="#dom-bluetoothremotegattservice-uuid">attribute for BluetoothRemoteGATTService</a><span>, in §5.3</span>
+     <li><a href="#dom-bluetoothremotegattcharacteristic-uuid">attribute for BluetoothRemoteGATTCharacteristic</a><span>, in §5.4</span>
+     <li><a href="#dom-bluetoothremotegattdescriptor-uuid">attribute for BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
     </ul>
    <li>
     UUID
@@ -4114,8 +4114,8 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li>
     value
     <ul>
-     <li><a href="#dom-bluetoothgattcharacteristic-value">attribute for BluetoothGATTCharacteristic</a><span>, in §5.4</span>
-     <li><a href="#dom-bluetoothgattdescriptor-value">attribute for BluetoothGATTDescriptor</a><span>, in §5.5</span>
+     <li><a href="#dom-bluetoothremotegattcharacteristic-value">attribute for BluetoothRemoteGATTCharacteristic</a><span>, in §5.4</span>
+     <li><a href="#dom-bluetoothremotegattdescriptor-value">attribute for BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
     </ul>
    <li><a href="#dom-bluetoothdevice-vendorid">vendorID</a><span>, in §4.3</span>
    <li><a href="#enumdef-vendoridsource">VendorIDSource</a><span>, in §4.3</span>
@@ -4127,8 +4127,8 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li>
     writeValue(value)
     <ul>
-     <li><a href="#dom-bluetoothgattcharacteristic-writevalue">method for BluetoothGATTCharacteristic</a><span>, in §5.4</span>
-     <li><a href="#dom-bluetoothgattdescriptor-writevalue">method for BluetoothGATTDescriptor</a><span>, in §5.5</span>
+     <li><a href="#dom-bluetoothremotegattcharacteristic-writevalue">method for BluetoothRemoteGATTCharacteristic</a><span>, in §5.4</span>
+     <li><a href="#dom-bluetoothremotegattdescriptor-writevalue">method for BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
     </ul>
    <li><a href="#dom-bluetoothcharacteristicproperties-writewithoutresponse">writeWithoutResponse</a><span>, in §5.4.1</span>
   </ul>
@@ -4301,7 +4301,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-vendorid">vendorID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productid">productID</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-productversion">productVersion</a>;
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTRemoteServer " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer " href="#dom-bluetoothdevice-gattserver">gattServer</a>;
   readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID> " href="#dom-bluetoothdevice-uuids">uuids</a>;
 };
 <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
@@ -4323,48 +4323,48 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothadverti
   readonly attribute <a data-link-type="idl-name" href="#bluetoothservicedatamap">BluetoothServiceDataMap</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothServiceDataMap " href="#dom-bluetoothadvertisingdata-servicedata">serviceData</a>;
 };
 
-interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothgattremoteserver-device">device</a>;
-  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothgattremoteserver-connected">connected</a>;
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattremoteserver">BluetoothGATTRemoteServer</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-connect">connect</a>();
-  void <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-disconnect">disconnect</a>();
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothgattremoteserver-getprimaryservice-service-service">service</a>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattremoteserver-getprimaryservices">getPrimaryServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothgattremoteserver-getprimaryservices-service-service">service</a>);
+interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothremotegattserver-device">device</a>;
+  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothremotegattserver-connected">connected</a>;
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-connect">connect</a>();
+  void <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-disconnect">disconnect</a>();
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothremotegattserver-getprimaryservice-service-service">service</a>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservices">getPrimaryServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothremotegattserver-getprimaryservices-service-service">service</a>);
 };
 
-interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattservice">BluetoothGATTService</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothgattservice-device">device</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothgattservice-uuid">uuid</a>;
-  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothgattservice-isprimary">isPrimary</a>;
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <a href="#dom-bluetoothgattservice-getcharacteristic-characteristic-characteristic">characteristic</a>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getcharacteristics">getCharacteristics</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <a href="#dom-bluetoothgattservice-getcharacteristics-characteristic-characteristic">characteristic</a>);
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getincludedservice">getIncludedService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothgattservice-getincludedservice-service-service">service</a>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattservice-getincludedservices">getIncludedServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothgattservice-getincludedservices-service-service">service</a>);
+interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice " href="#dom-bluetoothremotegattservice-device">device</a>;
+  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothremotegattservice-uuid">uuid</a>;
+  readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean " href="#dom-bluetoothremotegattservice-isprimary">isPrimary</a>;
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <a href="#dom-bluetoothremotegattservice-getcharacteristic-characteristic-characteristic">characteristic</a>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getcharacteristics">getCharacteristics</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a> <a href="#dom-bluetoothremotegattservice-getcharacteristics-characteristic-characteristic">characteristic</a>);
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservice">getIncludedService</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothremotegattservice-getincludedservice-service-service">service</a>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservices">getIncludedServices</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a href="#dom-bluetoothremotegattservice-getincludedservices-service-service">service</a>);
 };
-<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
-<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
-<a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> implements <a data-link-type="idl-name" href="#serviceeventhandlers">ServiceEventHandlers</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> implements <a data-link-type="idl-name" href="#serviceeventhandlers">ServiceEventHandlers</a>;
 
-interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothgattservice">BluetoothGATTService</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTService " href="#dom-bluetoothgattcharacteristic-service">service</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothgattcharacteristic-uuid">uuid</a>;
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothCharacteristicProperties " href="#dom-bluetoothgattcharacteristic-properties">properties</a>;
-  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothgattcharacteristic-value">value</a>;
-  Promise&lt;<a data-link-type="idl-name" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-getdescriptor">getDescriptor</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <a href="#dom-bluetoothgattcharacteristic-getdescriptor-descriptor-descriptor">descriptor</a>);
-  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a>>>
-    <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-getdescriptors">getDescriptors</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <a href="#dom-bluetoothgattcharacteristic-getdescriptors-descriptor-descriptor">descriptor</a>);
-  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-readvalue">readValue</a>();
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <a href="#dom-bluetoothgattcharacteristic-writevalue-value-value">value</a>);
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-startnotifications">startNotifications</a>();
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattcharacteristic-stopnotifications">stopNotifications</a>();
+interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTService " href="#dom-bluetoothremotegattcharacteristic-service">service</a>;
+  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothremotegattcharacteristic-uuid">uuid</a>;
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothCharacteristicProperties " href="#dom-bluetoothremotegattcharacteristic-properties">properties</a>;
+  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothremotegattcharacteristic-value">value</a>;
+  Promise&lt;<a data-link-type="idl-name" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-getdescriptor">getDescriptor</a>(<a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <a href="#dom-bluetoothremotegattcharacteristic-getdescriptor-descriptor-descriptor">descriptor</a>);
+  Promise&lt;sequence&lt;<a data-link-type="idl-name" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a>>>
+    <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-getdescriptors">getDescriptors</a>(optional <a data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid">BluetoothDescriptorUUID</a> <a href="#dom-bluetoothremotegattcharacteristic-getdescriptors-descriptor-descriptor">descriptor</a>);
+  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-readvalue">readValue</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <a href="#dom-bluetoothremotegattcharacteristic-writevalue-value-value">value</a>);
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-startnotifications">startNotifications</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-stopnotifications">stopNotifications</a>();
 };
-<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
-<a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> implements <a data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
+<a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> implements <a data-link-type="idl-name" href="#characteristiceventhandlers">CharacteristicEventHandlers</a>;
 
 interface <a class="idl-code" data-link-type="interface" href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a> {
   readonly attribute boolean <a data-readonly="" data-type="boolean " href="#dom-bluetoothcharacteristicproperties-broadcast">broadcast</a>;
@@ -4378,12 +4378,12 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothcharact
   readonly attribute boolean <a data-readonly="" data-type="boolean " href="#dom-bluetoothcharacteristicproperties-writableauxiliaries">writableAuxiliaries</a>;
 };
 
-interface <a class="idl-code" data-link-type="interface" href="#bluetoothgattdescriptor">BluetoothGATTDescriptor</a> {
-  readonly attribute <a data-link-type="idl-name" href="#bluetoothgattcharacteristic">BluetoothGATTCharacteristic</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothGATTCharacteristic " href="#dom-bluetoothgattdescriptor-characteristic">characteristic</a>;
-  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothgattdescriptor-uuid">uuid</a>;
-  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothgattdescriptor-value">value</a>;
-  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattdescriptor-readvalue">readValue</a>();
-  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothgattdescriptor-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <a href="#dom-bluetoothgattdescriptor-writevalue-value-value">value</a>);
+interface <a class="idl-code" data-link-type="interface" href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a> {
+  readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTCharacteristic " href="#dom-bluetoothremotegattdescriptor-characteristic">characteristic</a>;
+  readonly attribute <a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="UUID " href="#dom-bluetoothremotegattdescriptor-uuid">uuid</a>;
+  readonly attribute DataView? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DataView? " href="#dom-bluetoothremotegattdescriptor-value">value</a>;
+  Promise&lt;DataView> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-readvalue">readValue</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-writevalue">writeValue</a>(<a data-link-type="idl-name" href="https://heycam.github.io/webidl/#common-BufferSource">BufferSource</a> <a href="#dom-bluetoothremotegattdescriptor-writevalue-value-value">value</a>);
 };
 
 [NoInterfaceObject]

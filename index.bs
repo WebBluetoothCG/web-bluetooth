@@ -237,18 +237,18 @@ spec: webidl
           filters: [{
             services: ['heart_rate'],
           }]
-        }).then(device => device.gattServer.<a for="BluetoothGATTRemoteServer">connect()</a>)
-        .then(server => server.<a idl for="BluetoothGATTRemoteServer" lt="getPrimaryService()"
+        }).then(device => device.gattServer.<a for="BluetoothRemoteGATTServer">connect()</a>)
+        .then(server => server.<a idl for="BluetoothRemoteGATTServer" lt="getPrimaryService()"
                               >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate"
             >'heart_rate'</a>))
         .then(service => {
           chosenHeartRateService = service;
           return Promise.all([
-            service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()"
                        >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location"
             >'body_sensor_location'</a>)
               .then(handleBodySensorLocationCharacteristic),
-            service.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()"
                        >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
             >'heart_rate_measurement'</a>))
               .then(handleHeartRateMeasurementCharacteristic),
@@ -260,7 +260,7 @@ spec: webidl
             console.log("Unknown sensor location.");
             return Promise.resolve();
           }
-          return characteristic.<a for="BluetoothGATTCharacteristic">readValue()</a>
+          return characteristic.<a for="BluetoothRemoteGATTCharacteristic">readValue()</a>
           .then(sensorLocationData => {
             let sensorLocation = sensorLocationData.getUint8(0);
             switch (sensorLocation) {
@@ -278,12 +278,12 @@ spec: webidl
 
         function handleHeartRateMeasurementCharacteristic(characteristic) {
           characteristic.addEventListener('<a event>characteristicvaluechanged</a>', onHeartRateChanged);
-          return characteristic.<a for="BluetoothGATTCharacteristic">startNotifications()</a>;
+          return characteristic.<a for="BluetoothRemoteGATTCharacteristic">startNotifications()</a>;
         }
 
         function onHeartRateChanged(event) {
           let characteristic = event.target;
-          console.log(parseHeartRate(characteristic.<a attribute for="BluetoothGATTCharacteristic">value</a>));
+          console.log(parseHeartRate(characteristic.<a attribute for="BluetoothRemoteGATTCharacteristic">value</a>));
         }
       </pre>
 
@@ -292,8 +292,8 @@ spec: webidl
         <a idl lt="org.bluetooth.characteristic.heart_rate_measurement"
            ><code>heart_rate_measurement</code> documentation</a>
         to read the {{DataView}} stored
-        in a {{BluetoothGATTCharacteristic}}'s
-        {{BluetoothGATTCharacteristic/value}} field.
+        in a {{BluetoothRemoteGATTCharacteristic}}'s
+        {{BluetoothRemoteGATTCharacteristic/value}} field.
       </p>
 
       <pre highlight="js">
@@ -355,12 +355,12 @@ spec: webidl
           if (!chosenHeartRateService) {
             return Promise.reject(new Error('No heart rate sensor selected yet.'));
           }
-          return chosenHeartRateService.<a idl for="BluetoothGATTService" lt="getCharacteristic()"
+          return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()"
                                          >getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point"
             >'heart_rate_control_point'</a>))
           .then(controlPoint => {
             let resetEnergyExpended = new Uint8Array([1]);
-            return controlPoint.<a idl for="BluetoothGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
+            return controlPoint.<a idl for="BluetoothRemoteGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
           });
         }
       </pre>
@@ -793,8 +793,8 @@ spec: webidl
         An empty map from <a>Bluetooth cache</a> entries to {{Promise}}s.
       </td>
       <td>
-        The {{Promise}}s resolve to either {{BluetoothGATTService}},
-        {{BluetoothGATTCharacteristic}}, or {{BluetoothGATTDescriptor}}
+        The {{Promise}}s resolve to either {{BluetoothRemoteGATTService}},
+        {{BluetoothRemoteGATTCharacteristic}}, or {{BluetoothRemoteGATTDescriptor}}
         instances.
       </td>
     </tr>
@@ -1339,7 +1339,7 @@ spec: webidl
         readonly attribute unsigned long? vendorID;
         readonly attribute unsigned long? productID;
         readonly attribute unsigned long? productVersion;
-        readonly attribute BluetoothGATTRemoteServer gattServer;
+        readonly attribute BluetoothRemoteGATTServer gattServer;
         readonly attribute FrozenArray&lt;UUID> uuids;
       };
       BluetoothDevice implements EventTarget;
@@ -1839,7 +1839,7 @@ spec: webidl
     <div class="note">
       <p>
         The <a>GATT Profile Hierarchy</a> describes how a
-        <a idl lt="BluetoothGATTRemoteServer">GATT Server</a>
+        <a idl lt="BluetoothRemoteGATTServer">GATT Server</a>
         contains a hierarchy of Profiles, Primary <a>Service</a>s,
         <a>Included Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
       </p>
@@ -1864,20 +1864,20 @@ spec: webidl
         but while platform interfaces provide these entities in some order,
         they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
       </p>
-      <p link-for-hint="BluetoothGATTService">
-        A <a idl lt="BluetoothGATTService">Service</a> contains
+      <p link-for-hint="BluetoothRemoteGATTService">
+        A <a idl lt="BluetoothRemoteGATTService">Service</a> contains
         a collection of <a idl lt="getIncludedService()">Included Service</a>s
         and <a idl lt="getCharacteristic()">Characteristic</a>s.
         The Included Services are references to other Services,
         and a single Service can be included by more than one other Service.
         Services are known as
         <a idl lt="isPrimary">Primary Services</a> if they appear directly under the
-        <a idl lt="BluetoothGATTRemoteServer">GATT Server</a>,
+        <a idl lt="BluetoothRemoteGATTServer">GATT Server</a>,
         and Secondary Services if they're only included by other Services,
         but Primary Services can also be included.
       </p>
-      <p link-for-hint="BluetoothGATTCharacteristic">
-        A <a idl lt="BluetoothGATTCharacteristic">Characteristic</a>
+      <p link-for-hint="BluetoothRemoteGATTCharacteristic">
+        A <a idl lt="BluetoothRemoteGATTCharacteristic">Characteristic</a>
         contains a value, which is an array of bytes,
         and a collection of <a idl lt="getDescriptor()">Descriptor</a>s.
         Depending on the <a idl lt="BluetoothCharacteristicProperties">properties</a> of the Characteristic,
@@ -1885,7 +1885,7 @@ spec: webidl
         or register to be notified when the value changes.
       </p>
       <p>
-        Finally, a <a idl lt="BluetoothGATTDescriptor">Descriptor</a>
+        Finally, a <a idl lt="BluetoothRemoteGATTDescriptor">Descriptor</a>
         contains a value (again an array of bytes)
         that describes or configures its <a>Characteristic</a>.
       </p>
@@ -1902,9 +1902,9 @@ spec: webidl
         Each potential entity in the cache is either known-present, known-absent, or unknown.
         The cache MUST NOT contain two entities that are for the <a>same attribute</a>.
         Each known-present entity in the cache is associated with an optional
-        <code>Promise&lt;{{BluetoothGATTService}}></code>,
-        <code>Promise&lt;{{BluetoothGATTCharacteristic}}></code>,
-        or <code>Promise&lt;{{BluetoothGATTDescriptor}}></code> instance
+        <code>Promise&lt;{{BluetoothRemoteGATTService}}></code>,
+        <code>Promise&lt;{{BluetoothRemoteGATTCharacteristic}}></code>,
+        or <code>Promise&lt;{{BluetoothRemoteGATTDescriptor}}></code> instance
         for each {{Bluetooth}} instance.
       </p>
 
@@ -1979,11 +1979,11 @@ spec: webidl
             <li>
               If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
               in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}},
-              <a>create a <code>BluetoothGATTService</code>
+              <a>create a <code>BluetoothRemoteGATTService</code>
               representing</a> <var>entry</var>,
-              <a>create a <code>BluetoothGATTCharacteristic</code>
+              <a>create a <code>BluetoothRemoteGATTCharacteristic</code>
               representing</a> <var>entry</var>,
-              or <a>create a <code>BluetoothGATTDescriptor</code>
+              or <a>create a <code>BluetoothRemoteGATTDescriptor</code>
               representing</a> <var>entry</var>,
               depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
               and add a mapping from <var>entry</var> to the resulting <code>Promise</code>
@@ -2094,26 +2094,27 @@ spec: webidl
   </section>
 
   <section>
-    <h3 id="bluetoothgattremoteserver" dfn-type="interface">BluetoothGATTRemoteServer</h3>
+    <h3 oldids="bluetoothgattremoteserver"
+        dfn-type="interface">BluetoothRemoteGATTServer</h3>
 
     <p>
-      {{BluetoothGATTRemoteServer}} represents a <a>GATT Server</a> on a remote device.
+      {{BluetoothRemoteGATTServer}} represents a <a>GATT Server</a> on a remote device.
     </p>
 
     <pre class="idl">
-      interface BluetoothGATTRemoteServer {
+      interface BluetoothRemoteGATTServer {
         readonly attribute BluetoothDevice device;
         readonly attribute boolean connected;
-        Promise&lt;BluetoothGATTRemoteServer> connect();
+        Promise&lt;BluetoothRemoteGATTServer> connect();
         void disconnect();
-        Promise&lt;BluetoothGATTService> getPrimaryService(BluetoothServiceUUID service);
-        Promise&lt;sequence&lt;BluetoothGATTService>>
+        Promise&lt;BluetoothRemoteGATTService> getPrimaryService(BluetoothServiceUUID service);
+        Promise&lt;sequence&lt;BluetoothRemoteGATTService>>
           getPrimaryServices(optional BluetoothServiceUUID service);
       };
     </pre>
 
-    <div class="note" heading="{{BluetoothGATTRemoteServer}} attributes"
-         dfn-for="BluetoothGATTRemoteServer" dfn-type="attribute">
+    <div class="note" heading="{{BluetoothRemoteGATTServer}} attributes"
+         dfn-for="BluetoothRemoteGATTServer" dfn-type="attribute">
       <p>
         <dfn>device</dfn> is the device running this server.
       </p>
@@ -2122,13 +2123,13 @@ spec: webidl
         <dfn>connected</dfn> is true while this instance
         is connected to <code>this.device</code>.
         It can be false while the UA is physically connected,
-        for example when there are other connected {{BluetoothGATTRemoteServer}} instances
+        for example when there are other connected {{BluetoothRemoteGATTServer}} instances
         for other <a>global object</a>s.
       </p>
     </div>
 
     <p>
-      The <code><dfn method for="BluetoothGATTRemoteServer">connect()</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code> method, when invoked,
       MUST return <a>a new promise</a> <var>promise</var> and
       run the following steps <a>in parallel</a>:
     </p>
@@ -2156,7 +2157,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTRemoteServer">disconnect()</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTServer">disconnect()</dfn></code> method, when invoked,
       MUST perform the following steps:
     </p>
     <ol class="algorithm">
@@ -2175,7 +2176,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
       MUST perform the following steps:
     </p>
     <ol class="algorithm">
@@ -2195,7 +2196,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTRemoteServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
       MUST perform the following steps:
     </p>
     <ol class="algorithm">
@@ -2216,35 +2217,36 @@ spec: webidl
   </section>
 
   <section>
-    <h3 id="bluetoothgattservice" dfn-type="interface">BluetoothGATTService</h3>
+    <h3 oldids="bluetoothgattservice"
+        dfn-type="interface">BluetoothRemoteGATTService</h3>
 
     <p>
-      {{BluetoothGATTService}} represents a GATT <a>Service</a>,
+      {{BluetoothRemoteGATTService}} represents a GATT <a>Service</a>,
       a collection of characteristics and relationships to other services
       that encapsulate the behavior of part of a device.
     </p>
 
     <pre class="idl">
-      interface BluetoothGATTService {
+      interface BluetoothRemoteGATTService {
         readonly attribute BluetoothDevice device;
         readonly attribute UUID uuid;
         readonly attribute boolean isPrimary;
-        Promise&lt;BluetoothGATTCharacteristic>
+        Promise&lt;BluetoothRemoteGATTCharacteristic>
           getCharacteristic(BluetoothCharacteristicUUID characteristic);
-        Promise&lt;sequence&lt;BluetoothGATTCharacteristic>>
+        Promise&lt;sequence&lt;BluetoothRemoteGATTCharacteristic>>
           getCharacteristics(optional BluetoothCharacteristicUUID characteristic);
-        Promise&lt;BluetoothGATTService>
+        Promise&lt;BluetoothRemoteGATTService>
           getIncludedService(BluetoothServiceUUID service);
-        Promise&lt;sequence&lt;BluetoothGATTService>>
+        Promise&lt;sequence&lt;BluetoothRemoteGATTService>>
           getIncludedServices(optional BluetoothServiceUUID service);
       };
-      BluetoothGATTService implements EventTarget;
-      BluetoothGATTService implements CharacteristicEventHandlers;
-      BluetoothGATTService implements ServiceEventHandlers;
+      BluetoothRemoteGATTService implements EventTarget;
+      BluetoothRemoteGATTService implements CharacteristicEventHandlers;
+      BluetoothRemoteGATTService implements ServiceEventHandlers;
     </pre>
 
-    <div class="note" heading="{{BluetoothGATTService}} attributes"
-         dfn-for="BluetoothGATTService" dfn-type="attribute">
+    <div class="note" heading="{{BluetoothRemoteGATTService}} attributes"
+         dfn-for="BluetoothRemoteGATTService" dfn-type="attribute">
       <p>
         <dfn>device</dfn> is the {{BluetoothDevice}} representing
         the remote peripheral that the GATT service belongs to.
@@ -2260,13 +2262,13 @@ spec: webidl
     </div>
 
     <p>
-      To <dfn>create a <code>BluetoothGATTService</code> representing</dfn>
+      To <dfn>create a <code>BluetoothRemoteGATTService</code> representing</dfn>
       a Service <var>service</var>,
       the UA must return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
     </p>
     <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of {{BluetoothGATTService}}.</li>
+      <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTService}}.</li>
       <li>
         <a>Get the <code>BluetoothDevice</code> representing</a>
         the device in which <var>service</var> appears,
@@ -2298,7 +2300,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTService">getCharacteristic(<var>characteristic</var>)</dfn></code> method
+      The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristic(<var>characteristic</var>)</dfn></code> method
       retrieves a <a>Characteristic</a> inside this Service.
       When invoked, it MUST return
     </p>
@@ -2312,7 +2314,7 @@ spec: webidl
     </blockquote>
 
     <p>
-      The <code><dfn method for="BluetoothGATTService">getCharacteristics(<var>characteristic</var>)</dfn></code> method
+      The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristics(<var>characteristic</var>)</dfn></code> method
       retrieves a list of <a>Characteristic</a>s inside this Service.
       When invoked, it MUST return
     </p>
@@ -2326,7 +2328,7 @@ spec: webidl
     </blockquote>
 
     <p>
-      The <code><dfn method for="BluetoothGATTService">getIncludedService(<var>service</var>)</dfn></code> method
+      The <code><dfn method for="BluetoothRemoteGATTService">getIncludedService(<var>service</var>)</dfn></code> method
       retrieves an <a>Included Service</a> inside this Service.
       When invoked, it MUST return
     </p>
@@ -2340,7 +2342,7 @@ spec: webidl
     </blockquote>
 
     <p>
-      The <code><dfn method for="BluetoothGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
+      The <code><dfn method for="BluetoothRemoteGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
       retrieves a list of <a>Included Service</a>s inside this Service.
       When invoked, it MUST return
     </p>
@@ -2355,30 +2357,31 @@ spec: webidl
   </section>
 
   <section>
-    <h3 id="bluetoothgattcharacteristic" dfn-type="interface">BluetoothGATTCharacteristic</h3>
+    <h3 oldids="bluetoothgattcharacteristic"
+        dfn-type="interface">BluetoothRemoteGATTCharacteristic</h3>
 
-    <p>{{BluetoothGATTCharacteristic}} represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
+    <p>{{BluetoothRemoteGATTCharacteristic}} represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
 
     <pre class="idl">
-      interface BluetoothGATTCharacteristic {
-        readonly attribute BluetoothGATTService service;
+      interface BluetoothRemoteGATTCharacteristic {
+        readonly attribute BluetoothRemoteGATTService service;
         readonly attribute UUID uuid;
         readonly attribute BluetoothCharacteristicProperties properties;
         readonly attribute DataView? value;
-        Promise&lt;BluetoothGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
-        Promise&lt;sequence&lt;BluetoothGATTDescriptor>>
+        Promise&lt;BluetoothRemoteGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
+        Promise&lt;sequence&lt;BluetoothRemoteGATTDescriptor>>
           getDescriptors(optional BluetoothDescriptorUUID descriptor);
         Promise&lt;DataView> readValue();
         Promise&lt;void> writeValue(BufferSource value);
         Promise&lt;void> startNotifications();
         Promise&lt;void> stopNotifications();
       };
-      BluetoothGATTCharacteristic implements EventTarget;
-      BluetoothGATTCharacteristic implements CharacteristicEventHandlers;
+      BluetoothRemoteGATTCharacteristic implements EventTarget;
+      BluetoothRemoteGATTCharacteristic implements CharacteristicEventHandlers;
     </pre>
 
-    <div class="note" heading="{{BluetoothGATTCharacteristic}} attributes"
-         dfn-for="BluetoothGATTCharacteristic" dfn-type="attribute">
+    <div class="note" heading="{{BluetoothRemoteGATTCharacteristic}} attributes"
+         dfn-for="BluetoothRemoteGATTCharacteristic" dfn-type="attribute">
       <p>
         <dfn>service</dfn> is the GATT service this characteristic belongs to.
       </p>
@@ -2398,16 +2401,16 @@ spec: webidl
     </div>
 
     <p>
-      To <dfn>create a <code>BluetoothGATTCharacteristic</code> representing</dfn>
+      To <dfn>create a <code>BluetoothRemoteGATTCharacteristic</code> representing</dfn>
       a Characteristic <var>characteristic</var>,
       the UA must return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
     </p>
     <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of {{BluetoothGATTCharacteristic}}.</li>
+      <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTCharacteristic}}.</li>
       <li>
         Initialize <code><var>result</var>.service</code> from
-        the {{BluetoothGATTService}} instance representing
+        the {{BluetoothRemoteGATTService}} instance representing
         the Service in which <var>characteristic</var> appears.
       </li>
       <li>
@@ -2445,7 +2448,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
+      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
       retrieves a <a>Descriptor</a> inside this Characteristic.
       When invoked, it MUST return
     </p>
@@ -2459,7 +2462,7 @@ spec: webidl
     </blockquote>
 
     <p>
-      The <code><dfn method for="BluetoothGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
+      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
       retrieves a list of <a>Descriptor</a>s inside this Characteristic.
       When invoked, it MUST return
     </p>
@@ -2473,7 +2476,7 @@ spec: webidl
     </blockquote>
 
     <p>
-      The <code><dfn method for="BluetoothGATTCharacteristic">readValue()</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn></code> method, when invoked,
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>:
     </p>
@@ -2525,13 +2528,13 @@ spec: webidl
           the event handlers run after any `<var>promise</var>.then()` handlers
           that react to the new value.
           The second task is queued right after the first
-          to prevent {{BluetoothGATTCharacteristic/value}} from changing between them.
+          to prevent {{BluetoothRemoteGATTCharacteristic/value}} from changing between them.
         </p>
       </li>
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
       MUST run the following steps:
     </p>
     <ol class="algorithm">
@@ -2595,7 +2598,7 @@ spec: webidl
     </p>
 
     <p>
-      The <code><dfn method for="BluetoothGATTCharacteristic">startNotifications()</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">startNotifications()</dfn></code> method, when invoked,
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
       See <a href="#notification-events"></a> for details of receiving notifications.
@@ -2653,7 +2656,7 @@ spec: webidl
     </p>
 
     <p>
-      The <code><dfn method for="BluetoothGATTCharacteristic">stopNotifications()</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">stopNotifications()</dfn></code> method, when invoked,
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>:
     </p>
@@ -2688,7 +2691,7 @@ spec: webidl
       <h4 id="characteristicproperties"><dfn interface>BluetoothCharacteristicProperties</dfn></h4>
 
       <p>
-        Each {{BluetoothGATTCharacteristic}} exposes its <a>characteristic properties</a>
+        Each {{BluetoothRemoteGATTCharacteristic}} exposes its <a>characteristic properties</a>
         through a {{BluetoothCharacteristicProperties}} object.
         These properties express what operations are valid on the characteristic.
       </p>
@@ -2778,13 +2781,14 @@ spec: webidl
   </section>
 
   <section>
-    <h3 id="bluetoothgattdescriptor" dfn-type="interface">BluetoothGATTDescriptor</h3>
+    <h3 oldids="bluetoothgattdescriptor"
+        dfn-type="interface">BluetoothRemoteGATTDescriptor</h3>
 
-    <p>{{BluetoothGATTDescriptor}} represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
+    <p>{{BluetoothRemoteGATTDescriptor}} represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
 
     <pre class="idl">
-      interface BluetoothGATTDescriptor {
-        readonly attribute BluetoothGATTCharacteristic characteristic;
+      interface BluetoothRemoteGATTDescriptor {
+        readonly attribute BluetoothRemoteGATTCharacteristic characteristic;
         readonly attribute UUID uuid;
         readonly attribute DataView? value;
         Promise&lt;DataView> readValue();
@@ -2792,8 +2796,8 @@ spec: webidl
       };
     </pre>
 
-    <div class="note" heading="{{BluetoothGATTDescriptor}} attributes"
-         dfn-for="BluetoothGATTDescriptor" dfn-type="attribute">
+    <div class="note" heading="{{BluetoothRemoteGATTDescriptor}} attributes"
+         dfn-for="BluetoothRemoteGATTDescriptor" dfn-type="attribute">
       <p>
         <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
       </p>
@@ -2810,16 +2814,16 @@ spec: webidl
     </div>
 
     <p>
-      To <dfn>create a <code>BluetoothGATTDescriptor</code> representing</dfn>
+      To <dfn>create a <code>BluetoothRemoteGATTDescriptor</code> representing</dfn>
       a Descriptor <var>descriptor</var>,
       the UA must return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>.
     </p>
     <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of {{BluetoothGATTDescriptor}}.</li>
+      <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTDescriptor}}.</li>
       <li>
         Initialize <code><var>result</var>.characteristic</code> from
-        the {{BluetoothGATTCharacteristic}} instance representing
+        the {{BluetoothRemoteGATTCharacteristic}} instance representing
         the Characteristic in which <var>descriptor</var> appears.
       </li>
       <li>
@@ -2841,7 +2845,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTDescriptor">readValue()</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTDescriptor">readValue()</dfn></code> method, when invoked,
       MUST return <a>a new promise</a> <var>promise</var>
       and run the following steps <a>in parallel</a>:
     </p>
@@ -2880,7 +2884,7 @@ spec: webidl
     </ol>
 
     <p>
-      The <code><dfn method for="BluetoothGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
+      The <code><dfn method for="BluetoothRemoteGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
       MUST  run the following steps:
     </p>
     <ol class="algorithm">
@@ -2941,8 +2945,8 @@ spec: webidl
 
       <p>
         {{Navigator/bluetooth|navigator.bluetooth}} and
-        objects implementing the {{BluetoothDevice}}, {{BluetoothGATTService}},
-        {{BluetoothGATTCharacteristic}}, or {{BluetoothGATTDescriptor}} interface
+        objects implementing the {{BluetoothDevice}}, {{BluetoothRemoteGATTService}},
+        {{BluetoothRemoteGATTCharacteristic}}, or {{BluetoothRemoteGATTDescriptor}} interface
         <a>participate in a tree</a>,
         simply named the <a>Bluetooth tree</a>.
 
@@ -2956,7 +2960,7 @@ spec: webidl
         </li>
         <li>
           The <a>children</a> of a {{BluetoothDevice}}
-          are the {{BluetoothGATTService}} objects representing
+          are the {{BluetoothRemoteGATTService}} objects representing
           Primary and Secondary <a>Service</a>s on its <a>GATT Server</a>
           whose UUIDs are on the origin and device's <a>allowed services list</a>.
           The order of the primary services MUST be consistent with the order returned by
@@ -2964,15 +2968,15 @@ spec: webidl
           but secondary services and primary services with different UUIDs may be in any order.
         </li>
         <li>
-          The <a>children</a> of a {{BluetoothGATTService}} are
-          the {{BluetoothGATTCharacteristic}} objects representing its Characteristics.
+          The <a>children</a> of a {{BluetoothRemoteGATTService}} are
+          the {{BluetoothRemoteGATTCharacteristic}} objects representing its Characteristics.
           The order of the characteristics MUST be consistent with the order returned by
           the <a>Discover Characteristics by UUID</a> procedure,
           but characteristics with different UUIDs may be in any order.
         </li>
         <li>
-          The <a>children</a> of a {{BluetoothGATTCharacteristic}} are
-          the {{BluetoothGATTDescriptor}} objects representing its Descriptors
+          The <a>children</a> of a {{BluetoothRemoteGATTCharacteristic}} are
+          the {{BluetoothRemoteGATTDescriptor}} objects representing its Descriptors
           in the order returned by the <a>Discover All Characteristic Descriptors</a> procedure.
         </li>
       </ul>
@@ -2982,11 +2986,11 @@ spec: webidl
       <h4 id="event-types">Event types</h4>
 
       <dl>
-        <dt><dfn event for="BluetoothGATTCharacteristic"><code>characteristicvaluechanged</code></dfn></dt>
+        <dt><dfn event for="BluetoothRemoteGATTCharacteristic"><code>characteristicvaluechanged</code></dfn></dt>
         <dd>
-          Fired on a {{BluetoothGATTCharacteristic}} when its value changes,
+          Fired on a {{BluetoothRemoteGATTCharacteristic}} when its value changes,
           either as a result of
-          a <a idl for="BluetoothGATTCharacteristic" lt="readValue()">read request</a>,
+          a <a idl for="BluetoothRemoteGATTCharacteristic" lt="readValue()">read request</a>,
           or a <a href="#notification-events">value change notification/indication</a>.
         </dd>
 
@@ -2996,25 +3000,25 @@ spec: webidl
           <a href="#disconnection-events">an active GATT connection is lost</a>.
         </dd>
 
-        <dt><dfn event for="BluetoothGATTService"><code>serviceadded</code></dfn></dt>
+        <dt><dfn event for="BluetoothRemoteGATTService"><code>serviceadded</code></dfn></dt>
         <dd>
-          Fired on a new {{BluetoothGATTService}}
+          Fired on a new {{BluetoothRemoteGATTService}}
           <a href="#service-change-events">when it has been discovered on a remote device</a>,
           just after it is added to the <a>Bluetooth tree</a>.
         </dd>
 
-        <dt><dfn event for="BluetoothGATTService"><code>servicechanged</code></dfn></dt>
+        <dt><dfn event for="BluetoothRemoteGATTService"><code>servicechanged</code></dfn></dt>
         <dd>
-          Fired on a {{BluetoothGATTService}}
+          Fired on a {{BluetoothRemoteGATTService}}
           <a href="#service-change-events">when its state changes</a>.
           This involves any characteristics and/or descriptors
           that get added or removed from the service,
           as well as <a>Service Changed</a> indications from the remote device.
         </dd>
 
-        <dt><dfn event for="BluetoothGATTService"><code>serviceremoved</code></dfn></dt>
+        <dt><dfn event for="BluetoothRemoteGATTService"><code>serviceremoved</code></dfn></dt>
         <dd>
-          Fired on a {{BluetoothGATTService}}
+          Fired on a {{BluetoothRemoteGATTService}}
           <a href="#service-change-events">when it has been removed from its device</a>,
           just before it is removed from the <a>Bluetooth tree</a>.
         </dd>
@@ -3041,11 +3045,11 @@ spec: webidl
           abort these steps.
         </li>
         <li>
-          If <code>!<var>deviceObj</var>.gattServer.{{BluetoothGATTRemoteServer/connected}}</code>,
+          If <code>!<var>deviceObj</var>.gattServer.{{BluetoothRemoteGATTServer/connected}}</code>,
           abort these steps.
         </li>
         <li>
-          Set <code><var>deviceObj</var>.gattServer.{{BluetoothGATTRemoteServer/connected}}</code>
+          Set <code><var>deviceObj</var>.gattServer.{{BluetoothRemoteGATTServer/connected}}</code>
           to `false`.
         </li>
         <li>
@@ -3053,7 +3057,7 @@ spec: webidl
           with its {{Event/bubbles}} attribute initialized to `true`
           at <code><var>deviceObj</var></code>.
           <p class="note">
-            This event is <em>not</em> fired at the {{BluetoothGATTRemoteServer}}.
+            This event is <em>not</em> fired at the {{BluetoothRemoteGATTServer}}.
           </p>
         </li>
       </ol>
@@ -3077,7 +3081,7 @@ spec: webidl
 
           <ol>
             <li>
-              Let <var>characteristicObject</var> be the {{BluetoothGATTCharacteristic}} in
+              Let <var>characteristicObject</var> be the {{BluetoothRemoteGATTCharacteristic}} in
               the <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var>
               that represents the <a>Characteristic</a>.
             </li>
@@ -3179,10 +3183,10 @@ spec: webidl
                   <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
                   <a>fire an event</a> named {{serviceremoved}}
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
-                  at the {{BluetoothGATTService}} representing the <a>Service</a>.
+                  at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
                 </li>
                 <li>
-                  Remove this {{BluetoothGATTService}} from the <a>Bluetooth tree</a>.
+                  Remove this {{BluetoothRemoteGATTService}} from the <a>Bluetooth tree</a>.
                 </li>
               </ol>
             </li>
@@ -3192,10 +3196,10 @@ spec: webidl
               <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
               If the Service's UUID is in
               <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
-              add the {{BluetoothGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
+              add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
               and then <a>fire an event</a> named {{serviceadded}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at the {{BluetoothGATTService}}.
+              at the {{BluetoothRemoteGATTService}}.
             </li>
             <li>
               For each <a>Service</a> in <var>changedServices</var>,
@@ -3203,7 +3207,7 @@ spec: webidl
               <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
               <a>fire an event</a> named {{servicechanged}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at the {{BluetoothGATTService}} representing the <a>Service</a>.
+              at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
             </li>
           </ol>
         </li>
