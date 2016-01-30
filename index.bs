@@ -384,7 +384,7 @@ spec: webidl
       the UA MUST assume they give the site complete control over the device
       and inform the user of this risk.
       The UA MUST also allow the user to inspect what sites have access to what devices
-      and revoke these pairings.
+      and <a lt="revoke Bluetooth access">revoke</a> these pairings.
 
     <p>
       The UA MUST NOT allow the user to pair entire classes of devices with a website.
@@ -1233,20 +1233,14 @@ spec: webidl
     </p>
 
     <p>
-      The UA MAY remove devices from the <a>allowed devices map</a> at any time
+      The UA MAY <a>revoke Bluetooth access</a> to a device for an origin at any time
       based on signals from the user.
-      <span class="issue">
-        This needs a definition involving
-        removing {{BluetoothDevice}} instances from {{Bluetooth/[[deviceInstanceMap]]}}s
-        and clearing out their {{[[representedDevice]]}} fields.
+      <span class="note">
+        For example, if the user chooses not to remember access,
+        the UA might remove a device when the tab that was granted access to it is closed.
+        Or the UA might provide a revocation UI that allows the user
+        to explicitly remove a device even while a tab is actively using that device.
       </span>
-      For example, if the user chooses not to remember access,
-      the UA might remove a device when the tab that was granted access to it is closed.
-      Or the UA might provide a revocation UI that allows the user
-      to explicitly remove a device even while a tab is actively using that device.
-      If a device is removed from this list while
-      a {{Promise}} is pending to do something with the device,
-      it MUST be treated the same as if the device moved out of Bluetooth range.
     </p>
 
     <p>
@@ -1313,6 +1307,44 @@ spec: webidl
         Add a mapping from <var>device</var>
         to a pair of <var>id</var> and <var>allowed services</var>
         in the <a>allowed devices map</a>.
+      </li>
+    </ol>
+
+    <p>
+      To <dfn>revoke Bluetooth access</dfn>
+      to a <a>Bluetooth device</a> <var>device</var> for an <var>origin</var>,
+      the UA MUST run the following steps:
+    </p>
+    <ol class="algorithm">
+      <li>
+        Remove the entry in <var>origin</var>'s <a>allowed devices map</a>
+        whose key is <var>device</var>.
+      </li>
+      <li>
+        For each {{BluetoothDevice}} <var>deviceObj</var> in the UA
+        whose <a>relevant settings object</a>'s origin is <var>origin</var> and
+        whose <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>
+        is the <a>same device</a> as <var>device</var>,
+        <a>queue a task</a>
+        on <var>deviceObj</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a>
+        to do the following sub-steps:
+        <ol>
+          <li>
+            Let <var>wasConnected</var> be
+            <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>.
+          <li>
+            Call <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
+          </li>
+          <li>
+            Set <code><var>deviceObj</var>@{{[[representedDevice]]}}</code> to `null`.
+          </li>
+          <li>
+            If <var>wasConnected</var>,
+            <a>fire an event</a> named {{gattserverdisconnected}}
+            with its {{Event/bubbles}} attribute initialized to `true`
+            at <code><var>deviceObj</var></code>.
+          </li>
+        </ol>
       </li>
     </ol>
   </section>
@@ -2199,6 +2231,10 @@ spec: webidl
     </p>
     <ol class="algorithm">
       <li>
+        If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
+        <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+      </li>
+      <li>
         If <code>this.device@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
         attempt to create one using the procedures described
         in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
@@ -2210,6 +2246,10 @@ spec: webidl
       <li>
         <a>Queue a task</a> to perform the following sub-steps:
         <ol>
+          <li>
+            If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+          </li>
           <li>
             Set `this.connected` to `true`.
           </li>
@@ -2243,13 +2283,15 @@ spec: webidl
         </p>
       </li>
       <li>
+        Let <var>device</var> be <code>this.device@{{[[representedDevice]]}}</code>.
+      <li>
         <a>In parallel</a>:
-        if, for all {{BluetoothDevice}}s <code><var>device</var></code> in the whole UA
-        with <code><var>device</var>@{{[[representedDevice]]}}</code>
-        the <a>same device</a> as <code>this.device@{{[[representedDevice]]}}</code>,
-        <code>!<var>device</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>,
+        if, for all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA
+        with <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>
+        the <a>same device</a> as <var>device</var>,
+        <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
         the UA SHOULD destroy
-        <code><var>device</var>@{{[[representedDevice]]}}</code>'s <a>ATT Bearer</a>.
+        <var>device</var>'s <a>ATT Bearer</a>.
       </li>
     </ol>
 
