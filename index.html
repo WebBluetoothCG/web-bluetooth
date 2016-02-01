@@ -1947,7 +1947,7 @@ interface <dfn class="idl-code" data-dfn-type="interface" data-export="" id="blu
        <td><dfn class="idl-code" data-dfn-for="Bluetooth" data-dfn-type="attribute" data-export="" id="dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]<a class="self-link" href="#dom-bluetooth-deviceinstancemap-slot"></a></dfn>
        <td> An empty map from <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a>s
         to <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>></code> instances. 
-       <td>
+       <td> Ensures only one <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> instance represents each <a data-link-type="dfn" href="#bluetooth-device">Bluetooth device</a> inside a single global object. 
       <tr>
        <td><dfn class="idl-code" data-dfn-for="Bluetooth" data-dfn-type="attribute" data-export="" id="dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]<a class="self-link" href="#dom-bluetooth-attributeinstancemap-slot"></a></dfn>
        <td> An empty map from <a data-link-type="dfn" href="#bluetooth-cache">Bluetooth cache</a> entries to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>s. 
@@ -2707,6 +2707,12 @@ return navigator.bluetooth.requestDevice({
         for example when there are other connected <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a></code> instances
         for other <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#execution-context&apos;s-global-object">global object</a>s. </p>
      </div>
+     <p> When no ECMAScript code can
+      observe an instance of <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a></code> <var>server</var> anymore,
+      the UA SHOULD run <code><var>server</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-disconnect">disconnect()</a></code></code>. <span class="note" role="note"> Because <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code> instances are stored in <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a></code></code>,
+        this can’t happen at least until navigation releases the global object or
+        closing the tab or window destroys the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">browsing context</a>. </span> <span class="note" role="note"> Disconnecting on garbage collection ensures that
+        the UA doesn’t keep consuming resources on the remote device unnecessarily. </span> </p>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-connect">connect()<a class="self-link" href="#dom-bluetoothremotegattserver-connect"></a></dfn></code> method, when invoked,
       MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide#a-new-promise">a new promise</a> <var>promise</var> and
       run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
@@ -2729,7 +2735,7 @@ return navigator.bluetooth.requestDevice({
       <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">In parallel</a>:
         if, for all <code class="idl"><a data-link-type="idl" href="#bluetoothdevice">BluetoothDevice</a></code>s <code><var>device</var></code> in the whole UA
         with <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-device">same device</a> as <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>, <code>!<var>device</var>.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected">connected</a></code></code>,
-        the UA MAY destroy <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>’s <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>. 
+        the UA SHOULD destroy <code><var>device</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot">[[representedDevice]]</a></code></code>’s <a data-link-type="dfn" href="#att-bearer">ATT Bearer</a>. 
      </ol>
      <p> The <code><dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService(<var>service</var>)<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservice"></a></dfn></code> method, when invoked,
       MUST perform the following steps: </p>
@@ -4199,6 +4205,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#navigator">Navigator</a>
      <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#allowed-to-show-a-popup">allowed to show a popup</a>
+     <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">browsing context</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment settings object</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">event handler idl attribute</a>
      <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#execution-context&apos;s-global-object">global object</a>
