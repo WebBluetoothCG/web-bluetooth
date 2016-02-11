@@ -9,17 +9,17 @@ Work is in progress:
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
-Feature                   | Chrome OS | Chrome for Android M | Chrome for Mac OS X
-------------------------- | :-------: | :------------------: | :-----------------:
-Discovery                 | 45        | 48                   | 46
-└ Name or prefix          | 48        | 48                   | 48
-Chooser UI                | 49        | 48                   | 49
-GATT Server Connect       | 45        | 48                   |
-Read Characteristic       | 45        | 48                   |
-Write Characteristic      | 45        | 48                   |
-Characteristic Properties | 48        | 48                   |
-GATT Notifications        | 48        | (49 start only)      |
-GATT Server Disconnect    | 50        | 50                   |
+Feature                   | Chrome OS | Android M | Mac OS X | Linux*
+------------------------- | :-------: | :-------: | :------: | :----: 
+Discovery                 | 45        | 48        | 46       | 50
+└ Name or prefix          | 48        | 48        | 48       | 50
+Chooser UI                | 49        | 48        | 49       | 50
+GATT Server Connect       | 45        | 48        |          | 50
+Read Characteristic       | 45        | 48        |          | 50
+Write Characteristic      | 45        | 48        |          | 50
+Characteristic Properties | 48        | 48        |          | 50
+GATT Notifications        | 48        | (49 start only) |    | 50
+GATT Server Disconnect    | 50        | 50       |           | 50
 
 ### Notes
 
@@ -35,7 +35,7 @@ GATT Server Disconnect    | 50        | 50                   |
   3. "Bluetooth"
   4. Verify that Low Energy is supported.
 * [Windows](https://crbug.com/507419): Not started.
-* [Linux](https://crbug.com/570344): Not started.
+* [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and BlueZ 5+ installed.
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
 
 ## Hardware Compatibility List
