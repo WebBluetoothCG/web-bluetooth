@@ -4,16 +4,16 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2016-02-12**.
+* Notes updated **2016-02-15**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
-Feature                   | Chrome OS | Android M | Mac OS X | Linux*
-------------------------- | :-------: | :-------: | :------: | :----: 
-Discovery                 | ✓         | ✓         | ✓        | 50
-└ Name or prefix          | ✓         | ✓         | ✓        | 50
-Chooser UI                | 49        | ✓         | 49       | 50
+Feature                   | Chrome OS | Android M | Mac OS X | Linux | Windows 8.1
+------------------------- | :-------: | :-------: | :------: | :----: | :-----:
+Discovery                 | ✓         | ✓         | ✓        | 50     | 50 (paired devices only)
+└ Name or prefix          | ✓         | ✓         | ✓        | 50     | 50
+Chooser UI                | 49        | ✓         | 49       | 50     | 50
 GATT Server Connect       | ✓         | ✓         |          | 50
 Read Characteristic       | ✓         | ✓         |          | 50
 Write Characteristic      | ✓         | ✓         |          | 50
@@ -34,7 +34,7 @@ GATT Server Disconnect    | 50        | 50        |          | 50
   2. "System Report"
   3. "Bluetooth"
   4. Verify that Low Energy is supported.
-* [Windows](https://crbug.com/507419): Not started.
+* [Windows](https://crbug.com/507419): Discover only manually paired devices.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and BlueZ 5+ installed.
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
 
@@ -58,6 +58,9 @@ A polyfill for the Web Bluetooth API running inside a Chrome App.
 
 Developers can embed the Polyfill into a Chrome App to get a feel of how the
 Web Bluetooth API will work. Note: Only works on ChromeOS.
+
+# Opera
+Same as Chrome unless specificied otherwise
 
 # Firefox
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
