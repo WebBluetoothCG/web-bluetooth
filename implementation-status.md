@@ -20,6 +20,7 @@ Write Characteristic      | ✓         | ✓         |          | 50
 Characteristic Properties | ✓         | ✓         |          | 50
 GATT Notifications        | ✓         | (49 start only) |    | 50
 GATT Server Disconnect    | 50        | 50        |          | 50
+Get Characteristics List  | 50        | 50        |          | 50
 
 ### Notes
 
