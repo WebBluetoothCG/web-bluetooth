@@ -1578,7 +1578,7 @@ spec: permissions
       interface BluetoothDevice {
         readonly attribute DOMString id;
         readonly attribute DOMString? name;
-        readonly attribute BluetoothRemoteGATTServer gatt;
+        readonly attribute BluetoothRemoteGATTServer? gatt;
         readonly attribute FrozenArray&lt;UUID> uuids;
 
         Promise&lt;void> watchAdvertisements();
@@ -1605,7 +1605,8 @@ spec: permissions
       </p>
 
       <p>
-        <dfn>gatt</dfn> provides a way to interact with this device's GATT server.
+        {{BluetoothDevice/gatt}} provides a way to interact with this device's GATT server
+        if the site has permission to use any of its services.
       </p>
 
       <p>
@@ -1643,6 +1644,17 @@ spec: permissions
         <td>`undefined`</td>
         <td>
           The <a>Bluetooth device</a> this object represents.
+        </td>
+      </tr>
+      <tr>
+        <td><dfn>\[[gatt]]</dfn></td>
+        <td>
+          a new {{BluetoothRemoteGATTServer}} instance with
+          its {{BluetoothRemoteGATTServer/device}} attribute initialized to `this`
+          and its {{BluetoothRemoteGATTServer/connected}} attribute initialized to `false`.
+        </td>
+        <td>
+          Does not change.
         </td>
       </tr>
       <tr>
@@ -1736,12 +1748,6 @@ spec: permissions
             Initialize <code><var>result</var>.watchingAdvertisements</code> to `false`.
           </li>
           <li>
-            Set <code><var>result</var>.gatt.{{BluetoothRemoteGATTServer/device}}</code> to <var>result</var>.
-          </li>
-          <li>
-            Set <code><var>result</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code> to `false`.
-          </li>
-          <li>
             Add <var>device</var>'s
             advertised <a>Service UUIDs</a>
             to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
@@ -1763,6 +1769,22 @@ spec: permissions
         whose key is the <a>same device</a> as <var>device</var>.
       </li>
     </ol>
+
+    <div algorithm>
+      <p>
+        Getting the <code><dfn attribute for="BluetoothDevice">gatt</dfn></code> attribute
+        MUST perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>
+          If <code>this.{{[[allowedServices]]}}</code> is an empty list,
+          return `null`.
+        </li>
+        <li>
+          Return <code>this.{{[[gatt]]}}</code>.
+        </li>
+      </ol>
+    </div>
 
     <p>
       Getting the <code><dfn attribute for="BluetoothDevice">uuids</dfn></code> attribute
