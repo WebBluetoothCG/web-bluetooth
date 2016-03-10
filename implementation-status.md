@@ -37,6 +37,7 @@ Get Characteristics List  | 50        | 50        |          | 50
   4. Verify that Low Energy is supported.
 * [Windows](https://crbug.com/507419): Discover only manually paired devices.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and BlueZ 5+ installed (by default in Ubuntu 15.10).
+  * Note that Bluetooth daemon needs experimental interfaces feature enabled: `sudo /usr/sbin/bluetoothd -E`  
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
 
 ## Hardware Compatibility List
