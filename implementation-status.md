@@ -30,11 +30,7 @@ Get Characteristics List  | 50        | 50        |          | 50
  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
  * [Android Chooser UI](https://crbug.com/436280) works but has some bugs.
 * [Mac OS X](https://crbug.com/364359): Requires Mac OS X Yosemite. It is partially working, but not under active development. It's next on the list after ChromeOS and Android.
-  * Some MacBook's may not work:
-    1. Check "About this Mac"
-    2. "System Report"
-    3. "Bluetooth"
-    4. Verify that Low Energy is supported.
+  * Some MacBook's may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Windows](https://crbug.com/507419): Discover only manually paired devices.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and BlueZ 5+ installed (by default in Ubuntu 15.10).
   * Note that Bluetooth daemon needs experimental interfaces feature enabled: `sudo /usr/sbin/bluetoothd -E`  
