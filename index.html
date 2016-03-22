@@ -10,7 +10,7 @@
  *
  * Indices
  *   - .toc for the Table of Contents (<ol class="toc">)
- *     -> <span class="secno"> for the section numbers
+ *     + <span class="secno"> for the section numbers
  *   - #toc for the Table of Contents (<nav id="toc">)
  *   - ul.index for Indices (<a href="#ref">term</a><span>, in §N.M</span>)
  *   - table.index for Index Tables (e.g. for properties or elements)
@@ -113,39 +113,36 @@
 
 	div.head h2 { margin-bottom: 1.5em;}
 
-	div.head .logo {
+/** W3C Logo ******************************************************************/
+
+	.head .logo {
 		float: right;
-		margin: 0;
+		margin: 0.4rem 0 0.2rem .4rem;
 	}
 
-	@media screen {
-		div.head .logo > a {
-			display: inline-block;
-			margin: 0.4rem 0 0.2rem .4rem;
-		}
-
-		div.head img[src*="logos/W3C"] {
-			display: block;
-			border: solid #1a5e9a;
-			border-width: .65rem .7rem .6rem;
-			border-radius: .4rem;
-			background: #1a5e9a;
-			color: white;
-			font-weight: bold;
-		}
-
-		div.head a:hover > img[src*="logos/W3C"],
-		div.head a:focus > img[src*="logos/W3C"] {
-			background: #457cad;
-			border-color: #457cad;
-		}
-
-		div.head a:active > img[src*="logos/W3C"] {
-			background: #c00;
-			border-color: #c00;
-		}
+	.head img[src*="logos/W3C"] {
+		display: block;
+		border: solid #1a5e9a;
+		border-width: .65rem .7rem .6rem;
+		border-radius: .4rem;
+		background: #1a5e9a;
+		color: white;
+		font-weight: bold;
 	}
 
+	.head a:hover > img[src*="logos/W3C"],
+	.head a:focus > img[src*="logos/W3C"] {
+		opacity: .8;
+	}
+
+	.head a:active > img[src*="logos/W3C"] {
+		background: #c00;
+		border-color: #c00;
+	}
+
+	/* see also additional rules in Link Styling section */
+
+/** Copyright *****************************************************************/
 
 	p.copyright,
 	p.copyright small { font-size: small }
@@ -331,6 +328,7 @@
 		font: 100% sans-serif;   /* Reset all font styling to clear out UA styles */
 		font-family: inherit;    /* Inherit the font family. */
 		line-height: 1.2;        /* Keep wrapped headings compact */
+		hyphens: manual;         /* Hyphenated headings look weird */
 	}
 
 	h2, h3, h4, h5, h6 {
@@ -534,9 +532,11 @@
 	}
 
 	/* Backout above styling for W3C logo */
-	.head > p:first-child > a {
+	.head .logo,
+	.head .logo a {
 		border: none;
 		text-decoration: none;
+		background: transparent;
 	}
 
 /******************************************************************************/
@@ -828,8 +828,8 @@
 	table.index {
 		margin: 1em auto;
 		border-collapse: collapse;
-		width: 100%;
 		border: hidden;
+		width: 100%;
 	}
 	table.data caption,
 	table.index caption {
@@ -936,7 +936,7 @@ Possible extra rowspan handling
 
 	.toc a {
 		/* More spacing; use padding to make it part of the click target. */
-		padding-top: 0.1em;
+		padding-top: 0.1rem;
 		/* Larger, more consistently-sized click target */
 		display: block;
 		/* Reverse color scheme */
@@ -967,19 +967,14 @@ Possible extra rowspan handling
 	.toc > li li li li li { font-style:  italic;
 	                        font-size:   85%;    }
 
-	.toc > li             { margin: 1.5em 0;     }
+	.toc > li             { margin: 1.5rem 0;    }
 	.toc > li li          { margin: 0.3rem 0;    }
-	.toc > li li li       { margin-left: 2em;
-	                        margin-left: 2rem;   }
+	.toc > li li li       { margin-left: 2rem;   }
 
 	/* Section numbers in a column of their own */
-	:not(li) > .toc {
-		margin-left: 5em;
-	}
-
 	.toc .secno {
 		float: left;
-		width: 4em;
+		width: 4rem;
 		white-space: nowrap;
 	}
 	.toc > li li li li .secno {
@@ -1027,7 +1022,7 @@ Possible extra rowspan handling
 /** Index *********************************************************************/
 
 	/* Index Lists: Layout */
-	ul.index       { margin-left: 0; columns: 15em; -webkit-columns: 15em; -moz-columns: 15em; text-indent: 1em hanging; }
+	ul.index       { margin-left: 0; columns: 15em; text-indent: 1em hanging; }
 	ul.index li    { margin-left: 0; list-style: none; break-inside: avoid; }
 	ul.index li li { margin-left: 1em }
 	ul.index dl    { margin-top: 0; }
@@ -1106,6 +1101,12 @@ Possible extra rowspan handling
 	.figure .caption, .sidefigure .caption, figcaption {
 		/* in case figure is overlarge, limit caption to 50em */
 		max-width: 50rem;
+		margin-left: auto;
+		margin-right: auto;
+	}
+	.overlarge > table {
+		/* limit preferred width of table */
+		max-width: 50em;
 		margin-left: auto;
 		margin-right: auto;
 	}
@@ -1293,7 +1294,7 @@ Possible extra rowspan handling
 
 
 /********************************************
- Remember to remove the logo section when copypasting freshly.
+ Remember to fix the logo section when copypasting freshly.
  */
 </style>
   <meta content="Bikeshed 1.0.0" name="generator">
@@ -1401,7 +1402,7 @@ Possible extra rowspan handling
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-03-09">9 March 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-03-22">22 March 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2075,8 +2076,8 @@ interface <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-expor
       and let <var>scanResult</var> be the result. 
      <li> Remove devices from <var>scanResult</var> if
       they do not <a data-link-type="dfn" href="#matches-a-filter" id="ref-for-matches-a-filter-3">match a filter</a> in <var>uuidFilters</var>. 
-     <li>
-       Even if <var>scanResult</var> is empty,
+     <li id="requestDevice-prompt">
+      <a class="self-link" href="#requestDevice-prompt"></a> Even if <var>scanResult</var> is empty,
       display a prompt to the user requesting that the user select a device from it.
       The UA SHOULD show the user the human-readable name of each device.
       If this name is not available because the UA’s Bluetooth system doesn’t support privacy-enabled scans,
