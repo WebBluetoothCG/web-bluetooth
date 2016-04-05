@@ -36,21 +36,6 @@ Get Characteristics List  | 50        | 50        |          | 50
   * Note that Bluetooth daemon needs experimental interfaces feature enabled: `sudo /usr/sbin/bluetoothd -E`  
 * Latest demo post: [Web Bluetooth experimental in Chrome on Android and Chrome OS](https://www.w3.org/community/web-bluetooth/2015/11/18/web-bluetooth-experimental-in-chrome-on-android-and-chrome-os/) 2015-11-18
 
-## Hardware Compatibility List
-
-### Working
-
-Company | System Information | Bluetooth Manufacturer | Bluetooth Chipset
-------- | ------------------ | ---------------------- | -----------------
-Google  | Chromebook Pixel 2013 | Qualcomm Atheros, Inc. | AR5BMD22
-Google  | Chromebook Pixel 2015 | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
-Dell    | Chromebook 15      | Intel Inc. | Intel® Dual Band Wireless-AC 7260
-Toshiba | Chromebook 2 - 2015 Edition | Intel Inc. | Intel® Dual Band Wireless-AC 7260 
-Acer    | Chromebook 15 | Intel Inc. | Intel® Dual Band Wireless-AC 7260
-Asus    | Chromebook Flip <br/> 49| Broadcom | BCM4354
-Apple   | MacBook Air (13-inch, Mid 2012) <br/> OS X 10.11 | Broadcom | 20702A3
-Apple   | MacBook Air (13-inch, Early 2015) <br/> OS X 10.11 | Broadcom | 20702B0
-
 ## [Chrome Apps Polyfill](https://github.com/WebBluetoothCG/chrome-app-polyfill)
 A polyfill for the Web Bluetooth API running inside a Chrome App.
 
