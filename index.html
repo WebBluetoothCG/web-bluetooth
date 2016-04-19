@@ -2033,7 +2033,7 @@ interface <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-expor
     that device might not be included in the list of devices presented to the user.
     The UA would need to connect to the device to discover the full list of supported services,
     which can impair radio performance and cause delays, so this spec doesn’t require it. </p>
-    <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export="" data-lt="requestDevice(options)" id="dom-bluetooth-requestdevice">requestDevice(<var>options</var>)<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetooth-requestdevice">#dom-bluetooth-requestdevice</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetooth-requestdevice-1">1.1. Examples</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-2">2.1. Device access is powerful</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-3">3. Device Discovery</a> <a href="#ref-for-dom-bluetooth-requestdevice-4">(2)</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-5">9. Terminology and Conventions</a></span></span></dfn></code> method,
+    <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export="" data-lt="requestDevice(options)" id="dom-bluetooth-requestdevice">requestDevice(<var>options</var>)<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetooth-requestdevice">#dom-bluetooth-requestdevice</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetooth-requestdevice-1">1.1. Examples</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-2">2.1. Device access is powerful</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-3">3. Device Discovery</a> <a href="#ref-for-dom-bluetooth-requestdevice-4">(2)</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-5">3.1. Permission API Integration</a></span><span><a href="#ref-for-dom-bluetooth-requestdevice-6">9. Terminology and Conventions</a></span></span></dfn></code> method,
     when invoked, MUST run the following steps: </p>
     <ol class="algorithm">
      <li>
@@ -2198,7 +2198,45 @@ interface <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-expor
     <section>
      <h3 class="heading settled" data-level="3.1" id="permission-api-integration"><span class="secno">3.1. </span><span class="content">Permission API Integration</span><a class="self-link" href="#permission-api-integration"></a></h3>
      <p> The <a data-link-type="biblio" href="#biblio-permissions">[permissions]</a> API provides a uniform way
-      for websites to request permissions from users. </p>
+      for websites to request permissions from users
+      and query which permissions they have. </p>
+     <div class="example" id="example-permission-api-request">
+      <a class="self-link" href="#example-permission-api-request"></a> 
+      <p> Sites can use <code>navigator.permissions.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request">request</a></code>({<a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a>: "bluetooth", ...})</code> as an alternate spelling of <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-5">requestDevice()</a></code></code>. </p>
+<pre>navigator.permissions.<a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request">request</a>({
+  name: "bluetooth",
+  filters: [{
+    services: ['heart_rate'],
+  }]
+}).then(result => {
+  if (result.<a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-5">devices</a>.length > 1) {
+    return result.devices[0];
+  } else {
+    throw new <a data-link-type="idl" href="https://heycam.github.io/webidl/#dfn-DOMException">DOMException</a>("Chooser cancelled", "NotFoundError");
+  }
+}).then(device => {
+  sessionStorage.lastDevice = device.<a data-link-type="idl" href="#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id-1">id</a>;
+});
+</pre>
+      <p> The <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-deviceid" id="ref-for-dom-bluetoothpermissiondescriptor-deviceid-1">deviceId</a></code> member
+        is ignored in calls to <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request">request()</a></code>. </p>
+     </div>
+     <div class="example" id="example-permission-api-query">
+      <a class="self-link" href="#example-permission-api-query"></a> 
+      <p> Once a site has been granted access to a set of devices,
+        it can use <code>navigator.permissions.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-query">query</a></code>({<a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a>: "bluetooth", ...})</code> to retrieve those devices after a reload. </p>
+<pre>navigator.permissions.<a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-query">query</a>({
+  name: "bluetooth",
+  deviceId: sessionStorage.lastDevice,
+}).then(result => {
+  if (result.<a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-6">devices</a>.length > 1) {
+    return result.devices[0];
+  } else {
+    throw new <a data-link-type="idl" href="https://heycam.github.io/webidl/#dfn-DOMException">DOMException</a>("Lost permission", "NotFoundError");
+  }
+}).then(...);
+</pre>
+     </div>
      <p> The <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#enumdef-permissionname">PermissionName</a></code> enum is monkeypatched
       to include a <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-1">"bluetooth"</a></code> enum value. </p>
      <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="PermissionName" data-dfn-type="enum-value" data-export="" data-lt="&quot;bluetooth&quot;" id="dom-permissionname-bluetooth">"bluetooth"<span class="dfn-panel" data-deco=""><b><a href="#dom-permissionname-bluetooth">#dom-permissionname-bluetooth</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-permissionname-bluetooth-1">3.1. Permission API Integration</a></span><span><a href="#ref-for-dom-permissionname-bluetooth-2">4.3. BluetoothDevice</a></span></span></dfn> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission">permission</a> is defined as follows: </p>
@@ -2206,7 +2244,7 @@ interface <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-expor
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#associated-permissiondescriptor">associated PermissionDescriptor</a> 
       <dd>
 <pre class="idl def">dictionary <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" data-lt="BluetoothPermissionDescriptor" id="dictdef-bluetoothpermissiondescriptor">BluetoothPermissionDescriptor<span class="dfn-panel" data-deco=""><b><a href="#dictdef-bluetoothpermissiondescriptor">#dictdef-bluetoothpermissiondescriptor</a></b><b>Referenced in:</b><span><a href="#ref-for-dictdef-bluetoothpermissiondescriptor-1">3. Device Discovery</a></span><span><a href="#ref-for-dictdef-bluetoothpermissiondescriptor-2">3.1. Permission API Integration</a></span></span></dfn> : <a data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a> {
-  DOMString <dfn class="idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-bluetoothpermissiondescriptor-deviceid">deviceId<a class="self-link" href="#dom-bluetoothpermissiondescriptor-deviceid"></a></dfn>;
+  DOMString <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-lt="deviceId" data-type="DOMString " id="dom-bluetoothpermissiondescriptor-deviceid">deviceId<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothpermissiondescriptor-deviceid">#dom-bluetoothpermissiondescriptor-deviceid</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothpermissiondescriptor-deviceid-1">3.1. Permission API Integration</a></span></span></dfn>;
   // These match RequestDeviceOptions.
   sequence&lt;<a data-link-type="idl-name" href="#dictdef-bluetoothscanfilter" id="ref-for-dictdef-bluetoothscanfilter-2">BluetoothScanFilter</a>> <dfn class="idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothScanFilter> " id="dom-bluetoothpermissiondescriptor-filters">filters<a class="self-link" href="#dom-bluetoothpermissiondescriptor-filters"></a></dfn>;
   sequence&lt;<a data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-3">BluetoothServiceUUID</a>> <dfn class="idl-code" data-default="None" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices">optionalServices<a class="self-link" href="#dom-bluetoothpermissiondescriptor-optionalservices"></a></dfn> = [];
@@ -2227,7 +2265,7 @@ dictionary <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-exp
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-result-type">permission result type</a> 
       <dd>
 <pre class="idl def">interface <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export="" data-lt="BluetoothPermissionResult" id="bluetoothpermissionresult">BluetoothPermissionResult<span class="dfn-panel" data-deco=""><b><a href="#bluetoothpermissionresult">#bluetoothpermissionresult</a></b><b>Referenced in:</b><span><a href="#ref-for-bluetoothpermissionresult-1">3. Device Discovery</a></span><span><a href="#ref-for-bluetoothpermissionresult-2">3.1. Permission API Integration</a></span></span></dfn> : <a data-link-type="idl-name" href="https://w3c.github.io/permissions/#permissionstatus">PermissionStatus</a> {
-  attribute FrozenArray&lt;<a data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-4">BluetoothDevice</a>> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothPermissionResult" data-dfn-type="attribute" data-export="" data-lt="devices" data-type="FrozenArray<BluetoothDevice> " id="dom-bluetoothpermissionresult-devices">devices<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothpermissionresult-devices">#dom-bluetoothpermissionresult-devices</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothpermissionresult-devices-1">3. Device Discovery</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-2">(2)</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-3">(3)</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-4">(4)</a></span></span></dfn>;
+  attribute FrozenArray&lt;<a data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-4">BluetoothDevice</a>> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothPermissionResult" data-dfn-type="attribute" data-export="" data-lt="devices" data-type="FrozenArray<BluetoothDevice> " id="dom-bluetoothpermissionresult-devices">devices<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothpermissionresult-devices">#dom-bluetoothpermissionresult-devices</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothpermissionresult-devices-1">3. Device Discovery</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-2">(2)</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-3">(3)</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-4">(4)</a></span><span><a href="#ref-for-dom-bluetoothpermissionresult-devices-5">3.1. Permission API Integration</a> <a href="#ref-for-dom-bluetoothpermissionresult-devices-6">(2)</a></span></span></dfn>;
 };
 </pre>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-query-algorithm">permission query algorithm</a> 
@@ -2405,7 +2443,7 @@ enum <dfn class="dfn-paneled idl-code" data-dfn-type="enum" data-export="" data-
 };
 
 interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice" id="ref-for-bluetoothdevice-8">BluetoothDevice</a> {
-  readonly attribute DOMString <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DOMString " href="#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id-1">id</a>;
+  readonly attribute DOMString <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DOMString " href="#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id-2">id</a>;
   readonly attribute DOMString? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="DOMString? " href="#dom-bluetoothdevice-name" id="ref-for-dom-bluetoothdevice-name-1">name</a>;
   readonly attribute <a data-link-type="idl-name" href="#bluetoothadvertisingdata" id="ref-for-bluetoothadvertisingdata-1">BluetoothAdvertisingData</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothAdvertisingData " href="#dom-bluetoothdevice-addata" id="ref-for-dom-bluetoothdevice-addata-1">adData</a>;
   readonly attribute unsigned long? <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="unsigned long? " href="#dom-bluetoothdevice-deviceclass" id="ref-for-dom-bluetoothdevice-deviceclass-1">deviceClass</a>;
@@ -2423,7 +2461,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
 </pre>
      <div class="note no-marker" role="note">
       <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-13">BluetoothDevice</a></code> attributes</div>
-      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" data-lt="id" id="dom-bluetoothdevice-id">id<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothdevice-id">#dom-bluetoothdevice-id</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothdevice-id-1">4.3. BluetoothDevice</a></span></span></dfn> uniquely identifies a device to the extent that
+      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" data-lt="id" id="dom-bluetoothdevice-id">id<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothdevice-id">#dom-bluetoothdevice-id</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothdevice-id-1">3.1. Permission API Integration</a></span><span><a href="#ref-for-dom-bluetoothdevice-id-2">4.3. BluetoothDevice</a></span></span></dfn> uniquely identifies a device to the extent that
         the UA can determine that two Bluetooth connections are to the same device.
         It is computed as the <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-deviceid" id="ref-for-dom-allowedbluetoothdevice-deviceid-4">deviceId</a></code> in <a data-link-type="dfn" href="#add-an-allowed-bluetooth-device" id="ref-for-add-an-allowed-bluetooth-device-3">add an allowed Bluetooth device</a>.
         This ID can’t be used to match a device across origins
@@ -3761,7 +3799,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
     <p> When an algorithm in this specification uses a name defined in this or another specification,
     the name MUST resolve to its initial value,
     ignoring any changes that have been made to the name in the current execution environment.
-    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-5">requestDevice()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-14">BluetoothUUID.getService</a></code>)</code>,
+    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-6">requestDevice()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-14">BluetoothUUID.getService</a></code>)</code>,
     this MUST apply the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code> algorithm defined in <a data-link-type="biblio" href="#biblio-ecmascript">[ECMAScript]</a> with <code><var>filter</var>.services</code> as its <code>this</code> parameter and
     the algorithm defined in <a href="#standardized-uuids">§6.1 Standardized UUIDs</a> for <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-15">BluetoothUUID.getService</a></code> as its <code>callbackfn</code> parameter,
     regardless of any modifications that have been made to <code>window</code>, <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>, <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothUUID</code>, <code>BluetoothUUID.getService</code>, or other objects. </p>
@@ -4644,6 +4682,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://w3c.github.io/permissions/#dictdef-permissionstorage">PermissionStorage</a>
      <li><a href="https://w3c.github.io/permissions/#associated-permissiondescriptor">associated permissiondescriptor</a>
      <li><a href="https://w3c.github.io/permissions/#create-a-permission-storage-entry">create a permission storage entry</a>
+     <li><a href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a>
      <li><a href="https://w3c.github.io/permissions/#permission">permission</a>
      <li><a href="https://w3c.github.io/permissions/#permission-query-algorithm">permission query algorithm</a>
      <li><a href="https://w3c.github.io/permissions/#permission-request-algorithm">permission request algorithm</a>
@@ -4651,7 +4690,9 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://w3c.github.io/permissions/#permission-revocation-algorithm">permission revocation algorithm</a>
      <li><a href="https://w3c.github.io/permissions/#permission-storage-identifier">permission storage identifier</a>
      <li><a href="https://w3c.github.io/permissions/#permission-storage-type">permission storage type</a>
+     <li><a href="https://w3c.github.io/permissions/#dom-permissions-query">query()</a>
      <li><a href="https://w3c.github.io/permissions/#request-a-permission">request a permission</a>
+     <li><a href="https://w3c.github.io/permissions/#dom-permissions-request">request()</a>
      <li><a href="https://w3c.github.io/permissions/#retrieve-a-permission-storage-entry">retrieve a permission storage entry</a>
      <li><a href="https://w3c.github.io/permissions/#retrieve-the-permission-storage">retrieve the permission storage</a>
      <li><a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">state</a>
@@ -4678,6 +4719,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <li>
     <a data-link-type="biblio">[WebIDL-1]</a> defines the following terms:
     <ul>
+     <li><a href="https://heycam.github.io/webidl/#dfn-DOMException">DOMException</a>
      <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror">InvalidModificationError</a>
      <li><a href="https://heycam.github.io/webidl/#networkerror">NetworkError</a>
      <li><a href="https://heycam.github.io/webidl/#notfounderror">NotFoundError</a>

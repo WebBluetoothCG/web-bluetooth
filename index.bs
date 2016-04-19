@@ -1162,8 +1162,59 @@ spec: permissions
 
     <p>
       The [[permissions]] API provides a uniform way
-      for websites to request permissions from users.
+      for websites to request permissions from users
+      and query which permissions they have.
     </p>
+
+    <div class="example" id="example-permission-api-request">
+      <p>
+        Sites can use
+        <code highlight="js">navigator.permissions.{{Permissions/request()|request}}({<a idl for="PermissionDescriptor">name</a>: "bluetooth", ...})</code>
+        as an alternate spelling of
+        <code highlight="js">navigator.bluetooth.{{Bluetooth/requestDevice()}}</code>.
+      </p>
+      <pre highlight="js">
+        navigator.permissions.<a idl for="Permissions" lt="request()">request</a>({
+          name: "bluetooth",
+          filters: [{
+            services: ['heart_rate'],
+          }]
+        }).then(result => {
+          if (result.<a idl for="BluetoothPermissionResult">devices</a>.length > 1) {
+            return result.devices[0];
+          } else {
+            throw new <a idl>DOMException</a>("Chooser cancelled", "NotFoundError");
+          }
+        }).then(device => {
+          sessionStorage.lastDevice = device.<a idl for="BluetoothDevice">id</a>;
+        });
+      </pre>
+      <p>
+        The {{BluetoothPermissionDescriptor/deviceId}} member
+        is ignored in calls to {{Permissions/request()}}.
+      </p>
+    </div>
+
+    <div class="example" id="example-permission-api-query">
+      <p>
+        Once a site has been granted access to a set of devices,
+        it can use
+        <code highlight="js">navigator.permissions.{{Permissions/query()|query}}({<a idl for="PermissionDescriptor">name</a>: "bluetooth", ...})</code>
+        to retrieve those devices after a reload.
+      </p>
+      <pre highlight="js">
+        navigator.permissions.<a idl for="Permissions" lt="query()">query</a>({
+          name: "bluetooth",
+          deviceId: sessionStorage.lastDevice,
+        }).then(result => {
+          if (result.<a idl for="BluetoothPermissionResult">devices</a>.length > 1) {
+            return result.devices[0];
+          } else {
+            throw new <a idl>DOMException</a>("Lost permission", "NotFoundError");
+          }
+        }).then(...);
+      </pre>
+    </div>
 
     <p>
       The {{PermissionName}} enum is monkeypatched
