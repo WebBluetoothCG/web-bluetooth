@@ -1464,12 +1464,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <a href="#security-and-privacy"><span class="secno">2</span> <span class="content">Security and privacy considerations</span></a>
      <ol class="toc">
       <li><a href="#device-access-is-powerful"><span class="secno">2.1</span> <span class="content">Device access is powerful</span></a>
-      <li><a href="#attacks-on-devices"><span class="secno">2.2</span> <span class="content">Attacks on devices</span></a>
+      <li><a href="#server-takeovers"><span class="secno">2.2</span> <span class="content">Trusted servers can serve malicious code</span></a>
+      <li><a href="#attacks-on-devices"><span class="secno">2.3</span> <span class="content">Attacks on devices</span></a>
       <li>
-       <a href="#bluetooth-device-identifiers"><span class="secno">2.3</span> <span class="content">Bluetooth device identifiers</span></a>
+       <a href="#bluetooth-device-identifiers"><span class="secno">2.4</span> <span class="content">Bluetooth device identifiers</span></a>
        <ol class="toc">
-        <li><a href="#remote-device-identifiers"><span class="secno">2.3.1</span> <span class="content">Identifiers for remote Bluetooth devices</span></a>
-        <li><a href="#ua-bluetooth-address"><span class="secno">2.3.2</span> <span class="content">The UA’s Bluetooth address</span></a>
+        <li><a href="#remote-device-identifiers"><span class="secno">2.4.1</span> <span class="content">Identifiers for remote Bluetooth devices</span></a>
+        <li><a href="#ua-bluetooth-address"><span class="secno">2.4.2</span> <span class="content">The UA’s Bluetooth address</span></a>
        </ol>
      </ol>
     <li>
@@ -1542,6 +1543,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
      <ol class="toc">
       <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
+      <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
      </ol>
     <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
     <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
@@ -1712,8 +1714,28 @@ function onHeartRateChanged(event) {
       can access Bluetooth devices
       (<a href="#requestDevice-secure-context">requestDevice</a>). </p>
     </section>
+    <section class="non-normative">
+     <h3 class="heading settled" data-level="2.2" id="server-takeovers"><span class="secno">2.2. </span><span class="content">Trusted servers can serve malicious code</span><a class="self-link" href="#server-takeovers"></a></h3>
+     <p><em>This section is non-normative.</em></p>
+     <p> Even if the user trusts an origin,
+      that origin’s servers or developers could be compromised,
+      or the origin’s site could be vulnerable to XSS attacks.
+      Either could lead to users granting malicious code access to valuable devices.
+      Origins should define a Content Security Policy (<a data-link-type="biblio" href="#biblio-csp3">[CSP3]</a>)
+      to reduce the risk of XSS attacks,
+      but this doesn’t help with compromised servers or developers. </p>
+     <p> The ability to retrieve granted devices after a page reload,
+      provided by <a href="#permission-api-integration">§3.1 Permission API Integration</a>,
+      makes this risk worse.
+      Instead of having to get the user to grant access while the site is compromised,
+      the attacker can take advantage of previously-granted devices
+      if the user simply visits while the site is compromised.
+      On the other hand, when sites can keep access to devices across page reloads,
+      they don’t have to show as many permission prompts overall,
+      making it more likely that users will pay attention to the prompts they do see. </p>
+    </section>
     <section>
-     <h3 class="heading settled" data-level="2.2" id="attacks-on-devices"><span class="secno">2.2. </span><span class="content">Attacks on devices</span><a class="self-link" href="#attacks-on-devices"></a></h3>
+     <h3 class="heading settled" data-level="2.3" id="attacks-on-devices"><span class="secno">2.3. </span><span class="content">Attacks on devices</span><a class="self-link" href="#attacks-on-devices"></a></h3>
      <p><em>This section is non-normative.</em></p>
      <p> Communication from websites can break the security model of some devices,
       which assume they only receive messages from
@@ -1752,7 +1774,7 @@ function onHeartRateChanged(event) {
      </ul>
     </section>
     <section>
-     <h3 class="heading settled" data-level="2.3" id="bluetooth-device-identifiers"><span class="secno">2.3. </span><span class="content">Bluetooth device identifiers</span><a class="self-link" href="#bluetooth-device-identifiers"></a></h3>
+     <h3 class="heading settled" data-level="2.4" id="bluetooth-device-identifiers"><span class="secno">2.4. </span><span class="content">Bluetooth device identifiers</span><a class="self-link" href="#bluetooth-device-identifiers"></a></h3>
      <p><em>This section is non-normative.</em></p>
      <p> Each Bluetooth BR/EDR device has a unique 48-bit MAC address
       known as the <a data-link-type="dfn" href="#bd_addr" id="ref-for-bd_addr-1">BD_ADDR</a>.
@@ -1772,7 +1794,7 @@ function onHeartRateChanged(event) {
      <p> Each Bluetooth device also has a human-readable <a data-link-type="dfn" href="#bluetooth-device-name" id="ref-for-bluetooth-device-name-1">Bluetooth Device Name</a>.
       These aren’t guaranteed to be unique, but may well be, depending on the device type. </p>
      <section>
-      <h4 class="heading settled" data-level="2.3.1" id="remote-device-identifiers"><span class="secno">2.3.1. </span><span class="content">Identifiers for remote Bluetooth devices</span><a class="self-link" href="#remote-device-identifiers"></a></h4>
+      <h4 class="heading settled" data-level="2.4.1" id="remote-device-identifiers"><span class="secno">2.4.1. </span><span class="content">Identifiers for remote Bluetooth devices</span><a class="self-link" href="#remote-device-identifiers"></a></h4>
       <p><em>This section is non-normative.</em></p>
       <p> If a website can retrieve any of the persistent device IDs,
         these can be used, in combination with a large effort to catalog ambient devices,
@@ -1789,7 +1811,7 @@ function onHeartRateChanged(event) {
         but it takes work. </p>
      </section>
      <section>
-      <h4 class="heading settled" data-level="2.3.2" id="ua-bluetooth-address"><span class="secno">2.3.2. </span><span class="content">The UA’s Bluetooth address</span><a class="self-link" href="#ua-bluetooth-address"></a></h4>
+      <h4 class="heading settled" data-level="2.4.2" id="ua-bluetooth-address"><span class="secno">2.4.2. </span><span class="content">The UA’s Bluetooth address</span><a class="self-link" href="#ua-bluetooth-address"></a></h4>
       <p><em>This section is non-normative.</em></p>
       <p> In BR/EDR mode, or in LE mode during active scanning without the <a data-link-type="dfn" href="#privacy-feature" id="ref-for-privacy-feature-1">Privacy Feature</a>,
         the UA broadcasts its persistent ID to any nearby Bluetooth radio.
@@ -2376,7 +2398,7 @@ dictionary <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-exp
         the UA might revoke access to a device when the tab that was granted access to it is closed.
         Or the UA might provide a revocation UI that allows the user
         to explicitly revoke access even while a tab is actively using a device. </span> </p>
-     <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="add an allowed Bluetooth device" data-noexport="" id="add-an-allowed-bluetooth-device">add an allowed <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-11">Bluetooth device</a><span class="dfn-panel" data-deco=""><b><a href="#add-an-allowed-bluetooth-device">#add-an-allowed-bluetooth-device</a></b><b>Referenced in:</b><span><a href="#ref-for-add-an-allowed-bluetooth-device-1">2.3.1. Identifiers for remote Bluetooth devices</a></span><span><a href="#ref-for-add-an-allowed-bluetooth-device-2">3. Device Discovery</a></span><span><a href="#ref-for-add-an-allowed-bluetooth-device-3">4.3. BluetoothDevice</a></span></span></dfn> <var>device</var> to a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissionstorage" id="ref-for-dictdef-bluetoothpermissionstorage-5">BluetoothPermissionStorage</a></code> <var>storage</var> with an optional <var>allowed services</var> list of <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-2">UUID</a>s,
+     <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="add an allowed Bluetooth device" data-noexport="" id="add-an-allowed-bluetooth-device">add an allowed <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-11">Bluetooth device</a><span class="dfn-panel" data-deco=""><b><a href="#add-an-allowed-bluetooth-device">#add-an-allowed-bluetooth-device</a></b><b>Referenced in:</b><span><a href="#ref-for-add-an-allowed-bluetooth-device-1">2.4.1. Identifiers for remote Bluetooth devices</a></span><span><a href="#ref-for-add-an-allowed-bluetooth-device-2">3. Device Discovery</a></span><span><a href="#ref-for-add-an-allowed-bluetooth-device-3">4.3. BluetoothDevice</a></span></span></dfn> <var>device</var> to a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissionstorage" id="ref-for-dictdef-bluetoothpermissionstorage-5">BluetoothPermissionStorage</a></code> <var>storage</var> with an optional <var>allowed services</var> list of <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-2">UUID</a>s,
       the UA MUST run the following steps. </p>
      <ol class="algorithm">
       <li>
@@ -3853,7 +3875,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
              <li value="4">
               Informational Parameters 
               <ol>
-               <li value="6"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Read BD_ADDR Command" data-noexport="" id="read-bd_addr-command">Read BD_ADDR Command<span class="dfn-panel" data-deco=""><b><a href="#read-bd_addr-command">#read-bd_addr-command</a></b><b>Referenced in:</b><span><a href="#ref-for-read-bd_addr-command-1">2.3. Bluetooth device identifiers</a></span></span></dfn>
+               <li value="6"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Read BD_ADDR Command" data-noexport="" id="read-bd_addr-command">Read BD_ADDR Command<span class="dfn-panel" data-deco=""><b><a href="#read-bd_addr-command">#read-bd_addr-command</a></b><b>Referenced in:</b><span><a href="#ref-for-read-bd_addr-command-1">2.4. Bluetooth device identifiers</a></span></span></dfn>
               </ol>
              <li value="5">
               Status Parameters 
@@ -3905,7 +3927,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
              <li value="2">
               Representation of Bluetooth Parameters 
               <ol>
-               <li value="2"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Bluetooth Device Name" data-noexport="" id="bluetooth-device-name">Bluetooth Device Name<span class="dfn-panel" data-deco=""><b><a href="#bluetooth-device-name">#bluetooth-device-name</a></b><b>Referenced in:</b><span><a href="#ref-for-bluetooth-device-name-1">2.3. Bluetooth device identifiers</a></span><span><a href="#ref-for-bluetooth-device-name-2">3. Device Discovery</a> <a href="#ref-for-bluetooth-device-name-3">(2)</a> <a href="#ref-for-bluetooth-device-name-4">(3)</a> <a href="#ref-for-bluetooth-device-name-5">(4)</a> <a href="#ref-for-bluetooth-device-name-6">(5)</a></span><span><a href="#ref-for-bluetooth-device-name-7">4.1. Global Bluetooth device properties</a> <a href="#ref-for-bluetooth-device-name-8">(2)</a></span><span><a href="#ref-for-bluetooth-device-name-9">4.3. BluetoothDevice</a></span></span></dfn> (the user-friendly name) 
+               <li value="2"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Bluetooth Device Name" data-noexport="" id="bluetooth-device-name">Bluetooth Device Name<span class="dfn-panel" data-deco=""><b><a href="#bluetooth-device-name">#bluetooth-device-name</a></b><b>Referenced in:</b><span><a href="#ref-for-bluetooth-device-name-1">2.4. Bluetooth device identifiers</a></span><span><a href="#ref-for-bluetooth-device-name-2">3. Device Discovery</a> <a href="#ref-for-bluetooth-device-name-3">(2)</a> <a href="#ref-for-bluetooth-device-name-4">(3)</a> <a href="#ref-for-bluetooth-device-name-5">(4)</a> <a href="#ref-for-bluetooth-device-name-6">(5)</a></span><span><a href="#ref-for-bluetooth-device-name-7">4.1. Global Bluetooth device properties</a> <a href="#ref-for-bluetooth-device-name-8">(2)</a></span><span><a href="#ref-for-bluetooth-device-name-9">4.3. BluetoothDevice</a></span></span></dfn> (the user-friendly name) 
                <li value="4"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Class of Device" data-noexport="" id="class-of-device">Class of Device<span class="dfn-panel" data-deco=""><b><a href="#class-of-device">#class-of-device</a></b><b>Referenced in:</b><span><a href="#ref-for-class-of-device-1">4.1. Global Bluetooth device properties</a></span><span><a href="#ref-for-class-of-device-2">4.3. BluetoothDevice</a></span></span></dfn>
               </ol>
             </ol>
@@ -3933,15 +3955,15 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
            <li value="10">
             Security Aspects — LE Physical Transport 
             <ol>
-             <li value="7"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Privacy Feature" data-noexport="" id="privacy-feature">Privacy Feature<span class="dfn-panel" data-deco=""><b><a href="#privacy-feature">#privacy-feature</a></b><b>Referenced in:</b><span><a href="#ref-for-privacy-feature-1">2.3.2. The UA’s Bluetooth address</a> <a href="#ref-for-privacy-feature-2">(2)</a> <a href="#ref-for-privacy-feature-3">(3)</a></span><span><a href="#ref-for-privacy-feature-4">3. Device Discovery</a> <a href="#ref-for-privacy-feature-5">(2)</a></span></span></dfn>
+             <li value="7"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Privacy Feature" data-noexport="" id="privacy-feature">Privacy Feature<span class="dfn-panel" data-deco=""><b><a href="#privacy-feature">#privacy-feature</a></b><b>Referenced in:</b><span><a href="#ref-for-privacy-feature-1">2.4.2. The UA’s Bluetooth address</a> <a href="#ref-for-privacy-feature-2">(2)</a> <a href="#ref-for-privacy-feature-3">(3)</a></span><span><a href="#ref-for-privacy-feature-4">3. Device Discovery</a> <a href="#ref-for-privacy-feature-5">(2)</a></span></span></dfn>
              <li value="8">
               Random Device Address 
               <ol>
                <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Static Address" data-noexport="" id="static-address">Static Address<span class="dfn-panel" data-deco=""><b><a href="#static-address">#static-address</a></b><b>Referenced in:</b><span><a href="#ref-for-static-address-1">4.1. Global Bluetooth device properties</a> <a href="#ref-for-static-address-2">(2)</a></span><span><a href="#ref-for-static-address-3">4.2. Per-origin Bluetooth device properties</a></span></span></dfn>
                <li value="2">
-                <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Private address" data-noexport="" id="private-address">Private address<span class="dfn-panel" data-deco=""><b><a href="#private-address">#private-address</a></b><b>Referenced in:</b><span><a href="#ref-for-private-address-1">2.3. Bluetooth device identifiers</a></span><span><a href="#ref-for-private-address-2">4.1. Global Bluetooth device properties</a> <a href="#ref-for-private-address-3">(2)</a> <a href="#ref-for-private-address-4">(3)</a></span></span></dfn> 
+                <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Private address" data-noexport="" id="private-address">Private address<span class="dfn-panel" data-deco=""><b><a href="#private-address">#private-address</a></b><b>Referenced in:</b><span><a href="#ref-for-private-address-1">2.4. Bluetooth device identifiers</a></span><span><a href="#ref-for-private-address-2">4.1. Global Bluetooth device properties</a> <a href="#ref-for-private-address-3">(2)</a> <a href="#ref-for-private-address-4">(3)</a></span></span></dfn> 
                 <ol>
-                 <li value="3"> <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Resolvable Private Address Resolution Procedure" data-noexport="" id="resolvable-private-address-resolution-procedure">Resolvable Private Address Resolution Procedure<span class="dfn-panel" data-deco=""><b><a href="#resolvable-private-address-resolution-procedure">#resolvable-private-address-resolution-procedure</a></b><b>Referenced in:</b><span><a href="#ref-for-resolvable-private-address-resolution-procedure-1">2.3. Bluetooth device identifiers</a></span><span><a href="#ref-for-resolvable-private-address-resolution-procedure-2">4.1. Global Bluetooth device properties</a></span></span></dfn> 
+                 <li value="3"> <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Resolvable Private Address Resolution Procedure" data-noexport="" id="resolvable-private-address-resolution-procedure">Resolvable Private Address Resolution Procedure<span class="dfn-panel" data-deco=""><b><a href="#resolvable-private-address-resolution-procedure">#resolvable-private-address-resolution-procedure</a></b><b>Referenced in:</b><span><a href="#ref-for-resolvable-private-address-resolution-procedure-1">2.4. Bluetooth device identifiers</a></span><span><a href="#ref-for-resolvable-private-address-resolution-procedure-2">4.1. Global Bluetooth device properties</a></span></span></dfn> 
                 </ol>
               </ol>
             </ol>
@@ -3950,7 +3972,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
             Bluetooth Device Requirements 
             <ol>
              <li value="1">
-              Bluetooth Device Address (defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="BD_ADDR" data-noexport="" id="bd_addr">BD_ADDR<span class="dfn-panel" data-deco=""><b><a href="#bd_addr">#bd_addr</a></b><b>Referenced in:</b><span><a href="#ref-for-bd_addr-1">2.3. Bluetooth device identifiers</a> <a href="#ref-for-bd_addr-2">(2)</a></span></span></dfn>) 
+              Bluetooth Device Address (defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="BD_ADDR" data-noexport="" id="bd_addr">BD_ADDR<span class="dfn-panel" data-deco=""><b><a href="#bd_addr">#bd_addr</a></b><b>Referenced in:</b><span><a href="#ref-for-bd_addr-1">2.4. Bluetooth device identifiers</a> <a href="#ref-for-bd_addr-2">(2)</a></span></span></dfn>) 
               <ol>
                <li value="1">
                 Bluetooth Device Address Types 
@@ -3985,7 +4007,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
             </ol>
           </ol>
          <li value="7">
-          <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Generic Attribute Profile|GATT" data-noexport="" id="generic-attribute-profile">Generic Attribute Profile<span class="dfn-panel" data-deco=""><b><a href="#generic-attribute-profile">#generic-attribute-profile</a></b><b>Referenced in:</b><span><a href="#ref-for-generic-attribute-profile-1">1. Introduction</a></span><span><a href="#ref-for-generic-attribute-profile-2">2.2. Attacks on devices</a></span></span></dfn> (GATT) 
+          <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Generic Attribute Profile|GATT" data-noexport="" id="generic-attribute-profile">Generic Attribute Profile<span class="dfn-panel" data-deco=""><b><a href="#generic-attribute-profile">#generic-attribute-profile</a></b><b>Referenced in:</b><span><a href="#ref-for-generic-attribute-profile-1">1. Introduction</a></span><span><a href="#ref-for-generic-attribute-profile-2">2.3. Attacks on devices</a></span></span></dfn> (GATT) 
           <ol>
            <li value="2">
             Profile Overview 
@@ -4004,7 +4026,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
               <ol>
                <li value="2"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Service" data-noexport="" id="service">Service<span class="dfn-panel" data-deco=""><b><a href="#service">#service</a></b><b>Referenced in:</b><span><a href="#ref-for-service-1">1. Introduction</a></span><span><a href="#ref-for-service-2">3. Device Discovery</a> <a href="#ref-for-service-3">(2)</a> <a href="#ref-for-service-4">(3)</a> <a href="#ref-for-service-5">(4)</a> <a href="#ref-for-service-6">(5)</a></span><span><a href="#ref-for-service-7">5.1. GATT Information Model</a></span><span><a href="#ref-for-service-8">5.3. BluetoothRemoteGATTService</a></span><span><a href="#ref-for-service-9">5.6.1. Bluetooth Tree</a></span><span><a href="#ref-for-service-10">5.6.5. Responding to Service Changes</a> <a href="#ref-for-service-11">(2)</a> <a href="#ref-for-service-12">(3)</a> <a href="#ref-for-service-13">(4)</a> <a href="#ref-for-service-14">(5)</a> <a href="#ref-for-service-15">(6)</a> <a href="#ref-for-service-16">(7)</a> <a href="#ref-for-service-17">(8)</a> <a href="#ref-for-service-18">(9)</a> <a href="#ref-for-service-19">(10)</a> <a href="#ref-for-service-20">(11)</a> <a href="#ref-for-service-21">(12)</a> <a href="#ref-for-service-22">(13)</a> <a href="#ref-for-service-23">(14)</a> <a href="#ref-for-service-24">(15)</a></span></span></dfn>
                <li value="3"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Included Service" data-noexport="" id="included-service">Included Service<span class="dfn-panel" data-deco=""><b><a href="#included-service">#included-service</a></b><b>Referenced in:</b><span><a href="#ref-for-included-service-1">5.1. GATT Information Model</a></span><span><a href="#ref-for-included-service-2">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-included-service-3">(2)</a></span></span></dfn>s
-               <li value="4"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Characteristic" data-noexport="" id="characteristic">Characteristic<span class="dfn-panel" data-deco=""><b><a href="#characteristic">#characteristic</a></b><b>Referenced in:</b><span><a href="#ref-for-characteristic-1">1. Introduction</a></span><span><a href="#ref-for-characteristic-2">2.2. Attacks on devices</a></span><span><a href="#ref-for-characteristic-3">5.1. GATT Information Model</a> <a href="#ref-for-characteristic-4">(2)</a></span><span><a href="#ref-for-characteristic-5">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-characteristic-6">(2)</a></span><span><a href="#ref-for-characteristic-7">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-8">(2)</a> <a href="#ref-for-characteristic-9">(3)</a> <a href="#ref-for-characteristic-10">(4)</a> <a href="#ref-for-characteristic-11">(5)</a> <a href="#ref-for-characteristic-12">(6)</a></span><span><a href="#ref-for-characteristic-13">5.5. BluetoothRemoteGATTDescriptor</a></span><span><a href="#ref-for-characteristic-14">5.6.4. Responding to Notifications and Indications</a> <a href="#ref-for-characteristic-15">(2)</a></span><span><a href="#ref-for-characteristic-16">5.6.5. Responding to Service Changes</a> <a href="#ref-for-characteristic-17">(2)</a></span></span></dfn>
+               <li value="4"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Characteristic" data-noexport="" id="characteristic">Characteristic<span class="dfn-panel" data-deco=""><b><a href="#characteristic">#characteristic</a></b><b>Referenced in:</b><span><a href="#ref-for-characteristic-1">1. Introduction</a></span><span><a href="#ref-for-characteristic-2">2.3. Attacks on devices</a></span><span><a href="#ref-for-characteristic-3">5.1. GATT Information Model</a> <a href="#ref-for-characteristic-4">(2)</a></span><span><a href="#ref-for-characteristic-5">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-characteristic-6">(2)</a></span><span><a href="#ref-for-characteristic-7">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-8">(2)</a> <a href="#ref-for-characteristic-9">(3)</a> <a href="#ref-for-characteristic-10">(4)</a> <a href="#ref-for-characteristic-11">(5)</a> <a href="#ref-for-characteristic-12">(6)</a></span><span><a href="#ref-for-characteristic-13">5.5. BluetoothRemoteGATTDescriptor</a></span><span><a href="#ref-for-characteristic-14">5.6.4. Responding to Notifications and Indications</a> <a href="#ref-for-characteristic-15">(2)</a></span><span><a href="#ref-for-characteristic-16">5.6.5. Responding to Service Changes</a> <a href="#ref-for-characteristic-17">(2)</a></span></span></dfn>
               </ol>
             </ol>
            <li value="3">
@@ -4019,7 +4041,7 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
                  <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Characteristic Properties" data-noexport="" id="characteristic-properties">Characteristic Properties<span class="dfn-panel" data-deco=""><b><a href="#characteristic-properties">#characteristic-properties</a></b><b>Referenced in:</b><span><a href="#ref-for-characteristic-properties-1">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-properties-2">(2)</a> <a href="#ref-for-characteristic-properties-3">(3)</a></span><span><a href="#ref-for-characteristic-properties-4">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-characteristic-properties-5">(2)</a> <a href="#ref-for-characteristic-properties-6">(3)</a></span></span></dfn>
                 </ol>
                <li value="3">
-                Characteristic <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Descriptor" data-noexport="" id="descriptor">Descriptor<span class="dfn-panel" data-deco=""><b><a href="#descriptor">#descriptor</a></b><b>Referenced in:</b><span><a href="#ref-for-descriptor-1">1. Introduction</a></span><span><a href="#ref-for-descriptor-2">2.2. Attacks on devices</a></span><span><a href="#ref-for-descriptor-3">5.1. GATT Information Model</a></span><span><a href="#ref-for-descriptor-4">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-descriptor-5">(2)</a></span><span><a href="#ref-for-descriptor-6">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-descriptor-7">(2)</a> <a href="#ref-for-descriptor-8">(3)</a></span><span><a href="#ref-for-descriptor-9">5.6.5. Responding to Service Changes</a> <a href="#ref-for-descriptor-10">(2)</a></span></span></dfn> Declarations 
+                Characteristic <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Descriptor" data-noexport="" id="descriptor">Descriptor<span class="dfn-panel" data-deco=""><b><a href="#descriptor">#descriptor</a></b><b>Referenced in:</b><span><a href="#ref-for-descriptor-1">1. Introduction</a></span><span><a href="#ref-for-descriptor-2">2.3. Attacks on devices</a></span><span><a href="#ref-for-descriptor-3">5.1. GATT Information Model</a></span><span><a href="#ref-for-descriptor-4">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-descriptor-5">(2)</a></span><span><a href="#ref-for-descriptor-6">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-descriptor-7">(2)</a> <a href="#ref-for-descriptor-8">(3)</a></span><span><a href="#ref-for-descriptor-9">5.6.5. Responding to Service Changes</a> <a href="#ref-for-descriptor-10">(2)</a></span></span></dfn> Declarations 
                 <ol>
                  <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Characteristic Extended Properties" data-noexport="" id="characteristic-extended-properties">Characteristic Extended Properties<span class="dfn-panel" data-deco=""><b><a href="#characteristic-extended-properties">#characteristic-extended-properties</a></b><b>Referenced in:</b><span><a href="#ref-for-characteristic-extended-properties-1">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-characteristic-extended-properties-2">(2)</a></span></span></dfn>
                  <li value="3"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Client Characteristic Configuration" data-noexport="" id="client-characteristic-configuration">Client Characteristic Configuration<span class="dfn-panel" data-deco=""><b><a href="#client-characteristic-configuration">#client-characteristic-configuration</a></b><b>Referenced in:</b><span><a href="#ref-for-client-characteristic-configuration-1">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-client-characteristic-configuration-2">(2)</a></span></span></dfn>
@@ -4094,8 +4116,8 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
              <li value="4">
               Security in Bluetooth Low Energy 
               <ol>
-               <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Definition of Keys and Values" data-noexport="" id="definition-of-keys-and-values">Definition of Keys and Values<span class="dfn-panel" data-deco=""><b><a href="#definition-of-keys-and-values">#definition-of-keys-and-values</a></b><b>Referenced in:</b><span><a href="#ref-for-definition-of-keys-and-values-1">2.2. Attacks on devices</a></span></span></dfn>,
-                          defines the <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Identity Resolving Key|IRK" data-noexport="" id="identity-resolving-key">Identity Resolving Key<span class="dfn-panel" data-deco=""><b><a href="#identity-resolving-key">#identity-resolving-key</a></b><b>Referenced in:</b><span><a href="#ref-for-identity-resolving-key-1">2.3. Bluetooth device identifiers</a> <a href="#ref-for-identity-resolving-key-2">(2)</a></span><span><a href="#ref-for-identity-resolving-key-3">4.1. Global Bluetooth device properties</a> <a href="#ref-for-identity-resolving-key-4">(2)</a></span><span><a href="#ref-for-identity-resolving-key-5">4.2. Per-origin Bluetooth device properties</a></span></span></dfn> (<abbr title="Identity Resolving Key">IRK</abbr>) 
+               <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Definition of Keys and Values" data-noexport="" id="definition-of-keys-and-values">Definition of Keys and Values<span class="dfn-panel" data-deco=""><b><a href="#definition-of-keys-and-values">#definition-of-keys-and-values</a></b><b>Referenced in:</b><span><a href="#ref-for-definition-of-keys-and-values-1">2.3. Attacks on devices</a></span></span></dfn>,
+                          defines the <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Identity Resolving Key|IRK" data-noexport="" id="identity-resolving-key">Identity Resolving Key<span class="dfn-panel" data-deco=""><b><a href="#identity-resolving-key">#identity-resolving-key</a></b><b>Referenced in:</b><span><a href="#ref-for-identity-resolving-key-1">2.4. Bluetooth device identifiers</a> <a href="#ref-for-identity-resolving-key-2">(2)</a></span><span><a href="#ref-for-identity-resolving-key-3">4.1. Global Bluetooth device properties</a> <a href="#ref-for-identity-resolving-key-4">(2)</a></span><span><a href="#ref-for-identity-resolving-key-5">4.2. Per-origin Bluetooth device properties</a></span></span></dfn> (<abbr title="Identity Resolving Key">IRK</abbr>) 
               </ol>
             </ol>
           </ol>
@@ -4112,11 +4134,11 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
              <li value="3">
               Device Address 
               <ol>
-               <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Public Device Address" data-noexport="" id="public-device-address">Public Device Address<span class="dfn-panel" data-deco=""><b><a href="#public-device-address">#public-device-address</a></b><b>Referenced in:</b><span><a href="#ref-for-public-device-address-1">2.3. Bluetooth device identifiers</a> <a href="#ref-for-public-device-address-2">(2)</a> <a href="#ref-for-public-device-address-3">(3)</a></span></span></dfn>
+               <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Public Device Address" data-noexport="" id="public-device-address">Public Device Address<span class="dfn-panel" data-deco=""><b><a href="#public-device-address">#public-device-address</a></b><b>Referenced in:</b><span><a href="#ref-for-public-device-address-1">2.4. Bluetooth device identifiers</a> <a href="#ref-for-public-device-address-2">(2)</a> <a href="#ref-for-public-device-address-3">(3)</a></span></span></dfn>
                <li value="2">
                 Random Device Address 
                 <ol>
-                 <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Static Device Address" data-noexport="" id="static-device-address">Static Device Address<span class="dfn-panel" data-deco=""><b><a href="#static-device-address">#static-device-address</a></b><b>Referenced in:</b><span><a href="#ref-for-static-device-address-1">2.3. Bluetooth device identifiers</a> <a href="#ref-for-static-device-address-2">(2)</a></span></span></dfn>
+                 <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="Static Device Address" data-noexport="" id="static-device-address">Static Device Address<span class="dfn-panel" data-deco=""><b><a href="#static-device-address">#static-device-address</a></b><b>Referenced in:</b><span><a href="#ref-for-static-device-address-1">2.4. Bluetooth device identifiers</a> <a href="#ref-for-static-device-address-2">(2)</a></span></span></dfn>
                 </ol>
               </ol>
             </ol>
@@ -4771,6 +4793,11 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
    <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-whatwg-encoding">[WHATWG-ENCODING]
    <dd>Anne van Kesteren. <a href="https://encoding.spec.whatwg.org/">Encoding Standard</a>. Living Standard. URL: <a href="https://encoding.spec.whatwg.org/">https://encoding.spec.whatwg.org/</a>
+  </dl>
+  <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
+  <dl>
+   <dt id="biblio-csp3">[CSP3]
+   <dd>Mike West. <a href="http://www.w3.org/TR/CSP3/">Content Security Policy Level 3</a>. 26 January 2016. WD. URL: <a href="http://www.w3.org/TR/CSP3/">http://www.w3.org/TR/CSP3/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl def">dictionary <a href="#dictdef-bluetoothscanfilter">BluetoothScanFilter</a> {
