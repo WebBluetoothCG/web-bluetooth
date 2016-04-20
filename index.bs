@@ -103,6 +103,7 @@ spec: whatwg-dom; urlPrefix: http://dom.spec.whatwg.org/#; type: dfn
 
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     type: dfn
+        text: fulfilled; url: sec-promise-objects
         text: global object; url: global-object
         text: realm; url: sec-code-realms
     type: method
@@ -1074,8 +1075,20 @@ spec: permissions
     </li>
     <li>
       <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
-      inside the <a>context object</a> and <var>storage</var>
-      and <a>resolve</a> <var>promise</var> with the result.
+      inside the <a>context object</a> and <var>storage</var>,
+      and let <var>deviceObjPromise</var> be the result.
+    </li>
+    <li>
+      Wait for <var>deviceObjPromise</var> to settle.
+    </li>
+    <li>
+      If <var>deviceObjPromise</var> is <a>fulfilled</a>,
+      set <code><var>status</var>.{{BluetoothPermissionResult/devices}}</code>
+      to a new {{FrozenArray}} containing the value of <var>deviceObjPromise</var>
+      as its only element.
+    </li>
+    <li>
+      <a>Resolve</a> <var>promise</var> with <var>deviceObjPromise</var>.
     </li>
   </ol>
 
