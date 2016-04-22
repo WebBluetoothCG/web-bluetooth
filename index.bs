@@ -38,12 +38,6 @@ Markup Shorthands: css no, markdown yes
     "status": "Living Standard",
     "publisher": "Bluetooth SIG"
   },
-  "BLUETOOTH-ASSIGNED-BASEBAND": {
-    "href": "https://www.bluetooth.org/en-us/specification/assigned-numbers/baseband",
-    "title": "Assigned Numbers for Baseband",
-    "status": "Living Standard",
-    "publisher": "Bluetooth SIG"
-  },
   "BLUETOOTH-ASSIGNED-SERVICES": {
     "href": "https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx",
     "title": "Bluetooth GATT Specifications > Services",
@@ -87,13 +81,11 @@ spec: BLUETOOTH-ASSIGNED
             text: org.bluetooth.characteristic.heart_rate_control_point; url: heart_rate_control_point.xml#
             text: org.bluetooth.characteristic.heart_rate_measurement; url: heart_rate_measurement.xml#
             text: org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list; url: ieee_11073-20601_regulatory_certification_data_list.xml#
-            text: org.bluetooth.characteristic.pnp_id; url: pnp_id.xml#
         urlPrefix: descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.
             text: org.bluetooth.descriptor.gatt.characteristic_presentation_format; url: gatt.characteristic_presentation_format.xml#
             text: org.bluetooth.descriptor.gatt.client_characteristic_configuration; url: gatt.client_characteristic_configuration.xml#
         urlPrefix: services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.
             text: org.bluetooth.service.cycling_power; url: cycling_power.xml#
-            text: org.bluetooth.service.device_information; url: device_information.xml#
             text: org.bluetooth.service.heart_rate; url: heart_rate.xml#
     type: dfn
         text: Shortened Local Name; url: https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#
@@ -805,7 +797,7 @@ spec: permissions
       <td><dfn>\[[deviceInstanceMap]]</dfn></td>
       <td>
         An empty map from <a>Bluetooth device</a>s
-        to <code>Promise&lt;{{BluetoothDevice}}></code> instances.
+        to <code>{{BluetoothDevice}}</code> instances.
       </td>
       <td>
         Ensures only one {{BluetoothDevice}} instance represents each <a>Bluetooth device</a>
@@ -1072,6 +1064,11 @@ spec: permissions
       >Add <var>device</var> to <var>storage</var></a>
       with the union of <var>requiredServiceUUIDs</var>
       and <var>optionalServiceUUIDs</var> as <var>allowed services</var>.
+    </li>
+    <li>
+      The UA MAY <a>populate the Bluetooth cache</a> with
+      all Services inside <var>device</var>.
+      Ignore any errors from this step.
     </li>
     <li>
       <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
@@ -1462,12 +1459,6 @@ spec: permissions
       </li>
 
       <li>
-        An optional <a>Class of Device</a>,
-        one of the values defined in [[!BLUETOOTH-ASSIGNED-BASEBAND]].
-        The Class of Device is only used over the BR/EDR physical transport, not LE.
-      </li>
-
-      <li>
         A hierarchy of GATT attributes, described in [[#information-model]].
       </li>
     </ul>
@@ -1644,21 +1635,10 @@ spec: permissions
     </p>
 
     <pre class="idl">
-      // Allocation authorities for Vendor IDs:
-      enum VendorIDSource {
-        "bluetooth",
-        "usb"
-      };
-
       interface BluetoothDevice {
         readonly attribute DOMString id;
         readonly attribute DOMString? name;
         readonly attribute BluetoothAdvertisingData adData;
-        readonly attribute unsigned long? deviceClass;
-        readonly attribute VendorIDSource? vendorIDSource;
-        readonly attribute unsigned long? vendorID;
-        readonly attribute unsigned long? productID;
-        readonly attribute unsigned long? productVersion;
         readonly attribute BluetoothRemoteGATTServer gatt;
         readonly attribute FrozenArray&lt;UUID> uuids;
       };
@@ -1687,35 +1667,6 @@ spec: permissions
         <dfn>adData</dfn> contains the most recent advertising data received for this device.
         <span class="issue">TODO: Write the algorithm to update this
           when an advertising packet is received.</span>
-      </p>
-
-      <p>
-        <dfn>deviceClass</dfn> is the class of the device,
-        a bit-field defined by [[!BLUETOOTH-ASSIGNED-BASEBAND]].
-      </p>
-
-      <p>
-        <dfn>vendorIDSource</dfn> is
-        the Vendor ID Source field
-        in the {{org.bluetooth.characteristic.pnp_id|pnp_id}} characteristic
-        in the {{org.bluetooth.service.device_information|device_information}} service.
-      </p>
-      <p>
-        <dfn>vendorID</dfn> is the 16-bit Vendor ID field
-        in the {{org.bluetooth.characteristic.pnp_id|pnp_id}} characteristic
-        in the {{org.bluetooth.service.device_information|device_information}} service.
-      </p>
-      <p>
-        <dfn>productID</dfn> is the 16-bit Product ID field
-        in the {{org.bluetooth.characteristic.pnp_id|pnp_id}} characteristic
-        in the {{org.bluetooth.service.device_information|device_information}} service.
-      </p>
-      <p>
-        <dfn>productVersion</dfn> is the 16-bit Product Version field in the
-        {{org.bluetooth.characteristic.pnp_id|pnp_id}}
-        characteristic in the
-        {{org.bluetooth.service.device_information|device_information}}
-        service.
       </p>
 
       <p>
@@ -1796,22 +1747,27 @@ spec: permissions
       To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
       a <a>Bluetooth device</a> <var>device</var>
       inside a {{Bluetooth}} instance <var>context</var>,
-      and an optional {{BluetoothPermissionStorage}},
+      and an optional {{BluetoothPermissionStorage}} <var>storage</var>,
       the UA MUST run the following steps:
     </p>
     <ol class="algorithm">
       <li>
-        If there is a key in
+        If <var>storage</var> isn't set,
+        <a>retrieve the permission storage</a> for the {{PermissionName/"bluetooth"}} permission,
+        and set <var>storage</var> to the resulting {{BluetoothPermissionStorage}}.
+      </li>
+      <li>
+        Find the <var>allowedDevice</var> in <code><var>storage</var>.{{allowedDevices}}</code>
+        with <code><var>allowedDevice</var>@{{[[device]]}}</code>
+        the <a>same device</a> as <var>device</var>.
+        If there is no such object,
+        throw a {{SecurityError}} and abort these steps.
+      </li>
+      <li>
+        If there is no key in
         <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
         that is the <a>same device</a> as <var>device</var>,
-        return its value and abort these steps.
-      </li>
-      <li>Let <var>promise</var> be <a>a new promise</a>.</li>
-      <li>
-        Add a mapping from <var>device</var> to <var>promise</var>
-        in <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}.
-      </li>
-      <li>Return <var>promise</var>, and run the following steps <a>in parallel</a>.
+        run the following sub-steps:
         <ol>
           <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
           <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
@@ -1824,17 +1780,7 @@ spec: permissions
             to <var>device</var>.
           </li>
           <li>
-            If <var>storage</var> isn't set,
-            <a>retrieve the permission storage</a> for the {{PermissionName/"bluetooth"}} permission,
-            and set <var>storage</var> to the resulting {{BluetoothPermissionStorage}}.
-          </li>
-          <li>
-            Find the <var>allowedDevice</var> in <code><var>storage</var>.{{allowedDevices}}</code>
-            with <code><var>allowedDevice</var>@{{[[device]]}}</code>
-            the <a>same device</a> as <var>device</var>.
-            If there is no such object,
-            <a>resolve</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
-            Otherwise, initialize <code><var>result</var>.id</code>
+            Initialize <code><var>result</var>.id</code>
             to <code><var>allowedDevice</var>.{{AllowedBluetoothDevice/deviceId}}</code>,
             and initialize <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
             to <code><var>allowedDevice</var>.{{allowedServices}}</code>.
@@ -1849,55 +1795,6 @@ spec: permissions
             and set <code><var>result</var>.adData</code> to the result.
           </li>
           <li>
-            If <var>device</var> has a <a>Class of Device</a>,
-            set <code><var>result</var>.deviceClass</code> to that value.
-          </li>
-          <li>
-            <a>Populate the Bluetooth cache</a> with
-            the {{org.bluetooth.characteristic.pnp_id}} characteristic inside
-            the {{org.bluetooth.service.device_information}} service.
-            Ignore any errors from this step.
-          </li>
-          <li>
-            If the <a>Bluetooth cache</a> now has a known-present entry for this characteristic,
-            run the following substeps.
-            <ol>
-              <li>
-                Use any combination of the sub-procedures in
-                the <a>Characteristic Value Read</a> procedure to retrieve the value
-                of the {{org.bluetooth.characteristic.pnp_id}} characteristic
-                into <var>pnp</var>.
-                Handle errors as described in <a href="#error-handling"></a>.
-              </li>
-              <li>If the previous step returned an error, abort these substeps.</li>
-              <li>
-                Parse <var>pnp</var> as specified by
-                the {{org.bluetooth.characteristic.pnp_id}} characteristic definition.
-                If it's not 7 bytes long or
-                if the Vendor ID Source is not <code>1</code> or <code>2</code>,
-                abort these substeps.
-              </li>
-              <li>
-                Set <code><var>result</var>.vendorIDSource</code> according to the following table:
-                <table class="data">
-                  <thead><th>Parsed Vendor Id Source</th><th><code>vendorIDSource</code></th></thead>
-                  <tr><td>1</td><td><code>"bluetooth"</code></td></tr>
-                  <tr><td>2</td><td><code>"usb"</code></td></tr>
-                </table>
-              </li>
-              <li>
-                Set <code><var>result</var>.vendorID</code> to the value parsed for Vendor ID.
-              </li>
-              <li>
-                Set <code><var>result</var>.productID</code> to the value parsed for Product ID.
-              </li>
-              <li>
-                Set <code><var>result</var>.productVersion</code> to
-                the value parsed for Product Version.
-              </li>
-            </ol>
-          </li>
-          <li>
             Set <code><var>result</var>.gatt.{{BluetoothRemoteGATTServer/device}}</code> to <var>result</var>.
           </li>
           <li>
@@ -1909,17 +1806,20 @@ spec: permissions
             to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
           </li>
           <li>
-            The UA MAY <a>populate the Bluetooth cache</a> with
-            all Services inside <var>device</var>.
-            Ignore any errors from this step.
-          </li>
-          <li>
             If the <a>Bluetooth cache</a> contains
             known-present Services inside <var>device</var>,
             add the UUIDs of those Services to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
           </li>
-          <li>Resolve <var>promise</var> with <var>result</var>.</li>
+          <li>
+            Add a mapping from <var>device</var> to <var>result</var>
+            in <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}.
+          </li>
         </ol>
+      </li>
+      <li>
+        Return the value in
+        <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
+        whose key is the <a>same device</a> as <var>device</var>.
       </li>
     </ol>
 
@@ -2744,16 +2644,15 @@ spec: permissions
       <li>
         <a>Get the <code>BluetoothDevice</code> representing</a>
         the device in which <var>service</var> appears,
-        and let <var>devicePromise</var> be the result.
+        and let <var>device</var> be the result.
       </li>
-      <li>Wait for <var>devicePromise</var> to settle.</li>
       <li>
-        If <var>devicePromise</var> rejected,
-        <a>resolve</a> <var>promise</var> with <var>devicePromise</var> and abort these steps.
+        If the previous step threw an error,
+        <a>reject</a> <var>promise</var> with that error and abort these steps.
       </li>
       <li>
         Initialize <code><var>result</var>.device</code> from
-        the value of <var>devicePromise</var>.
+        <var>device</var>.
       </li>
       <li>
         Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
@@ -4287,7 +4186,6 @@ spec: permissions
                       <ol>
                         <li value="2"><dfn>Bluetooth Device Name</dfn> (the user-friendly name)
                         </li>
-                        <li value="4"><dfn>Class of Device</dfn></li>
                       </ol>
                     </li>
                   </ol>
