@@ -10,7 +10,7 @@ Work is in progress:
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
 Feature                   | Chrome OS | Android M | Mac OS X | Linux | Windows 8.1
-------------------------- | :-------: | :-------: | :------: | :----: | :-----:
+------------------------- | :-------: | :-------: | :------: | :---: | :---------:
 Discovery                 | ✓         | ✓         | ✓        | 50     | 50 (paired devices only)
 └ Name or prefix          | ✓         | ✓         | ✓        | 50     | 50
 Chooser UI                | ✓         | ✓         | ✓        | 50     | 50
@@ -21,6 +21,7 @@ Characteristic Properties | ✓         | ✓         |          | 50
 GATT Notifications        | ✓         | (start only) |    | 50
 GATT Server Disconnect    | 50        | 50        | 51       | 50
 Get Characteristics List  | 50        | 50        |          | 50
+Device Disconnected Event |
 
 ### Notes
 
