@@ -1591,7 +1591,10 @@ spec: permissions
         readonly attribute DOMString? name;
         readonly attribute BluetoothRemoteGATTServer gatt;
         readonly attribute FrozenArray&lt;UUID> uuids;
-        attribute boolean watchingAdvertisements;
+
+        void watchAdvertisements();
+        void unwatchAdvertisements();
+        readonly attribute boolean watchingAdvertisements;
       };
       BluetoothDevice implements EventTarget;
       BluetoothDevice implements BluetoothDeviceEventHandlers;
@@ -1615,12 +1618,6 @@ spec: permissions
       </p>
 
       <p>
-        <dfn>adData</dfn> contains the most recent advertising data received for this device.
-        <span class="issue">TODO: Write the algorithm to update this
-          when an advertising packet is received.</span>
-      </p>
-
-      <p>
         <dfn>gatt</dfn> provides a way to interact with this device's GATT server.
       </p>
 
@@ -1628,6 +1625,12 @@ spec: permissions
         {{BluetoothDevice/uuids}} lists
         the UUIDs of GATT services known to be on the device,
         that the current origin is allowed to access.
+      </p>
+
+      <p>
+        <dfn>watchingAdvertisements</dfn> is true if
+        the UA is currently scanning for advertisements from this device
+        and firing events for them.
       </p>
     </div>
 
@@ -1799,6 +1802,43 @@ spec: permissions
       </li>
     </ol>
 
+
+    <p class="note">
+      Scanning costs power,
+      so websites should avoid watching for advertisements unnecessarily,
+      and should call {{unwatchAdvertisements()}} to stop using power as soon as possible.
+    </p>
+
+    <p>
+      The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code> method,
+      when invoked,
+      MUST run the following steps:
+    </p>
+    <ol class="algorithm">
+      <li>Set <code>this.{{watchingAdvertisements}}</code> to `true`.</li>
+      <li>
+        Ensure that the UA is scanning for this device's advertisements.
+        The UA SHOULD NOT filter out "duplicate" advertisements for the same device.
+      </li>
+    </ol>
+
+    <p>
+      The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code> method,
+      when invoked,
+      MUST run the following steps:
+    </p>
+    <ol class="algorithm">
+      <li>Set <code>this.{{watchingAdvertisements}}</code> to `false`.</li>
+      <li>
+        If no more {{BluetoothDevice}}s in the whole UA
+        have {{watchingAdvertisements}} set to `true`,
+        the UA SHOULD stop scanning for advertisements.
+        Otherwise, if no more {{BluetoothDevice}}s representing the same device as `this`
+        have {{watchingAdvertisements}} set to `true`,
+        the UA SHOULD reconfigure the scan to avoid receiving reports for this device.
+      </li>
+    </ol>
+
     <section>
       <h4 id="advertising-events">Responding to Advertising Events</h4>
 
@@ -1889,7 +1929,7 @@ spec: permissions
           return navigator.bluetooth.requestDevice({
             filters: [{services: [known_service]}]
           }).then(device => {
-            device.watchingAdvertisements = true;
+            device.watchAdvertisements();
             device.addEventListener('advertisementreceived', interpretIBeacon);
           });
 
