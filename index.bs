@@ -1405,30 +1405,8 @@ spec: permissions
       </li>
 
       <li>
-        The following optional elements
-        from <a>Advertising Data</a> or the <a>Extended Inquiry Response</a>:
-        <ul>
-          <li>A list of advertised <a>Service UUIDs</a>.</li>
-          <li>
-            <a>Manufacturer Specific Data</a>,
-            consisting of a map from 16-bit Company Identifier Codes to byte arrays.
-            This is treated as an empty map if it's not present.
-          </li>
-          <li>A <a>TX Power Level</a>, from -127dBm to 127dBm.</li>
-          <li>
-            <a>Service Data</a>, consisting of a map from UUIDs to byte arrays.
-            This is treated as an empty map if it's not present.
-          </li>
-          <li>
-            An <a>Appearance</a>, one of the values defined by
-            the {{org.bluetooth.characteristic.gap.appearance}} characteristic.
-          </li>
-          <li>
-            A <a>Received Signal Strength Indication</a> (RSSI), from -127dBm to 20dBm.
-            This is received from the local Bluetooth adapter
-            rather than being sent by the remote device.
-          </li>
-        </ul>
+        A list of advertised <a>Service UUIDs</a>
+        from the <a>Advertising Data</a> or <a>Extended Inquiry Response</a>.
       </li>
 
       <li>
@@ -1611,9 +1589,12 @@ spec: permissions
       interface BluetoothDevice {
         readonly attribute DOMString id;
         readonly attribute DOMString? name;
-        readonly attribute BluetoothAdvertisingData adData;
         readonly attribute BluetoothRemoteGATTServer gatt;
         readonly attribute FrozenArray&lt;UUID> uuids;
+
+        Promise&lt;void> watchAdvertisements();
+        void unwatchAdvertisements();
+        readonly attribute boolean watchingAdvertisements;
       };
       BluetoothDevice implements EventTarget;
       BluetoothDevice implements BluetoothDeviceEventHandlers;
@@ -1637,19 +1618,19 @@ spec: permissions
       </p>
 
       <p>
-        <dfn>adData</dfn> contains the most recent advertising data received for this device.
-        <span class="issue">TODO: Write the algorithm to update this
-          when an advertising packet is received.</span>
-      </p>
-
-      <p>
         <dfn>gatt</dfn> provides a way to interact with this device's GATT server.
       </p>
 
       <p>
-        {{uuids}} lists
+        {{BluetoothDevice/uuids}} lists
         the UUIDs of GATT services known to be on the device,
         that the current origin is allowed to access.
+      </p>
+
+      <p>
+        <dfn>watchingAdvertisements</dfn> is true if
+        the UA is currently scanning for advertisements from this device
+        and firing events for them.
       </p>
     </div>
 
@@ -1710,7 +1691,7 @@ spec: permissions
         <td><dfn>\[[filteredUuids]]</dfn></td>
         <td><code>undefined</code></td>
         <td>
-          Cached value of {{uuids}}.
+          Cached value of {{BluetoothDevice/uuids}}.
           Up to date if {{[[cachedAllowedServices]]}} is equal to {{[[allowedServices]]}}.
         </td>
       </tr>
@@ -1763,9 +1744,7 @@ spec: permissions
             set <code><var>result</var>.name</code> to that string.
           </li>
           <li>
-            <a>Create a <code>BluetoothAdvertisingData</code></a> from <var>result</var>
-            and <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
-            and set <code><var>result</var>.adData</code> to the result.
+            Initialize <code><var>result</var>.watchingAdvertisements</code> to `false`.
           </li>
           <li>
             Set <code><var>result</var>.gatt.{{BluetoothRemoteGATTServer/device}}</code> to <var>result</var>.
@@ -1823,8 +1802,74 @@ spec: permissions
       </li>
     </ol>
 
+
+    <p class="note">
+      Scanning costs power,
+      so websites should avoid watching for advertisements unnecessarily,
+      and should call {{unwatchAdvertisements()}} to stop using power as soon as possible.
+    </p>
+
+    <p>
+      The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code> method,
+      when invoked,
+      MUST return <a>a new promise</a> |promise| and
+      run the following steps <a>in parallel</a>:
+    </p>
+    <ol class="algorithm">
+      <li>
+        Ensure that the UA is scanning for this device's advertisements.
+        The UA SHOULD NOT filter out "duplicate" advertisements for the same device.
+      </li>
+      <li>
+        If the UA fails to enable scanning,
+        <a>reject</a> |promise| with one of the following errors,
+        and abort these steps:
+
+        <dl class="switch">
+          <dt>The UA doesn't support scanning for advertisements</dt>
+          <dd>{{NotSupportedError}}</dd>
+
+          <dt>Bluetooth is turned off</dt>
+          <dd>{{InvalidStateError}}</dd>
+
+          <dt>Other reasons</dt>
+          <dd>{{UnknownError}}</dd>
+        </dl>
+      </li>
+      <li>
+        <a>Queue a task</a> to perform the following steps:
+        <ol>
+          <li>Set <code>this.{{watchingAdvertisements}}</code> to `true`.</li>
+          <li>Resolve |promise| with `undefined`.</li>
+        </ol>
+      </li>
+    </ol>
+
+    <p>
+      The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code> method,
+      when invoked,
+      MUST run the following steps:
+    </p>
+    <ol class="algorithm">
+      <li>Set <code>this.{{watchingAdvertisements}}</code> to `false`.</li>
+      <li>
+        If no more {{BluetoothDevice}}s in the whole UA
+        have {{watchingAdvertisements}} set to `true`,
+        the UA SHOULD stop scanning for advertisements.
+        Otherwise, if no more {{BluetoothDevice}}s representing the same device as `this`
+        have {{watchingAdvertisements}} set to `true`,
+        the UA SHOULD reconfigure the scan to avoid receiving reports for this device.
+      </li>
+    </ol>
+
     <section>
-      <h4 id="bluetoothadvertisingdata" dfn-type="interface">BluetoothAdvertisingData</h4>
+      <h4 id="advertising-events">Responding to Advertising Events</h4>
+
+      <p>
+        When an <a>advertising event</a> arrives for a {{BluetoothDevice}}
+        with {{BluetoothDevice/watchingAdvertisements}} set,
+        the UA delivers an "{{advertisementreceived}}" event.
+      </p>
 
       <pre class="idl">
         interface BluetoothManufacturerDataMap {
@@ -1833,17 +1878,42 @@ spec: permissions
         interface BluetoothServiceDataMap {
           readonly maplike&lt;UUID, DataView>;
         };
-        interface BluetoothAdvertisingData {
+        [Constructor(DOMString type, BluetoothAdvertisingEventInit init)]
+        interface BluetoothAdvertisingEvent : Event {
+          readonly attribute BluetoothDevice device;
+          readonly attribute FrozenArray&lt;UUID> uuids;
+          readonly attribute DOMString? name;
           readonly attribute unsigned short? appearance;
           readonly attribute byte? txPower;
           readonly attribute byte? rssi;
           readonly attribute BluetoothManufacturerDataMap manufacturerData;
           readonly attribute BluetoothServiceDataMap serviceData;
         };
+        dictionary BluetoothAdvertisingEventInit : EventInit {
+          required BluetoothDevice device;
+          sequence&lt;(DOMString or unsigned long)> uuids;
+          DOMString name;
+          unsigned short appearance;
+          byte txPower;
+          byte rssi;
+          Map manufacturerData;
+          Map serviceData;
+        };
       </pre>
 
-      <div class="note" heading="{{BluetoothAdvertisingData}} attributes"
-           dfn-for="BluetoothAdvertisingData" dfn-type="attribute">
+      <div class="note" heading="{{BluetoothAdvertisingEvent}} attributes"
+           dfn-for="BluetoothAdvertisingEvent" dfn-type="attribute"
+           link-for-hint="BluetoothAdvertisingEvent">
+        <p>
+          <dfn>device</dfn> is the {{BluetoothDevice}} that sent this advertisement.
+        </p>
+        <p>
+          <dfn>uuids</dfn> lists the Service UUIDs that
+          this advertisement says {{device}}'s GATT server supports.
+        </p>
+        <p>
+          <dfn>name</dfn> is {{device}}'s local name, or a prefix of it.
+        </p>
         <p>
           <dfn>appearance</dfn> is an <a>Appearance</a>, one of the values defined by
           the {{org.bluetooth.characteristic.gap.appearance}} characteristic.
@@ -1855,7 +1925,7 @@ spec: permissions
         </p>
         <p>
           <dfn>rssi</dfn> is
-          the power at which the device's packets are being received, measured in dBm.
+          the power at which the advertisement was received, measured in dBm.
           This is used to compute the path loss as <code>this.txPower - this.rssi</code>.
         </p>
         <p>
@@ -1867,7 +1937,7 @@ spec: permissions
         </p>
       </div>
 
-      <div class="example">
+      <div class="example" id="example-interpret-ibeacon">
         <p>
           To retrieve a device and read the iBeacon data out of it,
           a developer could use the following code.
@@ -1882,23 +1952,29 @@ spec: permissions
           return navigator.bluetooth.requestDevice({
             filters: [{services: [known_service]}]
           }).then(device => {
-            var rssi = device.adData.rssi;
-            var appleData = device.adData.manufacturerData.get(<a
-                       href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
-                       title="Apple, Inc.'s Company Identifier">0x004C</a>);
+            device.watchAdvertisements();
+            device.addEventListener('advertisementreceived', interpretIBeacon);
+          });
+
+          function interpretIBeacon(event) {
+            var rssi = event.rssi;
+            var appleData = event.manufacturerData.get(<a
+                href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
+                title="Apple, Inc.'s Company Identifier">0x004C</a>);
             if (appleData.byteLength != 23 ||
               appleData.getUint16(0, false) !== 0x0215) {
-              return {isBeacon: false};
+              console.log({isBeacon: false});
             }
             var uuidArray = new Uint8Array(appleData.buffer, 2, 16);
             var major = appleData.getUint16(18, false);
             var minor = appleData.getUint16(20, false);
             var txPowerAt1m = -appleData.getInt8(22);
-            return {isBeacon: true,
-                    uuidArray,
-                    major,
-                    minor,
-                    pathLossVs1m: txPowerAt1m - rssi};
+            console.log({
+                isBeacon: true,
+                uuidArray,
+                major,
+                minor,
+                pathLossVs1m: txPowerAt1m - rssi});
           });
         </pre>
 
@@ -1909,56 +1985,182 @@ spec: permissions
         </p>
       </div>
 
+      <p id="advertising-event-algorithm">
+        When the UA receives an <a>advertising event</a>
+        (consisting of an advertising packet and an optional scan response),
+        it MUST run the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>
+          Let <var>device</var> be the <a>Bluetooth device</a> that sent the advertising event.
+        </li>
+        <li>
+          For each {{BluetoothDevice}} <var>deviceObj</var> in the UA
+          such that <var>device</var> is the <a>same device</a> as
+          <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>,
+          <a>queue a task</a> on
+          <var>deviceObj</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a>
+          to do the following sub-steps:
+          <ol>
+            <li>
+              If <code><var>deviceObj</var>.{{watchingAdvertisements}}</code> is `false`,
+              abort these sub-steps.
+            </li>
+            <li>
+              Let <var>event</var> be
+              <pre highlight="js">
+                {
+                  bubbles: true,
+                  device: deviceObj,
+                  uuids: [],
+                  manufacturerData: new Map(),
+                  serviceData: new Map()
+                }
+              </pre>
+            </li>
+            <li>
+              If the <a>received signal strength</a> is available
+              for any packet in this advertising event,
+              set <code><var>event</var>.rssi</code> to this signal strength in dBm.
+            </li>
+            <li>
+              For each <a>AD structure</a> in the advertising packet and scan response,
+              select from the following steps depending on the AD type:
+              <dl class="switch">
+                <dt>Incomplete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+                <dt>Complete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+                <dt>Incomplete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+                <dt>Complete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+                <dt>Incomplete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+                <dt>Complete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+                <dd>Append the listed UUIDs to <code><var>event</var>.uuids</code>.</dd>
+
+                <dt>Shortened <a lt="Local Name Data Type">Local Name</a></dt>
+                <dt>Complete <a lt="Local Name Data Type">Local Name</a></dt>
+                <dd>
+                  <a>UTF-8 decode without BOM</a> the AD data and
+                  set <code><var>event</var>.name</code> to the result.
+
+                  Note: We don't expose whether the name is complete
+                  because existing APIs require
+                  reading the raw advertisement to get this information,
+                  and we want more evidence that it's useful
+                  before adding a field to the API.
+                </dd>
+
+                <dt><a>Manufacturer Specific Data</a></dt>
+                <dd>
+                  Add to <code><var>event</var>.manufacturerData</code>
+                  a mapping from the 16-bit Company Identifier Code to
+                  an {{ArrayBuffer}} containing the manufacturer-specific data.
+                </dd>
+
+                <dt><a>TX Power Level</a></dt>
+                <dd>
+                  Set <code><var>event</var>.txPower</code> to the AD data.
+                </dd>
+
+                <dt><a>Service Data</a> - 16 bit UUID</dt>
+                <dt><a>Service Data</a> - 32 bit UUID</dt>
+                <dt><a>Service Data</a> - 128 bit UUID</dt>
+                <dd>
+                  Add to <code><var>event</var>.serviceData</code>
+                  a mapping from the <a>UUID</a> to
+                  an {{ArrayBuffer}} containing the service data.
+                </dd>
+
+                <dt><a>Appearance</a></dt>
+                <dd>
+                  Set <code><var>event</var>.appearance</code> to the AD data.
+                </dd>
+
+                <dt>Otherwise</dt>
+                <dd>Skip to the next AD structure.</dd>
+              </dl>
+            </li>
+            <li>
+              <a>Fire an event</a> initialized as
+              <code>new {{BluetoothAdvertisingEvent}}("{{advertisementreceived}}",
+                <var>event</var>)</code>,
+              with its {{isTrusted}} attribute initialized to `true`,
+              at <var>deviceObj</var>.
+            </li>
+          </ol>
+        </li>
+      </ol>
+
       <p>
-        All fields in {{BluetoothAdvertisingData}} return
+        All fields in {{BluetoothAdvertisingEvent}} return
         the last value they were initialized or set to.
       </p>
 
       <p>
-        To <dfn>create a {{BluetoothAdvertisingData}}</dfn>
-        from a {{BluetoothDevice}} <var>deviceObj</var>
-        the UA must perform the following steps:
+        The <dfn constructor for="BluetoothAdvertisingEvent">BluetoothAdvertisingEvent(type, init)</dfn>
+        constructor MUST perform the following steps:
       </p>
       <ol class="algorithm">
         <li>
-          Let <var>device</var> be
-          <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>.
-        </li>
-        <li>Let <var>adData</var> be a new instance of {{BluetoothAdvertisingData}}.</li>
-        <li>
-          If <var>device</var> has an <a>Appearance</a>,
-          initialize <code><var>adData</var>.appearance</code> to its value.
-          Otherwise, initialize it to <code>null</code>.
+          Let <var>event</var> be the result of running the steps from [[dom#constructing-events]]
+          except for the {{BluetoothAdvertisingEventInit/uuids}},
+          {{BluetoothAdvertisingEventInit/manufacturerData}},
+          and {{BluetoothAdvertisingEventInit/serviceData}} members.
         </li>
         <li>
-          If <var>device</var> has a <a>TX Power Level</a>,
-          initialize <code><var>adData</var>.txPower</code> to its value.
-          Otherwise initialize it to <code>null</code>.
+          If <code><var>init</var>.uuids</code> is set,
+          initialize <code><var>event</var>.uuids</code>
+          to a new {{FrozenArray}} containing the elements of
+          <code><var>init</var>.uuids.map({{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+          Otherwise initialize <code><var>event</var>.uuids</code> to an empty {{FrozenArray}}.
         </li>
         <li>
-          If <var>device</var> has an <a>RSSI</a>,
-          initialize <code><var>adData</var>.rssi</code> to its value.
-          Otherwise initialize it to <code>null</code>.
+          For each mapping in <code><var>init</var>.manufacturerData</code>:
+          <ol>
+            <li>
+              Let <var>code</var> be the key converted to an {{unsigned short}}.
+            </li>
+            <li>
+              Let <var>value</var> be the value.
+            </li>
+            <li>
+              If <var>value</var> is not a {{BufferSource}}, throw a {{TypeError}}.
+            </li>
+            <li>
+              Let <var>bytes</var> be a new <a>read only ArrayBuffer</a>
+              containing <a>a copy of the bytes held</a> by <var>value</var>.
+            </li>
+            <li>
+              Add a mapping from <var>code</var> to <code>new DataView(<var>bytes</var>)</code>
+              in <code><var>event</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
+            </li>
+          </ol>
         </li>
         <li>
-          For each mapping in <var>device</var>'s <a>Manufacturer Specific Data</a>,
-          make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-          containing the contents of its byte array,
-          and add a mapping from the 16-bit code to <code>new DataView(<var>bytes</var>)</code>
-          in <code><var>adData</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
+          For each mapping in <code><var>init</var>.serviceData</code>:
+          <ol>
+            <li>
+              Let <var>key</var> be the key.
+            </li>
+            <li>
+              Let <var>service</var> be the result of calling
+              <code>BluetoothUUID.{{BluetoothUUID/getService()|getService}}(<var>key</var>).</code>
+            </li>
+            <li>
+              Let <var>value</var> be the value.
+            </li>
+            <li>
+              Set <var>value</var> is not a {{BufferSource}}, throw a {{TypeError}}.
+            </li>
+            <li>
+              Let <var>bytes</var> be a new <a>read only ArrayBuffer</a>
+              containing <a>a copy of the bytes held</a> by <var>value</var>.
+            </li>
+            <li>
+              Add a mapping from <var>service</var> to <code>new DataView(<var>bytes</var>)</code>
+              in <code><var>event</var>.serviceData@{{BluetoothServiceDataMap/[[data]]}}</code>.
+            </li>
+          </ol>
         </li>
-        <li>
-          For each mapping in <var>device</var>'s <a>Service Data</a>,
-          make a new <a>read only ArrayBuffer</a> <var>bytes</var>
-          containing the contents of its byte array,
-          and add a mapping from the <a>UUID</a> to <code>new DataView(<var>bytes</var>)</code>
-          in <code><var>adData</var>.serviceData@{{BluetoothServiceDataMap/[[unfilteredData]]}}</code>.
-        </li>
-        <li>
-          Set <code><var>adData</var>.serviceData@{{BluetoothServiceDataMap/[[deviceObj]]}}</code>
-          to <var>deviceObj</var>.
-        </li>
-        <li>Return <var>adData</var>.</li>
+        <li>Return <var>event</var>.</li>
       </ol>
 
       <section>
@@ -2005,14 +2207,7 @@ spec: permissions
             <th>Description (non-normative)</th>
           </thead>
           <tr>
-            <td><dfn>\[[deviceObj]]</dfn></td>
-            <td><code>undefined</code></td>
-            <td>
-              The {{BluetoothDevice}} within which this map represents service data.
-            </td>
-          </tr>
-          <tr>
-            <td><dfn>\[[unfilteredData]]</dfn></td>
+            <td><dfn>\[[data]]</dfn></td>
             <td><code>new {{Map}}()</code></td>
             <td>
               The advertised service data, converted to {{DataView}}s.
@@ -2022,9 +2217,7 @@ spec: permissions
 
         <p>
           The <a>map entries</a> of a {{BluetoothServiceDataMap}} instance are
-          the entries in <code>{{BluetoothServiceDataMap/[[unfilteredData]]}}</code>
-          whose keys also appear in
-          <code>{{BluetoothServiceDataMap/[[deviceObj]]}}@{{BluetoothDevice/[[allowedServices]]}}</code>.
+          the entries in <code>{{BluetoothServiceDataMap/[[data]]}}</code>.
         </p>
       </section>
     </section>
@@ -3373,6 +3566,13 @@ spec: permissions
       <h4 id="event-types">Event types</h4>
 
       <dl>
+        <dt><dfn event for="BluetoothDevice"><code>advertisementreceived</code></dfn></dt>
+        <dd>
+          Fired on a {{BluetoothDevice}}
+          when an <a href="#advertising-event-algorithm">advertising event
+          is received from that device</a>.
+        </dd>
+
         <dt><dfn event for="BluetoothRemoteGATTCharacteristic"><code>characteristicvaluechanged</code></dfn></dt>
         <dd>
           Fired on a {{BluetoothRemoteGATTCharacteristic}} when its value changes,
@@ -4067,19 +4267,22 @@ spec: permissions
       <ol>
         <li value="1">Architecture &amp; Terminology Overview
           <ol type="A">
-            <li value="1">Architecture
+            <li value="1">General Description
               <ol>
-                <li value="4">Communication Topology and Operation
+                <li value="2">Overview of Bluetooth Low Energy Operation
+                  (defines <dfn lt="advertising event|advertising events">advertising events</dfn>)
+                </li>
+              </ol>
+            </li>
+            <li value="4">Communication Topology and Operation
+              <ol>
+                <li value="2">Operational Procedures and Modes
                   <ol>
-                    <li value="2">Operational Procedures and Modes
+                    <li value="1">BR/EDR Procedures
                       <ol>
-                        <li value="1">BR/EDR Procedures
+                        <li value="1">Inquiry (Discovering) Procedure
                           <ol>
-                            <li value="1">Inquiry (Discovering) Procedure
-                              <ol>
-                                <li value="1"><dfn>Extended Inquiry Response</dfn></li>
-                              </ol>
-                            </li>
+                            <li value="1"><dfn>Extended Inquiry Response</dfn></li>
                           </ol>
                         </li>
                       </ol>
@@ -4104,7 +4307,7 @@ spec: permissions
                     <li value="5">Status Parameters
                       <ol>
                         <li value="4">
-                          Read <dfn lt="RSSI|Received Signal Strength Indication"
+                          Read <dfn lt="RSSI|Received Signal Strength"
                                     ><abbr title="Received Signal Strength Indication"
                                            >RSSI</abbr></dfn> Command
                         </li>
@@ -4201,7 +4404,9 @@ spec: permissions
                     </li>
                   </ol>
                 </li>
-                <li value="11"><dfn>Advertising Data</dfn> and Scan Response Data Format</li>
+                <li value="11"><dfn>Advertising Data</dfn> and Scan Response Data Format
+                  (defines <dfn>AD structure</dfn>)
+                </li>
                 <li value="15">Bluetooth Device Requirements
                   <ol>
                     <li value="1">Bluetooth Device Address (defines <dfn>BD_ADDR</dfn>)
