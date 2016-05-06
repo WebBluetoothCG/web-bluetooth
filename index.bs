@@ -1592,7 +1592,7 @@ spec: permissions
         readonly attribute BluetoothRemoteGATTServer gatt;
         readonly attribute FrozenArray&lt;UUID> uuids;
 
-        void watchAdvertisements();
+        Promise&lt;void> watchAdvertisements();
         void unwatchAdvertisements();
         readonly attribute boolean watchingAdvertisements;
       };
@@ -1812,13 +1812,36 @@ spec: permissions
     <p>
       The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code> method,
       when invoked,
-      MUST run the following steps:
+      MUST return <a>a new promise</a> |promise| and
+      run the following steps <a>in parallel</a>:
     </p>
     <ol class="algorithm">
-      <li>Set <code>this.{{watchingAdvertisements}}</code> to `true`.</li>
       <li>
         Ensure that the UA is scanning for this device's advertisements.
         The UA SHOULD NOT filter out "duplicate" advertisements for the same device.
+      </li>
+      <li>
+        If the UA fails to enable scanning,
+        <a>reject</a> |promise| with one of the following errors,
+        and abort these steps:
+
+        <dl class="switch">
+          <dt>The UA doesn't support scanning for advertisements</dt>
+          <dd>{{NotSupportedError}}</dd>
+
+          <dt>Bluetooth is turned off</dt>
+          <dd>{{InvalidStateError}}</dd>
+
+          <dt>Other reasons</dt>
+          <dd>{{UnknownError}}</dd>
+        </dl>
+      </li>
+      <li>
+        <a>Queue a task</a> to perform the following steps:
+        <ol>
+          <li>Set <code>this.{{watchingAdvertisements}}</code> to `true`.</li>
+          <li>Resolve |promise| with `undefined`.</li>
+        </ol>
       </li>
     </ol>
 
@@ -2019,7 +2042,10 @@ spec: permissions
                   set <code><var>event</var>.name</code> to the result.
 
                   Note: We don't expose whether the name is complete
-                  because Android and Core Bluetooth don't.
+                  because existing APIs require
+                  reading the raw advertisement to get this information,
+                  and we want more evidence that it's useful
+                  before adding a field to the API.
                 </dd>
 
                 <dt><a>Manufacturer Specific Data</a></dt>

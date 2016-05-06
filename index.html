@@ -1389,7 +1389,7 @@ Possible extra rowspan handling
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-05-04">4 May 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-05-06">6 May 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2430,7 +2430,7 @@ dictionary <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-exp
   readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver" id="ref-for-bluetoothremotegattserver-1">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer" href="#dom-bluetoothdevice-gatt" id="ref-for-dom-bluetoothdevice-gatt-1">gatt</a>;
   readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-2">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID>" href="#dom-bluetoothdevice-uuids" id="ref-for-dom-bluetoothdevice-uuids-1">uuids</a>;
 
-  void <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-watchadvertisements" id="ref-for-dom-bluetoothdevice-watchadvertisements-1">watchAdvertisements</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-watchadvertisements" id="ref-for-dom-bluetoothdevice-watchadvertisements-1">watchAdvertisements</a>();
   void <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-unwatchadvertisements" id="ref-for-dom-bluetoothdevice-unwatchadvertisements-1">unwatchAdvertisements</a>();
   readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean" href="#dom-bluetoothdevice-watchingadvertisements" id="ref-for-dom-bluetoothdevice-watchingadvertisements-1">watchingAdvertisements</a>;
 };
@@ -2546,11 +2546,28 @@ dictionary <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-exp
       and should call <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unwatchadvertisements" id="ref-for-dom-bluetoothdevice-unwatchadvertisements-2">unwatchAdvertisements()</a></code> to stop using power as soon as possible. </p>
      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="method" data-export="" data-lt="watchAdvertisements()" id="dom-bluetoothdevice-watchadvertisements">watchAdvertisements()<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothdevice-watchadvertisements">#dom-bluetoothdevice-watchadvertisements</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothdevice-watchadvertisements-1">4.3. BluetoothDevice</a></span></span></dfn></code> method,
       when invoked,
-      MUST run the following steps: </p>
+      MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and
+      run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
-      <li>Set <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchingadvertisements" id="ref-for-dom-bluetoothdevice-watchingadvertisements-2">watchingAdvertisements</a></code></code> to <code>true</code>.
       <li> Ensure that the UA is scanning for this device’s advertisements.
         The UA SHOULD NOT filter out "duplicate" advertisements for the same device. 
+      <li>
+        If the UA fails to enable scanning, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with one of the following errors,
+        and abort these steps: 
+       <dl class="switch">
+        <dt>The UA doesn’t support scanning for advertisements
+        <dd><code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code>
+        <dt>Bluetooth is turned off
+        <dd><code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror">InvalidStateError</a></code>
+        <dt>Other reasons
+        <dd><code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#unknownerror">UnknownError</a></code>
+       </dl>
+      <li>
+        <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to perform the following steps: 
+       <ol>
+        <li>Set <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchingadvertisements" id="ref-for-dom-bluetoothdevice-watchingadvertisements-2">watchingAdvertisements</a></code></code> to <code>true</code>.
+        <li>Resolve <var>promise</var> with <code>undefined</code>.
+       </ol>
      </ol>
      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="method" data-export="" data-lt="unwatchAdvertisements()" id="dom-bluetoothdevice-unwatchadvertisements">unwatchAdvertisements()<span class="dfn-panel" data-deco=""><b><a href="#dom-bluetoothdevice-unwatchadvertisements">#dom-bluetoothdevice-unwatchadvertisements</a></b><b>Referenced in:</b><span><a href="#ref-for-dom-bluetoothdevice-unwatchadvertisements-1">4.3. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothdevice-unwatchadvertisements-2">(2)</a></span></span></dfn></code> method,
       when invoked,
@@ -2689,7 +2706,10 @@ function interpretIBeacon(event) {
              <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">UTF-8 decode without BOM</a> the AD data and
                   set <code><var>event</var>.name</code> to the result. 
             <p class="note" role="note">Note: We don’t expose whether the name is complete
-                  because Android and Core Bluetooth don’t.</p>
+                  because existing APIs require
+                  reading the raw advertisement to get this information,
+                  and we want more evidence that it’s useful
+                  before adding a field to the API.</p>
            <dt><a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-1">Manufacturer Specific Data</a>
            <dd> Add to <code><var>event</var>.manufacturerData</code> a mapping from the 16-bit Company Identifier Code to
                   an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a></code> containing the manufacturer-specific data. 
@@ -4786,11 +4806,13 @@ typedef (DOMString or unsigned long) <a class="idl-code" data-link-type="typedef
      <li><a href="https://heycam.github.io/webidl/#dfn-DOMException">DOMException</a>
      <li><a href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a>
      <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror">InvalidModificationError</a>
+     <li><a href="https://heycam.github.io/webidl/#invalidstateerror">InvalidStateError</a>
      <li><a href="https://heycam.github.io/webidl/#networkerror">NetworkError</a>
      <li><a href="https://heycam.github.io/webidl/#notfounderror">NotFoundError</a>
      <li><a href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a>
      <li><a href="https://heycam.github.io/webidl/#securityerror">SecurityError</a>
      <li><a href="https://heycam.github.io/webidl/#syntaxerror">SyntaxError</a>
+     <li><a href="https://heycam.github.io/webidl/#unknownerror">UnknownError</a>
      <li><a href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>
      <li><a href="https://heycam.github.io/webidl/#dom-unsignedshort">unsigned short</a>
     </ul>
@@ -4881,7 +4903,7 @@ interface <a class="idl-code" data-link-type="interface" href="#bluetoothdevice"
   readonly attribute <a data-link-type="idl-name" href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothRemoteGATTServer" href="#dom-bluetoothdevice-gatt">gatt</a>;
   readonly attribute FrozenArray&lt;<a data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>> <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="FrozenArray<UUID>" href="#dom-bluetoothdevice-uuids">uuids</a>;
 
-  void <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-watchadvertisements">watchAdvertisements</a>();
+  Promise&lt;void> <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-watchadvertisements">watchAdvertisements</a>();
   void <a class="idl-code" data-link-type="method" href="#dom-bluetoothdevice-unwatchadvertisements">unwatchAdvertisements</a>();
   readonly attribute boolean <a class="idl-code" data-link-type="attribute" data-readonly="" data-type="boolean" href="#dom-bluetoothdevice-watchingadvertisements">watchingAdvertisements</a>;
 };
