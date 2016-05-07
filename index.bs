@@ -516,14 +516,14 @@ spec: permissions
   <h2 id="device-discovery">Device Discovery</h2>
 
   <pre class="idl">
-    dictionary BluetoothScanFilter {
+    dictionary BluetoothRequestDeviceFilter {
       sequence&lt;BluetoothServiceUUID> services;
       DOMString name;
       DOMString namePrefix;
     };
 
     dictionary RequestDeviceOptions {
-      required sequence&lt;BluetoothScanFilter> filters;
+      required sequence&lt;BluetoothRequestDeviceFilter> filters;
       sequence&lt;BluetoothServiceUUID> optionalServices = [];
     };
 
@@ -545,22 +545,22 @@ spec: permissions
     <ul>
       <li>
         support <em>all</em> the GATT service UUIDs
-        in the <dfn dict-member for="BluetoothScanFilter">services</dfn> list
+        in the <dfn dict-member for="BluetoothRequestDeviceFilter">services</dfn> list
         if that member is present,
       </li>
       <li>
-        have a name equal to <dfn dict-member for="BluetoothScanFilter">name</dfn>
+        have a name equal to <dfn dict-member for="BluetoothRequestDeviceFilter">name</dfn>
         if that member is present, and
       </li>
       <li>
-        have a name starting with <dfn dict-member for="BluetoothScanFilter">namePrefix</dfn>
+        have a name starting with <dfn dict-member for="BluetoothRequestDeviceFilter">namePrefix</dfn>
         if that member is present.
       </li>
     </ul>
     <p>
       After the user selects a device to pair with this origin,
       the origin is allowed to access to any service whose UUID was listed
-      in the {{BluetoothScanFilter/services}} list
+      in the {{BluetoothRequestDeviceFilter/services}} list
       in any element of <code>options.filters</code>
       or in <code>options.<dfn dict-member for="RequestDeviceOptions">optionalServices</dfn></code>.
     </p>
@@ -1232,7 +1232,7 @@ spec: permissions
           dictionary BluetoothPermissionDescriptor : PermissionDescriptor {
             DOMString deviceId;
             // These match RequestDeviceOptions.
-            sequence&lt;BluetoothScanFilter> filters;
+            sequence&lt;BluetoothRequestDeviceFilter> filters;
             sequence&lt;BluetoothServiceUUID> optionalServices = [];
           };
         </pre>
@@ -1354,7 +1354,7 @@ spec: permissions
     </p>
 
     <p>
-      A <dfn>Bluetooth device</dfn> has the following properties.
+      A <dfn export>Bluetooth device</dfn> has the following properties.
       Optional properties are not present, and sequence and map properties are empty,
       unless/until described otherwise.
       Other properties have a default specified or are specified when a device is introduced.
@@ -1403,7 +1403,8 @@ spec: permissions
 
     <p>
       The UA SHOULD determine that
-      two <a>Bluetooth device</a>s are the <dfn>same device</dfn> if and only if
+      two <a>Bluetooth device</a>s are
+      the <dfn export local-lt="same device">same Bluetooth device</dfn> if and only if
       they have the same <a>Public Bluetooth Address</a>, <a>Static Address</a>,
       <a>Private Address</a>, or <a>Identity Resolving Key</a>,
       or if the <a>Resolvable Private Address Resolution Procedure</a> succeeds using
@@ -1685,7 +1686,7 @@ spec: permissions
     </table>
 
     <p>
-      To <dfn>get the <code>BluetoothDevice</code> representing</dfn>
+      To <dfn export>get the <code>BluetoothDevice</code> representing</dfn>
       a <a>Bluetooth device</a> <var>device</var>
       inside a {{Bluetooth}} instance <var>context</var>,
       and an optional {{BluetoothPermissionStorage}} <var>storage</var>,
@@ -1994,85 +1995,97 @@ spec: permissions
               abort these sub-steps.
             </li>
             <li>
-              Let <var>event</var> be
-              <pre highlight="js">
-                {
-                  bubbles: true,
-                  device: deviceObj,
-                  uuids: [],
-                  manufacturerData: new Map(),
-                  serviceData: new Map()
-                }
-              </pre>
-            </li>
-            <li>
-              If the <a>received signal strength</a> is available
-              for any packet in this advertising event,
-              set <code><var>event</var>.rssi</code> to this signal strength in dBm.
-            </li>
-            <li>
-              For each <a>AD structure</a> in the advertising packet and scan response,
-              select from the following steps depending on the AD type:
-              <dl class="switch">
-                <dt>Incomplete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-                <dt>Complete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-                <dt>Incomplete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-                <dt>Complete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-                <dt>Incomplete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-                <dt>Complete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-                <dd>Append the listed UUIDs to <code><var>event</var>.uuids</code>.</dd>
-
-                <dt>Shortened <a lt="Local Name Data Type">Local Name</a></dt>
-                <dt>Complete <a lt="Local Name Data Type">Local Name</a></dt>
-                <dd>
-                  <a>UTF-8 decode without BOM</a> the AD data and
-                  set <code><var>event</var>.name</code> to the result.
-
-                  Note: We don't expose whether the name is complete
-                  because existing APIs require
-                  reading the raw advertisement to get this information,
-                  and we want more evidence that it's useful
-                  before adding a field to the API.
-                </dd>
-
-                <dt><a>Manufacturer Specific Data</a></dt>
-                <dd>
-                  Add to <code><var>event</var>.manufacturerData</code>
-                  a mapping from the 16-bit Company Identifier Code to
-                  an {{ArrayBuffer}} containing the manufacturer-specific data.
-                </dd>
-
-                <dt><a>TX Power Level</a></dt>
-                <dd>
-                  Set <code><var>event</var>.txPower</code> to the AD data.
-                </dd>
-
-                <dt><a>Service Data</a> - 16 bit UUID</dt>
-                <dt><a>Service Data</a> - 32 bit UUID</dt>
-                <dt><a>Service Data</a> - 128 bit UUID</dt>
-                <dd>
-                  Add to <code><var>event</var>.serviceData</code>
-                  a mapping from the <a>UUID</a> to
-                  an {{ArrayBuffer}} containing the service data.
-                </dd>
-
-                <dt><a>Appearance</a></dt>
-                <dd>
-                  Set <code><var>event</var>.appearance</code> to the AD data.
-                </dd>
-
-                <dt>Otherwise</dt>
-                <dd>Skip to the next AD structure.</dd>
-              </dl>
-            </li>
-            <li>
-              <a>Fire an event</a> initialized as
-              <code>new {{BluetoothAdvertisingEvent}}("{{advertisementreceived}}",
-                <var>event</var>)</code>,
-              with its {{isTrusted}} attribute initialized to `true`,
-              at <var>deviceObj</var>.
+              <a>Fire an `advertisementreceived` event</a>
+              for the advertising event at |deviceObj|.
             </li>
           </ol>
+        </li>
+      </ol>
+
+      <p>
+        To <dfn export>fire an {{advertisementreceived}} event</dfn>
+        for an advertising event |adv| at a {{BluetoothDevice}} |deviceObj|,
+        the UA MUST perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>
+          Let <var>event</var> be
+          <pre highlight="js">
+            {
+              bubbles: true,
+              device: <var>deviceObj</var>,
+              uuids: [],
+              manufacturerData: new Map(),
+              serviceData: new Map()
+            }
+          </pre>
+        </li>
+        <li>
+          If the <a>received signal strength</a> is available
+          for any packet in |adv|,
+          set <code><var>event</var>.rssi</code> to this signal strength in dBm.
+        </li>
+        <li>
+          For each <a>AD structure</a> in |adv|'s advertising packet and scan response,
+          select from the following steps depending on the AD type:
+          <dl class="switch">
+            <dt>Incomplete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+            <dt>Complete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+            <dt>Incomplete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+            <dt>Complete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+            <dt>Incomplete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+            <dt>Complete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+            <dd>Append the listed UUIDs to <code><var>event</var>.uuids</code>.</dd>
+
+            <dt>Shortened <a lt="Local Name Data Type">Local Name</a></dt>
+            <dt>Complete <a lt="Local Name Data Type">Local Name</a></dt>
+            <dd>
+              <a>UTF-8 decode without BOM</a> the AD data and
+              set <code><var>event</var>.name</code> to the result.
+
+              Note: We don't expose whether the name is complete
+              because existing APIs require
+              reading the raw advertisement to get this information,
+              and we want more evidence that it's useful
+              before adding a field to the API.
+            </dd>
+
+            <dt><a>Manufacturer Specific Data</a></dt>
+            <dd>
+              Add to <code><var>event</var>.manufacturerData</code>
+              a mapping from the 16-bit Company Identifier Code to
+              an {{ArrayBuffer}} containing the manufacturer-specific data.
+            </dd>
+
+            <dt><a>TX Power Level</a></dt>
+            <dd>
+              Set <code><var>event</var>.txPower</code> to the AD data.
+            </dd>
+
+            <dt><a>Service Data</a> - 16 bit UUID</dt>
+            <dt><a>Service Data</a> - 32 bit UUID</dt>
+            <dt><a>Service Data</a> - 128 bit UUID</dt>
+            <dd>
+              Add to <code><var>event</var>.serviceData</code>
+              a mapping from the <a>UUID</a> to
+              an {{ArrayBuffer}} containing the service data.
+            </dd>
+
+            <dt><a>Appearance</a></dt>
+            <dd>
+              Set <code><var>event</var>.appearance</code> to the AD data.
+            </dd>
+
+            <dt>Otherwise</dt>
+            <dd>Skip to the next AD structure.</dd>
+          </dl>
+        </li>
+        <li>
+          <a>Fire an event</a> initialized as
+          <code>new {{BluetoothAdvertisingEvent}}("{{advertisementreceived}}",
+            <var>event</var>)</code>,
+          with its {{isTrusted}} attribute initialized to `true`,
+          at <var>deviceObj</var>.
         </li>
       </ol>
 
