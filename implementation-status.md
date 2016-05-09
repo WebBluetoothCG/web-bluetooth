@@ -11,7 +11,7 @@ Work is in progress:
 
 Feature                   | Chrome OS | Android M | Mac OS X | Linux | Windows 8.1
 ------------------------- | :-------: | :-------: | :------: | :---: | :---------:
-Discovery                 | ✓         | ✓         | ✓        | ✓     | ✓ (paired devices only)
+Discovery                 | ✓         | ✓         | ✓        | ✓     | (paired devices only)
 └ Name or prefix          | ✓         | ✓         | ✓        | ✓     | ✓
 Chooser UI                | ✓         | ✓         | ✓        | ✓     | ✓
 GATT Server Connect       | ✓         | ✓         | 51       | ✓
