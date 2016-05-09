@@ -4,23 +4,23 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2016-04-25**.
+* Notes updated **2016-05-09**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
 Feature                   | Chrome OS | Android M | Mac OS X | Linux | Windows 8.1
 ------------------------- | :-------: | :-------: | :------: | :---: | :---------:
-Discovery                 | ✓         | ✓         | ✓        | 50     | 50 (paired devices only)
-└ Name or prefix          | ✓         | ✓         | ✓        | 50     | 50
-Chooser UI                | ✓         | ✓         | ✓        | 50     | 50
-GATT Server Connect       | ✓         | ✓         | 51       | 50
-Read Characteristic       | ✓         | ✓         |          | 50
-Write Characteristic      | ✓         | ✓         |          | 50
-Characteristic Properties | ✓         | ✓         |          | 50
-GATT Notifications        | ✓         | (start only) |    | 50
-GATT Server Disconnect    | 50        | 50        | 51       | 50
-Get Characteristics List  | 50        | 50        |          | 50
+Discovery                 | ✓         | ✓         | ✓        | ✓     | ✓ (paired devices only)
+└ Name or prefix          | ✓         | ✓         | ✓        | ✓     | ✓
+Chooser UI                | ✓         | ✓         | ✓        | ✓     | ✓
+GATT Server Connect       | ✓         | ✓         | 51       | ✓
+Read Characteristic       | ✓         | ✓         |          | ✓
+Write Characteristic      | ✓         | ✓         |          | ✓
+Characteristic Properties | ✓         | ✓         |          | ✓
+GATT Notifications        | ✓         | (start only) |    | ✓
+GATT Server Disconnect    | ✓         | ✓        | 51       | ✓
+Get Characteristics List  | ✓         | ✓        |          | ✓
 Device Disconnected Event |
 
 ### Notes
