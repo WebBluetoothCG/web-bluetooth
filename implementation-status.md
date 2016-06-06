@@ -21,7 +21,7 @@ Characteristic Properties | ✓         | ✓         |          | ✓
 GATT Notifications        | ✓         | (start only) |    | ✓
 GATT Server Disconnect    | ✓         | ✓        | 51       | ✓
 Get Characteristics List  | ✓         | ✓        |          | ✓
-Device Disconnected Event | 52        | 53        | 53       | 52     |
+Device Disconnected Event | 52        | 52        | 52       | 52     |
 
 ### Notes
 
