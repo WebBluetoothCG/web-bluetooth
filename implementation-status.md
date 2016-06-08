@@ -20,8 +20,9 @@ Write Characteristic      | ✓         | ✓         |          | ✓
 Characteristic Properties | ✓         | ✓         |          | ✓
 GATT Notifications        | ✓         | (start only) |    | ✓
 GATT Server Disconnect    | ✓         | ✓         | ✓        | ✓
-Get Characteristics List  | ✓         | ✓         |          | ✓
+Get Characteristics List  | ✓         | ✓         | :construction_worker:      | ✓
 Device Disconnected Event | 52        | 52        | 52       | 52     |
+Get Primary Services List | :construction_worker:       | :construction_worker:       | :construction_worker:      | :construction_worker:
 
 ### Notes
 
