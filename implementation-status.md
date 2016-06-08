@@ -14,13 +14,13 @@ Feature                   | Chrome OS | Android M | Mac OS X | Linux | Windows 8
 Discovery                 | ✓         | ✓         | ✓        | ✓     | (paired devices only)
 └ Name or prefix          | ✓         | ✓         | ✓        | ✓     | ✓
 Chooser UI                | ✓         | ✓         | ✓        | ✓     | ✓
-GATT Server Connect       | ✓         | ✓         | 51       | ✓
+GATT Server Connect       | ✓         | ✓         | ✓        | ✓
 Read Characteristic       | ✓         | ✓         |          | ✓
 Write Characteristic      | ✓         | ✓         |          | ✓
 Characteristic Properties | ✓         | ✓         |          | ✓
 GATT Notifications        | ✓         | (start only) |    | ✓
-GATT Server Disconnect    | ✓         | ✓        | 51       | ✓
-Get Characteristics List  | ✓         | ✓        |          | ✓
+GATT Server Disconnect    | ✓         | ✓         | ✓        | ✓
+Get Characteristics List  | ✓         | ✓         |          | ✓
 Device Disconnected Event | 52        | 52        | 52       | 52     |
 
 ### Notes
