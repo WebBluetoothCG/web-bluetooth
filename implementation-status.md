@@ -18,7 +18,7 @@ GATT Server Connect       | ✓         | ✓         | ✓     | ✓
 Read Characteristic       | ✓         | ✓         | :construction_worker:         | ✓
 Write Characteristic      | ✓         | ✓         | :construction_worker:         | ✓
 Characteristic Properties | ✓         | ✓         |  :construction_worker:        | ✓
-GATT Notifications        | ✓         | (start only) |    | ✓
+GATT Notifications        | ✓         | ✓ start \| :construction_worker: stop|    | ✓
 GATT Server Disconnect    | ✓         | ✓         | ✓     | ✓
 Get Characteristics List  | ✓         | ✓         | :construction_worker:      | ✓
 Device Disconnected Event | 52        | 52        | 52    | 52     |
