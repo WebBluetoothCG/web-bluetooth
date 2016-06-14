@@ -31,7 +31,7 @@ Get Primary Services List | :construction_worker:       | :construction_worker: 
  * Chrome builds requires Android 6, Marshmallow or later.
  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
  * [Android Chooser UI](https://crbug.com/436280) works but has some bugs.
-* [macOS](https://crbug.com/364359): Requires Mac OS X Yosemite.
+* [macOS](https://crbug.com/364359): Requires OS X Yosemite or later.
   * Some MacBook's may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Windows](https://crbug.com/507419): Discover only manually paired devices.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and BlueZ 5+ installed (by default in Ubuntu 15.10).
