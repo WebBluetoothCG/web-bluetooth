@@ -9,19 +9,19 @@ Work is in progress:
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
-Feature                   | Chrome OS | Android M | Mac OS X | Linux | Windows 8.1
-------------------------- | :-------: | :-------: | :------: | :---: | :---------:
-Discovery                 | ✓         | ✓         | ✓        | ✓     | (paired devices only)
-└ Name or prefix          | ✓         | ✓         | ✓        | ✓     | ✓
-Chooser UI                | ✓         | ✓         | ✓        | ✓     | ✓
-GATT Server Connect       | ✓         | ✓         | ✓        | ✓
+Feature                   | Chrome OS | Android M | macOS | Linux | Windows 8.1
+------------------------- | :-------: | :-------: | :---: | :---: | :---------:
+Discovery                 | ✓         | ✓         | ✓     | ✓     | (paired devices only)
+└ Name or prefix          | ✓         | ✓         | ✓     | ✓     | ✓
+Chooser UI                | ✓         | ✓         | ✓     | ✓     | ✓
+GATT Server Connect       | ✓         | ✓         | ✓     | ✓
 Read Characteristic       | ✓         | ✓         | :construction_worker:         | ✓
 Write Characteristic      | ✓         | ✓         | :construction_worker:         | ✓
 Characteristic Properties | ✓         | ✓         |  :construction_worker:        | ✓
 GATT Notifications        | ✓         | (start only) |    | ✓
-GATT Server Disconnect    | ✓         | ✓         | ✓        | ✓
+GATT Server Disconnect    | ✓         | ✓         | ✓     | ✓
 Get Characteristics List  | ✓         | ✓         | :construction_worker:      | ✓
-Device Disconnected Event | 52        | 52        | 52       | 52     |
+Device Disconnected Event | 52        | 52        | 52    | 52     |
 Get Primary Services List | :construction_worker:       | :construction_worker:       | :construction_worker:      | :construction_worker:
 
 ### Notes
@@ -31,7 +31,7 @@ Get Primary Services List | :construction_worker:       | :construction_worker: 
  * Chrome builds requires Android 6, Marshmallow or later.
  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop or later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
  * [Android Chooser UI](https://crbug.com/436280) works but has some bugs.
-* [Mac OS X](https://crbug.com/364359): Requires Mac OS X Yosemite.
+* [macOS](https://crbug.com/364359): Requires Mac OS X Yosemite.
   * Some MacBook's may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Windows](https://crbug.com/507419): Discover only manually paired devices.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and BlueZ 5+ installed (by default in Ubuntu 15.10).
