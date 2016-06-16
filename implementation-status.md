@@ -17,15 +17,14 @@ Chooser UI                | ✓         | ✓         | ✓     | ✓     | ✓
 GATT Server Connect       | ✓         | ✓         | ✓     | ✓
 Read Characteristic       | ✓         | ✓         | :construction_worker:         | ✓
 Write Characteristic      | ✓         | ✓         | :construction_worker:         | ✓
-Characteristic Properties | ✓         | ✓         |  :construction_worker:        | ✓
+Characteristic Properties | ✓         | ✓         | 53    | ✓
 GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|    | ✓
 GATT Server Disconnect    | ✓         | ✓         | ✓     | ✓
-Get Characteristics List  | ✓         | ✓         | :construction_worker:      | ✓
-Device Disconnected Event | 52*       | 52*       | 52*   | 52*    |
-Get Primary Services List | 53*       | 53*       | 53*   | 53*
+Get Characteristics List  | ✓         | ✓         | 53    | ✓
+Device Disconnected Event | 52        | 52        | 52    | 52    |
+Get Primary Services List | 53        | 53        | 53    | 53
 
-\* Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
-
+Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
 
 ### Notes
 
