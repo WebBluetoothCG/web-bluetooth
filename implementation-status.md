@@ -9,20 +9,20 @@ Work is in progress:
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
-Feature/Platform          | Chrome OS | Android | macOS | Linux | Windows
-------------------------- | :-------: | :-----: | :---: | :---: | :-----:
-Discovery                 | ✓         | ✓      | ✓     | ✓     | ✓
-└ Name or prefix          | ✓         | ✓      | ✓     | ✓     | ✓
-Chooser UI                | ✓         | ✓      | ✓     | ✓     | ✓
-GATT Server Connect       | ✓         | ✓      | ✓     | ✓
-Read Characteristic       | ✓         | ✓      | :construction_worker: | ✓
-Write Characteristic      | ✓         | ✓      | :construction_worker: | ✓
-Characteristic Properties | ✓         | ✓      | 53    | ✓
-GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|    | ✓
-GATT Server Disconnect    | ✓         | ✓      | ✓     | ✓
-Get Characteristics List  | ✓         | ✓      | 53    | ✓
-Device Disconnected Event | 52        | 52     | 52    | 52    |
-Get Primary Services List | 53        | 53     | 53    | 53
+Feature/Platform          | Chrome OS | Android | macOS | Linux | Windows | iOS
+------------------------- | :-------: | :-----: | :---: | :---: | :-----: | :-:
+Discovery                 | ✓         | ✓      | ✓     | ✓     | ✓       |  
+└ Name or prefix          | ✓         | ✓      | ✓     | ✓     | ✓       |
+Chooser UI                | ✓         | ✓      | ✓     | ✓     | ✓       |
+GATT Server Connect       | ✓         | ✓      | ✓     | ✓     |         |
+Read Characteristic       | ✓         | ✓      | :construction_worker: | ✓ |
+Write Characteristic      | ✓         | ✓      | :construction_worker: | ✓ |
+Characteristic Properties | ✓         | ✓      | 53    | ✓     |         |
+GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|    | ✓ |
+GATT Server Disconnect    | ✓         | ✓      | ✓     | ✓     |         |
+Get Characteristics List  | ✓         | ✓      | 53    | ✓     |         |
+Device Disconnected Event | 52        | 52     | 52    | 52    |          |
+Get Primary Services List | 53        | 53     | 53    | 53     |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
 
@@ -37,6 +37,7 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
   * Note that Bluetooth daemon needs experimental interfaces feature enabled: `sudo /usr/sbin/bluetoothd -E`  
 * [Windows](https://crbug.com/507419): Requires Windows 8.1.
   * Discover only manually paired devices.
+* iOS: Uses the web exposed APIs as provided by the [WKWebView](https://developer.apple.com/library/ios/documentation/WebKit/Reference/WKWebView_Ref/).
 
 ## [Chrome Apps Polyfill](https://github.com/WebBluetoothCG/chrome-app-polyfill)
 A polyfill for the Web Bluetooth API running inside a Chrome App.
