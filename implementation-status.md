@@ -15,8 +15,8 @@ Discovery                 | ✓         | ✓       | ✓     | ✓     | ✓   
 └ Name or prefix          | ✓         | ✓       | ✓     | ✓     | ✓       |
 Chooser UI                | ✓         | ✓       | ✓     | ✓     | ✓       |
 GATT Server Connect       | ✓         | ✓       | ✓     | ✓     |         |
-Read Characteristic       | ✓         | ✓       | :construction_worker: | ✓ |
-Write Characteristic      | ✓         | ✓       | :construction_worker: | ✓ |
+Read Characteristic       | ✓         | ✓       | 53    | ✓ |
+Write Characteristic      | ✓         | ✓       | 53    | ✓ |
 Characteristic Properties | ✓         | ✓       | 53    | ✓     |         |
 GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|  :construction_worker:  | ✓ |
 GATT Server Disconnect    | ✓         | ✓       | ✓     | ✓     |         |
