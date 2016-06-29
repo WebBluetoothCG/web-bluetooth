@@ -34,7 +34,8 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 * [macOS](https://crbug.com/364359): Requires OS X Yosemite or later.
   * Some MacBooks may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and [BlueZ](http://www.bluez.org/) 5.40+ installed.
-  * Note that Bluetooth daemon needs to run with experimental interfaces: `sudo /usr/sbin/bluetoothd -E`  
+  * Note that Bluetooth daemon needs to run with experimental interfaces: `sudo /usr/sbin/bluetoothd -E`
+  * Make sure `ControllerMode = dual` in `/etc/bluetooth/main.conf` for a complete Bluetooth scan.
 * [Windows](https://crbug.com/507419): Requires Windows 8.1.
   * Discover only manually paired devices.
 * iOS: Uses the web exposed APIs as provided by the [WKWebView](https://developer.apple.com/library/ios/documentation/WebKit/Reference/WKWebView_Ref/), no implementation planned in the Chromium codebase.
