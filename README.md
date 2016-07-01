@@ -18,6 +18,9 @@ Try it out
 * [Interact with Bluetooth devices on the Web](https://developers.google.com/web/updates/2015/07/interact-with-ble-devices-on-the-web) introduction article shows you how to get started with Web Bluetooth.
 * [Implementation Status](implementation-status.md) describes various browser support on platforms, hardware compatibility, polyfills.
 * [Android BLE Peripheral App](https://github.com/WebBluetoothCG/ble-test-peripheral-android) Simulates BLE peripherals easing experiments with the Web Bluetooth API by providing another device to connet to.
+* [Samples](https://googlechrome.github.io/samples/web-bluetooth/index.html)
+* [Code Labs](https://github.com/googlecodelabs?query=bluetooth)
+* [Demos](https://github.com/WebBluetoothCG/demos)
 
 Communication
 -------------
