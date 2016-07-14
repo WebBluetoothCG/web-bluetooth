@@ -79,6 +79,7 @@ spec: BLUETOOTH-ASSIGNED
 
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     type: dfn
+        text: current realm; url: current-realm
         text: fulfilled; url: sec-promise-objects
         text: realm; url: sec-code-realms
     type: method
@@ -93,10 +94,6 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
         text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
         text: TypedArray; url: sec-typedarray-constructors
 
-spec: permissions; urlPrefix: https://w3c.github.io/permissions/
-    type: dfn
-        text: permission store
-
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
@@ -105,8 +102,8 @@ spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
 <pre class="link-defaults">
 spec: html
     type: dfn
-        text: triggered by user activation
         text: browsing context
+        text: current settings object
         text: environment settings object
         text: event handler idl attribute
         text: global object
@@ -115,6 +112,7 @@ spec: html
         text: queue a task
         text: relevant settings object
         text: responsible event loop
+        text: triggered by user activation
 spec: permissions
     type: dfn
         text: create a permission storage entry
@@ -485,9 +483,9 @@ spec: permissions
         and a device can easily expose a custom GATT service to make this easier.
       </p>
       <p>
-        This specification
-        <a lt="add an allowed Bluetooth device">generates a new device ID</a>
-        for each origin for a given device,
+        This specification <a href="note-device-id-tracking">suggests</a> that
+        the UA use different device IDs for a single device
+        when its user doesn't intend scripts to learn that it's a single device,
         which makes it difficult for websites to abuse the device address like this.
         Device makers can still design their devices to help track users,
         but it takes work.
@@ -823,56 +821,51 @@ spec: permissions
 
   <p>
     The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)</dfn></code> method,
-    when invoked, MUST run the following steps:
+    when invoked, MUST return <a>a new promise</a> |promise|
+    and run the following steps <a>in parallel</a>:
   </p>
   <ol class="algorithm">
     <li>
-      <a>Request a permission</a>, passing:
-      <pre class="highlight">
-        {
-          name: "bluetooth",
-          filters: <var>options</var>.<a idl for="RequestDeviceOptions">filters</a>,
-          optionalServices: <var>options</var>.<a idl for="RequestDeviceOptions">optionalServices</a>,
-        }
-      </pre>
-      Let <var>permissionResult</var> be the resulting promise.
+      <a>Request Bluetooth devices</a>,
+      passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
+      and <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>,
+      and let |devices| be the result.
     </li>
     <li>
-      Return the result of <a>transforming</a> <var>permissionResult</var>
-      with a fulfillment handler that takes an argument <var>result</var>
-      and runs the following steps:
-      <ol>
-        <li>
-          If <code><var>result</var>.{{BluetoothPermissionResult/devices}}</code> is empty,
-          throw a {{NotFoundError}} and abort these steps.
-        </li>
-        <li>
-          Return <code><var>result</var>.{{BluetoothPermissionResult/devices}}[0]</code>.
-        </li>
-      </ol>
+      If the previous step threw an exception,
+      <a>reject</a> |promise| with that exception and abort these steps.
+    </li>
+    <li>
+      If |devices| is an empty sequence,
+      <a>reject</a> |promise| with a {{NotFoundError}} and abort these steps.
+    </li>
+    <li>
+      <a>Resolve</a> |promise| with <code>|devices|[0]</code>.
     </li>
   </ol>
 
   <p>
-    To <dfn>request the "bluetooth" permission</dfn>,
-    given a {{BluetoothPermissionStorage}} <var>storage</var>,
-    a {{BluetoothPermissionDescriptor}} <var>options</var>,
-    and a {{BluetoothPermissionResult}} <var>status</var>,
-    the UA MUST return <a>a new promise</a> <var>promise</var>
-    and run the following steps <a>in parallel</a>:
+    To <dfn>request Bluetooth devices</dfn>,
+    given a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|,
+    and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
+    the UA MUST run the following steps:
+  </p>
+  <p class="note">
+    Calls to this algorithm will eventually be able to request multiple devices,
+    but for now it only ever returns a single one.
   </p>
   <ol class="algorithm">
     <li id="requestDevice-user-gesture">
       If the algorithm is not <a>triggered by user activation</a>,
-      <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
+      throw a {{SecurityError}} and abort these steps.
     </li>
     <li>
       In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
       do the following substeps:
       <ol>
         <li>
-          If <code><var>options</var>.filters.length === 0</code>,
-          <a>reject</a> <var>promise</var> with a {{TypeError}}
+          If <code>|filters|.length === 0</code>,
+          throw a {{TypeError}}
           and abort these steps.
         </li>
         <li>
@@ -880,13 +873,13 @@ spec: permissions
           <var>requiredServiceUUIDs</var> be a new {{Set}}.
         </li>
         <li>
-          For each <var>filter</var> in <code><var>options</var>.filters</code>,
+          For each |filter| in |filters|,
           do the following steps:
           <ol>
             <li>
               If none of <var>filter</var>'s
               <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
-              <a>reject</a> <var>promise</var> with a {{TypeError}}
+              throw a {{TypeError}}
               and abort these steps.
             </li>
             <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
@@ -895,21 +888,21 @@ spec: permissions
               <ol>
                 <li>
                   If <code><var>filter</var>.services.length === 0</code>,
-                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  throw a {{TypeError}}
                   and abort these steps.
                 </li>
                 <li>
                   Let <var>services</var> be
                   <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
-                {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+                  {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
                 </li>
                 <li>
                   If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-                  <a>reject</a> <var>promise</var> with that exception and abort these steps.
+                  throw that exception and abort these steps.
                 </li>
                 <li>
                   If any <var>service</var> in <var>services</var> is <a>blacklisted</a>,
-                  <a>reject</a> <var>promise</var> with a {{SecurityError}}
+                  throw a {{SecurityError}}
                   and abort these steps.
                 </li>
                 <li>
@@ -925,7 +918,7 @@ spec: permissions
                   If the <a lt="utf-8 encode">UTF-8 encoding</a>
                   of <code><var>filter</var>.name</code>
                   is more than 248 bytes long,
-                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  throw a {{TypeError}}
                   and abort these steps.
 
                   <p class="note">
@@ -947,7 +940,7 @@ spec: permissions
                   or if the <a lt="utf-8 encode">UTF-8 encoding</a>
                   of <code><var>filter</var>.namePrefix</code>
                   is more than 248 bytes long,
-                  <a>reject</a> <var>promise</var> with a {{TypeError}}
+                  throw a {{TypeError}}
                   and abort these steps.
 
                   <p class="note">
@@ -966,12 +959,12 @@ spec: permissions
         </li>
         <li>
           Let <var>optionalServiceUUIDs</var> be
-          <code>{{Array.prototype.map}}.call(<var>options</var>.optionalServices,
+          <code>{{Array.prototype.map}}.call(|optionalServices|,
             {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
         </li>
         <li>
           If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-          <a>reject</a> <var>promise</var> with that exception and abort these steps.
+          throw that exception and abort these steps.
         </li>
         <li>
           Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a>blacklisted</a>.
@@ -979,15 +972,23 @@ spec: permissions
       </ol>
     </li>
     <li>
-      Set <code><var>status</var>.state</code>
-      to <code><var>storage</var>.state</code>.
+      Let |descriptor| be
+      <pre highlight="js">
+      {
+        name: "bluetooth",
+        filters: <var>uuidFilters</var>,
+        optionalServices: <var>optionalServiceUUIDs</var>,
+      }
+      </pre>
     </li>
     <li>
-      If <code><var>status</var>.state</code> is {{"denied"}},
-      set <code><var>status</var>.{{BluetoothPermissionResult/devices}}</code>
-      to an empty {{FrozenArray}},
-      <a>resolve</a> <var>promise</var> with `undefined`,
-      and abort these steps.
+      Let |state| be |descriptor|'s <a>permission state</a>.
+
+      Note: |state| will be {{"denied"}} in <a>non-secure contexts</a> because
+      {{"bluetooth"}} doesn't set the <a>allowed in non-secure contexts</a> flag.
+    </li>
+    <li>
+      If |state| is {{"denied"}}, return `[]` and abort these steps.
     </li>
     <li>
       <a>Scan for devices</a> with
@@ -1002,30 +1003,36 @@ spec: permissions
     </li>
     <li id="requestDevice-prompt">
       Even if <var>scanResult</var> is empty,
-      display a prompt to the user requesting that the user select a device from it.
-      The UA SHOULD show the user the human-readable name of each device.
-      If this name is not available because the UA's Bluetooth system doesn't support privacy-enabled scans,
-      the UA SHOULD allow the user to indicate interest and then perform a privacy-disabled scan to retrieve the name.
+      <a>prompt the user to choose</a> one of the devices in |scanResult|,
+      associated with |descriptor|,
+      and let |device| be the result.
+
       <p>
         The UA MAY allow the user to select a nearby device
         that does not match <var>uuidFilters</var>.
       </p>
+
+      <p class="note">
+        The UA should show the user the human-readable name of each device.
+        If this name is not available because, for example,
+        the UA's Bluetooth system doesn't support privacy-enabled scans,
+        the UA should allow the user to indicate interest and
+        then perform a privacy-disabled scan to retrieve the name.
+      </p>
     </li>
     <li>
-      Wait for the user to have selected a <var>device</var> or cancelled the prompt.
+      If |device| is {{"denied"}}, return `[]` and abort these steps.
     </li>
-    <li>
-      If the user cancels the prompt,
-      set <code><var>status</var>.{{BluetoothPermissionResult/devices}}</code>
-      to an empty {{FrozenArray}},
-      <a>resolve</a> <var>promise</var> with `undefined`,
-      and abort these steps.
-    </li>
-    <li>
-      <a lt="add an allowed bluetooth device"
-      >Add <var>device</var> to <var>storage</var></a>
-      with the union of <var>requiredServiceUUIDs</var>
-      and <var>optionalServiceUUIDs</var> as <var>allowed services</var>.
+    <li class="note">
+      Choosing a |device| probably indicates that
+      the user intends that device to appear in
+      the {{BluetoothPermissionData/allowedDevices}} list
+      of {{"bluetooth"}}'s <a>extra permission data</a> for
+      at least the <a>current settings object</a>,
+      and for all the services in the union of <var>requiredServiceUUIDs</var>
+      and <var>optionalServiceUUIDs</var>
+      to appear in its {{AllowedBluetoothDevice/allowedServices}} list,
+      in addition to any services that were already there.
     </li>
     <li>
       The UA MAY <a>populate the Bluetooth cache</a> with
@@ -1034,20 +1041,12 @@ spec: permissions
     </li>
     <li>
       <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
-      inside the <a>context object</a> and <var>storage</var>,
+      inside the <a>context object</a>,
+      propagating any exception,
       and let |deviceObj| be the result.
     </li>
     <li>
-      If the previous step threw an exception,
-      <a>reject</a> |promise| with that exception and abort these steps.
-    </li>
-    <li>
-      Set <code><var>status</var>.{{BluetoothPermissionResult/devices}}</code>
-      to a new {{FrozenArray}} containing the value of |deviceObj|
-      as its only element.
-    </li>
-    <li>
-      <a>Resolve</a> <var>promise</var> with `undefined`.
+      Return <code>[|deviceObj|]</code>.
     </li>
   </ol>
 
@@ -1217,8 +1216,9 @@ spec: permissions
     </div>
 
     <p>
-      The <dfn enum-value for="PermissionName">"bluetooth"</dfn> <a>permission</a>
-      is defined as follows:
+      The <dfn enum-value for="PermissionName">"bluetooth"</dfn> <a>powerful feature</a>'s
+      permission-related algorithms and types
+      are defined as follows:
     </p>
     <dl>
       <dt>
@@ -1235,17 +1235,17 @@ spec: permissions
         </pre>
       </dd>
       <dt>
-        <a>permission storage type</a>
+        <a>extra permission data type</a>
       </dt>
       <dd>
         <p oldids="allowed-devices-map,device-id,allowed-services-list"
-        >{{BluetoothPermissionStorage}}, defined as:</p>
+        >{{BluetoothPermissionData}}, defined as:</p>
         <pre class="idl">
           dictionary AllowedBluetoothDevice {
             required DOMString deviceId;
             required sequence&lt;UUID> allowedServices;
           };
-          dictionary BluetoothPermissionStorage : PermissionStorage {
+          dictionary BluetoothPermissionData {
             required sequence&lt;AllowedBluetoothDevice> allowedDevices = [];
           };
         </pre>
@@ -1254,6 +1254,27 @@ spec: permissions
           <dfn attribute for="AllowedBluetoothDevice">\[[device]]</dfn>
           that holds a <a>Bluetooth device</a>.
         </p>
+        <p>
+          Distinct elements of {{BluetoothPermissionData/allowedDevices}}
+          must have different {{AllowedBluetoothDevice/[[device]]}}s
+          and different {{AllowedBluetoothDevice/deviceId}}s.
+        </p>
+        <div class="note" id="note-device-id-tracking">
+          <p>
+            A {{AllowedBluetoothDevice/deviceId}} allows a site to track that
+            a {{BluetoothDevice}} instance seen at one time represents
+            the same device as another {{BluetoothDevice}} instance seen at another time,
+            possibly in a different <a>realm</a>.
+            UAs should consider whether their user intends that tracking to happen or not-happen
+            when returning {{"bluetooth"}}'s <a>extra permission data</a>.
+          </p>
+          <p>
+            For example, users generally don't intend two different origins to know
+            that they're interacting with the same device,
+            and they generally don't intend unique identifiers to persist
+            after they've cleared an origin's cookies.
+          </p>
+        </div>
       </dd>
       <dt>
         <a>permission result type</a>
@@ -1266,12 +1287,35 @@ spec: permissions
         </pre>
       </dd>
       <dt>
-        <a>permission query algorithm</a>
+        <a>permission request algorithm</a>
       </dt>
       <dd>
+        <p>
+          Given a {{BluetoothPermissionDescriptor}} <var>options</var>
+          and a {{BluetoothPermissionResult}} <var>status</var>,
+          the UA MUST run the following steps:
+        </p>
+        <ol class="algorithm">
+          <li>
+            <a>Request Bluetooth devices</a>,
+            passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
+            and <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>,
+            propagating any exception,
+            and let |devices| be the result.
+          </li>
+          <li>
+            Set <code>|status|.devices</code> to
+            a new {{FrozenArray}} whose contents are the elements of |devices|.
+          </li>
+        </ol>
+      </dd>
+
+      <dt>
+        <a>permission query algorithm</a>
+      </dt>
+      <dd algorithm>
         To <dfn>query the "bluetooth" permission</dfn> with
-        a {{BluetoothPermissionDescriptor}} <var>desc</var>,
-        a {{BluetoothPermissionStorage}} <var>storage</var>,
+        a {{BluetoothPermissionDescriptor}} <var>desc</var>
         and a {{BluetoothPermissionResult}} <var>status</var>, the UA must:
         <ol class="algorithm">
           <li>
@@ -1279,13 +1323,23 @@ spec: permissions
           </li>
           <li>
             Set <code><var>status</var>.{{PermissionStatus/state}}</code>
-            to {{PermissionState/"prompt"}}.
+            to |desc|'s <a>permission state</a>.
+          </li>
+          <li>
+            If <code>|status|.{{PermissionStatus/state}}</code> is {{"denied"}},
+            set <code>|status|.devices</code> to an empty {{FrozenArray}}
+            and abort these steps.
           </li>
           <li>
             Let <var>matchingDevices</var> be a new {{Array}}.
           </li>
           <li>
-            For each <var>allowedDevice</var> in <code><var>storage</var>.allowedDevices</code>,
+            Let |data|, a {{BluetoothPermissionData}},
+            be {{"bluetooth"}}'s <a>extra permission data</a>
+            for the <a>current settings object</a>.
+          </li>
+          <li>
+            For each |allowedDevice| in <code>|data|.allowedDevices</code>,
             run the following substeps:
             <ol>
               <li>
@@ -1298,6 +1352,9 @@ spec: permissions
                 and <code><var>allowedDevice</var>@{{[[device]]}}</code> does not
                 <a>match a filter</a> in <code><var>desc</var>.filters</code>,
                 continue to the next <var>allowedDevice</var>.
+              </li>
+              <li class="note">
+                Note: The <code>|desc|.optionalServices</code> field does not affect the result.
               </li>
               <li>
                 <a>Get the `BluetoothDevice` representing</a>
@@ -1313,20 +1370,56 @@ spec: permissions
           </li>
         </ol>
       </dd>
-      <dt>
-        <a>permission request algorithm</a>
-      </dt>
-      <dd>
-        <a>Request the "bluetooth" permission</a>.
-      </dd>
+
       <dt>
         <a>permission revocation algorithm</a>
       </dt>
-      <dd>
-        <p class="issue">
-          The permissions API's revocation support is still in flux,
-          so this isn't filled in yet.
+      <dd algorithm>
+        <p>
+          To <dfn>revoke Bluetooth access</dfn> to devices the user no longer intends to expose,
+          the UA MUST run the following steps:
         </p>
+        <ol class="algorithm">
+          <li>
+            Let |data|, a {{BluetoothPermissionData}},
+            be {{"bluetooth"}}'s <a>extra permission data</a>
+            for the <a>current settings object</a>.
+          </li>
+          <li>
+            For each {{BluetoothDevice}} instance |deviceObj| in the <a>current realm</a>,
+            run the following substeps:
+            <ol>
+              <li>
+                If there is an {{AllowedBluetoothDevice}} |allowedDevice| in <code>|data|.{{allowedDevices}}</code>
+                such that:
+                <ul>
+                  <li>
+                    <code>|allowedDevice|.{{[[device]]}}</code> is
+                    the <a>same device</a> as <code>|deviceObj|.{{[[representedDevice]]}}</code>, and
+                  </li>
+                  <li>
+                    <code>|allowedDevice|.{{AllowedBluetoothDevice/deviceId}} ===
+                    |deviceObj|.{{BluetoothDevice/id}}</code>,
+                  </li>
+                </ul>
+                then update <code>|deviceObj|.{{[[allowedServices]]}}</code> to be
+                <code>|allowedDevice|.{{allowedServices}}</code>,
+                and continue to the next |deviceObj|.
+              </li>
+              <li>
+                Otherwise, detach |deviceObj| from its device by running the remaining steps.
+              </li>
+              <li>
+                Call <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
+
+                Note: This fires a {{gattserverdisconnected}} event at |deviceObj|.
+              </li>
+              <li>
+                Set <code><var>deviceObj</var>@{{[[representedDevice]]}}</code> to `null`.
+              </li>
+            </ol>
+          </li>
+        </ol>
       </dd>
     </dl>
   </section>
@@ -1411,156 +1504,6 @@ spec: permissions
   </section>
 
   <section>
-    <h3 id="per-origin-device-properties">Per-origin Bluetooth device properties</h3>
-
-    <p>
-      The UA stores per-origin data in {{BluetoothPermissionStorage}} objects
-      in the <a>permission store</a>.
-    </p>
-
-    <p>
-      The UA MAY <a>revoke Bluetooth access</a> to a device
-      for a <a>permission storage identifier</a> at any time
-      based on signals from the user.
-      <span class="note">
-        For example, if the user chooses not to remember access,
-        the UA might revoke access to a device when the tab that was granted access to it is closed.
-        Or the UA might provide a revocation UI that allows the user
-        to explicitly revoke access even while a tab is actively using a device.
-      </span>
-    </p>
-
-    <p>
-      To <dfn>add an allowed <a>Bluetooth device</a></dfn> <var>device</var>
-      to a {{BluetoothPermissionStorage}} <var>storage</var>
-      with an optional <var>allowed services</var> list of <a>UUID</a>s,
-      the UA MUST run the following steps.
-    </p>
-    <ol class="algorithm">
-      <li>
-        Search for an element <var>allowedDevice</var>
-        in <code><var>storage</var>.{{BluetoothPermissionStorage/allowedDevices}}</code>
-        with <code><var>allowedDevice</var>@{{AllowedBluetoothDevice/[[device]]}}</code>
-        the <a>same device</a> as <var>device</var>.
-        If one is found, do the following sub-steps.
-        <ol>
-          <li>
-            Set <code><var>allowedDevice</var>.{{allowedServices}}</code> to
-            the set-union of itself and <var>allowed services</var>.
-          </li>
-          <li>
-            Let <var>newServices</var> be
-            a copy of <code><var>allowedDevice</var>.{{allowedServices}}</code>.
-          </li>
-          <li>
-            For each {{BluetoothDevice}} <var>deviceObj</var> in the UA:
-            <ol>
-              <li>
-                Let <var>settings</var> be
-                the <a>relevant settings object</a> for <var>deviceObj</var>.
-              </li>
-              <li>
-                If <var>settings</var>' <a lt="environment settings object">origin</a>
-                is <var>origin</var> and
-                <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code> is
-                the <a>same device</a> as <var>device</var>,
-                <a>queue a task</a> on <var>settings</var>' <a>responsible event loop</a> to
-                set <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
-                to <var>newServices</var>.
-                <p class="note">
-                  There's no need to fire {{serviceadded}} for these new services because
-                  <a href="#only-notify-for-requested-services"
-                  >none of them could have been returned from a previous service query</a>.
-                </p>
-              </li>
-            </ol>
-          </li>
-          <li>
-            Abort these steps.
-          </li>
-        </ol>
-      </li>
-      <li>
-        Let <var>id</var> be a new <code>DOMString</code> that
-        isn't equal to any of the {{AllowedBluetoothDevice/deviceId}}s
-        in an element
-        of <code><var>storage</var>.{{BluetoothPermissionStorage/allowedDevices}}</code>
-        and isn't equal to or derived from any of <var>device</var>'s
-        <a>Public Bluetooth Address</a>, <a>Static Address</a>,
-        or <a>Identity Resolving Key</a>.
-        <var>id</var> MUST, with very high probability,
-        be unequal to the {{AllowedBluetoothDevice/deviceId}}s
-        in all other {{AllowedBluetoothDevice}} objects
-        that have even been stored in the <a>permission store</a>
-        with {{AllowedBluetoothDevice/[[device]]}} the <a>same device</a> as <var>device</var>.
-      </li>
-      <li>
-        If <var>allowed services</var> wasn't provided, set it to an empty list.
-      </li>
-      <li link-for-hint="AllowedBluetoothDevice">
-        Append <code class="highlight">{ {{deviceId}}: <var>id</var>,
-        {{allowedServices}}: <var>allowed services</var> }</code>,
-        with a {{[[device]]}} internal slot of <var>device</var>,
-        to <code><var>storage</var>.allowedDevices</code>.
-      </li>
-    </ol>
-
-    <p>
-      To <dfn>revoke Bluetooth access</dfn>
-      to a <a>Bluetooth device</a> <var>device</var>
-      for a <a>permission storage identifier</a> <var>identifier</var>,
-      the UA MUST run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        Let <var>storage</var> be
-        <a lt="retrieve a permission storage entry">the permission storage entry of</a>
-        <var>identifier</var>.
-      </li>
-      <li>
-        If <var>storage</var> is `undefined`, abort these steps.
-      </li>
-      <li>
-        If there is an <var>allowedDevice</var>
-        in <code><var>storage</var>.{{BluetoothPermissionStorage/allowedDevices}}</code>
-        with <code><var>allowedDevice</var>.{{AllowedBluetoothDevice/[[device]]}}</code>
-        the <a>same device</a> as <var>device</var>, remove it.
-        Otherwise, abort these steps.
-      </li>
-      <li>
-        <a>Create a permission storage entry</a> for <var>identifier</var>
-        with the value <var>storage</var>.
-      </li>
-      <li>
-        For each {{BluetoothDevice}} <var>deviceObj</var> in the UA
-        whose <a>relevant settings object</a>'s origin is <var>origin</var> and
-        whose <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>
-        is the <a>same device</a> as <var>device</var>,
-        <a>queue a task</a>
-        on <var>deviceObj</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a>
-        to do the following sub-steps:
-        <ol>
-          <li>
-            Let <var>wasConnected</var> be
-            <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>.
-          <li>
-            Call <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
-          </li>
-          <li>
-            Set <code><var>deviceObj</var>@{{[[representedDevice]]}}</code> to `null`.
-          </li>
-          <li>
-            If <var>wasConnected</var>,
-            <a>fire an event</a> named {{gattserverdisconnected}}
-            with its {{Event/bubbles}} attribute initialized to `true`
-            at <code><var>deviceObj</var></code>.
-          </li>
-        </ol>
-      </li>
-    </ol>
-  </section>
-
-  <section>
     <h3 id="bluetoothdevice" dfn-type="interface">BluetoothDevice</h3>
 
     <p>
@@ -1590,11 +1533,9 @@ spec: permissions
          dfn-for="BluetoothDevice" dfn-type="attribute">
       <p>
         <dfn>id</dfn> uniquely identifies a device to the extent that
-        the UA can determine that two Bluetooth connections are to the same device.
-        It is computed as the {{AllowedBluetoothDevice/deviceId}}
-        in <a>add an allowed Bluetooth device</a>.
-        This ID can't be used to match a device across origins
-        or after the user revokes and re-grants access to the device.
+        the UA can determine that two Bluetooth connections are to the same device
+        and to the extent that
+        the user <a href="#note-device-id-tracking">wants to expose that fact to script</a>.
       </p>
 
       <p>
@@ -1685,17 +1626,16 @@ spec: permissions
       To <dfn export>get the <code>BluetoothDevice</code> representing</dfn>
       a <a>Bluetooth device</a> <var>device</var>
       inside a {{Bluetooth}} instance <var>context</var>,
-      and an optional {{BluetoothPermissionStorage}} <var>storage</var>,
       the UA MUST run the following steps:
     </p>
     <ol class="algorithm">
       <li>
-        If <var>storage</var> isn't set,
-        <a>retrieve the permission storage</a> for the {{PermissionName/"bluetooth"}} permission,
-        and set <var>storage</var> to the resulting {{BluetoothPermissionStorage}}.
+        Let |data|, a {{BluetoothPermissionData}},
+        be {{"bluetooth"}}'s <a>extra permission data</a>
+        for the <a>current settings object</a>.
       </li>
       <li>
-        Find the <var>allowedDevice</var> in <code><var>storage</var>.{{allowedDevices}}</code>
+        Find the |allowedDevice| in <code>|data|.{{allowedDevices}}</code>
         with <code><var>allowedDevice</var>@{{[[device]]}}</code>
         the <a>same device</a> as <var>device</var>.
         If there is no such object,
@@ -3530,7 +3470,9 @@ spec: permissions
           The <a>children</a>
           of {{Navigator/bluetooth|navigator.bluetooth}}</code></a>
           are the {{BluetoothDevice}} objects representing
-          devices on the origin's {{BluetoothPermissionStorage/allowedDevices}} list,
+          devices in the {{BluetoothPermissionData/allowedDevices}} list
+          in {{"bluetooth"}}'s <a>extra permission data</a>
+          for {{Navigator/bluetooth|navigator.bluetooth}}'s <a>relevant settings object</a>,
           in an unspecified order.
         </li>
         <li>
