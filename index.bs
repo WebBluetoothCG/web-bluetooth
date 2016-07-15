@@ -1035,19 +1035,19 @@ spec: permissions
     <li>
       <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
       inside the <a>context object</a> and <var>storage</var>,
-      and let <var>deviceObjPromise</var> be the result.
+      and let |deviceObj| be the result.
     </li>
     <li>
-      Wait for <var>deviceObjPromise</var> to settle.
+      If the previous step threw an exception,
+      <a>reject</a> |promise| with that exception and abort these steps.
     </li>
     <li>
-      If <var>deviceObjPromise</var> is <a>fulfilled</a>,
-      set <code><var>status</var>.{{BluetoothPermissionResult/devices}}</code>
-      to a new {{FrozenArray}} containing the value of <var>deviceObjPromise</var>
+      Set <code><var>status</var>.{{BluetoothPermissionResult/devices}}</code>
+      to a new {{FrozenArray}} containing the value of |deviceObj|
       as its only element.
     </li>
     <li>
-      <a>Resolve</a> <var>promise</var> with <var>deviceObjPromise</var>.
+      <a>Resolve</a> <var>promise</var> with `undefined`.
     </li>
   </ol>
 
@@ -1303,8 +1303,7 @@ spec: permissions
                 <a>Get the `BluetoothDevice` representing</a>
                 <code><var>allowedDevice</var>@{{[[device]]}}</code>
                 within <code><var>global</var>.navigator.bluetooth</code>,
-                wait for the result to settle,
-                and add its value to <var>matchingDevices</var>.
+                and add the result to <var>matchingDevices</var>.
               </li>
             </ol>
           </li>

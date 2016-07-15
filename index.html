@@ -2160,11 +2160,10 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       all Services inside <var>device</var>.
       Ignore any errors from this step. 
      <li> <a data-link-type="dfn" href="#get-the-bluetoothdevice-representing" id="ref-for-get-the-bluetoothdevice-representing-1">Get the <code>BluetoothDevice</code> representing</a> <var>device</var> inside the <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#context-object">context object</a> and <var>storage</var>,
-      and let <var>deviceObjPromise</var> be the result. 
-     <li> Wait for <var>deviceObjPromise</var> to settle. 
-     <li> If <var>deviceObjPromise</var> is <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-promise-objects">fulfilled</a>,
-      set <code><var>status</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-5">devices</a></code></code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> containing the value of <var>deviceObjPromise</var> as its only element. 
-     <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">Resolve</a> <var>promise</var> with <var>deviceObjPromise</var>. 
+      and let <var>deviceObj</var> be the result. 
+     <li> If the previous step threw an exception, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with that exception and abort these steps. 
+     <li> Set <code><var>status</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-5">devices</a></code></code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> containing the value of <var>deviceObj</var> as its only element. 
+     <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">Resolve</a> <var>promise</var> with <code>undefined</code>. 
     </ol>
     <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="scan-for-devices">scan for devices</dfn> with
     an optional <var>set of <a data-link-type="dfn" href="#service" id="ref-for-service-3">Service</a> UUIDs</var>, defaulting to the set of all UUIDs,
@@ -2323,8 +2322,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
                 and <code><var>allowedDevice</var>@<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-1">[[device]]</a></code></code> does not <a data-link-type="dfn" href="#matches-a-filter" id="ref-for-matches-a-filter-4">match a filter</a> in <code><var>desc</var>.filters</code>,
                 continue to the next <var>allowedDevice</var>. 
           <li> <a data-link-type="dfn" href="#get-the-bluetoothdevice-representing" id="ref-for-get-the-bluetoothdevice-representing-2">Get the <code>BluetoothDevice</code> representing</a> <code><var>allowedDevice</var>@<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-2">[[device]]</a></code></code> within <code><var>global</var>.navigator.bluetooth</code>,
-                wait for the result to settle,
-                and add its value to <var>matchingDevices</var>. 
+                and add the result to <var>matchingDevices</var>. 
          </ol>
         <li> Set <code><var>status</var>.devices</code> to
             a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> whose contents are <var>matchingDevices</var>. 
@@ -4743,7 +4741,6 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <li><a href="https://tc39.github.io/ecma262/#sec-set-objects">Set</a>
      <li><a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
      <li><a href="https://tc39.github.io/ecma262/#sec-typedarray-constructors">TypedArray</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-promise-objects">fulfilled</a>
      <li><a href="https://tc39.github.io/ecma262/#sec-code-realms">realm</a>
     </ul>
    <li>
