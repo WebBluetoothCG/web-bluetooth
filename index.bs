@@ -111,7 +111,6 @@ spec: html
         text: event handler idl attribute
         text: global object
         text: in parallel
-        text: incumbent settings object
         text: perform a microtask checkpoint
         text: queue a task
         text: relevant settings object
@@ -348,7 +347,8 @@ spec: permissions
       To help ensure that only the entity the user approved for access actually has access,
       this specification requires that only <a>secure context</a>s
       can access Bluetooth devices
-      (<a href="#requestDevice-secure-context">requestDevice</a>).
+      (<a idl lt="Bluetooth">requestDevice</a>).
+    </p>
   </section>
 
   <section class="non-normative">
@@ -513,7 +513,7 @@ spec: permissions
 </section>
 
 <section>
-  <h2 id="device-discovery">Device Discovery</h2>
+  <h2 id="device-discovery" oldids="requestDevice-secure-context">Device Discovery</h2>
 
   <pre class="idl">
     dictionary BluetoothRequestDeviceFilter {
@@ -528,6 +528,7 @@ spec: permissions
     };
 
     interface Bluetooth {
+      [SecureContext]
       Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
     };
     Bluetooth implements EventTarget;
@@ -861,10 +862,6 @@ spec: permissions
     and run the following steps <a>in parallel</a>:
   </p>
   <ol class="algorithm">
-    <li id="requestDevice-secure-context">
-      If the <a>incumbent settings object</a> is not a <a>secure context</a>,
-      <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
-    </li>
     <li id="requestDevice-user-gesture">
       If the algorithm is not <a>triggered by user activation</a>,
       <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
