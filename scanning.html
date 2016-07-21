@@ -1587,8 +1587,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</dfn> {
-  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit-1">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanoptions-filters">filters<a class="self-link" href="#dom-bluetoothlescanoptions-filters"></a></dfn>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit-1">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanoptions-filters">filters<a class="self-link" href="#dom-bluetoothlescanoptions-filters"></a></dfn>;
   <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-keeprepeateddevices" id="ref-for-dom-bluetoothlescanoptions-keeprepeateddevices-1">keepRepeatedDevices</a> = <span class="kt">false</span>;
+  <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-acceptalladvertisements" id="ref-for-dom-bluetoothlescanoptions-acceptalladvertisements-1">acceptAllAdvertisements</a> = <span class="kt">false</span>;
 };
 
 <span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">Bluetooth</a> {
@@ -1614,11 +1615,21 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       set <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" id="dom-bluetoothlescanoptions-keeprepeateddevices">keepRepeatedDevices</dfn> to <code>true</code>.
       Note that setting <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanoptions-keeprepeateddevices" id="ref-for-dom-bluetoothlescanoptions-keeprepeateddevices-2">keepRepeatedDevices</a></code> to <code>false</code> doesn’t guarantee you won’t get redundant events;
       it just allows the UA to save power by omitting them. </p>
+     <p> In the rare case that you want to receive every advertisement without filtering them,
+      use the <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" id="dom-bluetoothlescanoptions-acceptalladvertisements">acceptAllAdvertisements</dfn> field. </p>
     </div>
     <div data-algorithm="requestLEScan(|options|)">
      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export="" id="dom-bluetooth-requestlescan">requestLEScan(<var>options</var>)</dfn></code> method,
       when invoked, MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
+      <li>
+        If <code><var>options</var>.acceptAllAdvertisements</code> is <code>true</code>,
+        and <code><var>options</var>.filters</code> is present, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+       <p class="note" role="note">Note: There’s no need to include filters if all advertisements are being accepted.</p>
+      <li>
+        If <code><var>options</var>.acceptAllAdvertisements</code> is <code>false</code>,
+        and <code><var>options</var>.filters</code> is either absent or empty, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+       <p class="note" role="note">Note: An empty set of filters wouldn’t return any advertisements.</p>
       <li> Let <var>filters</var> be <code><var>options</var>.filters.map(filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter-1">BluetoothLEScanFilter</a></code>(filter))</code>.
         If this throws an exception, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with that exception and abort these steps. 
       <li id="scanning-permission">
@@ -1627,9 +1638,10 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <span class="nx">name</span><span class="o">:</span> <a data-link-type="idl" href="#dom-permissionname-bluetooth-le-scan" id="ref-for-dom-permissionname-bluetooth-le-scan-1"><span class="s2">"bluetooth-le-scan"</span></a><span class="p">,</span>
   <span class="nx">filters</span><span class="o">:</span> <var><span class="nx">options</span></var><span class="p">.</span><span class="nx">filters</span><span class="p">,</span>
   <span class="nx">keepRepeatedDevices</span><span class="o">:</span> <var><span class="nx">options</span></var><span class="p">.</span><span class="nx">keepRepeatedDevices</span><span class="p">,</span>
+  <span class="nx">acceptAllAdvertisements</span><span class="o">:</span> <var><span class="nx">options</span></var><span class="p">.</span><span class="nx">acceptAllAdvertisements</span><span class="p">,</span>
 <span class="p">}</span>
 </pre>
-       <p class="note" role="note"> This may require that this algorithm was <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">triggered by user activation</a>. </p>
+       <p class="note" role="note">Note: This may require that this algorithm was <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">triggered by user activation</a>.</p>
       <li> If the result is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a></code>,
         reject <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror">NotAllowedError</a></code> and abort these steps. 
       <li>
@@ -1647,6 +1659,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
          <tr>
           <td><code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-keeprepeateddevices" id="ref-for-dom-bluetoothlescan-keeprepeateddevices-1">keepRepeatedDevices</a></code>
           <td><code><var>options</var>.keepRepeatedDevices</code>
+         <tr>
+          <td><code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-acceptalladvertisements" id="ref-for-dom-bluetoothlescan-acceptalladvertisements-1">acceptAllAdvertisements</a></code>
+          <td><code><var>options</var>.acceptAllAdvertisements</code>
          <tr>
           <td><code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-active" id="ref-for-dom-bluetoothlescan-active-1">active</a></code>
           <td><code>true</code>
@@ -1684,6 +1699,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothlescan">BluetoothLEScan</dfn> {
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothlescanfilter" id="ref-for-bluetoothlescanfilter-2">BluetoothLEScanFilter</a>> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScan" data-dfn-type="attribute" data-export="" data-readonly="" data-type="FrozenArray<BluetoothLEScanFilter>" id="dom-bluetoothlescan-filters">filters</dfn>;
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScan" data-dfn-type="attribute" data-export="" data-readonly="" data-type="boolean" id="dom-bluetoothlescan-keeprepeateddevices">keepRepeatedDevices</dfn>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScan" data-dfn-type="attribute" data-export="" data-readonly="" data-type="boolean" id="dom-bluetoothlescan-acceptalladvertisements">acceptAllAdvertisements</dfn>;
 
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScan" data-dfn-type="attribute" data-export="" data-readonly="" data-type="boolean" id="dom-bluetoothlescan-active">active</dfn>;
 
@@ -1699,6 +1715,10 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="constructor" data-export="" id="dom-bluetoothlescanfilter-bluetoothlescanfilter">BluetoothLEScanFilter(<var>init</var>)</dfn> constructor, when invoked MUST perform the following steps: </p>
       <ol class="algorithm">
        <li> Initialize all fields to <code>null</code>. 
+       <li>
+         If no member of <var>init</var> is present, throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>. 
+        <p class="note" role="note">Note: A filter can’t implicitly allow all advertisements.
+          Use <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanoptions-acceptalladvertisements" id="ref-for-dom-bluetoothlescanoptions-acceptalladvertisements-2">acceptAllAdvertisements</a></code> to explicitly do it.</p>
        <li> For each <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-present">present</a> member in <var>init</var>,
           set <code>this</code>'s attribute with a matching identifier to the value of the member.
           If the member’s type is <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a></code>,
@@ -1730,7 +1750,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 <pre class="idl highlight def"><span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothlescanpermissiondescriptor">BluetoothLEScanPermissionDescriptor</dfn> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a> {
   // These match BluetoothLEScanOptions.
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit-3">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanpermissiondescriptor-filters">filters<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-filters"></a></dfn>;
-  <span class="kt">boolean</span> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">keepRepeatedDevices<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices"></a></dfn>;
+  <span class="kt">boolean</span> <dfn class="nv idl-code" data-default="false" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">keepRepeatedDevices<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices"></a></dfn> = <span class="kt">false</span>;
+  <span class="kt">boolean</span> <dfn class="nv idl-code" data-default="false" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements">acceptAllAdvertisements<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements"></a></dfn> = <span class="kt">false</span>;
 };
 </pre>
       <dt><a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-result-type">permission result type</a>
@@ -1813,7 +1834,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <div data-algorithm="bluetoothlescan-match">
       <p> An advertising event <var>event</var> <dfn class="dfn-paneled" data-dfn-for="BluetoothLEScan" data-dfn-type="dfn" data-lt="match" data-noexport="" id="bluetoothlescan-match">matches</dfn> a <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan-8">BluetoothLEScan</a></code> <var>scan</var> if the following steps return <code>match</code>: </p>
       <ol class="algorithm">
-       <li> If <var>event</var> doesn’t <a data-link-type="dfn" href="#bluetoothlescanfilter-match" id="ref-for-bluetoothlescanfilter-match-2">match</a> any filter in <code><var>scan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-filters" id="ref-for-dom-bluetoothlescan-filters-2">filters</a></code></code>,
+       <li> <code><var>scan</var>.acceptAllAdvertisements</code> is <code>false</code> and <var>event</var> doesn’t <a data-link-type="dfn" href="#bluetoothlescanfilter-match" id="ref-for-bluetoothlescanfilter-match-2">match</a> any filter in <code><var>scan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-filters" id="ref-for-dom-bluetoothlescan-filters-2">filters</a></code></code>,
           return <code>no match</code>. 
        <li> If <code><var>scan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-keeprepeateddevices" id="ref-for-dom-bluetoothlescan-keeprepeateddevices-2">keepRepeatedDevices</a></code></code> is <code>false</code>,
           there is a <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice">BluetoothDevice</a></code> <var>device</var> that
@@ -2135,6 +2156,13 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
+   <li>
+    acceptAllAdvertisements
+    <ul>
+     <li><a href="#dom-bluetoothlescanoptions-acceptalladvertisements">dict-member for BluetoothLEScanOptions</a><span>, in §4</span>
+     <li><a href="#dom-bluetoothlescan-acceptalladvertisements">attribute for BluetoothLEScan</a><span>, in §4.1</span>
+     <li><a href="#dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements">dict-member for BluetoothLEScanPermissionDescriptor</a><span>, in §4.2</span>
+    </ul>
    <li><a href="#dom-bluetoothlescan-active">active</a><span>, in §4.1</span>
    <li><a href="#active-scanning">Active Scanning</a><span>, in §7</span>
    <li><a href="#dom-bluetooth-activescans-slot">[[activeScans]]</a><span>, in §6</span>
@@ -2215,6 +2243,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <a data-link-type="biblio">[ECMAScript]</a> defines the following terms:
     <ul>
      <li><a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a>
+     <li><a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
@@ -2320,8 +2349,9 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</a> {
-  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanoptions-filters">filters</a>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanoptions-filters">filters</a>;
   <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-keeprepeateddevices">keepRepeatedDevices</a> = <span class="kt">false</span>;
+  <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-acceptalladvertisements">acceptAllAdvertisements</a> = <span class="kt">false</span>;
 };
 
 <span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">Bluetooth</a> {
@@ -2340,6 +2370,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 <span class="kt">interface</span> <a class="nv" href="#bluetoothlescan">BluetoothLEScan</a> {
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothlescanfilter">BluetoothLEScanFilter</a>> <a class="nv" data-readonly="" data-type="FrozenArray<BluetoothLEScanFilter>" href="#dom-bluetoothlescan-filters">filters</a>;
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <a class="nv" data-readonly="" data-type="boolean" href="#dom-bluetoothlescan-keeprepeateddevices">keepRepeatedDevices</a>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <a class="nv" data-readonly="" data-type="boolean" href="#dom-bluetoothlescan-acceptalladvertisements">acceptAllAdvertisements</a>;
 
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <a class="nv" data-readonly="" data-type="boolean" href="#dom-bluetoothlescan-active">active</a>;
 
@@ -2349,7 +2380,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothlescanpermissiondescriptor">BluetoothLEScanPermissionDescriptor</a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a> {
   // These match BluetoothLEScanOptions.
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanpermissiondescriptor-filters">filters</a>;
-  <span class="kt">boolean</span> <a class="nv" data-type="boolean " href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">keepRepeatedDevices</a>;
+  <span class="kt">boolean</span> <a class="nv" data-default="false" data-type="boolean " href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">keepRepeatedDevices</a> = <span class="kt">false</span>;
+  <span class="kt">boolean</span> <a class="nv" data-default="false" data-type="boolean " href="#dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements">acceptAllAdvertisements</a> = <span class="kt">false</span>;
 };
 
 <span class="kt">interface</span> <a class="nv" href="#bluetoothlescanpermissionresult">BluetoothLEScanPermissionResult</a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#permissionstatus">PermissionStatus</a> {
@@ -2381,6 +2413,13 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanoptions-keeprepeateddevices-1">4. Scanning for BLE advertisements</a> <a href="#ref-for-dom-bluetoothlescanoptions-keeprepeateddevices-2">(2)</a>
     <li><a href="#ref-for-dom-bluetoothlescanoptions-keeprepeateddevices-3">6. Changes to existing interfaces</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothlescanoptions-acceptalladvertisements">
+   <b><a href="#dom-bluetoothlescanoptions-acceptalladvertisements">#dom-bluetoothlescanoptions-acceptalladvertisements</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanoptions-acceptalladvertisements-1">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-dom-bluetoothlescanoptions-acceptalladvertisements-2">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetooth-requestlescan">
@@ -2422,6 +2461,12 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-keeprepeateddevices-1">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-bluetoothlescan-keeprepeateddevices-2">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothlescan-acceptalladvertisements">
+   <b><a href="#dom-bluetoothlescan-acceptalladvertisements">#dom-bluetoothlescan-acceptalladvertisements</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescan-acceptalladvertisements-1">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothlescan-active">

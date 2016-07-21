@@ -273,8 +273,9 @@ spec: html
     };
 
     dictionary BluetoothLEScanOptions {
-      required sequence&lt;BluetoothLEScanFilterInit> filters;
+      sequence&lt;BluetoothLEScanFilterInit> filters;
       boolean keepRepeatedDevices = false;
+      boolean acceptAllAdvertisements = false;
     };
 
     partial interface Bluetooth {
@@ -311,6 +312,10 @@ spec: html
       doesn't guarantee you won't get redundant events;
       it just allows the UA to save power by omitting them.
     </p>
+    <p>
+      In the rare case that you want to receive every advertisement without filtering them,
+      use the <dfn dict-member for="BluetoothLEScanOptions">acceptAllAdvertisements</dfn> field.
+    </p>
   </div>
 
   <div algorithm>
@@ -320,6 +325,20 @@ spec: html
       and run the following steps <a>in parallel</a>:
     </p>
     <ol class="algorithm">
+      <li>
+        If <code>|options|.acceptAllAdvertisements</code> is `true`,
+        and <code>|options|.filters</code> is present,
+        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+
+        Note: There's no need to include filters if all advertisements are being accepted.
+      </li>
+      <li>
+        If <code>|options|.acceptAllAdvertisements</code> is `false`,
+        and <code>|options|.filters</code> is either absent or empty,
+        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+
+        Note: An empty set of filters wouldn't return any advertisements.
+      </li>
       <li>
         Let |filters| be
         <code>|options|.filters.map(filter=>new
@@ -334,12 +353,11 @@ spec: html
             name: <a idl>"bluetooth-le-scan"</a>,
             filters: <var>options</var>.filters,
             keepRepeatedDevices: <var>options</var>.keepRepeatedDevices,
+            acceptAllAdvertisements: <var>options</var>.acceptAllAdvertisements,
           }
         </pre>
 
-        <p class="note">
-          This may require that this algorithm was <a>triggered by user activation</a>.
-        </p>
+        Note: This may require that this algorithm was <a>triggered by user activation</a>.
       </li>
       <li>
         If the result is {{"denied"}},
@@ -354,6 +372,10 @@ spec: html
           <tr>
             <td>{{BluetoothLEScan/keepRepeatedDevices}}</td>
             <td><code>|options|.keepRepeatedDevices</code></td>
+          </tr>
+          <tr>
+            <td>{{BluetoothLEScan/acceptAllAdvertisements}}</td>
+            <td><code>|options|.acceptAllAdvertisements</code></td>
           </tr>
           <tr><td>{{BluetoothLEScan/active}}</td><td>`true`</td></tr>
         </table>
@@ -405,6 +427,7 @@ spec: html
       interface BluetoothLEScan {
         readonly attribute FrozenArray&lt;BluetoothLEScanFilter> filters;
         readonly attribute boolean keepRepeatedDevices;
+        readonly attribute boolean acceptAllAdvertisements;
 
         readonly attribute boolean active;
 
@@ -428,6 +451,12 @@ spec: html
       <ol class="algorithm">
         <li>
           Initialize all fields to `null`.
+        </li>
+        <li>
+          If no member of |init| is present, throw a {{TypeError}}.
+
+          Note: A filter can't implicitly allow all advertisements.
+          Use {{BluetoothLEScanOptions/acceptAllAdvertisements}} to explicitly do it.
         </li>
         <li>
           For each <a>present</a> member in |init|,
@@ -475,7 +504,8 @@ spec: html
           dictionary BluetoothLEScanPermissionDescriptor : PermissionDescriptor {
             // These match BluetoothLEScanOptions.
             sequence&lt;BluetoothLEScanFilterInit> filters;
-            boolean keepRepeatedDevices;
+            boolean keepRepeatedDevices = false;
+            boolean acceptAllAdvertisements = false;
           };
         </pre>
       </dd>
@@ -590,7 +620,7 @@ spec: html
           Let <var>device</var> be the <a>Bluetooth device</a> that sent the advertising event.
         </li>
         <li>
-          For each {{Bluetooth}} instance |bluetooth| in the UA, 
+          For each {{Bluetooth}} instance |bluetooth| in the UA,
           <a>queue a task</a> on
           |bluetooth|'s <a>relevant settings object</a>'s <a>responsible event loop</a>
           to do the following sub-steps:
@@ -633,7 +663,8 @@ spec: html
       </p>
       <ol class="algorithm">
         <li>
-          If |event| doesn't <a for="BluetoothLEScanFilter">match</a>
+          <code>|scan|.acceptAllAdvertisements</code> is `false` and
+          |event| doesn't <a for="BluetoothLEScanFilter">match</a>
           any filter in <code>|scan|.{{BluetoothLEScan/filters}}</code>,
           return `no match`.
         </li>
@@ -644,7 +675,7 @@ spec: html
           and <code>|device|.{{[[returnedFromScans]]}}</code> includes |scan|,
           the UA MAY return `no match`.
         </li>
-        <li>Return `match`.</li> 
+        <li>Return `match`.</li>
       </ol>
     </div>
 
@@ -751,7 +782,7 @@ spec: html
     as its <code>callbackfn</code> parameter,
     regardless of any modifications that have been made to <code>window</code>,
     <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
-    <code>Function</code>, <code>Function.prototype</code>, 
+    <code>Function</code>, <code>Function.prototype</code>,
     <code>BluetoothLEScanFilter</code>, or other objects.
   </p>
 
