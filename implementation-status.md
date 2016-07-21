@@ -4,7 +4,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2016-06-30**.
+* Notes updated **2016-07-21**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
@@ -21,7 +21,7 @@ Characteristic Properties | ✓         | ✓       | 53    | ✓     |         
 GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|  53 start  | ✓ |
 GATT Server Disconnect    | ✓         | ✓       | ✓     | ✓     |         |
 Get Characteristics List  | ✓         | ✓       | 53    | ✓     |         |
-Device Disconnected Event | 52        | 52      | 52    | 52    |         |
+Device Disconnected Event | 52        | 52      | ✓     | ✓     |         |
 Get Primary Services List | 53        | 53      | 53    | 53    |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
