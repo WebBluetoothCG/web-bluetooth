@@ -53,7 +53,7 @@ Same as Chrome unless specificied otherwise
 - https://bugzilla.mozilla.org/buglist.cgi?quicksearch=%5Bweb-bluetooth%5D
 
 # Servo
-https://github.com/servo/servo/issues/9392
+https://szeged.github.io/servo/
  
 # Microsoft Edge
 https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
