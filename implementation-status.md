@@ -56,9 +56,3 @@ https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
 # Safari
 https://bugs.webkit.org/show_bug.cgi?id=101034
-
-# [Android BLE Peripheral App](https://github.com/WebBluetoothCG/ble-test-peripheral-android)
-
-The Peripheral App simulates a BLE peripheral. Developers can connect to
-the simulated BLE peripheral using the Web Bluetooth API to read and write
-characteristics or subscribe to notifications from them.
