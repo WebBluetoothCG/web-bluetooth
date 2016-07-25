@@ -2,7 +2,7 @@
 This document shows the implementation status of Web Bluetooth on the
 different browsers.
 
-<a href="#chrome"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/chrome/chrome_256x256.png" alt="Chrome browser logo"></a><a href="#opera"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/opera/opera_256x256.png" alt="Opera browser logo"></a><a href="#firefox"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/firefox/firefox_256x256.png" alt="Firefox browser logo"></a><a href="#servo"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/browser.html/browser.html_256x256.png" alt="Servo browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/edge/edge_256x256.png" alt="Microsoft Edge browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/safari/safari_256x256.png" alt="Safari browser logo">
+<a href="#chrome"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/chrome/chrome_256x256.png" alt="Chrome browser logo"></a><a href="#opera"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/opera/opera_256x256.png" alt="Opera browser logo"></a><a href="#servo"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/browser.html/browser.html_256x256.png" alt="Servo browser logo"></a><a href="#firefox"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/firefox/firefox_256x256.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/edge/edge_256x256.png" alt="Microsoft Edge browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/safari/safari_256x256.png" alt="Safari browser logo">
 
 # Chrome
 Work is in progress:
@@ -50,12 +50,12 @@ Web Bluetooth API will work. Note: Only works on ChromeOS.
 # Opera
 Same as Chrome unless specificied otherwise
 
+# Servo
+https://szeged.github.io/servo/
+
 # Firefox
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
 - https://bugzilla.mozilla.org/buglist.cgi?quicksearch=%5Bweb-bluetooth%5D
-
-# Servo
-https://szeged.github.io/servo/
  
 # Microsoft Edge
 https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
