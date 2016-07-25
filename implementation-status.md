@@ -41,12 +41,6 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
   * Discover only manually paired devices.
 * iOS: Uses the web exposed APIs as provided by the [WKWebView](https://developer.apple.com/library/ios/documentation/WebKit/Reference/WKWebView_Ref/), no implementation planned in the Chromium codebase.
 
-## [Chrome Apps Polyfill](https://github.com/WebBluetoothCG/chrome-app-polyfill)
-A polyfill for the Web Bluetooth API running inside a Chrome App.
-
-Developers can embed the Polyfill into a Chrome App to get a feel of how the
-Web Bluetooth API will work. Note: Only works on ChromeOS.
-
 # Opera
 Same as Chrome unless specificied otherwise
 
