@@ -5,11 +5,15 @@ different browsers.
 <a href="#chrome"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/chrome/chrome_256x256.png" alt="Chrome browser logo"></a><a href="#opera"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/opera/opera_256x256.png" alt="Opera browser logo"></a><a href="#servo"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/browser.html/browser.html_256x256.png" alt="Servo browser logo"></a><a href="#firefox"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/firefox/firefox_256x256.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/edge/edge_256x256.png" alt="Microsoft Edge browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/safari/safari_256x256.png" alt="Safari browser logo"></a>
 
 # Chrome
-Work is in progress:
+
+## Status: Work In progress
 * Notes updated **2016-07-21**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
-* The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
+
+## Availability
+* The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
+* To use it with no flag, you'll need to [request a token for your origin](http://bit.ly/WebBluetoothOriginTrial) and [insert it in your application](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md).
 
 Feature/Platform          | Chrome OS | Android | macOS | Linux | Windows | iOS
 ------------------------- | :-------: | :-----: | :---: | :---: | :-----: | :-:
