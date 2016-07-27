@@ -1403,7 +1403,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-07-20">20 July 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-07-27">27 July 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2064,7 +2064,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <li>
        If the previous step threw an exception, abort these steps. 
       <p class="note" role="note">Note: This means the UA didn’t infer that the user intended to
-      grant the current <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-code-realms">realm</a> access to <var>referringDevice</var>.</p>
+      grant the current <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-code-realms">realm</a> access to <var>referringDevice</var>.
+      For example, the user might have denied GATT access globally.</p>
      <li> Set <code>navigator.bluetooth@<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-referringdevice-slot" id="ref-for-dom-bluetooth-referringdevice-slot-2">[[referringDevice]]</a></code></code> to <var>referringDeviceObj</var>. 
     </ol>
     <p> A <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-4">Bluetooth device</a> <var>device</var> <dfn class="dfn-paneled" data-dfn-type="dfn" data-local-lt="match a filter|matches any filter" data-noexport="" id="matches-a-filter">matches a filter</dfn> <var>filter</var> if the following steps return <code>match</code>: </p>
@@ -2530,7 +2531,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <td><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</dfn>
         <td><code>undefined</code>
         <td> This device’s <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-3">allowedServices</a></code> list for this origin
-          or <code>"all"</code> if all services are allowed. 
+          or <code>"all"</code> if all services are allowed.
+          For example, a UA may grant an origin access to all services on
+          a <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-referringdevice" id="ref-for-dom-bluetooth-referringdevice-4">referringDevice</a></code> that advertised a URL on that origin. 
        <tr>
         <td><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-unfiltereduuids-slot">[[unfilteredUuids]]</dfn>
         <td><code>new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-set-objects">Set</a></code>()</code>
@@ -3316,7 +3319,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li>
         Return a <code>this.service.device.gatt</code>-<a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper-3">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps in parallel. 
        <ol>
-        <li> If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-2">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps.
+        <li> If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
+            in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-2">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps. 
         <li> Use any combination of the sub-procedures in
             the <a data-link-type="dfn" href="#characteristic-value-write" id="ref-for-characteristic-value-write-1">Characteristic Value Write</a> procedure
             to write <var>bytes</var> to <var>characteristic</var>.
@@ -3345,13 +3349,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li> Let <var>characteristic</var> be
         the GATT <a data-link-type="dfn" href="#characteristic" id="ref-for-characteristic-11">Characteristic</a> that <code>this</code> represents. 
       <li> If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-        in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-2">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps. 
+        in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-3">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps. 
       <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set-1">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth-2">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a> <var>promise</var> with <code>undefined</code> and abort these steps. 
       <li> If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-9">connected</a></code></code> is <code>false</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
       <li> Use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors-1">Characteristic Descriptors</a> procedures
         to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration-1">Client Characteristic Configuration</a> descriptor
         is set, matching the constraints
-        in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-3">properties</a>.
+        in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-4">properties</a>.
         The UA SHOULD avoid setting both bits,
         and MUST deduplicate <a href="#notification-events">value-change events</a> if both bits are set.
         Handle errors as described in <a href="#error-handling">§5.7 Error handling</a>. 
@@ -3381,7 +3385,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       arrive after the promise resolves. </p>
      <section>
       <h4 class="heading settled" data-level="5.4.1" id="characteristicproperties"><span class="secno">5.4.1. </span><span class="content"><dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</dfn></span><a class="self-link" href="#characteristicproperties"></a></h4>
-      <p> Each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-14">BluetoothRemoteGATTCharacteristic</a></code> exposes its <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-4">characteristic properties</a> through a <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties-3">BluetoothCharacteristicProperties</a></code> object.
+      <p> Each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-14">BluetoothRemoteGATTCharacteristic</a></code> exposes its <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-5">characteristic properties</a> through a <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties-3">BluetoothCharacteristicProperties</a></code> object.
         These properties express what operations are valid on the characteristic. </p>
 <pre class="idl highlight def"><span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties-4">BluetoothCharacteristicProperties</a> {
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <dfn class="nv idl-code" data-dfn-for="BluetoothCharacteristicProperties" data-dfn-type="attribute" data-export="" data-readonly="" data-type="boolean" id="dom-bluetoothcharacteristicproperties-broadcast">broadcast<a class="self-link" href="#dom-bluetoothcharacteristicproperties-broadcast"></a></dfn>;
@@ -3401,7 +3405,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <ol class="algorithm">
        <li> Let <var>propertiesObj</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties-5">BluetoothCharacteristicProperties</a></code>. 
        <li> Let <var>properties</var> be
-          the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-5">characteristic properties</a> of <var>characteristic</var>. 
+          the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-6">characteristic properties</a> of <var>characteristic</var>. 
        <li>
          Initialize the attributes of <var>propertiesObj</var> from
           the corresponding bits in <var>properties</var>: 
@@ -3434,7 +3438,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
            <td>Authenticated Signed Writes
         </table>
        <li>
-         If the Extended Properties bit of the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-6">characteristic properties</a> is not set,
+         If the Extended Properties bit of the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-7">characteristic properties</a> is not set,
           initialize <code><var>propertiesObj</var>.reliableWrite</code> and <code><var>propertiesObj</var>.writableAuxiliaries</code> to <code>false</code>.
           Otherwise, run the following steps: 
         <ol>
@@ -5204,6 +5208,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <b><a href="#dom-bluetooth-referringdevice">#dom-bluetooth-referringdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetooth-referringdevice-1">3. Device Discovery</a> <a href="#ref-for-dom-bluetooth-referringdevice-2">(2)</a> <a href="#ref-for-dom-bluetooth-referringdevice-3">(3)</a>
+    <li><a href="#ref-for-dom-bluetooth-referringdevice-4">4.2. BluetoothDevice</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="matches-a-filter">
@@ -6434,8 +6439,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="characteristic-properties">
    <b><a href="#characteristic-properties">#characteristic-properties</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-characteristic-properties-1">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-properties-2">(2)</a> <a href="#ref-for-characteristic-properties-3">(3)</a>
-    <li><a href="#ref-for-characteristic-properties-4">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-characteristic-properties-5">(2)</a> <a href="#ref-for-characteristic-properties-6">(3)</a>
+    <li><a href="#ref-for-characteristic-properties-1">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-properties-2">(2)</a> <a href="#ref-for-characteristic-properties-3">(3)</a> <a href="#ref-for-characteristic-properties-4">(4)</a>
+    <li><a href="#ref-for-characteristic-properties-5">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-characteristic-properties-6">(2)</a> <a href="#ref-for-characteristic-properties-7">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="descriptor">
