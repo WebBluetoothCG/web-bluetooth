@@ -108,6 +108,8 @@ spec: html
         text: event handler idl attribute
         text: global object
         text: in parallel
+        text: initialising a new document object
+        text: navigated
         text: perform a microtask checkpoint
         text: queue a task
         text: relevant settings object
@@ -527,6 +529,8 @@ spec: permissions
 
     interface Bluetooth {
       [SecureContext]
+      readonly attribute BluetoothDevice? referringDevice;
+      [SecureContext]
       Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
     };
     Bluetooth implements EventTarget;
@@ -535,6 +539,14 @@ spec: permissions
     Bluetooth implements ServiceEventHandlers;
   </pre>
   <div class="note" heading="{{Bluetooth}} members">
+    <p>
+      {{Bluetooth/referringDevice}} gives access to
+      the device from which the user opened this page, if any.
+      For example, an <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
+      might advertise a URL, which the UA allows the user to open.
+      A {{BluetoothDevice}} representing the beacon would be available
+      through <code>navigator.bluetooth.{{referringDevice}}</code>.
+    </p>
     <p>
       {{Bluetooth/requestDevice(options)}} asks the user
       to grant this origin access to a device
@@ -779,7 +791,56 @@ spec: permissions
         instances.
       </td>
     </tr>
+    <tr>
+      <td><dfn>\[[referringDevice]]</dfn></td>
+      <td>
+        `null`
+      </td>
+      <td>
+        Set to a {{BluetoothDevice}} while <a>initialising a new `Document` object</a>
+        if the `Document` was opened from the device.
+      </td>
+    </tr>
   </table>
+
+  <p>
+    Getting <code>navigator.bluetooth.<dfn attribute for="Bluetooth">referringDevice</dfn></code>
+    must return {{[[referringDevice]]}}.
+  </p>
+  <p>
+    Some UAs may allow the user
+    to cause a <a>browsing context</a> to <a lt="navigated">navigate</a>
+    in response to a <a>Bluetooth device</a>.
+    <span class="note">
+      For example, if an
+      <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
+      advertises a URL,
+      the UA may allow the user to navigate to this URL.
+    </span>
+    If this happens, then as part of <a>initialising a new `Document` object</a>,
+    the UA MUST run the following steps:
+  </p>
+  <ol class="algorithm">
+    <li>
+      Let <var>referringDevice</var> be the device that caused the navigation.
+    </li>
+    <li>
+      <a>Get the <code>BluetoothDevice</code> representing</a> <var>referringDevice</var>
+      inside `navigator.bluetooth`,
+      and let |referringDeviceObj| be the result.
+    </li>
+    <li>
+      If the previous step threw an exception, abort these steps.
+
+      Note: This means the UA didn't infer that the user intended to
+      grant the current <a>realm</a> access to |referringDevice|.
+      For example, the user might have denied GATT access globally.
+    </li>
+    <li>
+      Set <code>navigator.bluetooth@{{[[referringDevice]]}}</code>
+      to |referringDeviceObj|.
+    </li>
+  </ol>
 
   <p>
     A <a>Bluetooth device</a> <var>device</var>
@@ -1243,7 +1304,8 @@ spec: permissions
         <pre class="idl">
           dictionary AllowedBluetoothDevice {
             required DOMString deviceId;
-            required sequence&lt;UUID> allowedServices;
+            // An allowedServices of "all" means all services are allowed.
+            required (DOMString or sequence&lt;UUID>) allowedServices;
           };
           dictionary BluetoothPermissionData {
             required sequence&lt;AllowedBluetoothDevice> allowedDevices = [];
@@ -1587,7 +1649,10 @@ spec: permissions
         <td><dfn>\[[allowedServices]]</dfn></td>
         <td>`undefined`</td>
         <td>
-          This device's {{AllowedBluetoothDevice/allowedServices}} list for this origin.
+          This device's {{AllowedBluetoothDevice/allowedServices}} list for this origin
+          or `"all"` if all services are allowed.
+          For example, a UA may grant an origin access to all services on
+          a {{referringDevice}} that advertised a URL on that origin.
         </td>
       </tr>
       <tr>
@@ -1716,8 +1781,16 @@ spec: permissions
             Set {{[[cachedUnfilteredUuids]]}} to a copy of {{[[unfilteredUuids]]}}.
           </li>
           <li>
-            Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of the intersection of
-            {{BluetoothDevice/[[unfilteredUuids]]}} and {{BluetoothDevice/[[allowedServices]]}}.
+            Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of:
+            <dl class="switch">
+              <dt>If {{BluetoothDevice/[[allowedServices]]}} is `"all"`</dt>
+              <dd>the elements of {{BluetoothDevice/[[unfilteredUuids]]}}</dd>
+              <dt>Otherwise,</dt>
+              <dd>
+                the intersection of
+                {{BluetoothDevice/[[unfilteredUuids]]}} and {{BluetoothDevice/[[allowedServices]]}}.
+              </dd>
+            </dl>
           </li>
         </ol>
       </li>
@@ -2354,7 +2427,7 @@ spec: permissions
         <var>single</var>: boolean,<br>
         <var>uuidCanonicalizer</var>: function,<br>
         <var>uuid</var>: optional <code>(DOMString or unsigned int)</code>,<br>
-        <var>allowedUuids</var>: optional <code>Array&lt;DOMString></code>,<br>
+        <var>allowedUuids</var>: optional <code>("all" or Array&lt;DOMString>)</code>,<br>
         <var>child type</var>: GATT declaration type),</span><br>
         the UA MUST perform the following steps:
       </p>
@@ -2388,7 +2461,10 @@ spec: permissions
             <li>are within the Bluetooth entity represented by <var>attribute</var>,</li>
             <li>have a type described by <var>child type</var>,</li>
             <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,</li>
-            <li>if <var>allowedUuids</var> is present, have a UUID in <var>allowedUuids</var>, and</li>
+            <li>
+              if <var>allowedUuids</var> is present and not `"all"`,
+              have a UUID in <var>allowedUuids</var>, and
+            </li>
             <li>if the <var>single</var> flag is set, are the first of these.</li>
           </ul>
           Let <var>promise</var> be the result.
@@ -2655,7 +2731,8 @@ spec: permissions
     </p>
     <ol class="algorithm">
       <li>
-        If <var>service</var> is not in
+        If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`
+        and <var>service</var> is not in
         <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
       </li>
@@ -2675,7 +2752,8 @@ spec: permissions
     </p>
     <ol class="algorithm">
       <li>
-        If <var>service</var> is present
+        If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`,
+        and <var>service</var> is present
         and not in <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
         return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
       </li>
@@ -3717,8 +3795,8 @@ spec: permissions
                   <code><var>deviceObj</var>@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
                 </li>
                 <li>
-                  If the Service's UUID is in
-                  <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>,
+                  If <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+                  is `"all"` or contains the Service's UUID,
                   <a>fire an event</a> named {{serviceremoved}}
                   with its <code>bubbles</code> attribute initialized to <code>true</code>
                   at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
@@ -3732,8 +3810,8 @@ spec: permissions
               For each <a>Service</a> in <var>addedEntities</var>,
               add the Service's UUID to
               <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-              If the Service's UUID is in
-              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
+              If <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
+              is `"all"` or contains the Service's UUID,
               add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
               and then <a>fire an event</a> named {{serviceadded}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
@@ -3741,8 +3819,8 @@ spec: permissions
             </li>
             <li>
               For each <a>Service</a> in <var>changedServices</var>,
-              if the Service's UUID is in
-              <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>,
+              if <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
+              is `"all"` or contains the Service's UUID,
               <a>fire an event</a> named {{servicechanged}}
               with its <code>bubbles</code> attribute initialized to <code>true</code>
               at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
