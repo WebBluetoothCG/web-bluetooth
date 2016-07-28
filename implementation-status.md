@@ -8,7 +8,7 @@ different browsers.
 Work is in progress:
 * Notes updated **2016-07-21**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
-* The `chrome://flags/#enable-web-bluetooth` flag must be enabled.
+* The `chrome://flags/#enable-web-bluetooth` flag must be enabled, or the web page must have an [origin trial meta tag or header](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md) with a token requested from [http://bit.ly/WebBluetoothOriginTrial]().
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
 Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
