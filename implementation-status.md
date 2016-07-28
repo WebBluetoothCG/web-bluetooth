@@ -23,7 +23,7 @@ Characteristic Properties | ✓         | ✓       | 53  | ✓     |         |
 GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|  53 start  | ✓ |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
 Get Characteristics List  | ✓         | ✓       | 53  | ✓     |         |
-Device Disconnected Event | ✓         | 52      | ✓   | ✓     |         |
+Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Get Primary Services List | 53        | 53      | 53  | 53    |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
