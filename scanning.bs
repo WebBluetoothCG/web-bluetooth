@@ -168,7 +168,7 @@ spec: html
         let myBeaconUuid = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
 
         navigator.bluetooth.<a idl for="Bluetooth" lt="requestLEScan()">requestLEScan</a>({
-          filters: [{manufacturerData: 0x004C}],
+          filters: [{manufacturerId: 0x004C}],
           options: {
             keepRepeatedDevices: true,
           }
@@ -267,8 +267,8 @@ spec: html
   <pre class="idl">
     dictionary BluetoothLEScanFilterInit {
       BluetoothServiceUUID serviceUUID;
-      unsigned short manufacturerData;
-      BluetoothServiceUUID serviceData;
+      unsigned short manufacturerId;
+      BluetoothServiceUUID serviceDataUUID;
     };
 
     dictionary BluetoothLEScanOptions {
@@ -418,8 +418,8 @@ spec: html
       [Constructor(BluetoothLEScanFilterInit init)]
       interface BluetoothLEScanFilter {
         readonly attribute UUID? serviceUUID;
-        readonly attribute unsigned short? manufacturerData;
-        readonly attribute UUID? serviceData;
+        readonly attribute unsigned short? manufacturerId;
+        readonly attribute UUID? serviceDataUUID;
       };
 
       interface BluetoothLEScan {
@@ -690,12 +690,12 @@ spec: html
           it is equal to a <a>Service UUID</a> in |event|.
         </li>
         <li>
-          If <code>|filter|.manufacturerData</code> is non-`null`,
+          If <code>|filter|.manufacturerId</code> is non-`null`,
           it is equal to the Company Identifier Code
           in some <a>Manufacturer Specific Data</a> in |event|.
         </li>
         <li>
-          If <code>|filter|.serviceData</code> is non-`null`,
+          If <code>|filter|.serviceDataUUID</code> is non-`null`,
           it is the 128-bit UUID representation of the UUID
           in some <a>Service Data</a> in |event|.
         </li>
