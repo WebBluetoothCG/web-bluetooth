@@ -71,54 +71,16 @@ Markup Shorthands: css no, markdown yes
 </pre>
 
 <pre class="anchors">
-spec: BLUETOOTH-ASSIGNED
-    type: enum; urlPrefix: https://developer.bluetooth.org/gatt/
-        urlPrefix: characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.
-            text: org.bluetooth.characteristic.body_sensor_location; url: body_sensor_location.xml#
-            text: org.bluetooth.characteristic.gap.appearance; url: gap.appearance.xml#
-            text: org.bluetooth.characteristic.heart_rate_control_point; url: heart_rate_control_point.xml#
-            text: org.bluetooth.characteristic.heart_rate_measurement; url: heart_rate_measurement.xml#
-            text: org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list; url: ieee_11073-20601_regulatory_certification_data_list.xml#
-            text: org.bluetooth.characteristic.pnp_id; url: pnp_id.xml#
-        urlPrefix: descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.
-            text: org.bluetooth.descriptor.gatt.characteristic_presentation_format; url: gatt.characteristic_presentation_format.xml#
-            text: org.bluetooth.descriptor.gatt.client_characteristic_configuration; url: gatt.client_characteristic_configuration.xml#
-        urlPrefix: services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.
-            text: org.bluetooth.service.cycling_power; url: cycling_power.xml#
-            text: org.bluetooth.service.device_information; url: device_information.xml#
-            text: org.bluetooth.service.heart_rate; url: heart_rate.xml#
-    type: dfn
-        text: Shortened Local Name; url: https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#
-
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
-    type: dfn
-        text: Realm; url: sec-code-realms
     type: method
         text: Array.prototype.map; url: sec-array.prototype.map
     type: interface
-        text: Array; url: sec-array-objects
-        text: ArrayBuffer; url: sec-arraybuffer-constructor
-        text: DataView; url: sec-dataview-constructor
-        text: Map; url: sec-map-constructor
-        text: Promise; url:sec-promise-objects
-        text: Set; url: sec-set-objects
         text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
-        text: TypedArray; url: sec-typedarray-constructors
-
-spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
-    type: dfn
-        text: a copy of the bytes held; url: dfn-get-buffer-source-copy
 </pre>
 <pre class="link-defaults">
 spec: html
     type: dfn
-        text: browsing context
-        text: environment settings object
-        text: event handler idl attribute
-        text: global object
         text: in parallel
-        text: incumbent settings object
-        text: perform a microtask checkpoint
         text: queue a task
         text: relevant settings object
         text: responsible event loop
@@ -266,6 +228,8 @@ spec: html
 
   <pre class="idl">
     dictionary BluetoothLEScanFilterInit {
+      DOMString name;
+      DOMString namePrefix;
       BluetoothServiceUUID serviceUUID;
       unsigned short manufacturerId;
       BluetoothServiceUUID serviceDataUUID;
@@ -417,6 +381,8 @@ spec: html
     <pre class="idl">
       [Constructor(BluetoothLEScanFilterInit init)]
       interface BluetoothLEScanFilter {
+        readonly attribute DOMString? name;
+        readonly attribute DOMString? namePrefix;
         readonly attribute UUID? serviceUUID;
         readonly attribute unsigned short? manufacturerId;
         readonly attribute UUID? serviceDataUUID;
@@ -686,6 +652,18 @@ spec: html
       </p>
       <ul>
         <li>
+          If <code>|filter|.name</code> is non-`null`,
+          |event| has a <a>Local Name</a> equal to <code>|filter|.name</code>.
+
+          Note: A <a>Shortened Local Name</a>
+          can match a {{BluetoothLEScanFilter/name}} filter.
+        </li>
+        <li>
+          If <code>|filter|.namePrefix</code> is non-`null`,
+          |event| has a <a>Local Name</a>,
+          and <code>|filter|.namePrefix</code> is a prefix of it.
+        </li>
+        <li>
           If <code>|filter|.serviceUUID</code> is non-`null`,
           it is equal to a <a>Service UUID</a> in |event|.
         </li>
@@ -872,6 +850,11 @@ spec: html
             <li value="1">Data Types Definitions and Formats
               <ol>
                 <li value="1"><dfn>Service UUID</dfn></li>
+                <li value="1">
+                  <dfn>Local Name</dfn>
+                  also defines <dfn>Shortened Local Name</dfn>
+                  and <dfn>Complete Local Name</dfn>
+                </li>
                 <li value="4"><dfn>Manufacturer Specific Data</dfn></li>
                 <li value="11"><dfn>Service Data</dfn></li>
               </ol>
