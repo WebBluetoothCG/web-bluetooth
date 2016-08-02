@@ -1,0 +1,872 @@
+<pre class='metadata'>
+Title: Web Bluetooth Scanning
+Repository: WebBluetoothCG/web-bluetooth
+Status: CG-DRAFT
+ED: https://webbluetoothcg.github.io/web-bluetooth/scanning.html
+Shortname: web-bluetooth-scanning
+Level: 1
+Editor: See contributors on GitHub, , https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors
+Abstract: This document describes an API to scan for nearby Bluetooth Low Energy devices in real time.
+
+Group: web-bluetooth-cg
+!Participate: <a href="https://www.w3.org/community/web-bluetooth/">Join the W3C Community Group</a>
+!Participate: <a href="https://github.com/WebBluetoothCG/web-bluetooth">Fix the text through GitHub</a>
+!Participate: <a href="mailto:public-web-bluetooth@w3.org">public-web-bluetooth@w3.org</a> (<a href="https://lists.w3.org/Archives/Public/public-web-bluetooth/" rel="discussion">archives</a>)
+!Participate: <a href="irc://irc.w3.org:6665/#web-bluetooth">IRC: #web-bluetooth on W3C's IRC</a>
+
+Markup Shorthands: css no, markdown yes
+</pre>
+
+<pre class=biblio>
+{
+  "BLUETOOTH42": {
+    "href": "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439",
+    "title": "BLUETOOTH SPECIFICATION Version 4.2",
+    "publisher": "Bluetooth SIG",
+    "date": "2 December 2014"
+  },
+  "BLUETOOTH-GATT-REST": {
+    "href": "https://www.bluetooth.org/docman/handlers/downloaddoc.ashx?doc_id=285910",
+    "title": "GATT REST API",
+    "publisher": "Bluetooth Internet WG",
+    "date": "7 April 2014"
+  },
+  "BLUETOOTH-ASSIGNED": {
+    "href": "https://www.bluetooth.org/en-us/specification/assigned-numbers",
+    "title": "Assigned Numbers",
+    "status": "Living Standard",
+    "publisher": "Bluetooth SIG"
+  },
+  "BLUETOOTH-ASSIGNED-BASEBAND": {
+    "href": "https://www.bluetooth.org/en-us/specification/assigned-numbers/baseband",
+    "title": "Assigned Numbers for Baseband",
+    "status": "Living Standard",
+    "publisher": "Bluetooth SIG"
+  },
+  "BLUETOOTH-ASSIGNED-SERVICES": {
+    "href": "https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx",
+    "title": "Bluetooth GATT Specifications > Services",
+    "status": "Living Standard",
+    "publisher": "Bluetooth SIG"
+  },
+  "BLUETOOTH-ASSIGNED-CHARACTERISTICS": {
+    "href": "https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx",
+    "title": "Bluetooth GATT Specifications > Characteristics",
+    "status": "Living Standard",
+    "publisher": "Bluetooth SIG"
+  },
+  "BLUETOOTH-ASSIGNED-DESCRIPTORS": {
+    "href": "https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorsHomePage.aspx",
+    "title": "Bluetooth GATT Specifications > Descriptors",
+    "status": "Living Standard",
+    "publisher": "Bluetooth SIG"
+  },
+  "BLUETOOTH-SUPPLEMENT6": {
+    "href": "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735",
+    "title": "Supplement to the Bluetooth Core Specification Version 6",
+    "date": "14 July 2015",
+    "publisher": "Bluetooth SIG"
+  }
+}
+</pre>
+
+<pre class="anchors">
+spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
+    type: method
+        text: Array.prototype.map; url: sec-array.prototype.map
+    type: interface
+        text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
+</pre>
+<pre class="link-defaults">
+spec: html
+    type: dfn
+        text: in parallel
+        text: queue a task
+        text: relevant settings object
+        text: responsible event loop
+        text: triggered by user activation
+</pre>
+
+<style>
+  .argument-list { display: inline-block; vertical-align: top; }
+  /* Show self-links for various elements. This is incompatible with nearby floats. */
+  .note, .why, .example, .issue { overflow: inherit; }
+</style>
+
+<section class="non-normative">
+  <h2 id="introduction">Introduction</h2>
+
+  <em>This section is non-normative.</em>
+
+  <p>
+    <a href="https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy">Bluetooth Low Energy (BLE)</a>
+    allows devices to broadcast advertisements to nearby <a>observers</a>.
+    These advertisements can contain small amounts of data
+    of a variety of types defined in [[BLUETOOTH-SUPPLEMENT6]].
+  </p>
+
+  <p>
+    For example, a beacon might announce that it's next to a particular museum exhibit
+    and is advertising with 1mW of power,
+    which would let nearby observers know their approximate distance to that exhibit.
+  </p>
+
+  <p>
+    This specification extends [[web-bluetooth]] to allow websites to
+    receive these advertisements from nearby BLE devices,
+    with the user's permission.
+  </p>
+
+  <section>
+    <h3 id="introduction-examples">Examples</h3>
+
+    <div class="example" id="example-ibeacon">
+      <p>
+        To discover what iBeacons are nearby and measure their distance,
+        a website could use code like the following:
+      </p>
+      <pre highlight="js">
+        function recordNearbyBeacon(major, minor, pathLossVs1m) { ... }
+        let myBeaconUuid = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
+
+        navigator.bluetooth.<a idl for="Bluetooth" lt="requestLEScan()">requestLEScan</a>({
+          filters: [{manufacturerId: 0x004C}],
+          options: {
+            keepRepeatedDevices: true,
+          }
+        }).then(() => {
+          navigator.bluetooth.addEventListener('<a idl>advertisementreceived</a>', event => {
+            let appleData = event.manufacturerData.get(<a
+                href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
+                title="Apple, Inc.'s Company Identifier">0x004C</a>);
+            if (appleData.byteLength != 23 ||
+                appleData.getUint16(0, false) !== 0x0215) {
+              // Isn't an iBeacon.
+              return;
+            }
+            let uuidArray = new Uint8Array(appleData.buffer, 2, 16);
+            for (let i = 0; i < 16; i++) {
+              if (uuidArray[i] != myBeaconUuid[i]) {
+                // Not my class of beacon.
+                return;
+              }
+            }
+            let major = appleData.getUint16(18, false);
+            let minor = appleData.getUint16(20, false);
+            let txPowerAt1m = -appleData.getInt8(22);
+            let pathLossVs1m = txPowerAt1m - event.rssi;
+
+            recordNearbyBeacon(major, minor, pathLossVs1m);
+          });
+        })
+      </pre>
+    </div>
+  </section>
+</section>
+
+<section class="non-normative">
+  <h2 id="privacy">Privacy considerations</h2>
+
+  <em>This section is non-normative.</em>
+
+  <p>
+    <a lt="active scanning">Actively scanning</a> for advertisements
+    broadcasts a <a>device address</a> of the scanning device.
+    If the UA's Bluetooth system supports the <a>privacy feature</a>,
+    this address rotates periodically,
+    which prevents remote radios from tracking the user's device.
+    However, if the UA's Bluetooth system does not support the <a>privacy feature</a>,
+    this address is a stable unique identifier that's difficult to change.
+    To mitigate this, UAs should either use <a>passive scanning</a>,
+    use the <a>privacy feature in an observer</a>,
+    or warn the user that nearby devices will learn the identity of their device.
+  </p>
+
+  <p>
+    The ambient advertisements in a user's area are unlikely to directly include GPS coordinates,
+    but are likely to contain unique identifiers
+    that could be manually correlated with particular physical locations
+    or with particular other people.
+    Given that, the user needs to give permission
+    before a website gets access to nearby advertisements.
+  </p>
+
+  <p>
+    If a user has already given a site permission to know their location,
+    it might be ok to implicitly grant access to BLE advertisements.
+    However, BLE advertisements give away
+    strictly less location information than full [[geolocation-api]] access,
+    so UAs should allow users to grant that intermediate level of access.
+  </p>
+
+  <p>
+    BLE advertisements are usually fully public,
+    since they're broadcast unencrypted on 2.4GHz radio waves.
+    However, it's possible that a user would
+    have a device broadcast private information in a radio-shielded room.
+    This is probably an inappropriate use for BLE advertisements,
+    but might argue for requiring explicit permission to scan,
+    rather than inferring it from having permission to get a geolocation.
+  </p>
+</section>
+
+<section class="non-normative">
+  <h2 id="security">Security considerations</h2>
+
+  <em>This section is non-normative.</em>
+
+  <p>
+    Because this API doesn't write anything,
+    there are few if any security implications.
+    A device in a shielded room might broadcast security-sensitive information,
+    but we don't have any actual attack scenarios for that.
+  </p>
+</section>
+
+<section>
+  <h2 id="scanning">Scanning for BLE advertisements</h2>
+
+  <pre class="idl">
+    dictionary BluetoothLEScanFilterInit {
+      DOMString name;
+      DOMString namePrefix;
+      BluetoothServiceUUID serviceUUID;
+      unsigned short manufacturerId;
+      BluetoothServiceUUID serviceDataUUID;
+    };
+
+    dictionary BluetoothLEScanOptions {
+      sequence&lt;BluetoothLEScanFilterInit> filters;
+      boolean keepRepeatedDevices = false;
+      boolean acceptAllAdvertisements = false;
+    };
+
+    partial interface Bluetooth {
+      [SecureContext]
+      Promise&lt;BluetoothLEScan> requestLEScan(BluetoothLEScanOptions options);
+    };
+  </pre>
+  <div class="note" heading="{{Bluetooth/requestLEScan()}} summary">
+    <p>
+      <code>navigator.bluetooth.{{requestLEScan(options)}}</code>
+      starts scanning for BLE advertisements,
+      asking the user for permission if they haven't yet granted it.
+    </p>
+    <p>
+      Because this could show a prompt,
+      it requires a <a>secure context</a>,
+      and UAs are likely to require a <a lt="triggered by user activation">user gesture</a>.
+    </p>
+    <p>
+      Advertising events that <a for="BluetoothLEScanFilter">match</a>
+      a {{BluetoothLEScanFilter}} in an active {{BluetoothLEScan}}
+      cause {{advertisementreceived}} events to be dispatched
+      to the sending {{BluetoothDevice}}.
+      A filter matches if the advertisement includes data equal to each <a>present</a> member.
+      Usually, you'll only include one member in each filter.
+    </p>
+    <p>
+      Normally scans will discard
+      the second and subsequent advertisements from a single device
+      to save power.
+      If you need to receive them,
+      set <dfn dict-member for="BluetoothLEScanOptions">keepRepeatedDevices</dfn> to `true`.
+      Note that setting {{BluetoothLEScanOptions/keepRepeatedDevices}} to `false`
+      doesn't guarantee you won't get redundant events;
+      it just allows the UA to save power by omitting them.
+    </p>
+    <p>
+      In the rare case that you want to receive every advertisement without filtering them,
+      use the <dfn dict-member for="BluetoothLEScanOptions">acceptAllAdvertisements</dfn> field.
+    </p>
+  </div>
+
+  <div algorithm>
+    <p>
+      The <code><dfn method for="Bluetooth">requestLEScan(|options|)</dfn></code> method,
+      when invoked, MUST return <a>a new promise</a> |promise|
+      and run the following steps <a>in parallel</a>:
+    </p>
+    <ol class="algorithm">
+      <li>
+        If <code>|options|.acceptAllAdvertisements</code> is `true`,
+        and <code>|options|.filters</code> is present,
+        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+
+        Note: There's no need to include filters if all advertisements are being accepted.
+      </li>
+      <li>
+        If <code>|options|.acceptAllAdvertisements</code> is `false`,
+        and <code>|options|.filters</code> is either absent or empty,
+        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+
+        Note: An empty set of filters wouldn't return any advertisements.
+      </li>
+      <li>
+        Let |filters| be
+        <code>|options|.filters.map(filter=>new
+        {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>.
+        If this throws an exception,
+        <a>reject</a> |promise| with that exception and abort these steps.
+      </li>
+      <li id="scanning-permission">
+        <a>Request permission to use</a>
+        <pre highlight="js">
+          {
+            name: <a idl>"bluetooth-le-scan"</a>,
+            filters: <var>options</var>.filters,
+            keepRepeatedDevices: <var>options</var>.keepRepeatedDevices,
+            acceptAllAdvertisements: <var>options</var>.acceptAllAdvertisements,
+          }
+        </pre>
+
+        Note: This may require that this algorithm was <a>triggered by user activation</a>.
+      </li>
+      <li>
+        If the result is {{"denied"}},
+        reject |promise| with a {{NotAllowedError}} and abort these steps.
+      </li>
+      <li>
+        Let |scan| be a new {{BluetoothLEScan}} instance
+        whose fields are initialized as in the following table:
+        <table class="data">
+          <thead><th>Field</th><th>Initial value</th></thead>
+          <tr><td>{{BluetoothLEScan/filters}}</td><td>|filters|</td></tr>
+          <tr>
+            <td>{{BluetoothLEScan/keepRepeatedDevices}}</td>
+            <td><code>|options|.keepRepeatedDevices</code></td>
+          </tr>
+          <tr>
+            <td>{{BluetoothLEScan/acceptAllAdvertisements}}</td>
+            <td><code>|options|.acceptAllAdvertisements</code></td>
+          </tr>
+          <tr><td>{{BluetoothLEScan/active}}</td><td>`true`</td></tr>
+        </table>
+      </li>
+      <li>
+        Add |scan| to <code>navigator.bluetooth.{{[[activeScans]]}}</code>.
+      </li>
+      <li>
+        Ensure the UA is scanning for BLE advertisements
+        in a mode that will receive at least
+        all advertisements <a for="BluetoothLEScan">matching</a> any scan
+        in any {{[[activeScans]]}} set in the whole UA.
+
+        <p class="issue" id="issue-limit-scan-periods">
+          Find wording that allows the UA to limit its scan to only certain periods of time,
+          to save power.
+        </p>
+      </li>
+      <li>
+        If the UA fails to start scanning,
+        remove |scan| from <code>navigator.bluetooth.{{[[activeScans]]}}</code>,
+        <a>reject</a> |promise| with one of the following errors,
+        and abort these steps:
+
+        <dl class="switch">
+          <dt>The UA doesn't support scanning for advertisements</dt>
+          <dd>{{NotSupportedError}}</dd>
+
+          <dt>Bluetooth is turned off</dt>
+          <dd>{{InvalidStateError}}</dd>
+
+          <dt>Other reasons</dt>
+          <dd>{{UnknownError}}</dd>
+        </dl>
+      </li>
+      <li>
+        <a>Resolve</a> |promise| with |scan|.
+      </li>
+    </ol>
+  </div>
+
+  <section>
+    <h3 id="scan-control">Controlling a BLE scan</h3>
+
+    <pre class="idl">
+      [Constructor(BluetoothLEScanFilterInit init)]
+      interface BluetoothLEScanFilter {
+        readonly attribute DOMString? name;
+        readonly attribute DOMString? namePrefix;
+        readonly attribute UUID? serviceUUID;
+        readonly attribute unsigned short? manufacturerId;
+        readonly attribute UUID? serviceDataUUID;
+      };
+
+      interface BluetoothLEScan {
+        readonly attribute FrozenArray&lt;BluetoothLEScanFilter> filters;
+        readonly attribute boolean keepRepeatedDevices;
+        readonly attribute boolean acceptAllAdvertisements;
+
+        readonly attribute boolean active;
+
+        void stop();
+      };
+    </pre>
+
+    <div class="note" heading="{{BluetoothLEScan}} members">
+      <p>
+        {{BluetoothLEScan/stop()|BluetoothLEScan.stop()}}
+        stops a previously-requested scan.
+        Sites should do this as soon as possible to avoid wasting power.
+      </p>
+    </div>
+
+    <div algorithm>
+      <p>
+        The <dfn constructor for="BluetoothLEScanFilter">BluetoothLEScanFilter(|init|)</dfn>
+        constructor, when invoked MUST perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>
+          Initialize all fields to `null`.
+        </li>
+        <li>
+          If no member of |init| is present, throw a {{TypeError}}.
+
+          Note: A filter can't implicitly allow all advertisements.
+          Use {{BluetoothLEScanOptions/acceptAllAdvertisements}} to explicitly do it.
+        </li>
+        <li>
+          For each <a>present</a> member in |init|,
+          set `this`'s attribute with a matching identifier to the value of the member.
+          If the member's type is {{BluetoothServiceUUID}},
+          pass its value through {{BluetoothUUID/getService()|BluetoothUUID.getService()}}
+          to get the value with which to initialize the attribute.
+          If any of these calls throw an exception,
+          propagate that exception from this constructor.
+        </li>
+      </ol>
+    </div>
+
+    <div algorithm>
+      <p>
+        The <dfn method for="BluetoothLEScan">stop()</dfn> method, when invoked,
+        MUST perform the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>Set <code>this.{{BluetoothLEScan/active}}</code> to `false`.</li>
+        <li>Remove `this` from <code>navigator.bluetooth.{{[[activeScans]]}}</code>.</li>
+        <li>
+          The UA SHOULD reconfigure or stop its BLE scan to save power
+          while still receiving any advertisements that
+          <a for="BluetoothLEScan">match</a> any scan
+          in any {{[[activeScans]]}} set in the whole UA.
+        </li>
+      </ol>
+    </div>
+  </section>
+
+  <section>
+    <h3 id="permission">Permission to scan</h3>
+
+    <p>
+      The <dfn enum-value for="PermissionName">"bluetooth-le-scan"</dfn>
+      <a>powerful feature</a>'s
+      permission-related algorithms and types
+      are defined as follows:
+    </p>
+    <dl>
+      <dt><a>permission descriptor type</a></dt>
+      <dd>
+        <pre class="idl">
+          dictionary BluetoothLEScanPermissionDescriptor : PermissionDescriptor {
+            // These match BluetoothLEScanOptions.
+            sequence&lt;BluetoothLEScanFilterInit> filters;
+            boolean keepRepeatedDevices = false;
+            boolean acceptAllAdvertisements = false;
+          };
+        </pre>
+      </dd>
+
+      <dt><a>permission result type</a></dt>
+      <dd>
+        <pre class="idl">
+          interface BluetoothLEScanPermissionResult : PermissionStatus {
+            attribute FrozenArray&lt;BluetoothLEScan> scans;
+          };
+        </pre>
+      </dd>
+
+      <dt><a>permission query algorithm</a></dt>
+      <dd algorithm="permission-query">
+        <p>
+          Given a {{BluetoothLEScanPermissionDescriptor}} |descriptor|
+          and a {{BluetoothLEScanPermissionResult}} |result|:
+        </p>
+        <ol class="algorithm">
+          <li>
+            Update <code>|result|.{{PermissionStatus/state}}</code>
+            to |descriptor|'s <a>permission state</a>.
+          </li>
+          <li>
+            If <code>|result|.{{PermissionStatus/state}}</code> is {{"denied"}},
+            set <code>|result|.scans</code> to an empty {{FrozenArray}}
+            and abort these steps.
+          </li>
+          <li>
+            Update <code>|result|.{{scans}}</code> to
+            a new {{FrozenArray}} containing
+            the elements of <code>navigator.bluetooth.{{[[activeScans]]}}</code>.
+
+            <p class="issue" id="issue-should-query-filter">
+              Consider filtering the result to active scans that
+              match the fields of the descriptor.
+            </p>
+          </li>
+        </ol>
+      </dd>
+
+      <dt><a>permission request algorithm</a></dt>
+      <dd algorithm="permission-request">
+        <p>
+          Given a {{BluetoothLEScanPermissionDescriptor}} |descriptor|
+          and a {{BluetoothLEScanPermissionResult}} |result|:
+        </p>
+        <ol class="algorithm">
+          <li>
+            Let |promise| be the result of
+            <code>navigator.bluetooth.{{requestLEScan()|requestLEScan}}(|descriptor|)</code>.
+          </li>
+          <li>Wait for |promise| to settle.</li>
+          <li>
+            If |promise| rejected, throw the reason it rejected with,
+            and abort these steps.
+          </li>
+          <li>
+            Update <code>|result|.status</code> to
+            |descriptor|'s <a>permission state</a>.
+          </li>
+          <li>
+            Update <code>|result|.scans</code> to
+            a new {{FrozenArray}} whose single element is the value in |promise|.
+          </li>
+        </ol>
+      </dd>
+
+      <dt>
+        <a>permission revocation algorithm</a>
+      </dt>
+      <dd algorithm="permission-revocation">
+        <ol class="algorithm">
+          <li>
+            For each |activeScan| in <code>navigator.bluetooth.{{[[activeScans]]}}</code>:
+            <ol>
+              <li>
+                If the <a>permission state</a> of
+                <pre highlight="js">
+                  {
+                    name: "bluetooth-le-scan",
+                    filters: <var>activeScan</var>.filters,
+                    keepRepeatedDevices: <var>activeScan</var>.keepRepeatedDevices
+                  }
+                </pre>
+                is not {{"granted"}},
+                call <code>|activeScan|.{{stop()}}</code>.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </dd>
+    </dl>
+  </section>
+</section>
+
+<section>
+  <h2 id="events">Event handling</h2>
+
+  <section>
+    <h3 id="advertising-events">Responding to advertising events</h3>
+
+    <div algorithm="receive-advertising-event">
+      <p>
+        When the UA receives an <a>advertising event</a> |event|
+        (consisting of an advertising packet and an optional scan response),
+        it MUST run the following steps:
+      </p>
+      <ol class="algorithm">
+        <li>
+          Let <var>device</var> be the <a>Bluetooth device</a> that sent the advertising event.
+        </li>
+        <li>
+          For each {{Bluetooth}} instance |bluetooth| in the UA,
+          <a>queue a task</a> on
+          |bluetooth|'s <a>relevant settings object</a>'s <a>responsible event loop</a>
+          to do the following sub-steps:
+          <ol>
+            <li>
+              Let |scans| be the set of
+              {{BluetoothLEScan}}s in <code>|bluetooth|.{{[[activeScans]]}}</code>
+              that <a for="BluetoothLEScan">match</a> |event|.
+            </li>
+            <li>If |scans| is empty, abort these sub-steps.</li>
+            <li class="note">
+              Note: the user's <a href="#scanning-permission">permission to scan</a>
+              likely indicates that
+              they intend newly-discovered devices to appear in
+              {{"bluetooth"}}'s <a>extra permission data</a>,
+              but possibly without any {{AllowedBluetoothDevice/allowedServices}}.
+            </li>
+            <li>
+              <a>Get the `BluetoothDevice` representing</a> |device| inside |bluetooth|,
+              and let |deviceObj| be the result.
+            </li>
+            <li>
+              Add each {{BluetoothLEScan}} in |scans|
+              to <code>|deviceObj|.{{[[returnedFromScans]]}}</code>.
+            </li>
+            <li>
+              <a>Fire an `advertisementreceived` event</a>
+              for |event| at |deviceObj|.
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
+
+    <div algorithm="bluetoothlescan-match">
+      <p>
+        An advertising event |event|
+        <dfn for="BluetoothLEScan" lt="match">matches</dfn> a {{BluetoothLEScan}} |scan|
+        if the following steps return `match`:
+      </p>
+      <ol class="algorithm">
+        <li>
+          <code>|scan|.acceptAllAdvertisements</code> is `false` and
+          |event| doesn't <a for="BluetoothLEScanFilter">match</a>
+          any filter in <code>|scan|.{{BluetoothLEScan/filters}}</code>,
+          return `no match`.
+        </li>
+        <li>
+          If <code>|scan|.{{BluetoothLEScan/keepRepeatedDevices}}</code> is `false`,
+          there is a {{BluetoothDevice}} |device| that
+          represents the <a>same Bluetooth device</a> as the one that sent |event|,
+          and <code>|device|.{{[[returnedFromScans]]}}</code> includes |scan|,
+          the UA MAY return `no match`.
+        </li>
+        <li>Return `match`.</li>
+      </ol>
+    </div>
+
+    <div algorithm="bluetoothlescanfilter-match">
+      <p>
+        An advertising event |event|
+        <dfn for="BluetoothLEScanFilter" lt="match">matches</dfn>
+        a {{BluetoothLEScanFilter}} |filter|
+        if all of the following conditions hold:
+      </p>
+      <ul>
+        <li>
+          If <code>|filter|.name</code> is non-`null`,
+          |event| has a <a>Local Name</a> equal to <code>|filter|.name</code>.
+
+          Note: A <a>Shortened Local Name</a>
+          can match a {{BluetoothLEScanFilter/name}} filter.
+        </li>
+        <li>
+          If <code>|filter|.namePrefix</code> is non-`null`,
+          |event| has a <a>Local Name</a>,
+          and <code>|filter|.namePrefix</code> is a prefix of it.
+        </li>
+        <li>
+          If <code>|filter|.serviceUUID</code> is non-`null`,
+          it is equal to a <a>Service UUID</a> in |event|.
+        </li>
+        <li>
+          If <code>|filter|.manufacturerId</code> is non-`null`,
+          it is equal to the Company Identifier Code
+          in some <a>Manufacturer Specific Data</a> in |event|.
+        </li>
+        <li>
+          If <code>|filter|.serviceDataUUID</code> is non-`null`,
+          it is the 128-bit UUID representation of the UUID
+          in some <a>Service Data</a> in |event|.
+        </li>
+      </ul>
+    </div>
+  </section>
+</section>
+
+<section>
+  <h2 id="changes">Changes to existing interfaces</h2>
+
+  <p>
+    Instances of {{Bluetooth}} additionally have the following internal slots:
+  </p>
+  <table class="data" dfn-for="Bluetooth" dfn-type="attribute">
+    <thead>
+      <th>Internal Slot</th>
+      <th>Initial Value</th>
+      <th>Description (non-normative)</th>
+    </thead>
+    <tr>
+      <td><dfn>\[[activeScans]]</dfn></td>
+      <td>
+        An empty set of {{BluetoothLEScan}} instances.
+      </td>
+      <td>
+        The contents of this set will have {{BluetoothLEScan/active}} equal to `true`.
+      </td>
+    </tr>
+  </table>
+
+  <p>
+    Instances of {{BluetoothDevice}} additionally have the following internal slots:
+  </p>
+  <table class="data" dfn-for="BluetoothDevice" dfn-type="attribute">
+    <thead>
+      <th>Internal Slot</th>
+      <th>Initial Value</th>
+      <th>Description (non-normative)</th>
+    </thead>
+    <tr>
+      <td><dfn>\[[returnedFromScans]]</dfn></td>
+      <td>
+        An empty set of {{BluetoothLEScan}} objects.
+      </td>
+      <td>
+        Used to implement {{BluetoothLEScanOptions/keepRepeatedDevices}}.
+      </td>
+    </tr>
+  </table>
+</section>
+
+<section>
+  <h2 id="terminology">Terminology and conventions</h2>
+
+  <p>
+    This specification uses a few conventions and several terms from other specifications.
+    This section lists those and links to their primary definitions.
+  </p>
+
+  <p>
+    When an algorithm in this specification uses a name defined in this or another specification,
+    the name MUST resolve to its initial value,
+    ignoring any changes that have been made to the name in the current execution environment.
+    For example, when the {{Bluetooth/requestLEScan()}} algorithm says to call
+    <code>|options|.filters.map(filter=>new
+    {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>,
+    this MUST apply the
+    {{Array.prototype.map}} algorithm defined in [[ECMAScript]]
+    with <code>|options|.services</code> as its <code>this</code> parameter and
+    the algorithm defined at {{BluetoothLEScanFilter/BluetoothLEScanFilter()}}
+    as its <code>callbackfn</code> parameter,
+    regardless of any modifications that have been made to <code>window</code>,
+    <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
+    <code>Function</code>, <code>Function.prototype</code>,
+    <code>BluetoothLEScanFilter</code>, or other objects.
+  </p>
+
+  <dl>
+    <dt>[[!BLUETOOTH42]]</dt>
+    <dd>
+      <ol>
+        <li value="1">Architecture &amp; Terminology Overview
+          <ol type="A">
+            <li value="1">General Description
+              <ol>
+                <li value="2">Overview of Bluetooth Low Energy Operation
+                  (defines <dfn lt="advertising event|advertising events">advertising events</dfn>)
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li value="3">Core System Package [Host volume]
+          <ol type="A">
+            <li value="3">Generic Access Profile
+              <ol>
+                <li value="2">Profile Overview
+                  <ol>
+                    <li value="2">Profile Roles
+                      <ol>
+                        <li value="2">Roles when Operating over an LE Physical Transport
+                          <ol>
+                            <li value="2"><dfn>Observer</dfn> Role</li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+                <li value="10">Security Aspects &mdash; LE Physical Transport
+                  <ol>
+                    <li value="7"><dfn>Privacy Feature</dfn>
+                      <ol>
+                        <li value="4"><dfn>Privacy Feature in an Observer</dfn>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+        <li value="6">Core System Package [Low Energy Controller volume]
+          <ol type="A">
+            <li value="2">Link Layer Specification
+              <ol>
+                <li value="1">General Description
+                  <ol>
+                    <li value="3"><dfn>Device Address</dfn></li>
+                  </ol>
+                </li>
+                <li value="2">Air Interface Packets
+                  <ol>
+                    <li value="3">Advertising Channel PDU
+                      <ol>
+                        <li value="1">Advertising PDUs
+                          <ol>
+                            <li value="1"><dfn>ADV_IND</dfn></li>
+                            <li value="2"><dfn>ADV_DIRECT_IND</dfn></li>
+                            <li value="3"><dfn>ADV_NONCONN_IND</dfn></li>
+                            <li value="4"><dfn>ADV_SCAN_IND</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+                <li value="4">Air Interface Protocol
+                  <ol>
+                    <li value="4">Non-Connected States
+                      <ol>
+                        <li value="3">Scanning State
+                          <ol>
+                            <li value="1"><dfn>Passive Scanning</dfn></li>
+                            <li value="2"><dfn>Active Scanning</dfn></li>
+                          </ol>
+                        </li>
+                      </ol>
+                    </li>
+                  </ol>
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </dd>
+    <dt>[[!BLUETOOTH-SUPPLEMENT6]]</dt>
+    <dd>
+      <ol type="A">
+        <li value="1">Data Types Specification
+          <ol>
+            <li value="1">Data Types Definitions and Formats
+              <ol>
+                <li value="1"><dfn>Service UUID</dfn></li>
+                <li value="1">
+                  <dfn>Local Name</dfn>
+                  also defines <dfn>Shortened Local Name</dfn>
+                  and <dfn>Complete Local Name</dfn>
+                </li>
+                <li value="4"><dfn>Manufacturer Specific Data</dfn></li>
+                <li value="11"><dfn>Service Data</dfn></li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </dd>
+  </dl>
+</section>
