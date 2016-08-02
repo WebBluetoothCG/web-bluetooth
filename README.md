@@ -7,7 +7,8 @@ This is a project of the W3C [Web Bluetooth Community Group](http://www.w3.org/c
 
 Specification
 -------------
-* [Specification](https://webbluetoothcg.github.io/web-bluetooth/), including code samples.
+* [Web Bluetooth Specification](https://webbluetoothcg.github.io/web-bluetooth/), including code samples.
+* [Web Bluetooth Scanning Specification](https://webbluetoothcg.github.io/web-bluetooth/scanning.html), extends Web Bluetooth to support active scanning.
 * [Use Cases and Security Requirements](https://webbluetoothcg.github.io/web-bluetooth/use-cases.html) motivating specification decisions.
 * [Test APIs](https://webbluetoothcg.github.io/web-bluetooth/tests/)
   * These support [testharness.js based tests](https://code.google.com/p/chromium/codesearch/#chromium/src/third_party/WebKit/LayoutTests/bluetooth/) that currently live in the Chromium repository.
