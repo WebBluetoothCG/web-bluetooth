@@ -34,6 +34,7 @@
  *   - .note       for informative notes             (div, p, span, aside, details)
  *   - .example    for informative examples          (div, p, pre, span)
  *   - .issue      for issues                        (div, p, span)
+ *   - .assertion  for assertions                    (div, p, span)
  *   - .advisement for loud normative statements     (div, p, strong)
  *   - .annoying-warning for spec obsoletion notices (div, aside, details)
  *
@@ -48,9 +49,9 @@
  *   - ::before styled for CSS-generated issue/example/figure numbers:
  *     -> Documents wishing to use this only need to add
  *        figcaption::before,
- *        .caption::before { content: "Figure "  counter(figure);  }
- *        .example::before { content: "Example " counter(example); }
- *        .issue::before   { content: "Issue "   counter(issue);   }
+ *        .caption::before { content: "Figure "  counter(figure) " ";  }
+ *        .example::before { content: "Example " counter(example) " "; }
+ *        .issue::before   { content: "Issue "   counter(issue) " ";   }
  *
  * Header Stuff (ignore, just don't conflict with these classes)
  *   - .head for the header
@@ -597,7 +598,7 @@
 /*                             Colored Boxes                                  */
 /******************************************************************************/
 
-	.issue, .note, .example, .advisement, blockquote {
+	.issue, .note, .example, .assertion, .advisement, blockquote {
 		padding: .5em;
 		border: .5em;
 		border-left-style: solid;
@@ -612,6 +613,7 @@
 	.note,
 	.example,
 	.advisement,
+	.assertion,
 	blockquote {
 		margin: 1em auto;
 	}
@@ -644,7 +646,7 @@
 		padding-right: 1em;
 		text-transform: uppercase;
 	}
-	/* Add .issue::before { content: "Issue " counter(issue); } for autogen numbers,
+	/* Add .issue::before { content: "Issue " counter(issue) " "; } for autogen numbers,
 	   or use class="marker" to mark up the issue number in source. */
 
 /** Example *******************************************************************/
@@ -662,7 +664,7 @@
 		min-width: 7.5em;
 		display: block;
 	}
-	/* Add .example::before { content: "Example " counter(example); } for autogen numbers,
+	/* Add .example::before { content: "Example " counter(example) " "; } for autogen numbers,
 	   or use class="marker" to mark up the example number in source. */
 
 /** Non-normative Note ********************************************************/
@@ -689,6 +691,14 @@
 	}
 	details.note[open] > summary {
 		border-bottom: 1px silver solid;
+	}
+
+/** Assertion Box *************************************************************/
+	/*  for assertions in algorithms */
+
+	.assertion {
+		border-color: #AAA;
+		background: #EEE;
 	}
 
 /** Advisement Box ************************************************************/
@@ -1403,7 +1413,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth Scanning</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-08-01">1 August 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-08-02">2 August 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1619,7 +1629,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <p> In the rare case that you want to receive every advertisement without filtering them,
       use the <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" id="dom-bluetoothlescanoptions-acceptalladvertisements">acceptAllAdvertisements</dfn> field. </p>
     </div>
-    <div data-algorithm="requestLEScan(|options|)">
+    <div class="algorithm" data-algorithm="requestLEScan(|options|)">
      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export="" id="dom-bluetooth-requestlescan">requestLEScan(<var>options</var>)</dfn></code> method,
       when invoked, MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
@@ -1716,7 +1726,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop-2">BluetoothLEScan.stop()</a></code> stops a previously-requested scan.
         Sites should do this as soon as possible to avoid wasting power. </p>
      </div>
-     <div data-algorithm="BluetoothLEScanFilter(|init|)">
+     <div class="algorithm" data-algorithm="BluetoothLEScanFilter(|init|)">
       <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="constructor" data-export="" id="dom-bluetoothlescanfilter-bluetoothlescanfilter">BluetoothLEScanFilter(<var>init</var>)</dfn> constructor, when invoked MUST perform the following steps: </p>
       <ol class="algorithm">
        <li> Initialize all fields to <code>null</code>. 
@@ -1732,7 +1742,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
           propagate that exception from this constructor. 
       </ol>
      </div>
-     <div data-algorithm="stop()">
+     <div class="algorithm" data-algorithm="stop()">
       <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScan" data-dfn-type="method" data-export="" id="dom-bluetoothlescan-stop">stop()</dfn> method, when invoked,
         MUST perform the following steps: </p>
       <ol class="algorithm">
@@ -1766,7 +1776,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
 };
 </pre>
       <dt><a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-query-algorithm">permission query algorithm</a>
-      <dd data-algorithm="permission-query">
+      <dd class="algorithm" data-algorithm="permission-query">
        <p> Given a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothlescanpermissiondescriptor" id="ref-for-dictdef-bluetoothlescanpermissiondescriptor-1">BluetoothLEScanPermissionDescriptor</a></code> <var>descriptor</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanpermissionresult" id="ref-for-bluetoothlescanpermissionresult-1">BluetoothLEScanPermissionResult</a></code> <var>result</var>: </p>
        <ol class="algorithm">
         <li> Update <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state">state</a></code></code> to <var>descriptor</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-state">permission state</a>. 
@@ -1780,7 +1790,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
               match the fields of the descriptor. </p>
        </ol>
       <dt><a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-request-algorithm">permission request algorithm</a>
-      <dd data-algorithm="permission-request">
+      <dd class="algorithm" data-algorithm="permission-request">
        <p> Given a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothlescanpermissiondescriptor" id="ref-for-dictdef-bluetoothlescanpermissiondescriptor-2">BluetoothLEScanPermissionDescriptor</a></code> <var>descriptor</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanpermissionresult" id="ref-for-bluetoothlescanpermissionresult-2">BluetoothLEScanPermissionResult</a></code> <var>result</var>: </p>
        <ol class="algorithm">
         <li> Let <var>promise</var> be the result of <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan-5">requestLEScan</a></code>(<var>descriptor</var>)</code>. 
@@ -1792,7 +1802,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
             a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> whose single element is the value in <var>promise</var>. 
        </ol>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-revocation-algorithm">permission revocation algorithm</a> 
-      <dd data-algorithm="permission-revocation">
+      <dd class="algorithm" data-algorithm="permission-revocation">
        <ol class="algorithm">
         <li>
           For each <var>activeScan</var> in <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-activescans-slot" id="ref-for-dom-bluetooth-activescans-slot-7">[[activeScans]]</a></code></code>: 
@@ -1816,7 +1826,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <h2 class="heading settled" data-level="5" id="events"><span class="secno">5. </span><span class="content">Event handling</span><a class="self-link" href="#events"></a></h2>
     <section>
      <h3 class="heading settled" data-level="5.1" id="advertising-events"><span class="secno">5.1. </span><span class="content">Responding to advertising events</span><a class="self-link" href="#advertising-events"></a></h3>
-     <div data-algorithm="receive-advertising-event">
+     <div class="algorithm" data-algorithm="receive-advertising-event">
       <p> When the UA receives an <a data-link-type="dfn" href="#advertising-event" id="ref-for-advertising-event-1">advertising event</a> <var>event</var> (consisting of an advertising packet and an optional scan response),
         it MUST run the following steps: </p>
       <ol class="algorithm">
@@ -1836,7 +1846,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
         </ol>
       </ol>
      </div>
-     <div data-algorithm="bluetoothlescan-match">
+     <div class="algorithm" data-algorithm="bluetoothlescan-match">
       <p> An advertising event <var>event</var> <dfn class="dfn-paneled" data-dfn-for="BluetoothLEScan" data-dfn-type="dfn" data-lt="match" data-noexport="" id="bluetoothlescan-match">matches</dfn> a <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan-8">BluetoothLEScan</a></code> <var>scan</var> if the following steps return <code>match</code>: </p>
       <ol class="algorithm">
        <li> <code><var>scan</var>.acceptAllAdvertisements</code> is <code>false</code> and <var>event</var> doesn’t <a data-link-type="dfn" href="#bluetoothlescanfilter-match" id="ref-for-bluetoothlescanfilter-match-2">match</a> any filter in <code><var>scan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-filters" id="ref-for-dom-bluetoothlescan-filters-2">filters</a></code></code>,
@@ -1849,7 +1859,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
        <li>Return <code>match</code>.
       </ol>
      </div>
-     <div data-algorithm="bluetoothlescanfilter-match">
+     <div class="algorithm" data-algorithm="bluetoothlescanfilter-match">
       <p> An advertising event <var>event</var> <dfn class="dfn-paneled" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="dfn" data-lt="match" data-noexport="" id="bluetoothlescanfilter-match">matches</dfn> a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanfilter" id="ref-for-bluetoothlescanfilter-3">BluetoothLEScanFilter</a></code> <var>filter</var> if all of the following conditions hold: </p>
       <ul>
        <li>
