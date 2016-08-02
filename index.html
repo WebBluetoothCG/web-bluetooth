@@ -34,6 +34,7 @@
  *   - .note       for informative notes             (div, p, span, aside, details)
  *   - .example    for informative examples          (div, p, pre, span)
  *   - .issue      for issues                        (div, p, span)
+ *   - .assertion  for assertions                    (div, p, span)
  *   - .advisement for loud normative statements     (div, p, strong)
  *   - .annoying-warning for spec obsoletion notices (div, aside, details)
  *
@@ -48,9 +49,9 @@
  *   - ::before styled for CSS-generated issue/example/figure numbers:
  *     -> Documents wishing to use this only need to add
  *        figcaption::before,
- *        .caption::before { content: "Figure "  counter(figure);  }
- *        .example::before { content: "Example " counter(example); }
- *        .issue::before   { content: "Issue "   counter(issue);   }
+ *        .caption::before { content: "Figure "  counter(figure) " ";  }
+ *        .example::before { content: "Example " counter(example) " "; }
+ *        .issue::before   { content: "Issue "   counter(issue) " ";   }
  *
  * Header Stuff (ignore, just don't conflict with these classes)
  *   - .head for the header
@@ -597,7 +598,7 @@
 /*                             Colored Boxes                                  */
 /******************************************************************************/
 
-	.issue, .note, .example, .advisement, blockquote {
+	.issue, .note, .example, .assertion, .advisement, blockquote {
 		padding: .5em;
 		border: .5em;
 		border-left-style: solid;
@@ -612,6 +613,7 @@
 	.note,
 	.example,
 	.advisement,
+	.assertion,
 	blockquote {
 		margin: 1em auto;
 	}
@@ -644,7 +646,7 @@
 		padding-right: 1em;
 		text-transform: uppercase;
 	}
-	/* Add .issue::before { content: "Issue " counter(issue); } for autogen numbers,
+	/* Add .issue::before { content: "Issue " counter(issue) " "; } for autogen numbers,
 	   or use class="marker" to mark up the issue number in source. */
 
 /** Example *******************************************************************/
@@ -662,7 +664,7 @@
 		min-width: 7.5em;
 		display: block;
 	}
-	/* Add .example::before { content: "Example " counter(example); } for autogen numbers,
+	/* Add .example::before { content: "Example " counter(example) " "; } for autogen numbers,
 	   or use class="marker" to mark up the example number in source. */
 
 /** Non-normative Note ********************************************************/
@@ -689,6 +691,14 @@
 	}
 	details.note[open] > summary {
 		border-bottom: 1px silver solid;
+	}
+
+/** Assertion Box *************************************************************/
+	/*  for assertions in algorithms */
+
+	.assertion {
+		border-color: #AAA;
+		background: #EEE;
 	}
 
 /** Advisement Box ************************************************************/
@@ -1403,7 +1413,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-07-27">27 July 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-08-02">2 August 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1413,6 +1423,8 @@ pre.idl.highlight { color: #708090; }
      <dd><a href="#issues-index">Inline In Spec</a>
      <dt class="editor">Editor:
      <dd class="editor p-author h-card vcard"><a class="p-name fn u-url url" href="https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors">See contributors on GitHub</a>
+     <dt>Translations <small>(non-normative and likely out-of-date)</small>:
+     <dd><span title="Japanese"><a href="https://tkybpp.github.io/web-bluetooth-jp/" hreflang="ja" lang="ja" rel="alternate">日本語</a></span>
      <dt>Participate:
      <dd><span><a href="https://www.w3.org/community/web-bluetooth/">Join the W3C Community Group</a></span>
      <dd><span><a href="https://github.com/WebBluetoothCG/web-bluetooth">Fix the text through GitHub</a></span>
@@ -2375,7 +2387,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
             a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> whose contents are the elements of <var>devices</var>. 
        </ol>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-query-algorithm">permission query algorithm</a> 
-      <dd data-algorithm="query the &quot;bluetooth&quot; permission">
+      <dd class="algorithm" data-algorithm="query the &quot;bluetooth&quot; permission">
         To <dfn data-dfn-type="dfn" data-noexport="" id="query-the-bluetooth-permission">query the "bluetooth" permission<a class="self-link" href="#query-the-bluetooth-permission"></a></dfn> with
         a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondescriptor" id="ref-for-dictdef-bluetoothpermissiondescriptor-2">BluetoothPermissionDescriptor</a></code> <var>desc</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothpermissionresult" id="ref-for-bluetoothpermissionresult-2">BluetoothPermissionResult</a></code> <var>status</var>, the UA must: 
        <ol class="algorithm">
@@ -2404,7 +2416,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
             a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> whose contents are <var>matchingDevices</var>. 
        </ol>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-revocation-algorithm">permission revocation algorithm</a> 
-      <dd data-algorithm="revoke Bluetooth access">
+      <dd class="algorithm" data-algorithm="revoke Bluetooth access">
        <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="revoke-bluetooth-access">revoke Bluetooth access</dfn> to devices the user no longer intends to expose,
           the UA MUST run the following steps: </p>
        <ol class="algorithm">
@@ -4926,7 +4938,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
   <dl>
    <dt id="biblio-csp3">[CSP3]
-   <dd>Mike West. <a href="https://w3c.github.io/webappsec-csp/">Content Security Policy Level 3</a>. 21 June 2016. WD. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
+   <dd>Mike West. <a href="https://w3c.github.io/webappsec-csp/">Content Security Policy Level 3</a>. 1 August 2016. WD. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl def"><span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothrequestdevicefilter">BluetoothRequestDeviceFilter</a> {
