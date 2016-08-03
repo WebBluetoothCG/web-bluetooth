@@ -46,6 +46,9 @@ if [ -d published ]; then
   cp -r published/ out/
 fi
 
+# Keep links to gh-pages/implementation-status.md working.
+cp -r implementation-status.md out/
+
 # Re-generating.
 for SPEC in $SPECS; do
   curl https://api.csswg.org/bikeshed/ -f -F file=@${SPEC}.bs > out/${SPEC}.html;
