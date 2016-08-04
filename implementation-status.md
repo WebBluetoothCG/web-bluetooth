@@ -15,6 +15,7 @@ Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       | See notes
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
+└ Manufacturer/Service data |         |         |     |       |         |
 Referring Device (Physical Web) |     |         |     |       |         |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |

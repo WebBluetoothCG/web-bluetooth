@@ -525,6 +525,8 @@ spec: permissions
       sequence&lt;BluetoothServiceUUID> services;
       DOMString name;
       DOMString namePrefix;
+      unsigned short manufacturerId;
+      BluetoothServiceUUID serviceDataUUID;
     };
 
     dictionary RequestDeviceOptions {
@@ -566,10 +568,21 @@ spec: permissions
       </li>
       <li>
         have a name equal to <dfn dict-member for="BluetoothRequestDeviceFilter">name</dfn>
-        if that member is present, and
+        if that member is present,
       </li>
       <li>
         have a name starting with <dfn dict-member for="BluetoothRequestDeviceFilter">namePrefix</dfn>
+        if that member is present,
+      </li>
+      <li>
+        advertise <a>manufacturer specific data</a> with
+        a company identifier code equal to
+        <dfn dict-member for="BluetoothRequestDeviceFilter">manufacturerId</dfn>
+        if that member is present, and
+      </li>
+      <li>
+        advertise <a>service data</a> with
+        a UUID equal to <dfn dict-member for="BluetoothRequestDeviceFilter">serviceDataUUID</dfn>
         if that member is present.
       </li>
     </ul>
@@ -730,6 +743,53 @@ spec: permissions
     </table>
   </div>
 
+  <div class="example" id="example-filter-by-manufacturer-service-data">
+    <p>
+      Say the devices in the <a href="#example-filter-by-services">previous example</a>
+      also advertise manufacturer or service data as follows:
+    </p>
+    <table class="data">
+      <thead><th>Device</th><th>Manufacturer Data</th><th>Service Data</th></thead>
+      <tr><td>D1</td><td>17: 01 02 03</td><td></td></tr>
+      <tr><td>D2</td><td></td><td>A: 01 02 03</td></tr>
+    </table>
+
+    <p>
+      The following table shows which devices the user can select between
+      for several values of <var>filters</var> passed to
+      <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
+    </p>
+
+    <table class="data">
+      <thead><th><var>filters</var></th><th>Devices</th></thead>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerId: 17}]
+          </pre>
+        </td>
+        <td>D1</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{serviceDataUUID: A}]
+          </pre>
+        </td>
+        <td>D2</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerId: 17},
+             {serviceDataUUID: A}]
+          </pre>
+        </td>
+        <td>D1, D2</td>
+      </tr>
+    </table>
+  </div>
+
   <div class="example" id="example-disallowed-filters">
     <p>
       Filters that either accept or reject all possible devices cause {{TypeError}}s.
@@ -876,6 +936,19 @@ spec: permissions
         the device supports a primary (vs included) service with UUID <var>uuid</var>,
         return `mismatch`.
       </li>
+      <li>
+        If <code><var>filter</var>.manufacturerId</code> is present then
+        if <var>device</var> hasn't advertised <a>manufacturer specific data</a>
+        with a company identifier code equal to
+        <code><var>filter</var>.manufacturerId</code>,
+        return `mismatch`.
+      </li>
+      <li>
+        If <code><var>filter</var>.serviceDataUUID</code> is present then
+        if <var>device</var> hasn't advertised <a>service data</a>
+        with a UUID equal to <code><var>filter</var>.serviceDataUUID</code>,
+        return `mismatch`.
+      </li>
       <li>Return `match`.</li>
     </ol>
   </div>
@@ -952,7 +1025,7 @@ spec: permissions
             <ol>
               <li>
                 If none of <var>filter</var>'s
-                <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
+                members is present,
                 throw a {{TypeError}}
                 and abort these steps.
               </li>
@@ -1028,6 +1101,36 @@ spec: permissions
                   </li>
                 </ol>
               </li>
+
+              <li>
+                If <code>|filter|.manufacturerId</code> is present,
+                set <code>|canonicalizedFilter|.manufacturerId</code>
+                to <code>|filter|.manufacturerId</code>.
+              </li>
+
+              <li>
+                If <code>|filter|.serviceDataUUID</code> is present, do the following sub-steps.
+                <ol>
+                  <li>
+                    Let |service| be
+                    {{BluetoothUUID/getService()|BluetoothUUID.getService}}(<code>|filter|.serviceDataUUID)</code>.
+                  </li>
+                  <li>
+                    If the previous step threw an exception,
+                    throw that exception and abort these steps.
+                  </li>
+                  <li>
+                    If |service| is <a>blacklisted</a>,
+                    throw a {{SecurityError}}
+                    and abort these steps.
+                  </li>
+                  <li>
+                    Set <code>|canonicalizedFilter|.serviceDataUUID</code>
+                    to |service|.
+                  </li>
+                </ol>
+              </li>
+
               <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.</li>
             </ol>
           </li>
