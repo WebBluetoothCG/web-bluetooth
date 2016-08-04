@@ -15,6 +15,7 @@ Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       | See notes
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
+Referring Device (Physical Web) |     |         |     |       |         |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
 Read Characteristic       | ✓         | ✓       | 53  | ✓     |         |
@@ -26,6 +27,7 @@ Get Characteristics List  | ✓         | ✓       | 53  | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Get Primary Services List | 53        | 53      | 53  | 53    |         |
 startNotifications returns `this` |   |         |     |       |         |
+Advertisements Scanning   |           |         |     |       |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
 
