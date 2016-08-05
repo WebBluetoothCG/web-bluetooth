@@ -228,8 +228,11 @@ spec: permissions
         }
 
         function handleHeartRateMeasurementCharacteristic(characteristic) {
-          characteristic.addEventListener('<a event>characteristicvaluechanged</a>', onHeartRateChanged);
-          return characteristic.<a for="BluetoothRemoteGATTCharacteristic">startNotifications()</a>;
+          return characteristic.<a for="BluetoothRemoteGATTCharacteristic">startNotifications()</a>
+          .then(_ => {
+            characteristic.addEventListener('<a event>characteristicvaluechanged</a>',
+                                            onHeartRateChanged);
+          });
         }
 
         function onHeartRateChanged(event) {
@@ -2948,8 +2951,8 @@ spec: permissions
           getDescriptors(optional BluetoothDescriptorUUID descriptor);
         Promise&lt;DataView> readValue();
         Promise&lt;void> writeValue(BufferSource value);
-        Promise&lt;void> startNotifications();
-        Promise&lt;void> stopNotifications();
+        Promise&lt;BluetoothRemoteGATTCharacteristic> startNotifications();
+        Promise&lt;BluetoothRemoteGATTCharacteristic> stopNotifications();
       };
       BluetoothRemoteGATTCharacteristic implements EventTarget;
       BluetoothRemoteGATTCharacteristic implements CharacteristicEventHandlers;
@@ -3215,7 +3218,7 @@ spec: permissions
       <li>
         If <var>characteristic</var>'s <a>active notification context set</a> contains
         {{Navigator/bluetooth|navigator.bluetooth}},
-        <a>resolve</a> <var>promise</var> with <code>undefined</code> and abort these steps.
+        <a>resolve</a> <var>promise</var> with `this` and abort these steps.
       </li>
       <li>
         If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
@@ -3242,7 +3245,7 @@ spec: permissions
         to <var>characteristic</var>'s <a>active notification context set</a>.
       </li>
       <li>
-        <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+        <a>Resolve</a> <var>promise</var> with `this`.
       </li>
     </ol>
 
@@ -3277,7 +3280,7 @@ spec: permissions
         <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
       </li>
       <li>
-        <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with <code>undefined</code>.
+        <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
       </li>
     </ol>
 
