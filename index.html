@@ -2226,7 +2226,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <ol class="algorithm">
      <li> If the UA has scanned for devices recently <span class="issue" id="issue-2f91a41d"><a class="self-link" href="#issue-2f91a41d"></a>TODO: Nail down the amount of time.</span> with a set of UUIDs that was a superset of the UUIDs for the current scan,
       then the UA MAY return the result of that scan and abort these steps. 
-     <li>Let <var>nearbyDevices</var> be a set of <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-5">Bluetooth device</a>s, initially empty.
+     <li> Let <var>nearbyDevices</var> be a set of <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-5">Bluetooth device</a>s,
+      initially equal to the set of devices that
+      are connected (have an <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-1">ATT Bearer</a>) to the UA. 
      <li>
        If the UA supports the LE transport, perform the <a data-link-type="dfn" href="#general-discovery-procedure" id="ref-for-general-discovery-procedure-1">General Discovery Procedure</a>,
       except that the UA may include devices that have no <a data-link-type="dfn" href="#discoverable-mode" id="ref-for-discoverable-mode-1">Discoverable Mode</a> flag set,
@@ -2475,8 +2477,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         but the full name hasn’t been read yet.
         The <a data-link-type="dfn" href="#bluetooth-device-name" id="ref-for-bluetooth-device-name-8">Bluetooth Device Name</a> is encoded as UTF-8 and
         converted to a DOMString using the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without BOM</a> algorithm. 
-      <li> An <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-1">ATT Bearer</a>, over which all GATT communication happens.
-        The <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-2">ATT Bearer</a> is created by procedures described in
+      <li> An optional <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-2">ATT Bearer</a>, over which all GATT communication happens.
+        The <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-3">ATT Bearer</a> is created by procedures described in
         "Connection Establishment" under <a data-link-type="dfn" href="#gap-interoperability-requirements" id="ref-for-gap-interoperability-requirements-1">GAP Interoperability Requirements</a>.
         It is disconnected in ways <a data-link-type="biblio" href="#biblio-bluetooth42">[BLUETOOTH42]</a> isn’t entirely clear about. 
       <li> A list of advertised <a data-link-type="dfn" href="#service-uuid-data-type" id="ref-for-service-uuid-data-type-2">Service UUIDs</a> from the <a data-link-type="dfn" href="#advertising-data" id="ref-for-advertising-data-2">Advertising Data</a> or <a data-link-type="dfn" href="#extended-inquiry-response" id="ref-for-extended-inquiry-response-4">Extended Inquiry Response</a>. 
@@ -3023,6 +3025,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <ul>
          <li>are within the Bluetooth entity represented by <var>attribute</var>,
          <li>have a type described by <var>child type</var>,
+         <li>have a UUID that is not <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-4">blacklisted</a>,
          <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,
          <li> if <var>allowedUuids</var> is present and not <code>"all"</code>,
               have a UUID in <var>allowedUuids</var>, and 
@@ -3108,7 +3111,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
       <li> If <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-5">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
-      <li> If <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-6">[[representedDevice]]</a></code></code> has no <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-3">ATT Bearer</a>,
+      <li> If <code>this.device@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-6">[[representedDevice]]</a></code></code> has no <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-4">ATT Bearer</a>,
         attempt to create one using the procedures described
         in "Connection Establishment" under <a data-link-type="dfn" href="#gap-interoperability-requirements" id="ref-for-gap-interoperability-requirements-2">GAP Interoperability Requirements</a>. 
       <li> If this attempt fails, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
@@ -3133,7 +3136,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">In parallel</a>:
         if, for all <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-33">BluetoothDevice</a></code>s <code><var>deviceObj</var></code> in the whole UA
         with <code><var>deviceObj</var>@<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-9">[[representedDevice]]</a></code></code> the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-8">same device</a> as <var>device</var>, <code><var>deviceObj</var>.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-6">connected</a></code></code> is <code>false</code>,
-        the UA SHOULD destroy <var>device</var>’s <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-4">ATT Bearer</a>. 
+        the UA SHOULD destroy <var>device</var>’s <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-5">ATT Bearer</a>. 
      </ol>
      <p class="note" role="note"> Algorithms need to fail if
       their <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver" id="ref-for-bluetoothremotegattserver-13">BluetoothRemoteGATTServer</a></code> was disconnected while they were running,
@@ -3630,7 +3633,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      </section>
      <section>
       <h4 class="heading settled" data-level="5.6.3" id="disconnection-events"><span class="secno">5.6.3. </span><span class="content">Responding to Disconnection</span><a class="self-link" href="#disconnection-events"></a></h4>
-      <p> When a <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-16">Bluetooth device</a> <var>device</var>’s <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-5">ATT Bearer</a> is lost
+      <p> When a <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-16">Bluetooth device</a> <var>device</var>’s <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-6">ATT Bearer</a> is lost
         (e.g. because the remote device moved out of range
         or the user used a platform feature to disconnect it),
         for each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-41">BluetoothDevice</a></code> <var>deviceObj</var> the UA MUST <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to perform the following steps: </p>
@@ -6172,7 +6175,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <b><a href="#blacklisted">#blacklisted</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-blacklisted-1">3. Device Discovery</a> <a href="#ref-for-blacklisted-2">(2)</a>
-    <li><a href="#ref-for-blacklisted-3">5.1.2. Navigating the Bluetooth Hierarchy</a>
+    <li><a href="#ref-for-blacklisted-3">5.1.2. Navigating the Bluetooth Hierarchy</a> <a href="#ref-for-blacklisted-4">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="blacklisted-for-reads">
@@ -6423,9 +6426,10 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="att-bearer">
    <b><a href="#att-bearer">#att-bearer</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-att-bearer-1">4.1. Global Bluetooth device properties</a> <a href="#ref-for-att-bearer-2">(2)</a>
-    <li><a href="#ref-for-att-bearer-3">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-att-bearer-4">(2)</a>
-    <li><a href="#ref-for-att-bearer-5">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-att-bearer-1">3. Device Discovery</a>
+    <li><a href="#ref-for-att-bearer-2">4.1. Global Bluetooth device properties</a> <a href="#ref-for-att-bearer-3">(2)</a>
+    <li><a href="#ref-for-att-bearer-4">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-att-bearer-5">(2)</a>
+    <li><a href="#ref-for-att-bearer-6">5.6.3. Responding to Disconnection</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="attribute-caching">
