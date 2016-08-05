@@ -25,6 +25,7 @@ GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         
 Get Characteristics List  | ✓         | ✓       | 53  | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Get Primary Services List | 53        | 53      | 53  | 53    |         |
+startNotifications returns `this` |   |         |     |       |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
 
@@ -50,7 +51,7 @@ https://szeged.github.io/servo/
 # Firefox
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
 - https://bugzilla.mozilla.org/buglist.cgi?quicksearch=%5Bweb-bluetooth%5D
- 
+
 # Microsoft Edge
 https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
