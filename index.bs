@@ -811,68 +811,73 @@ spec: permissions
     Getting <code>navigator.bluetooth.<dfn attribute for="Bluetooth">referringDevice</dfn></code>
     must return {{[[referringDevice]]}}.
   </p>
-  <p>
-    Some UAs may allow the user
-    to cause a <a>browsing context</a> to <a lt="navigated">navigate</a>
-    in response to a <a>Bluetooth device</a>.
-    <span class="note">
-      For example, if an
-      <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
-      advertises a URL,
-      the UA may allow the user to navigate to this URL.
-    </span>
-    If this happens, then as part of <a>initialising a new `Document` object</a>,
-    the UA MUST run the following steps:
-  </p>
-  <ol class="algorithm">
-    <li>
-      Let <var>referringDevice</var> be the device that caused the navigation.
-    </li>
-    <li>
-      <a>Get the <code>BluetoothDevice</code> representing</a> <var>referringDevice</var>
-      inside `navigator.bluetooth`,
-      and let |referringDeviceObj| be the result.
-    </li>
-    <li>
-      If the previous step threw an exception, abort these steps.
 
-      Note: This means the UA didn't infer that the user intended to
-      grant the current <a>realm</a> access to |referringDevice|.
-      For example, the user might have denied GATT access globally.
-    </li>
-    <li>
-      Set <code>navigator.bluetooth@{{[[referringDevice]]}}</code>
-      to |referringDeviceObj|.
-    </li>
-  </ol>
+  <div algorithm="initializing referringDevice">
+    <p>
+      Some UAs may allow the user
+      to cause a <a>browsing context</a> to <a lt="navigated">navigate</a>
+      in response to a <a>Bluetooth device</a>.
+      <span class="note">
+        For example, if an
+        <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
+        advertises a URL,
+        the UA may allow the user to navigate to this URL.
+      </span>
+      If this happens, then as part of <a>initialising a new `Document` object</a>,
+      the UA MUST run the following steps:
+    </p>
+    <ol>
+      <li>
+        Let <var>referringDevice</var> be the device that caused the navigation.
+      </li>
+      <li>
+        <a>Get the <code>BluetoothDevice</code> representing</a> <var>referringDevice</var>
+        inside `navigator.bluetooth`,
+        and let |referringDeviceObj| be the result.
+      </li>
+      <li>
+        If the previous step threw an exception, abort these steps.
 
-  <p>
-    A <a>Bluetooth device</a> <var>device</var>
-    <dfn local-lt="match a filter|matches any filter">matches a filter</dfn> <var>filter</var>
-    if the following steps return `match`:
-  </p>
-  <ol class="algorithm">
-    <li>
-      If <code><var>filter</var>.name</code> is present then,
-      if <var>device</var>'s <a>Bluetooth Device Name</a> isn't complete
-      and equal to <code><var>filter</var>.name</code>,
-      return `mismatch`.
-    </li>
-    <li>
-      If <code><var>filter</var>.namePrefix</code> is present then
-      if <var>device</var>'s <a>Bluetooth Device Name</a> isn't present
-      or doesn't start with <code><var>filter</var>.namePrefix</code>,
-      return `mismatch`.
-    </li>
-    <li>
-      For each <var>uuid</var> in <code><var>filter</var>.services</code>,
-      if the UA has not received advertising data, an <a>extended inquiry response</a>,
-      or a service discovery response indicating that
-      the device supports a primary (vs included) service with UUID <var>uuid</var>,
-      return `mismatch`.
-    </li>
-    <li>Return `match`.
-  </ol>
+        Note: This means the UA didn't infer that the user intended to
+        grant the current <a>realm</a> access to |referringDevice|.
+        For example, the user might have denied GATT access globally.
+      </li>
+      <li>
+        Set <code>navigator.bluetooth@{{[[referringDevice]]}}</code>
+        to |referringDeviceObj|.
+      </li>
+    </ol>
+  </div>
+
+  <div algorithm>
+    <p>
+      A <a>Bluetooth device</a> <var>device</var>
+      <dfn local-lt="match a filter|matches any filter">matches a filter</dfn> <var>filter</var>
+      if the following steps return `match`:
+    </p>
+    <ol>
+      <li>
+        If <code><var>filter</var>.name</code> is present then,
+        if <var>device</var>'s <a>Bluetooth Device Name</a> isn't complete
+        and equal to <code><var>filter</var>.name</code>,
+        return `mismatch`.
+      </li>
+      <li>
+        If <code><var>filter</var>.namePrefix</code> is present then
+        if <var>device</var>'s <a>Bluetooth Device Name</a> isn't present
+        or doesn't start with <code><var>filter</var>.namePrefix</code>,
+        return `mismatch`.
+      </li>
+      <li>
+        For each <var>uuid</var> in <code><var>filter</var>.services</code>,
+        if the UA has not received advertising data, an <a>extended inquiry response</a>,
+        or a service discovery response indicating that
+        the device supports a primary (vs included) service with UUID <var>uuid</var>,
+        return `mismatch`.
+      </li>
+      <li>Return `match`.</li>
+    </ol>
+  </div>
 
   <p class="note">
     The list of Service UUIDs that a device advertises
@@ -884,342 +889,348 @@ spec: permissions
     which can impair radio performance and cause delays, so this spec doesn't require it.
   </p>
 
-  <p>
-    The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)</dfn></code> method,
-    when invoked, MUST return <a>a new promise</a> |promise|
-    and run the following steps <a>in parallel</a>:
-  </p>
-  <ol class="algorithm">
-    <li>
-      <a>Request Bluetooth devices</a>,
-      passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
-      and <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>,
-      and let |devices| be the result.
-    </li>
-    <li>
-      If the previous step threw an exception,
-      <a>reject</a> |promise| with that exception and abort these steps.
-    </li>
-    <li>
-      If |devices| is an empty sequence,
-      <a>reject</a> |promise| with a {{NotFoundError}} and abort these steps.
-    </li>
-    <li>
-      <a>Resolve</a> |promise| with <code>|devices|[0]</code>.
-    </li>
-  </ol>
+  <div algorithm>
+    <p>
+      The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)</dfn></code> method,
+      when invoked, MUST return <a>a new promise</a> |promise|
+      and run the following steps <a>in parallel</a>:
+    </p>
+    <ol>
+      <li>
+        <a>Request Bluetooth devices</a>,
+        passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
+        and <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>,
+        and let |devices| be the result.
+      </li>
+      <li>
+        If the previous step threw an exception,
+        <a>reject</a> |promise| with that exception and abort these steps.
+      </li>
+      <li>
+        If |devices| is an empty sequence,
+        <a>reject</a> |promise| with a {{NotFoundError}} and abort these steps.
+      </li>
+      <li>
+        <a>Resolve</a> |promise| with <code>|devices|[0]</code>.
+      </li>
+    </ol>
+  </div>
 
-  <p>
-    To <dfn>request Bluetooth devices</dfn>,
-    given a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|,
-    and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
-    the UA MUST run the following steps:
-  </p>
-  <p class="note">
-    Calls to this algorithm will eventually be able to request multiple devices,
-    but for now it only ever returns a single one.
-  </p>
-  <ol class="algorithm">
-    <li id="requestDevice-user-gesture">
-      If the algorithm is not <a>triggered by user activation</a>,
-      throw a {{SecurityError}} and abort these steps.
-    </li>
-    <li>
-      In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
-      do the following sub-steps:
-      <ol>
-        <li>
-          If <code>|filters|.length === 0</code>,
-          throw a {{TypeError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let <var>uuidFilters</var> be a new {{Array}} and
-          <var>requiredServiceUUIDs</var> be a new {{Set}}.
-        </li>
-        <li>
-          For each |filter| in |filters|,
-          do the following steps:
-          <ol>
-            <li>
-              If none of <var>filter</var>'s
-              <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
-              throw a {{TypeError}}
-              and abort these steps.
-            </li>
-            <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
-            <li>
-              If <code><var>filter</var>.services</code> is present, do the following sub-steps:
-              <ol>
-                <li>
-                  If <code><var>filter</var>.services.length === 0</code>,
-                  throw a {{TypeError}}
-                  and abort these steps.
-                </li>
-                <li>
-                  Let <var>services</var> be
-                  <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
-                  {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
-                </li>
-                <li>
-                  If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-                  throw that exception and abort these steps.
-                </li>
-                <li>
-                  If any <var>service</var> in <var>services</var> is <a>blacklisted</a>,
-                  throw a {{SecurityError}}
-                  and abort these steps.
-                </li>
-                <li>
-                  Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.
-                </li>
-                <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
-              </ol>
-            </li>
-            <li>
-              If <code><var>filter</var>.name</code> is present, do the following sub-steps.
-              <ol>
-                <li>
-                  If the <a lt="utf-8 encode">UTF-8 encoding</a>
-                  of <code><var>filter</var>.name</code>
-                  is more than 248 bytes long,
-                  throw a {{TypeError}}
-                  and abort these steps.
+  <div algorithm>
+    <p>
+      To <dfn>request Bluetooth devices</dfn>,
+      given a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|,
+      and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
+      the UA MUST run the following steps:
+    </p>
+    <p class="note">
+      Calls to this algorithm will eventually be able to request multiple devices,
+      but for now it only ever returns a single one.
+    </p>
+    <ol>
+      <li id="requestDevice-user-gesture">
+        If the algorithm is not <a>triggered by user activation</a>,
+        throw a {{SecurityError}} and abort these steps.
+      </li>
+      <li>
+        In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
+        do the following sub-steps:
+        <ol>
+          <li>
+            If <code>|filters|.length === 0</code>,
+            throw a {{TypeError}}
+            and abort these steps.
+          </li>
+          <li>
+            Let <var>uuidFilters</var> be a new {{Array}} and
+            <var>requiredServiceUUIDs</var> be a new {{Set}}.
+          </li>
+          <li>
+            For each |filter| in |filters|,
+            do the following steps:
+            <ol>
+              <li>
+                If none of <var>filter</var>'s
+                <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
+                throw a {{TypeError}}
+                and abort these steps.
+              </li>
+              <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
+              <li>
+                If <code><var>filter</var>.services</code> is present, do the following sub-steps:
+                <ol>
+                  <li>
+                    If <code><var>filter</var>.services.length === 0</code>,
+                    throw a {{TypeError}}
+                    and abort these steps.
+                  </li>
+                  <li>
+                    Let <var>services</var> be
+                    <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
+                    {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+                  </li>
+                  <li>
+                    If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
+                    throw that exception and abort these steps.
+                  </li>
+                  <li>
+                    If any service in <var>services</var> is <a>blacklisted</a>,
+                    throw a {{SecurityError}}
+                    and abort these steps.
+                  </li>
+                  <li>
+                    Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.
+                  </li>
+                  <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
+                </ol>
+              </li>
+              <li>
+                If <code><var>filter</var>.name</code> is present, do the following sub-steps.
+                <ol>
+                  <li>
+                    If the <a lt="utf-8 encode">UTF-8 encoding</a>
+                    of <code><var>filter</var>.name</code>
+                    is more than 248 bytes long,
+                    throw a {{TypeError}}
+                    and abort these steps.
 
-                  <p class="note">
-                    248 is the maximum number of UTF-8 code units in
-                    a <a>Bluetooth Device Name</a>.
-                  </p>
-                </li>
-                <li>
-                  Set <code><var>canonicalizedFilter</var>.name</code>
-                  to <code><var>filter</var>.name</code>.
-                </li>
-              </ol>
-            </li>
-            <li>
-              If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps.
-              <ol>
-                <li>
-                  If <code><var>filter</var>.namePrefix.length === 0</code>
-                  or if the <a lt="utf-8 encode">UTF-8 encoding</a>
-                  of <code><var>filter</var>.namePrefix</code>
-                  is more than 248 bytes long,
-                  throw a {{TypeError}}
-                  and abort these steps.
+                    <p class="note">
+                      248 is the maximum number of UTF-8 code units in
+                      a <a>Bluetooth Device Name</a>.
+                    </p>
+                  </li>
+                  <li>
+                    Set <code><var>canonicalizedFilter</var>.name</code>
+                    to <code><var>filter</var>.name</code>.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps.
+                <ol>
+                  <li>
+                    If <code><var>filter</var>.namePrefix.length === 0</code>
+                    or if the <a lt="utf-8 encode">UTF-8 encoding</a>
+                    of <code><var>filter</var>.namePrefix</code>
+                    is more than 248 bytes long,
+                    throw a {{TypeError}}
+                    and abort these steps.
 
-                  <p class="note">
-                    248 is the maximum number of UTF-8 code units in
-                    a <a>Bluetooth Device Name</a>.
-                  </p>
-                </li>
-                <li>
-                  Set <code><var>canonicalizedFilter</var>.namePrefix</code>
-                  to <code><var>filter</var>.namePrefix</code>.
-                </li>
-              </ol>
-            </li>
-            <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.</li>
-          </ol>
-        </li>
-        <li>
-          Let <var>optionalServiceUUIDs</var> be
-          <code>{{Array.prototype.map}}.call(|optionalServices|,
-            {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
-        </li>
-        <li>
-          If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-          throw that exception and abort these steps.
-        </li>
-        <li>
-          Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a>blacklisted</a>.
-        </li>
-      </ol>
-    </li>
-    <li>
-      Let |descriptor| be
-      <pre highlight="js">
-      {
-        name: "bluetooth",
-        filters: <var>uuidFilters</var>,
-        optionalServices: <var>optionalServiceUUIDs</var>,
-      }
-      </pre>
-    </li>
-    <li>
-      Let |state| be |descriptor|'s <a>permission state</a>.
+                    <p class="note">
+                      248 is the maximum number of UTF-8 code units in
+                      a <a>Bluetooth Device Name</a>.
+                    </p>
+                  </li>
+                  <li>
+                    Set <code><var>canonicalizedFilter</var>.namePrefix</code>
+                    to <code><var>filter</var>.namePrefix</code>.
+                  </li>
+                </ol>
+              </li>
+              <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.</li>
+            </ol>
+          </li>
+          <li>
+            Let <var>optionalServiceUUIDs</var> be
+            <code>{{Array.prototype.map}}.call(|optionalServices|,
+              {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+          </li>
+          <li>
+            If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
+            throw that exception and abort these steps.
+          </li>
+          <li>
+            Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a>blacklisted</a>.
+          </li>
+        </ol>
+      </li>
+      <li>
+        Let |descriptor| be
+        <pre highlight="js">
+        {
+          name: "bluetooth",
+          filters: <var>uuidFilters</var>,
+          optionalServices: <var>optionalServiceUUIDs</var>,
+        }
+        </pre>
+      </li>
+      <li>
+        Let |state| be |descriptor|'s <a>permission state</a>.
 
-      Note: |state| will be {{"denied"}} in <a>non-secure contexts</a> because
-      {{"bluetooth"}} doesn't set the <a>allowed in non-secure contexts</a> flag.
-    </li>
-    <li>
-      If |state| is {{"denied"}}, return `[]` and abort these steps.
-    </li>
-    <li>
-      <a>Scan for devices</a> with
-      <var>requiredServiceUUIDs</var>
-      as the <var>set of <a>Service</a> UUIDs</var>,
-      and let <var>scanResult</var> be the result.
-    </li>
-    <li>
-      Remove devices from <var>scanResult</var> if
-      they do not <a>match a filter</a>
-      in <var>uuidFilters</var>.
-    </li>
-    <li id="requestDevice-prompt">
-      Even if <var>scanResult</var> is empty,
-      <a>prompt the user to choose</a> one of the devices in |scanResult|,
-      associated with |descriptor|,
-      and let |device| be the result.
+        Note: |state| will be {{"denied"}} in <a>non-secure contexts</a> because
+        {{"bluetooth"}} doesn't set the <a>allowed in non-secure contexts</a> flag.
+      </li>
+      <li>
+        If |state| is {{"denied"}}, return `[]` and abort these steps.
+      </li>
+      <li>
+        <a>Scan for devices</a> with
+        <var>requiredServiceUUIDs</var>
+        as the <i>set of <a>Service</a> UUIDs</i>,
+        and let <var>scanResult</var> be the result.
+      </li>
+      <li>
+        Remove devices from <var>scanResult</var> if
+        they do not <a>match a filter</a>
+        in <var>uuidFilters</var>.
+      </li>
+      <li id="requestDevice-prompt">
+        Even if <var>scanResult</var> is empty,
+        <a>prompt the user to choose</a> one of the devices in |scanResult|,
+        associated with |descriptor|,
+        and let |device| be the result.
 
-      <p>
-        The UA MAY allow the user to select a nearby device
-        that does not match <var>uuidFilters</var>.
-      </p>
+        <p>
+          The UA MAY allow the user to select a nearby device
+          that does not match <var>uuidFilters</var>.
+        </p>
 
-      <p class="note">
-        The UA should show the user the human-readable name of each device.
-        If this name is not available because, for example,
-        the UA's Bluetooth system doesn't support privacy-enabled scans,
-        the UA should allow the user to indicate interest and
-        then perform a privacy-disabled scan to retrieve the name.
-      </p>
-    </li>
-    <li>
-      If |device| is {{"denied"}}, return `[]` and abort these steps.
-    </li>
-    <li class="note">
-      Choosing a |device| probably indicates that
-      the user intends that device to appear in
-      the {{BluetoothPermissionData/allowedDevices}} list
-      of {{"bluetooth"}}'s <a>extra permission data</a> for
-      at least the <a>current settings object</a>,
-      and for all the services in the union of <var>requiredServiceUUIDs</var>
-      and <var>optionalServiceUUIDs</var>
-      to appear in its {{AllowedBluetoothDevice/allowedServices}} list,
-      in addition to any services that were already there.
-    </li>
-    <li>
-      The UA MAY <a>populate the Bluetooth cache</a> with
-      all Services inside <var>device</var>.
-      Ignore any errors from this step.
-    </li>
-    <li>
-      <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
-      inside the <a>context object</a>,
-      propagating any exception,
-      and let |deviceObj| be the result.
-    </li>
-    <li>
-      Return <code>[|deviceObj|]</code>.
-    </li>
-  </ol>
+        <p class="note">
+          The UA should show the user the human-readable name of each device.
+          If this name is not available because, for example,
+          the UA's Bluetooth system doesn't support privacy-enabled scans,
+          the UA should allow the user to indicate interest and
+          then perform a privacy-disabled scan to retrieve the name.
+        </p>
+      </li>
+      <li>
+        If |device| is {{"denied"}}, return `[]` and abort these steps.
+      </li>
+      <li class="note">
+        Choosing a |device| probably indicates that
+        the user intends that device to appear in
+        the {{BluetoothPermissionData/allowedDevices}} list
+        of {{"bluetooth"}}'s <a>extra permission data</a> for
+        at least the <a>current settings object</a>,
+        and for all the services in the union of <var>requiredServiceUUIDs</var>
+        and <var>optionalServiceUUIDs</var>
+        to appear in its {{AllowedBluetoothDevice/allowedServices}} list,
+        in addition to any services that were already there.
+      </li>
+      <li>
+        The UA MAY <a>populate the Bluetooth cache</a> with
+        all Services inside <var>device</var>.
+        Ignore any errors from this step.
+      </li>
+      <li>
+        <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
+        inside the <a>context object</a>,
+        propagating any exception,
+        and let |deviceObj| be the result.
+      </li>
+      <li>
+        Return <code>[|deviceObj|]</code>.
+      </li>
+    </ol>
+  </div>
 
-  <p>
-    To <dfn>scan for devices</dfn> with
-    an optional <var>set of <a>Service</a> UUIDs</var>, defaulting to the set of all UUIDs,
-    the UA MUST perform the following steps:
-  </p>
-  <ol class="algorithm">
-    <li>
-      If the UA has scanned for devices recently
-      <span class="issue">TODO: Nail down the amount of time.</span>
-      with a set of UUIDs that was a superset of the UUIDs for the current scan,
-      then the UA MAY return the result of that scan and abort these steps.
-    </li>
-    <li>
-      Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s,
-      initially equal to the set of devices that
-      are connected (have an <a>ATT Bearer</a>) to the UA.
-    </li>
-    <li>
-      If the UA supports the LE transport, perform the <a>General Discovery Procedure</a>,
-      except that the UA may include devices that have no <a>Discoverable Mode</a> flag set,
-      and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
-      The UA SHOULD enable the <a>Privacy Feature</a>.
+  <div algorithm>
+    <p>
+      To <dfn>scan for devices</dfn> with
+      an optional <var>set of <a>Service</a> UUIDs</var>, defaulting to the set of all UUIDs,
+      the UA MUST perform the following steps:
+    </p>
+    <ol>
+      <li>
+        If the UA has scanned for devices recently
+        <span class="issue">TODO: Nail down the amount of time.</span>
+        with a set of UUIDs that was a superset of the UUIDs for the current scan,
+        then the UA MAY return the result of that scan and abort these steps.
+      </li>
+      <li>
+        Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s,
+        initially equal to the set of devices that
+        are connected (have an <a>ATT Bearer</a>) to the UA.
+      </li>
+      <li>
+        If the UA supports the LE transport, perform the <a>General Discovery Procedure</a>,
+        except that the UA may include devices that have no <a>Discoverable Mode</a> flag set,
+        and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
+        The UA SHOULD enable the <a>Privacy Feature</a>.
 
-      <p class="issue">
-        Both <a>passive scanning</a> and
-        the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
-        We ought to require UAs to use either one,
-        but none of the OS APIs appear to expose either.
-        Bluetooth also makes it hard to use <a>passive scanning</a> since
-        it doesn't require <a>Central</a> devices to support the
-        <a>Observation Procedure</a>.
-      </p>
-    </li>
-    <li>
-      If the UA supports the BR/EDR transport, perform the <a>Device Discovery Procedure</a>
-      and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
+        <p class="issue">
+          Both <a>passive scanning</a> and
+          the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
+          We ought to require UAs to use either one,
+          but none of the OS APIs appear to expose either.
+          Bluetooth also makes it hard to use <a>passive scanning</a> since
+          it doesn't require <a>Central</a> devices to support the
+          <a>Observation Procedure</a>.
+        </p>
+      </li>
+      <li>
+        If the UA supports the BR/EDR transport, perform the <a>Device Discovery Procedure</a>
+        and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
 
-      <p class="issue">
-        All forms of BR/EDR inquiry/discovery
-        appear to leak the unique, immutable device address.
-      </p>
-    </li>
-    <li>Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
-    <li>
-      For each <a>Bluetooth device</a> <var>device</var> in <var>nearbyDevices</var>,
-      do the following sub-steps:
-      <ol>
-        <li>
-          If <var>device</var>'s <a>supported physical transports</a> include LE and
-          its <a>Bluetooth Device Name</a> is partial or absent,
-          the UA SHOULD perform the <a>Name Discovery Procedure</a>
-          to acquire a complete name.
-        </li>
-        <li>
-          If <var>device</var>'s advertised <a>Service UUIDs</a>
-          have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
-          add <var>device</var> to <var>result</var> and abort these sub-steps.
+        <p class="issue">
+          All forms of BR/EDR inquiry/discovery
+          appear to leak the unique, immutable device address.
+        </p>
+      </li>
+      <li>Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
+      <li>
+        For each <a>Bluetooth device</a> <var>device</var> in <var>nearbyDevices</var>,
+        do the following sub-steps:
+        <ol>
+          <li>
+            If <var>device</var>'s <a>supported physical transports</a> include LE and
+            its <a>Bluetooth Device Name</a> is partial or absent,
+            the UA SHOULD perform the <a>Name Discovery Procedure</a>
+            to acquire a complete name.
+          </li>
+          <li>
+            If <var>device</var>'s advertised <a>Service UUIDs</a>
+            have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
+            add <var>device</var> to <var>result</var> and abort these sub-steps.
 
-          <p class="note">
-            For BR/EDR devices, there is no way to distinguish GATT from non-GATT services
-            in the <a>Extended Inquiry Response</a>.
-            If a site filters to the UUID of a non-GATT service,
-            the user may be able to select a device
-            for the result of <code>requestDevice</code>
-            that this API provides no way to interact with.
-          </p>
-        </li>
-        <li>
-          The UA MAY connect to <var>device</var> and <a>populate the Bluetooth cache</a>
-          with all Services whose UUIDs are in the <var>set of <a>Service</a> UUIDs</var>.
-          If <var>device</var>'s <a>supported physical transports</a> include BR/EDR,
-          then in addition to the standard GATT procedures,
-          the UA MAY use the Service Discovery Protocol (<a>Searching for Services</a>)
-          when populating the cache.
-
-          <div class="note" id="note-extra-discovery">
-            <p>
-              Connecting to every nearby device to discover services costs power and
-              can slow down other use of the Bluetooth radio.
-              UAs should only discover extra services on a device if
-              they have some reason to expect that device to be interesting.
+            <p class="note">
+              For BR/EDR devices, there is no way to distinguish GATT from non-GATT services
+              in the <a>Extended Inquiry Response</a>.
+              If a site filters to the UUID of a non-GATT service,
+              the user may be able to select a device
+              for the result of <code>requestDevice</code>
+              that this API provides no way to interact with.
             </p>
+          </li>
+          <li>
+            The UA MAY connect to <var>device</var> and <a>populate the Bluetooth cache</a>
+            with all Services whose UUIDs are in the <var>set of <a>Service</a> UUIDs</var>.
+            If <var>device</var>'s <a>supported physical transports</a> include BR/EDR,
+            then in addition to the standard GATT procedures,
+            the UA MAY use the Service Discovery Protocol (<a>Searching for Services</a>)
+            when populating the cache.
 
-            <p>
-              UAs should also help developers avoid relying on this extra discovery behavior.
-              For example, say a developer has previously connected to a device,
-              so the UA knows the device's full set of supported services.
-              If this developer then filters using a non-advertised UUID,
-              the dialog they see may include this device,
-              even if the filter would likely exclude the device on users' machines.
-              The UA could provide a developer option to warn when this happens or
-              to include only advertised services in matching filters.
-            </p>
-          </div>
-        </li>
-        <li>
-          If the <a>Bluetooth cache</a> contains
-          known-present Services inside <var>device</var>
-          with UUIDs in the <var>set of <a>Service</a> UUIDs</var>,
-          the UA MAY add <var>device</var> to <var>result</var>.
-        </li>
-      </ol>
-    </li>
-    <li>Return <var>result</var> from the scan.</li>
-  </ol>
+            <div class="note" id="note-extra-discovery">
+              <p>
+                Connecting to every nearby device to discover services costs power and
+                can slow down other use of the Bluetooth radio.
+                UAs should only discover extra services on a device if
+                they have some reason to expect that device to be interesting.
+              </p>
+
+              <p>
+                UAs should also help developers avoid relying on this extra discovery behavior.
+                For example, say a developer has previously connected to a device,
+                so the UA knows the device's full set of supported services.
+                If this developer then filters using a non-advertised UUID,
+                the dialog they see may include this device,
+                even if the filter would likely exclude the device on users' machines.
+                The UA could provide a developer option to warn when this happens or
+                to include only advertised services in matching filters.
+              </p>
+            </div>
+          </li>
+          <li>
+            If the <a>Bluetooth cache</a> contains
+            known-present Services inside <var>device</var>
+            with UUIDs in the <var>set of <a>Service</a> UUIDs</var>,
+            the UA MAY add <var>device</var> to <var>result</var>.
+          </li>
+        </ol>
+      </li>
+      <li>Return <var>result</var> from the scan.</li>
+    </ol>
+  </div>
 
   <p class="issue">
     We need a way for a site to register to receive an event
@@ -1360,13 +1371,13 @@ spec: permissions
       <dt>
         <a>permission request algorithm</a>
       </dt>
-      <dd>
+      <dd algorithm="permission request">
         <p>
           Given a {{BluetoothPermissionDescriptor}} <var>options</var>
           and a {{BluetoothPermissionResult}} <var>status</var>,
           the UA MUST run the following steps:
         </p>
-        <ol class="algorithm">
+        <ol>
           <li>
             <a>Request Bluetooth devices</a>,
             passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
@@ -1388,7 +1399,7 @@ spec: permissions
         To <dfn>query the "bluetooth" permission</dfn> with
         a {{BluetoothPermissionDescriptor}} <var>desc</var>
         and a {{BluetoothPermissionResult}} <var>status</var>, the UA must:
-        <ol class="algorithm">
+        <ol>
           <li>
             Let <var>global</var> be the <a>global object associated with</a> <var>status</var>.
           </li>
@@ -1450,7 +1461,7 @@ spec: permissions
           To <dfn>revoke Bluetooth access</dfn> to devices the user no longer intends to expose,
           the UA MUST run the following steps:
         </p>
-        <ol class="algorithm">
+        <ol>
           <li>
             Let |data|, a {{BluetoothPermissionData}},
             be {{"bluetooth"}}'s <a>extra permission data</a>
@@ -1708,83 +1719,85 @@ spec: permissions
       </tr>
     </table>
 
-    <p>
-      To <dfn export>get the <code>BluetoothDevice</code> representing</dfn>
-      a <a>Bluetooth device</a> <var>device</var>
-      inside a {{Bluetooth}} instance <var>context</var>,
-      the UA MUST run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        Let |data|, a {{BluetoothPermissionData}},
-        be {{"bluetooth"}}'s <a>extra permission data</a>
-        for the <a>current settings object</a>.
-      </li>
-      <li>
-        Find the |allowedDevice| in <code>|data|.{{allowedDevices}}</code>
-        with <code><var>allowedDevice</var>@{{[[device]]}}</code>
-        the <a>same device</a> as <var>device</var>.
-        If there is no such object,
-        throw a {{SecurityError}} and abort these steps.
-      </li>
-      <li>
-        If there is no key in
-        <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
-        that is the <a>same device</a> as <var>device</var>,
-        run the following sub-steps:
-        <ol>
-          <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
-          <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
-          <li>
-            Initialize <code><var>result</var>@{{[[context]]}}</code>
-            to <var>context</var>.
-          </li>
-          <li>
-            Initialize <code><var>result</var>@{{[[representedDevice]]}}</code>
-            to <var>device</var>.
-          </li>
-          <li>
-            Initialize <code><var>result</var>.id</code>
-            to <code><var>allowedDevice</var>.{{AllowedBluetoothDevice/deviceId}}</code>,
-            and initialize <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
-            to <code><var>allowedDevice</var>.{{allowedServices}}</code>.
-          </li>
-          <li>
-            If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
-            set <code><var>result</var>.name</code> to that string.
-          </li>
-          <li>
-            Initialize <code><var>result</var>.watchingAdvertisements</code> to `false`.
-          </li>
-          <li>
-            Add <var>device</var>'s
-            advertised <a>Service UUIDs</a>
-            to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-          </li>
-          <li>
-            If the <a>Bluetooth cache</a> contains
-            known-present Services inside <var>device</var>,
-            add the UUIDs of those Services to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-          </li>
-          <li>
-            Add a mapping from <var>device</var> to <var>result</var>
-            in <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}.
-          </li>
-        </ol>
-      </li>
-      <li>
-        Return the value in
-        <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
-        whose key is the <a>same device</a> as <var>device</var>.
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        To <dfn export>get the <code>BluetoothDevice</code> representing</dfn>
+        a <a>Bluetooth device</a> <var>device</var>
+        inside a {{Bluetooth}} instance <var>context</var>,
+        the UA MUST run the following steps:
+      </p>
+      <ol>
+        <li>
+          Let |data|, a {{BluetoothPermissionData}},
+          be {{"bluetooth"}}'s <a>extra permission data</a>
+          for the <a>current settings object</a>.
+        </li>
+        <li>
+          Find the |allowedDevice| in <code>|data|.{{allowedDevices}}</code>
+          with <code><var>allowedDevice</var>@{{[[device]]}}</code>
+          the <a>same device</a> as <var>device</var>.
+          If there is no such object,
+          throw a {{SecurityError}} and abort these steps.
+        </li>
+        <li>
+          If there is no key in
+          <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
+          that is the <a>same device</a> as <var>device</var>,
+          run the following sub-steps:
+          <ol>
+            <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
+            <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
+            <li>
+              Initialize <code><var>result</var>@{{[[context]]}}</code>
+              to <var>context</var>.
+            </li>
+            <li>
+              Initialize <code><var>result</var>@{{[[representedDevice]]}}</code>
+              to <var>device</var>.
+            </li>
+            <li>
+              Initialize <code><var>result</var>.id</code>
+              to <code><var>allowedDevice</var>.{{AllowedBluetoothDevice/deviceId}}</code>,
+              and initialize <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+              to <code><var>allowedDevice</var>.{{allowedServices}}</code>.
+            </li>
+            <li>
+              If <var>device</var> has a partial or complete <a>Bluetooth Device Name</a>,
+              set <code><var>result</var>.name</code> to that string.
+            </li>
+            <li>
+              Initialize <code><var>result</var>.watchingAdvertisements</code> to `false`.
+            </li>
+            <li>
+              Add <var>device</var>'s
+              advertised <a>Service UUIDs</a>
+              to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+            </li>
+            <li>
+              If the <a>Bluetooth cache</a> contains
+              known-present Services inside <var>device</var>,
+              add the UUIDs of those Services to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+            </li>
+            <li>
+              Add a mapping from <var>device</var> to <var>result</var>
+              in <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}.
+            </li>
+          </ol>
+        </li>
+        <li>
+          Return the value in
+          <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
+          whose key is the <a>same device</a> as <var>device</var>.
+        </li>
+      </ol>
+    </div>
 
     <div algorithm>
       <p>
         Getting the <code><dfn attribute for="BluetoothDevice">gatt</dfn></code> attribute
         MUST perform the following steps:
       </p>
-      <ol class="algorithm">
+      <ol>
         <li>
           If <code>this.{{[[allowedServices]]}}</code> is an empty list,
           return `null`.
@@ -1795,41 +1808,42 @@ spec: permissions
       </ol>
     </div>
 
-    <p>
-      Getting the <code><dfn attribute for="BluetoothDevice">uuids</dfn></code> attribute
-      MUST perform the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If {{[[cachedAllowedServices]]}} is not equal to {{[[allowedServices]]}}
-        or {{[[cachedUnfilteredUuids]]}} is not equal to {{[[unfilteredUuids]]}},
-        perform the following sub-steps:
-        <ol>
-          <li>
-            Set {{[[cachedAllowedServices]]}} to a copy of {{[[allowedServices]]}}.
-          </li>
-          <li>
-            Set {{[[cachedUnfilteredUuids]]}} to a copy of {{[[unfilteredUuids]]}}.
-          </li>
-          <li>
-            Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of:
-            <dl class="switch">
-              <dt>If {{BluetoothDevice/[[allowedServices]]}} is `"all"`</dt>
-              <dd>the elements of {{BluetoothDevice/[[unfilteredUuids]]}}</dd>
-              <dt>Otherwise,</dt>
-              <dd>
-                the intersection of
-                {{BluetoothDevice/[[unfilteredUuids]]}} and {{BluetoothDevice/[[allowedServices]]}}.
-              </dd>
-            </dl>
-          </li>
-        </ol>
-      </li>
-      <li>
-        Return {{[[filteredUuids]]}}.
-      </li>
-    </ol>
-
+    <div algorithm>
+      <p>
+        Getting the <code><dfn attribute for="BluetoothDevice">uuids</dfn></code> attribute
+        MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If {{[[cachedAllowedServices]]}} is not equal to {{[[allowedServices]]}}
+          or {{[[cachedUnfilteredUuids]]}} is not equal to {{[[unfilteredUuids]]}},
+          perform the following sub-steps:
+          <ol>
+            <li>
+              Set {{[[cachedAllowedServices]]}} to a copy of {{[[allowedServices]]}}.
+            </li>
+            <li>
+              Set {{[[cachedUnfilteredUuids]]}} to a copy of {{[[unfilteredUuids]]}}.
+            </li>
+            <li>
+              Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of:
+              <dl class="switch">
+                <dt>If {{BluetoothDevice/[[allowedServices]]}} is `"all"`</dt>
+                <dd>the elements of {{BluetoothDevice/[[unfilteredUuids]]}}</dd>
+                <dt>Otherwise,</dt>
+                <dd>
+                  the intersection of
+                  {{BluetoothDevice/[[unfilteredUuids]]}} and {{BluetoothDevice/[[allowedServices]]}}.
+                </dd>
+              </dl>
+            </li>
+          </ol>
+        </li>
+        <li>
+          Return {{[[filteredUuids]]}}.
+        </li>
+      </ol>
+    </div>
 
     <p class="note">
       Scanning costs power,
@@ -1837,59 +1851,63 @@ spec: permissions
       and should call {{unwatchAdvertisements()}} to stop using power as soon as possible.
     </p>
 
-    <p>
-      The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code> method,
-      when invoked,
-      MUST return <a>a new promise</a> |promise| and
-      run the following steps <a>in parallel</a>:
-    </p>
-    <ol class="algorithm">
-      <li>
-        Ensure that the UA is scanning for this device's advertisements.
-        The UA SHOULD NOT filter out "duplicate" advertisements for the same device.
-      </li>
-      <li>
-        If the UA fails to enable scanning,
-        <a>reject</a> |promise| with one of the following errors,
-        and abort these steps:
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code> method,
+        when invoked,
+        MUST return <a>a new promise</a> |promise| and
+        run the following steps <a>in parallel</a>:
+      </p>
+      <ol>
+        <li>
+          Ensure that the UA is scanning for this device's advertisements.
+          The UA SHOULD NOT filter out "duplicate" advertisements for the same device.
+        </li>
+        <li>
+          If the UA fails to enable scanning,
+          <a>reject</a> |promise| with one of the following errors,
+          and abort these steps:
 
-        <dl class="switch">
-          <dt>The UA doesn't support scanning for advertisements</dt>
-          <dd>{{NotSupportedError}}</dd>
+          <dl class="switch">
+            <dt>The UA doesn't support scanning for advertisements</dt>
+            <dd>{{NotSupportedError}}</dd>
 
-          <dt>Bluetooth is turned off</dt>
-          <dd>{{InvalidStateError}}</dd>
+            <dt>Bluetooth is turned off</dt>
+            <dd>{{InvalidStateError}}</dd>
 
-          <dt>Other reasons</dt>
-          <dd>{{UnknownError}}</dd>
-        </dl>
-      </li>
-      <li>
-        <a>Queue a task</a> to perform the following steps:
-        <ol>
-          <li>Set <code>this.{{watchingAdvertisements}}</code> to `true`.</li>
-          <li>Resolve |promise| with `undefined`.</li>
-        </ol>
-      </li>
-    </ol>
+            <dt>Other reasons</dt>
+            <dd>{{UnknownError}}</dd>
+          </dl>
+        </li>
+        <li>
+          <a>Queue a task</a> to perform the following steps:
+          <ol>
+            <li>Set <code>this.{{watchingAdvertisements}}</code> to `true`.</li>
+            <li>Resolve |promise| with `undefined`.</li>
+          </ol>
+        </li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code> method,
-      when invoked,
-      MUST run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>Set <code>this.{{watchingAdvertisements}}</code> to `false`.</li>
-      <li>
-        If no more {{BluetoothDevice}}s in the whole UA
-        have {{watchingAdvertisements}} set to `true`,
-        the UA SHOULD stop scanning for advertisements.
-        Otherwise, if no more {{BluetoothDevice}}s representing the same device as `this`
-        have {{watchingAdvertisements}} set to `true`,
-        the UA SHOULD reconfigure the scan to avoid receiving reports for this device.
-      </li>
-    </ol>
-
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code> method,
+        when invoked,
+        MUST run the following steps:
+      </p>
+      <ol>
+        <li>Set <code>this.{{watchingAdvertisements}}</code> to `false`.</li>
+        <li>
+          If no more {{BluetoothDevice}}s in the whole UA
+          have {{watchingAdvertisements}} set to `true`,
+          the UA SHOULD stop scanning for advertisements.
+          Otherwise, if no more {{BluetoothDevice}}s representing the same device as `this`
+          have {{watchingAdvertisements}} set to `true`,
+          the UA SHOULD reconfigure the scan to avoid receiving reports for this device.
+        </li>
+      </ol>
+    </div>
+    
     <section>
       <h4 id="advertising-events">Responding to Advertising Events</h4>
 
@@ -2013,195 +2031,201 @@ spec: permissions
         </p>
       </div>
 
-      <p id="advertising-event-algorithm">
-        When the UA receives an <a>advertising event</a>
-        (consisting of an advertising packet and an optional scan response),
-        it MUST run the following steps:
-      </p>
-      <ol class="algorithm">
-        <li>
-          Let <var>device</var> be the <a>Bluetooth device</a> that sent the advertising event.
-        </li>
-        <li>
-          For each {{BluetoothDevice}} <var>deviceObj</var> in the UA
-          such that <var>device</var> is the <a>same device</a> as
-          <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>,
-          <a>queue a task</a> on
-          <var>deviceObj</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a>
-          to do the following sub-steps:
-          <ol>
-            <li>
-              If <code><var>deviceObj</var>.{{watchingAdvertisements}}</code> is `false`,
-              abort these sub-steps.
-            </li>
-            <li>
-              <a>Fire an `advertisementreceived` event</a>
-              for the advertising event at |deviceObj|.
-            </li>
-          </ol>
-        </li>
-      </ol>
+      <div algorithm="received advertising event" id="advertising-event-algorithm">
+        <p>
+          When the UA receives an <a>advertising event</a>
+          (consisting of an advertising packet and an optional scan response),
+          it MUST run the following steps:
+        </p>
+        <ol>
+          <li>
+            Let <var>device</var> be the <a>Bluetooth device</a> that sent the advertising event.
+          </li>
+          <li>
+            For each {{BluetoothDevice}} <var>deviceObj</var> in the UA
+            such that <var>device</var> is the <a>same device</a> as
+            <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>,
+            <a>queue a task</a> on
+            <var>deviceObj</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a>
+            to do the following sub-steps:
+            <ol>
+              <li>
+                If <code><var>deviceObj</var>.{{watchingAdvertisements}}</code> is `false`,
+                abort these sub-steps.
+              </li>
+              <li>
+                <a>Fire an `advertisementreceived` event</a>
+                for the advertising event at |deviceObj|.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </div>
 
-      <p>
-        To <dfn export>fire an {{advertisementreceived}} event</dfn>
-        for an advertising event |adv| at a {{BluetoothDevice}} |deviceObj|,
-        the UA MUST perform the following steps:
-      </p>
-      <ol class="algorithm">
-        <li>
-          Let <var>event</var> be
-          <pre highlight="js">
-            {
-              bubbles: true,
-              device: <var>deviceObj</var>,
-              uuids: [],
-              manufacturerData: new Map(),
-              serviceData: new Map()
-            }
-          </pre>
-        </li>
-        <li>
-          If the <a>received signal strength</a> is available
-          for any packet in |adv|,
-          set <code><var>event</var>.rssi</code> to this signal strength in dBm.
-        </li>
-        <li>
-          For each <a>AD structure</a> in |adv|'s advertising packet and scan response,
-          select from the following steps depending on the AD type:
-          <dl class="switch">
-            <dt>Incomplete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-            <dt>Complete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-            <dt>Incomplete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-            <dt>Complete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-            <dt>Incomplete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-            <dt>Complete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
-            <dd>Append the listed UUIDs to <code><var>event</var>.uuids</code>.</dd>
+      <div algorithm>
+        <p>
+          To <dfn export>fire an {{advertisementreceived}} event</dfn>
+          for an advertising event |adv| at a {{BluetoothDevice}} |deviceObj|,
+          the UA MUST perform the following steps:
+        </p>
+        <ol>
+          <li>
+            Let <var>event</var> be
+            <pre highlight="js">
+              {
+                bubbles: true,
+                device: <var>deviceObj</var>,
+                uuids: [],
+                manufacturerData: new Map(),
+                serviceData: new Map()
+              }
+            </pre>
+          </li>
+          <li>
+            If the <a>received signal strength</a> is available
+            for any packet in |adv|,
+            set <code><var>event</var>.rssi</code> to this signal strength in dBm.
+          </li>
+          <li>
+            For each <a>AD structure</a> in |adv|'s advertising packet and scan response,
+            select from the following steps depending on the AD type:
+            <dl class="switch">
+              <dt>Incomplete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+              <dt>Complete List of 16-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+              <dt>Incomplete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+              <dt>Complete List of 32-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+              <dt>Incomplete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+              <dt>Complete List of 128-bit <a lt="Service UUID Data Type">Service UUIDs</a></dt>
+              <dd>Append the listed UUIDs to <code><var>event</var>.uuids</code>.</dd>
 
-            <dt>Shortened <a lt="Local Name Data Type">Local Name</a></dt>
-            <dt>Complete <a lt="Local Name Data Type">Local Name</a></dt>
-            <dd>
-              <a>UTF-8 decode without BOM</a> the AD data and
-              set <code><var>event</var>.name</code> to the result.
+              <dt>Shortened <a lt="Local Name Data Type">Local Name</a></dt>
+              <dt>Complete <a lt="Local Name Data Type">Local Name</a></dt>
+              <dd>
+                <a>UTF-8 decode without BOM</a> the AD data and
+                set <code><var>event</var>.name</code> to the result.
 
-              Note: We don't expose whether the name is complete
-              because existing APIs require
-              reading the raw advertisement to get this information,
-              and we want more evidence that it's useful
-              before adding a field to the API.
-            </dd>
+                Note: We don't expose whether the name is complete
+                because existing APIs require
+                reading the raw advertisement to get this information,
+                and we want more evidence that it's useful
+                before adding a field to the API.
+              </dd>
 
-            <dt><a>Manufacturer Specific Data</a></dt>
-            <dd>
-              Add to <code><var>event</var>.manufacturerData</code>
-              a mapping from the 16-bit Company Identifier Code to
-              an {{ArrayBuffer}} containing the manufacturer-specific data.
-            </dd>
+              <dt><a>Manufacturer Specific Data</a></dt>
+              <dd>
+                Add to <code><var>event</var>.manufacturerData</code>
+                a mapping from the 16-bit Company Identifier Code to
+                an {{ArrayBuffer}} containing the manufacturer-specific data.
+              </dd>
 
-            <dt><a>TX Power Level</a></dt>
-            <dd>
-              Set <code><var>event</var>.txPower</code> to the AD data.
-            </dd>
+              <dt><a>TX Power Level</a></dt>
+              <dd>
+                Set <code><var>event</var>.txPower</code> to the AD data.
+              </dd>
 
-            <dt><a>Service Data</a> - 16 bit UUID</dt>
-            <dt><a>Service Data</a> - 32 bit UUID</dt>
-            <dt><a>Service Data</a> - 128 bit UUID</dt>
-            <dd>
-              Add to <code><var>event</var>.serviceData</code>
-              a mapping from the <a>UUID</a> to
-              an {{ArrayBuffer}} containing the service data.
-            </dd>
+              <dt><a>Service Data</a> - 16 bit UUID</dt>
+              <dt><a>Service Data</a> - 32 bit UUID</dt>
+              <dt><a>Service Data</a> - 128 bit UUID</dt>
+              <dd>
+                Add to <code><var>event</var>.serviceData</code>
+                a mapping from the <a>UUID</a> to
+                an {{ArrayBuffer}} containing the service data.
+              </dd>
 
-            <dt><a>Appearance</a></dt>
-            <dd>
-              Set <code><var>event</var>.appearance</code> to the AD data.
-            </dd>
+              <dt><a>Appearance</a></dt>
+              <dd>
+                Set <code><var>event</var>.appearance</code> to the AD data.
+              </dd>
 
-            <dt>Otherwise</dt>
-            <dd>Skip to the next AD structure.</dd>
-          </dl>
-        </li>
-        <li>
-          <a>Fire an event</a> initialized as
-          <code>new {{BluetoothAdvertisingEvent}}("{{advertisementreceived}}",
-            <var>event</var>)</code>,
-          with its {{isTrusted}} attribute initialized to `true`,
-          at <var>deviceObj</var>.
-        </li>
-      </ol>
+              <dt>Otherwise</dt>
+              <dd>Skip to the next AD structure.</dd>
+            </dl>
+          </li>
+          <li>
+            <a>Fire an event</a> initialized as
+            <code>new {{BluetoothAdvertisingEvent}}("{{advertisementreceived}}",
+              <var>event</var>)</code>,
+            with its {{isTrusted}} attribute initialized to `true`,
+            at <var>deviceObj</var>.
+          </li>
+        </ol>
+      </div>
 
       <p>
         All fields in {{BluetoothAdvertisingEvent}} return
         the last value they were initialized or set to.
       </p>
 
-      <p>
-        The <dfn constructor for="BluetoothAdvertisingEvent">BluetoothAdvertisingEvent(type, init)</dfn>
-        constructor MUST perform the following steps:
-      </p>
-      <ol class="algorithm">
-        <li>
-          Let <var>event</var> be the result of running the steps from [[dom#constructing-events]]
-          except for the {{BluetoothAdvertisingEventInit/uuids}},
-          {{BluetoothAdvertisingEventInit/manufacturerData}},
-          and {{BluetoothAdvertisingEventInit/serviceData}} members.
-        </li>
-        <li>
-          If <code><var>init</var>.uuids</code> is set,
-          initialize <code><var>event</var>.uuids</code>
-          to a new {{FrozenArray}} containing the elements of
-          <code><var>init</var>.uuids.map({{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
-          Otherwise initialize <code><var>event</var>.uuids</code> to an empty {{FrozenArray}}.
-        </li>
-        <li>
-          For each mapping in <code><var>init</var>.manufacturerData</code>:
-          <ol>
-            <li>
-              Let <var>code</var> be the key converted to an {{unsigned short}}.
-            </li>
-            <li>
-              Let <var>value</var> be the value.
-            </li>
-            <li>
-              If <var>value</var> is not a {{BufferSource}}, throw a {{TypeError}}.
-            </li>
-            <li>
-              Let <var>bytes</var> be a new <a>read only ArrayBuffer</a>
-              containing <a>a copy of the bytes held</a> by <var>value</var>.
-            </li>
-            <li>
-              Add a mapping from <var>code</var> to <code>new DataView(<var>bytes</var>)</code>
-              in <code><var>event</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
-            </li>
-          </ol>
-        </li>
-        <li>
-          For each mapping in <code><var>init</var>.serviceData</code>:
-          <ol>
-            <li>
-              Let <var>key</var> be the key.
-            </li>
-            <li>
-              Let <var>service</var> be the result of calling
-              <code>BluetoothUUID.{{BluetoothUUID/getService()|getService}}(<var>key</var>).</code>
-            </li>
-            <li>
-              Let <var>value</var> be the value.
-            </li>
-            <li>
-              Set <var>value</var> is not a {{BufferSource}}, throw a {{TypeError}}.
-            </li>
-            <li>
-              Let <var>bytes</var> be a new <a>read only ArrayBuffer</a>
-              containing <a>a copy of the bytes held</a> by <var>value</var>.
-            </li>
-            <li>
-              Add a mapping from <var>service</var> to <code>new DataView(<var>bytes</var>)</code>
-              in <code><var>event</var>.serviceData@{{BluetoothServiceDataMap/[[data]]}}</code>.
-            </li>
-          </ol>
-        </li>
-        <li>Return <var>event</var>.</li>
-      </ol>
+      <div algorithm>
+        <p>
+          The <dfn constructor for="BluetoothAdvertisingEvent">BluetoothAdvertisingEvent(type, init)</dfn>
+          constructor MUST perform the following steps:
+        </p>
+        <ol>
+          <li>
+            Let <var>event</var> be the result of running the steps from [[dom#constructing-events]]
+            except for the {{BluetoothAdvertisingEventInit/uuids}},
+            {{BluetoothAdvertisingEventInit/manufacturerData}},
+            and {{BluetoothAdvertisingEventInit/serviceData}} members.
+          </li>
+          <li>
+            If <code><var>init</var>.uuids</code> is set,
+            initialize <code><var>event</var>.uuids</code>
+            to a new {{FrozenArray}} containing the elements of
+            <code><var>init</var>.uuids.map({{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+            Otherwise initialize <code><var>event</var>.uuids</code> to an empty {{FrozenArray}}.
+          </li>
+          <li>
+            For each mapping in <code><var>init</var>.manufacturerData</code>:
+            <ol>
+              <li>
+                Let <var>code</var> be the key converted to an {{unsigned short}}.
+              </li>
+              <li>
+                Let <var>value</var> be the value.
+              </li>
+              <li>
+                If <var>value</var> is not a {{BufferSource}}, throw a {{TypeError}}.
+              </li>
+              <li>
+                Let <var>bytes</var> be a new <a>read only ArrayBuffer</a>
+                containing <a>a copy of the bytes held</a> by <var>value</var>.
+              </li>
+              <li>
+                Add a mapping from <var>code</var> to <code>new DataView(<var>bytes</var>)</code>
+                in <code><var>event</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
+              </li>
+            </ol>
+          </li>
+          <li>
+            For each mapping in <code><var>init</var>.serviceData</code>:
+            <ol>
+              <li>
+                Let <var>key</var> be the key.
+              </li>
+              <li>
+                Let <var>service</var> be the result of calling
+                <code>BluetoothUUID.{{BluetoothUUID/getService()|getService}}(<var>key</var>).</code>
+              </li>
+              <li>
+                Let <var>value</var> be the value.
+              </li>
+              <li>
+                Set <var>value</var> is not a {{BufferSource}}, throw a {{TypeError}}.
+              </li>
+              <li>
+                Let <var>bytes</var> be a new <a>read only ArrayBuffer</a>
+                containing <a>a copy of the bytes held</a> by <var>value</var>.
+              </li>
+              <li>
+                Add a mapping from <var>service</var> to <code>new DataView(<var>bytes</var>)</code>
+                in <code><var>event</var>.serviceData@{{BluetoothServiceDataMap/[[data]]}}</code>.
+              </li>
+            </ol>
+          </li>
+          <li>Return <var>event</var>.</li>
+        </ol>
+      </div>
 
       <section>
         <h5 dfn-type="interface">BluetoothManufacturerDataMap</h5>
@@ -2368,152 +2392,158 @@ spec: permissions
         but UAs MAY use another order if the device's order isn't available.
       </p>
 
-      <p>
-        To <dfn>populate the Bluetooth cache</dfn> with entries matching some description,
-        the UA MUST run the following steps.
-        <span class="note">Note that these steps can block,
-          so uses of this algorithm must be <a>in parallel</a>.</span>
-      </p>
-      <ol class="algorithm">
-        <li>
-          Attempt to make all matching entries in the cache either known-present or known-absent,
-          using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
-          will return enough information.
-          Handle errors as described in <a href="#error-handling"></a>.
-        </li>
-        <li>
-          If the previous step returns an error, return that error from this algorithm.
-        </li>
-      </ol>
+      <div algorithm>
+        <p>
+          To <dfn>populate the Bluetooth cache</dfn> with entries matching some description,
+          the UA MUST run the following steps.
+          <span class="note">Note that these steps can block,
+            so uses of this algorithm must be <a>in parallel</a>.</span>
+        </p>
+        <ol>
+          <li>
+            Attempt to make all matching entries in the cache either known-present or known-absent,
+            using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
+            will return enough information.
+            Handle errors as described in <a href="#error-handling"></a>.
+          </li>
+          <li>
+            If the previous step returns an error, return that error from this algorithm.
+          </li>
+        </ol>
+      </div>
 
-      <p>
-        To <dfn>query the Bluetooth cache</dfn> in
-        a {{BluetoothDevice}} instance <var>deviceObj</var>
-        for entries matching some description,
-        the UA MUST return a
-        <code><var>deviceObj</var>.gatt</code>-<a>connection-checking wrapper</a> around
-        <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>:
-      </p>
-      <ol class="algorithm">
-        <li>
-          If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-          is `false`,
-          <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-        </li>
-        <li>
-          <a>Populate the Bluetooth cache</a> with entries matching the description.
-        </li>
-        <li>
-          If the previous step returns an error,
-          <a>reject</a> <var>promise</var> with that error and abort these steps.
-        </li>
-        <li>
-          Let <var>entries</var> be the sequence
-          of known-present cache entries matching the description.
-        </li>
-        <li>
-          Let <var>context</var> be
-          <code><var>deviceObj</var>@{{BluetoothDevice/[[context]]}}</code>.
-        </li>
-        <li>
-          Let <var>result</var> be a new sequence.
-        </li>
-        <li>
-          For each <var>entry</var> in <var>entries</var>:
-          <ol>
-            <li>
-              If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
-              in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}},
-              <a>create a <code>BluetoothRemoteGATTService</code>
-              representing</a> <var>entry</var>,
-              <a>create a <code>BluetoothRemoteGATTCharacteristic</code>
-              representing</a> <var>entry</var>,
-              or <a>create a <code>BluetoothRemoteGATTDescriptor</code>
-              representing</a> <var>entry</var>,
-              depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
-              and add a mapping from <var>entry</var> to the resulting <code>Promise</code>
-              in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}}.
-            </li>
-            <li>
-              Append to <var>result</var>
-              the <code>Promise&lt;BluetoothGATT*></code> instance
-              associated with <var>entry</var>
-              in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}}.
-            </li>
-          </ol>
-        </li>
-        <li>
-          <a>Resolve</a> <var>promise</var> with the result of
-          <a>waiting for all</a> elements of <var>result</var>.
-        </li>
-      </ol>
+      <div algorithm>
+        <p>
+          To <dfn>query the Bluetooth cache</dfn> in
+          a {{BluetoothDevice}} instance <var>deviceObj</var>
+          for entries matching some description,
+          the UA MUST return a
+          <code><var>deviceObj</var>.gatt</code>-<a>connection-checking wrapper</a> around
+          <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
+        <ol>
+          <li>
+            If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+            is `false`,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+          </li>
+          <li>
+            <a>Populate the Bluetooth cache</a> with entries matching the description.
+          </li>
+          <li>
+            If the previous step returns an error,
+            <a>reject</a> <var>promise</var> with that error and abort these steps.
+          </li>
+          <li>
+            Let <var>entries</var> be the sequence
+            of known-present cache entries matching the description.
+          </li>
+          <li>
+            Let <var>context</var> be
+            <code><var>deviceObj</var>@{{BluetoothDevice/[[context]]}}</code>.
+          </li>
+          <li>
+            Let <var>result</var> be a new sequence.
+          </li>
+          <li>
+            For each <var>entry</var> in <var>entries</var>:
+            <ol>
+              <li>
+                If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
+                in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}},
+                <a>create a <code>BluetoothRemoteGATTService</code>
+                representing</a> <var>entry</var>,
+                <a>create a <code>BluetoothRemoteGATTCharacteristic</code>
+                representing</a> <var>entry</var>,
+                or <a>create a <code>BluetoothRemoteGATTDescriptor</code>
+                representing</a> <var>entry</var>,
+                depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
+                and add a mapping from <var>entry</var> to the resulting <code>Promise</code>
+                in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}}.
+              </li>
+              <li>
+                Append to <var>result</var>
+                the <code>Promise&lt;BluetoothGATT*></code> instance
+                associated with <var>entry</var>
+                in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}}.
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a>Resolve</a> <var>promise</var> with the result of
+            <a>waiting for all</a> elements of <var>result</var>.
+          </li>
+        </ol>
+      </div>
     </section>
 
     <section>
       <h4 id="navigating-bluetooth-hierarchy">Navigating the Bluetooth Hierarchy</h4>
 
-      <p>
-        To <dfn>GetGATTChildren</dfn>(<span class="argument-list"><var>attribute</var>: GATT Attribute,<br>
-        <var>single</var>: boolean,<br>
-        <var>uuidCanonicalizer</var>: function,<br>
-        <var>uuid</var>: optional <code>(DOMString or unsigned int)</code>,<br>
-        <var>allowedUuids</var>: optional <code>("all" or Array&lt;DOMString>)</code>,<br>
-        <var>child type</var>: GATT declaration type),</span><br>
-        the UA MUST perform the following steps:
-      </p>
-      <ol class="algorithm">
-        <li>
-          If <var>uuid</var> is present,
-          set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
-          If <var>uuidCanonicalizer</var> threw an exception,
-          return <a>a promise rejected with</a> that exception and abort these steps.
-        </li>
-        <li>
-          If <var>uuid</var> is present and is <a>blacklisted</a>,
-          return <a>a promise rejected with</a> a {{SecurityError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>:
-          <dl class="switch">
-            <dt>{{BluetoothDevice}}</dt>
-            <dd><code><var>attribute</var></code></dd>
-            <dt>{{BluetoothRemoteGATTService}}</dt>
-            <dd><code><var>attribute</var>.{{BluetoothRemoteGATTService/device}}</code></dd>
-            <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
-            <dd><code><var>attribute</var>.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}</code></dd>
-          </dl>
-        </li>
-        <li>
-          <a>Query the Bluetooth cache</a> in <code><var>deviceObj</var></code>
-          for entries that:
-          <ul>
-            <li>are within the Bluetooth entity represented by <var>attribute</var>,</li>
-            <li>have a type described by <var>child type</var>,</li>
-            <li>have a UUID that is not <a>blacklisted</a>,</li>
-            <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,</li>
-            <li>
-              if <var>allowedUuids</var> is present and not `"all"`,
-              have a UUID in <var>allowedUuids</var>, and
-            </li>
-            <li>if the <var>single</var> flag is set, are the first of these.</li>
-          </ul>
-          Let <var>promise</var> be the result.
-        </li>
-        <li>
-          Return the result of
-          <a>transforming</a> <var>promise</var> with a fulfillment handler that:
-          <ul>
-            <li>If its argument is empty, throws a {{NotFoundError}},</li>
-            <li>
-              Otherwise, if the <var>single</var> flag is set,
-              returns the first (only) element of its argument.
-            </li>
-            <li>Otherwise, returns its argument.</li>
-          </ul>
-        </li>
-      </ol>
+      <div algorithm>
+        <p>
+          To <dfn>GetGATTChildren</dfn>(<span class="argument-list"><var>attribute</var>: GATT Attribute,<br>
+          <var>single</var>: boolean,<br>
+          <var>uuidCanonicalizer</var>: function,<br>
+          <var>uuid</var>: optional <code>(DOMString or unsigned int)</code>,<br>
+          <var>allowedUuids</var>: optional <code>("all" or Array&lt;DOMString>)</code>,<br>
+          <var>child type</var>: GATT declaration type),</span><br>
+          the UA MUST perform the following steps:
+        </p>
+        <ol>
+          <li>
+            If <var>uuid</var> is present,
+            set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
+            If <var>uuidCanonicalizer</var> threw an exception,
+            return <a>a promise rejected with</a> that exception and abort these steps.
+          </li>
+          <li>
+            If <var>uuid</var> is present and is <a>blacklisted</a>,
+            return <a>a promise rejected with</a> a {{SecurityError}}
+            and abort these steps.
+          </li>
+          <li>
+            Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>:
+            <dl class="switch">
+              <dt>{{BluetoothDevice}}</dt>
+              <dd><code><var>attribute</var></code></dd>
+              <dt>{{BluetoothRemoteGATTService}}</dt>
+              <dd><code><var>attribute</var>.{{BluetoothRemoteGATTService/device}}</code></dd>
+              <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
+              <dd><code><var>attribute</var>.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}</code></dd>
+            </dl>
+          </li>
+          <li>
+            <a>Query the Bluetooth cache</a> in <code><var>deviceObj</var></code>
+            for entries that:
+            <ul>
+              <li>are within the Bluetooth entity represented by <var>attribute</var>,</li>
+              <li>have a type described by <var>child type</var>,</li>
+              <li>have a UUID that is not <a>blacklisted</a>,</li>
+              <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,</li>
+              <li>
+                if <var>allowedUuids</var> is present and not `"all"`,
+                have a UUID in <var>allowedUuids</var>, and
+              </li>
+              <li>if the <var>single</var> flag is set, are the first of these.</li>
+            </ul>
+            Let <var>promise</var> be the result.
+          </li>
+          <li>
+            Return the result of
+            <a>transforming</a> <var>promise</var> with a fulfillment handler that:
+            <ul>
+              <li>If its argument is empty, throws a {{NotFoundError}},</li>
+              <li>
+                Otherwise, if the <var>single</var> flag is set,
+                returns the first (only) element of its argument.
+              </li>
+              <li>Otherwise, returns its argument.</li>
+            </ul>
+          </li>
+        </ol>
+      </div>
     </section>
 
     <section>
@@ -2627,177 +2657,188 @@ spec: permissions
       </tr>
     </table>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code> method, when invoked,
-      MUST return <a>a new promise</a> <var>promise</var> and
-      run the following steps <a>in parallel</a>:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
-        <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-      </li>
-      <li>
-        If <code>this.device@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
-        attempt to create one using the procedures described
-        in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
-      </li>
-      <li>
-        If this attempt fails,
-        <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-      </li>
-      <li>
-        <a>Queue a task</a> to perform the following sub-steps:
-        <ol>
-          <li>
-            If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-          </li>
-          <li>
-            Set `this.connected` to `true`.
-          </li>
-          <li>
-            <a>Resolve</a> <var>promise</var> with <code>this</code>.
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code> method, when invoked,
+        MUST return <a>a new promise</a> <var>promise</var> and
+        run the following steps <a>in parallel</a>:
+      </p>
+      <ol>
+        <li>
+          If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
+          <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+        </li>
+        <li>
+          If <code>this.device@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
+          attempt to create one using the procedures described
+          in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
+        </li>
+        <li>
+          If this attempt fails,
+          <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+        </li>
+        <li>
+          <a>Queue a task</a> to perform the following sub-steps:
+          <ol>
+            <li>
+              If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
+              <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+            </li>
+            <li>
+              Set `this.connected` to `true`.
+            </li>
+            <li>
+              <a>Resolve</a> <var>promise</var> with <code>this</code>.
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTServer">disconnect()</dfn></code> method, when invoked,
-      MUST perform the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.{{connected}}</code> is <code>false</code>, abort these steps.
-      </li>
-      <li>
-        Clear <code>this@{{[[activeAlgorithms]]}}</code>.
-      </li>
-      <li>
-        Set <code>this.{{connected}}</code> to <code>false</code>.
-      </li>
-      <li>
-        <a>Fire an event</a> named {{gattserverdisconnected}}
-        with its {{Event/bubbles}} attribute initialized to `true`
-        at <code>this.{{device}}</code>.
-        <p class="note">
-          This event is <em>not</em> fired at the {{BluetoothRemoteGATTServer}}.
-        </p>
-      </li>
-      <li>
-        Let <var>device</var> be <code>this.device@{{[[representedDevice]]}}</code>.
-      <li>
-        <a>In parallel</a>:
-        if, for all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA
-        with <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>
-        the <a>same device</a> as <var>device</var>,
-        <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
-        the UA SHOULD destroy
-        <var>device</var>'s <a>ATT Bearer</a>.
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTServer">disconnect()</dfn></code> method, when invoked,
+        MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.{{connected}}</code> is <code>false</code>, abort these steps.
+        </li>
+        <li>
+          Clear <code>this@{{[[activeAlgorithms]]}}</code>.
+        </li>
+        <li>
+          Set <code>this.{{connected}}</code> to <code>false</code>.
+        </li>
+        <li>
+          <a>Fire an event</a> named {{gattserverdisconnected}}
+          with its {{Event/bubbles}} attribute initialized to `true`
+          at <code>this.{{device}}</code>.
+          <p class="note">
+            This event is <em>not</em> fired at the {{BluetoothRemoteGATTServer}}.
+          </p>
+        </li>
+        <li>
+          Let <var>device</var> be <code>this.device@{{[[representedDevice]]}}</code>.
+        </li>
+        <li>
+          <a>In parallel</a>:
+          if, for all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA
+          with <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>
+          the <a>same device</a> as <var>device</var>,
+          <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
+          the UA SHOULD destroy
+          <var>device</var>'s <a>ATT Bearer</a>.
+        </li>
+      </ol>
+    </div>
 
-    <p class="note">
-      Algorithms need to fail if
-      their {{BluetoothRemoteGATTServer}} was disconnected while they were running,
-      even if the UA stays connected the whole time
-      and the {{BluetoothRemoteGATTServer}} is subsequently re-connected before they finish.
-      We wrap the returned {{Promise}} to accomplish this.
-    </p>
-    <p>
-      To create a <var>gattServer</var>-<dfn>connection-checking wrapper</dfn>
-      around a {{Promise}} <var>promise</var>, the UA MUST:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code><var>gattServer</var>.connected</code> is `true`,
-        add <var>promise</var> to
-        <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
-      </li>
-      <li>
-        Return the result of <a>transforming</a> <var>promise</var>
-        with fulfillment and rejection handlers that perform the following steps:
-        <dl>
-          <dt>fulfillment handler</dt>
-          <dd>
-            <ol class="algorithm">
-              <li>
-                If <var>promise</var> is in
-                <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
-                remove it and return the first argument.
-              </li>
-              <li>
-                Otherwise, throw a {{NetworkError}}.
-                <span class="note">
-                  Because <var>gattServer</var> was disconnected
-                  during the execution of the main algorithm.
-                </span>
-              </li>
-            </ol>
-          </dd>
-          <dt>rejection handler</dt>
-          <dd>
-            <ol class="algorithm">
-              <li>
-                If <var>promise</var> is in
-                <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
-                remove it and throw the first argument.
-              </li>
-              <li>
-                Otherwise, throw a {{NetworkError}}.
-                <span class="note">
-                  Because <var>gattServer</var> was disconnected
-                  during the execution of the main algorithm.
-                </span>
-              </li>
-            </ol>
-          </dd>
-        </dl>
-      </li>
-    </ol>
+    <div algorithm>
+      <p class="note">
+        Algorithms need to fail if
+        their {{BluetoothRemoteGATTServer}} was disconnected while they were running,
+        even if the UA stays connected the whole time
+        and the {{BluetoothRemoteGATTServer}} is subsequently re-connected before they finish.
+        We wrap the returned {{Promise}} to accomplish this.
+      </p>
+      <p>
+        To create a <var>gattServer</var>-<dfn>connection-checking wrapper</dfn>
+        around a {{Promise}} <var>promise</var>, the UA MUST:
+      </p>
+      <ol>
+        <li>
+          If <code><var>gattServer</var>.connected</code> is `true`,
+          add <var>promise</var> to
+          <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
+        </li>
+        <li>
+          Return the result of <a>transforming</a> <var>promise</var>
+          with fulfillment and rejection handlers that perform the following steps:
+          <dl>
+            <dt>fulfillment handler</dt>
+            <dd>
+              <ol>
+                <li>
+                  If <var>promise</var> is in
+                  <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
+                  remove it and return the first argument.
+                </li>
+                <li>
+                  Otherwise, throw a {{NetworkError}}.
+                  <span class="note">
+                    Because <var>gattServer</var> was disconnected
+                    during the execution of the main algorithm.
+                  </span>
+                </li>
+              </ol>
+            </dd>
+            <dt>rejection handler</dt>
+            <dd>
+              <ol>
+                <li>
+                  If <var>promise</var> is in
+                  <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
+                  remove it and throw the first argument.
+                </li>
+                <li>
+                  Otherwise, throw a {{NetworkError}}.
+                  <span class="note">
+                    Because <var>gattServer</var> was disconnected
+                    during the execution of the main algorithm.
+                  </span>
+                </li>
+              </ol>
+            </dd>
+          </dl>
+        </li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
-      MUST perform the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`
-        and <var>service</var> is not in
-        <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
-        return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-      </li>
-      <li>
-      Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device</code>,<br>
-        <var>single</var>=true,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-        <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
-        <var>child type</var>="GATT Primary Service")</span>
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
+        MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`
+          and <var>service</var> is not in
+          <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
+          return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+        </li>
+        <li>
+        Return <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br>
+          <i>single</i>=true,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+          <i>uuid</i>=<code><var>service</var></code>,<br>
+          <i>allowedUuids</i>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
+          <i>child type</i>="GATT Primary Service")</span>
+        </li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
-      MUST perform the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`,
-        and <var>service</var> is present
-        and not in <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
-        return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-      </li>
-      <li>
-        Return <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
-        <var>single</var>=false,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-        <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
-        <var>child type</var>="GATT Primary Service")</span>
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
+        MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`,
+          and <var>service</var> is present
+          and not in <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
+          return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+        </li>
+        <li>
+          Return <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
+          <i>single</i>=false,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+          <i>uuid</i>=<code><var>service</var></code>,<br>
+          <i>allowedUuids</i>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
+          <i>child type</i>="GATT Primary Service")</span>
+        </li>
+      </ol>
+    </div>
   </section>
 
   <section>
@@ -2845,93 +2886,103 @@ spec: permissions
       </p>
     </div>
 
-    <p>
-      To <dfn>create a <code>BluetoothRemoteGATTService</code> representing</dfn>
-      a Service <var>service</var>,
-      the UA must return <a>a new promise</a> <var>promise</var>
-      and run the following steps <a>in parallel</a>.
-    </p>
-    <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTService}}.</li>
-      <li>
-        <a>Get the <code>BluetoothDevice</code> representing</a>
-        the device in which <var>service</var> appears,
-        and let <var>device</var> be the result.
-      </li>
-      <li>
-        If the previous step threw an error,
-        <a>reject</a> <var>promise</var> with that error and abort these steps.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.device</code> from
-        <var>device</var>.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
-      </li>
-      <li>
-        If <var>service</var> is a Primary Service,
-        initialize <code><var>result</var>.isPrimary</code> to true.
-        Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
-      </li>
-      <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
-    </ol>
+    <div algorithm>
+      <p>
+        To <dfn>create a <code>BluetoothRemoteGATTService</code> representing</dfn>
+        a Service <var>service</var>,
+        the UA must return <a>a new promise</a> <var>promise</var>
+        and run the following steps <a>in parallel</a>.
+      </p>
+      <ol>
+        <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTService}}.</li>
+        <li>
+          <a>Get the <code>BluetoothDevice</code> representing</a>
+          the device in which <var>service</var> appears,
+          and let <var>device</var> be the result.
+        </li>
+        <li>
+          If the previous step threw an error,
+          <a>reject</a> <var>promise</var> with that error and abort these steps.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.device</code> from
+          <var>device</var>.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
+        </li>
+        <li>
+          If <var>service</var> is a Primary Service,
+          initialize <code><var>result</var>.isPrimary</code> to true.
+          Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
+        </li>
+        <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristic(<var>characteristic</var>)</dfn></code> method
-      retrieves a <a>Characteristic</a> inside this Service.
-      When invoked, it MUST return
-    </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
-        <var>single</var>=true,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
-        <var>uuid</var>=<code><var>characteristic</var></code>,<br>
-        <var>allowedUuids</var>=<code>undefined</code>,<br>
-        <var>child type</var>="GATT Characteristic")</span>
-    </blockquote>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristic(<var>characteristic</var>)</dfn></code> method
+        retrieves a <a>Characteristic</a> inside this Service.
+        When invoked, it MUST return
+      </p>
+      <blockquote>
+        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+          <i>single</i>=true,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
+          <i>uuid</i>=<code><var>characteristic</var></code>,<br>
+          <i>allowedUuids</i>=<code>undefined</code>,<br>
+          <i>child type</i>="GATT Characteristic")</span>
+      </blockquote>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristics(<var>characteristic</var>)</dfn></code> method
-      retrieves a list of <a>Characteristic</a>s inside this Service.
-      When invoked, it MUST return
-    </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
-        <var>single</var>=false,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
-        <var>uuid</var>=<code><var>characteristic</var></code>,<br>
-        <var>allowedUuids</var>=<code>undefined</code>,<br>
-        <var>child type</var>="GATT Characteristic")</span>
-    </blockquote>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristics(<var>characteristic</var>)</dfn></code> method
+        retrieves a list of <a>Characteristic</a>s inside this Service.
+        When invoked, it MUST return
+      </p>
+      <blockquote>
+        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+          <i>single</i>=false,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
+          <i>uuid</i>=<code><var>characteristic</var></code>,<br>
+          <i>allowedUuids</i>=<code>undefined</code>,<br>
+          <i>child type</i>="GATT Characteristic")</span>
+      </blockquote>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTService">getIncludedService(<var>service</var>)</dfn></code> method
-      retrieves an <a>Included Service</a> inside this Service.
-      When invoked, it MUST return
-    </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
-        <var>single</var>=true,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-        <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>undefined</code>,<br>
-        <var>child type</var>="GATT Included Service")</span>
-    </blockquote>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTService">getIncludedService(<var>service</var>)</dfn></code> method
+        retrieves an <a>Included Service</a> inside this Service.
+        When invoked, it MUST return
+      </p>
+      <blockquote>
+        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+          <i>single</i>=true,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+          <i>uuid</i>=<code><var>service</var></code>,<br>
+          <i>allowedUuids</i>=<code>undefined</code>,<br>
+          <i>child type</i>="GATT Included Service")</span>
+      </blockquote>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
-      retrieves a list of <a>Included Service</a>s inside this Service.
-      When invoked, it MUST return
-    </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
-        <var>single</var>=false,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-        <var>uuid</var>=<code><var>service</var></code>,<br>
-        <var>allowedUuids</var>=<code>undefined</code>,<br>
-        <var>child type</var>="GATT Included Service")</span>
-    </blockquote>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
+        retrieves a list of <a>Included Service</a>s inside this Service.
+        When invoked, it MUST return
+      </p>
+      <blockquote>
+        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+          <i>single</i>=false,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+          <i>uuid</i>=<code><var>service</var></code>,<br>
+          <i>allowedUuids</i>=<code>undefined</code>,<br>
+          <i>child type</i>="GATT Included Service")</span>
+      </blockquote>
+    </div>
   </section>
 
   <section>
@@ -2978,211 +3029,221 @@ spec: permissions
       </p>
     </div>
 
-    <p>
-      To <dfn>create a <code>BluetoothRemoteGATTCharacteristic</code> representing</dfn>
-      a Characteristic <var>characteristic</var>,
-      the UA must return <a>a new promise</a> <var>promise</var>
-      and run the following steps <a>in parallel</a>.
-    </p>
-    <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTCharacteristic}}.</li>
-      <li>
-        Initialize <code><var>result</var>.service</code> from
-        the {{BluetoothRemoteGATTService}} instance representing
-        the Service in which <var>characteristic</var> appears.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.uuid</code> from
-        the UUID of <var>characteristic</var>.
-      </li>
-      <li>
-        <a>Create a <code>BluetoothCharacteristicProperties</code> instance
-        from the Characteristic</a> <var>characteristic</var>,
-        and let <var>propertiesPromise</var> be the result.
-      </li>
-      <li>Wait for <var>propertiesPromise</var> to settle.</li>
-      <li>
-        If <var>propertiesPromise</var> was rejected,
-        <a>resolve</a> <var>promise</var> with <var>propertiesPromise</var> and
-        abort these steps.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.properties</code> from
-        the value <var>propertiesPromise</var> was fulfilled with.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.value</code> to <code>null</code>.
-        The UA MAY initialize <code><var>result</var>.value</code> to
-        a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
-        the most recently read value from <var>characteristic</var>
-        if this value is available.
-      </li>
-      <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
-    </ol>
+    <div algorithm>
+      <p>
+        To <dfn>create a <code>BluetoothRemoteGATTCharacteristic</code> representing</dfn>
+        a Characteristic <var>characteristic</var>,
+        the UA must return <a>a new promise</a> <var>promise</var>
+        and run the following steps <a>in parallel</a>.
+      </p>
+      <ol>
+        <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTCharacteristic}}.</li>
+        <li>
+          Initialize <code><var>result</var>.service</code> from
+          the {{BluetoothRemoteGATTService}} instance representing
+          the Service in which <var>characteristic</var> appears.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.uuid</code> from
+          the UUID of <var>characteristic</var>.
+        </li>
+        <li>
+          <a>Create a <code>BluetoothCharacteristicProperties</code> instance
+          from the Characteristic</a> <var>characteristic</var>,
+          and let <var>propertiesPromise</var> be the result.
+        </li>
+        <li>Wait for <var>propertiesPromise</var> to settle.</li>
+        <li>
+          If <var>propertiesPromise</var> was rejected,
+          <a>resolve</a> <var>promise</var> with <var>propertiesPromise</var> and
+          abort these steps.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.properties</code> from
+          the value <var>propertiesPromise</var> was fulfilled with.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.value</code> to <code>null</code>.
+          The UA MAY initialize <code><var>result</var>.value</code> to
+          a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
+          the most recently read value from <var>characteristic</var>
+          if this value is available.
+        </li>
+        <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
-      retrieves a <a>Descriptor</a> inside this Characteristic.
-      When invoked, it MUST return
-    </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
-        <var>single</var>=true,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
-        <var>uuid</var>=<code><var>descriptor</var></code>,<br>
-        <var>allowedUuids</var>=<code>undefined</code>,<br>
-        <var>child type</var>="GATT Descriptor")</span>
-    </blockquote>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
+        retrieves a <a>Descriptor</a> inside this Characteristic.
+        When invoked, it MUST return
+      </p>
+      <blockquote>
+        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+          <i>single</i>=true,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
+          <i>uuid</i>=<code><var>descriptor</var></code>,<br>
+          <i>allowedUuids</i>=<code>undefined</code>,<br>
+          <i>child type</i>="GATT Descriptor")</span>
+      </blockquote>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
-      retrieves a list of <a>Descriptor</a>s inside this Characteristic.
-      When invoked, it MUST return
-    </p>
-    <blockquote>
-      <a>GetGATTChildren</a>(<span class="argument-list"><var>attribute</var>=<code>this</code>,<br>
-        <var>single</var>=false,<br>
-        <var>uuidCanonicalizer</var>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
-        <var>uuid</var>=<code><var>descriptor</var></code>,<br>
-        <var>allowedUuids</var>=<code>undefined</code>,<br>
-        <var>child type</var>="GATT Descriptor")</span>
-    </blockquote>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
+        retrieves a list of <a>Descriptor</a>s inside this Characteristic.
+        When invoked, it MUST return
+      </p>
+      <blockquote>
+        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+          <i>single</i>=false,<br>
+          <i>uuidCanonicalizer</i>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
+          <i>uuid</i>=<code><var>descriptor</var></code>,<br>
+          <i>allowedUuids</i>=<code>undefined</code>,<br>
+          <i>child type</i>="GATT Descriptor")</span>
+      </blockquote>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn></code> method, when invoked,
-      MUST run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.uuid</code> is <a>blacklisted for reads</a>,
-        return <a>a promise rejected with</a> a {{SecurityError}}
-        and abort these steps.
-      </li>
-      <li>
-        If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-        is `false`,
-        return <a>a promise rejected with</a> a {{NetworkError}}
-        and abort these steps.
-      </li>
-      <li>
-        Let <var>characteristic</var> be the <a>Characteristic</a>
-        that <code>this</code> represents.
-      </li>
-      <li>
-        Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-        <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>:
-        <ol>
-          <li>
-            If the <code>Read</code> bit is not set
-            in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
-            <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
-          </li>
-          <li>
-            Use any combination of the sub-procedures in
-            the <a>Characteristic Value Read</a> procedure
-            to retrieve the value of <var>characteristic</var>.
-            Handle errors as described in <a href="#error-handling"></a>.
-          </li>
-          <li>
-            If the previous step returned an error,
-            <a>reject</a> <var>promise</var> with that error and abort these steps.
-          </li>
-          <li>
-            <a>Queue a task</a> to perform the following steps:
-            <ol>
-              <li>
-                If <var>promise</var> is not in
-                <code>this.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
-                <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-              </li>
-              <li>
-                Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
-                and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
-              </li>
-              <li>
-                <a>Fire an event</a> named {{characteristicvaluechanged}}
-                with its <code>bubbles</code> attribute initialized to <code>true</code>
-                at <code>this</code>.
-              </li>
-              <li>
-                <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <div algorithm="Characteristic.readValue()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn></code> method, when invoked,
+        MUST run the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.uuid</code> is <a>blacklisted for reads</a>,
+          return <a>a promise rejected with</a> a {{SecurityError}}
+          and abort these steps.
+        </li>
+        <li>
+          If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+          is `false`,
+          return <a>a promise rejected with</a> a {{NetworkError}}
+          and abort these steps.
+        </li>
+        <li>
+          Let <var>characteristic</var> be the <a>Characteristic</a>
+          that <code>this</code> represents.
+        </li>
+        <li>
+          Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
+          <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+          <ol>
+            <li>
+              If the <code>Read</code> bit is not set
+              in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
+              <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
+            </li>
+            <li>
+              Use any combination of the sub-procedures in
+              the <a>Characteristic Value Read</a> procedure
+              to retrieve the value of <var>characteristic</var>.
+              Handle errors as described in <a href="#error-handling"></a>.
+            </li>
+            <li>
+              If the previous step returned an error,
+              <a>reject</a> <var>promise</var> with that error and abort these steps.
+            </li>
+            <li>
+              <a>Queue a task</a> to perform the following steps:
+              <ol>
+                <li>
+                  If <var>promise</var> is not in
+                  <code>this.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+                </li>
+                <li>
+                  Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
+                  and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
+                </li>
+                <li>
+                  <a>Fire an event</a> named {{characteristicvaluechanged}}
+                  with its <code>bubbles</code> attribute initialized to <code>true</code>
+                  at <code>this</code>.
+                </li>
+                <li>
+                  <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
-      MUST run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.uuid</code> is <a>blacklisted for writes</a>,
-        return <a>a promise rejected with</a> a {{SecurityError}}
-        and abort these steps.
-      </li>
-      <li>
-        Let <var>characteristic</var> be the <a>Characteristic</a>
-        that <code>this</code> represents.
-      </li>
-      <li>
-        Let <var>bytes</var> be
-        <a>a copy of the bytes held</a> by <code><var>value</var></code>.
-      </li>
-      <li>
-        If <var>bytes</var> is more than 512 bytes long
-        (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
-        return <a>a promise rejected with</a> an {{InvalidModificationError}}
-        and abort these steps.
-      </li>
-      <li>
-        If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
-        return <a>a promise rejected with</a> a {{NetworkError}}
-        and abort these steps.
-      </li>
-      <li>
-        Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-        <a>a new promise</a> <var>promise</var>
-        and run the following steps in parallel.
-        <ol>
-          <li>
-            If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
-            in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
-            <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
-          </li>
-          <li>
-            Use any combination of the sub-procedures in
-            the <a>Characteristic Value Write</a> procedure
-            to write <var>bytes</var> to <var>characteristic</var>.
-            Handle errors as described in <a href="#error-handling"></a>.
-          </li>
-          <li>
-            If the previous step returned an error,
-            <a>reject</a> <var>promise</var> with that error and abort these steps.
-          </li>
-          <li>
-            <a>Queue a task</a> to perform the following steps:
-            <ol>
-              <li>
-                If <var>promise</var> is not in
-                <code>this.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
-                <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-              </li>
-              <li>
-                Set <code>this.value</code> to
-                a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
-              </li>
-              <li>
-                <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <div algorithm="Characteristic.writeValue()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
+        MUST run the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.uuid</code> is <a>blacklisted for writes</a>,
+          return <a>a promise rejected with</a> a {{SecurityError}}
+          and abort these steps.
+        </li>
+        <li>
+          Let <var>characteristic</var> be the <a>Characteristic</a>
+          that <code>this</code> represents.
+        </li>
+        <li>
+          Let <var>bytes</var> be
+          <a>a copy of the bytes held</a> by <code><var>value</var></code>.
+        </li>
+        <li>
+          If <var>bytes</var> is more than 512 bytes long
+          (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
+          return <a>a promise rejected with</a> an {{InvalidModificationError}}
+          and abort these steps.
+        </li>
+        <li>
+          If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
+          return <a>a promise rejected with</a> a {{NetworkError}}
+          and abort these steps.
+        </li>
+        <li>
+          Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
+          <a>a new promise</a> <var>promise</var>
+          and run the following steps in parallel.
+          <ol>
+            <li>
+              If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
+              in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
+              <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
+            </li>
+            <li>
+              Use any combination of the sub-procedures in
+              the <a>Characteristic Value Write</a> procedure
+              to write <var>bytes</var> to <var>characteristic</var>.
+              Handle errors as described in <a href="#error-handling"></a>.
+            </li>
+            <li>
+              If the previous step returned an error,
+              <a>reject</a> <var>promise</var> with that error and abort these steps.
+            </li>
+            <li>
+              <a>Queue a task</a> to perform the following steps:
+              <ol>
+                <li>
+                  If <var>promise</var> is not in
+                  <code>this.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+                </li>
+                <li>
+                  Set <code>this.value</code> to
+                  a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
+                </li>
+                <li>
+                  <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
 
     <p>
       The UA MUST maintain a map from each known GATT <a>Characteristic</a> to
@@ -3195,100 +3256,104 @@ spec: permissions
       </span>
     </p>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">startNotifications()</dfn></code> method, when invoked,
-      MUST return <a>a new promise</a> <var>promise</var>
-      and run the following steps <a>in parallel</a>.
-      See <a href="#notification-events"></a> for details of receiving notifications.
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.uuid</code> is <a>blacklisted for reads</a>,
-        <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
-      </li>
-      <li>
-        Let <var>characteristic</var> be
-        the GATT <a>Characteristic</a> that <code>this</code> represents.
-      </li>
-      <li>
-        If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-        in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
-        <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
-      </li>
-      <li>
-        If <var>characteristic</var>'s <a>active notification context set</a> contains
-        {{Navigator/bluetooth|navigator.bluetooth}},
-        <a>resolve</a> <var>promise</var> with `this` and abort these steps.
-      </li>
-      <li>
-        If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
-        <a>reject</a> <var>promise</var> with a {{NetworkError}}
-        and abort these steps.
-      </li>
-      <li>
-        Use any of the <a>Characteristic Descriptors</a> procedures
-        to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
-        <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
-        is set, matching the constraints
-        in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>.
-        The UA SHOULD avoid setting both bits,
-        and MUST deduplicate <a href="#notification-events">value-change events</a>
-        if both bits are set.
-        Handle errors as described in <a href="#error-handling"></a>.
-      </li>
-      <li>
-        If the previous step returned an error,
-        <a>reject</a> <var>promise</var> with that error and abort these steps.
-      </li>
-      <li>
-        Add {{Navigator/bluetooth|navigator.bluetooth}}
-        to <var>characteristic</var>'s <a>active notification context set</a>.
-      </li>
-      <li>
-        <a>Resolve</a> <var>promise</var> with `this`.
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">startNotifications()</dfn></code> method, when invoked,
+        MUST return <a>a new promise</a> <var>promise</var>
+        and run the following steps <a>in parallel</a>.
+        See <a href="#notification-events"></a> for details of receiving notifications.
+      </p>
+      <ol>
+        <li>
+          If <code>this.uuid</code> is <a>blacklisted for reads</a>,
+          <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
+        </li>
+        <li>
+          Let <var>characteristic</var> be
+          the GATT <a>Characteristic</a> that <code>this</code> represents.
+        </li>
+        <li>
+          If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
+          in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
+          <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
+        </li>
+        <li>
+          If <var>characteristic</var>'s <a>active notification context set</a> contains
+          {{Navigator/bluetooth|navigator.bluetooth}},
+          <a>resolve</a> <var>promise</var> with `this` and abort these steps.
+        </li>
+        <li>
+          If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
+          <a>reject</a> <var>promise</var> with a {{NetworkError}}
+          and abort these steps.
+        </li>
+        <li>
+          Use any of the <a>Characteristic Descriptors</a> procedures
+          to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
+          <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
+          is set, matching the constraints
+          in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>.
+          The UA SHOULD avoid setting both bits,
+          and MUST deduplicate <a href="#notification-events">value-change events</a>
+          if both bits are set.
+          Handle errors as described in <a href="#error-handling"></a>.
+        </li>
+        <li>
+          If the previous step returned an error,
+          <a>reject</a> <var>promise</var> with that error and abort these steps.
+        </li>
+        <li>
+          Add {{Navigator/bluetooth|navigator.bluetooth}}
+          to <var>characteristic</var>'s <a>active notification context set</a>.
+        </li>
+        <li>
+          <a>Resolve</a> <var>promise</var> with `this`.
+        </li>
+      </ol>
 
-    <p class="note">
-      After notifications are enabled,
-      the resulting <a href="#notification-events">value-change events</a> won't be delivered
-      until after the current
-      <a lt="perform a microtask checkpoint">microtask checkpoint</a>.
-      This allows a developer to set up handlers
-      in the <code>.then</code> handler of the result promise.
-    </p>
+      <p class="note">
+        After notifications are enabled,
+        the resulting <a href="#notification-events">value-change events</a> won't be delivered
+        until after the current
+        <a lt="perform a microtask checkpoint">microtask checkpoint</a>.
+        This allows a developer to set up handlers
+        in the <code>.then</code> handler of the result promise.
+      </p>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTCharacteristic">stopNotifications()</dfn></code> method, when invoked,
-      MUST return <a>a new promise</a> <var>promise</var>
-      and run the following steps <a>in parallel</a>:
-    </p>
-    <ol class="algorithm">
-      <li>
-        Let <var>characteristic</var> be
-        the GATT <a>Characteristic</a> that <code>this</code> represents.
-      </li>
-      <li>
-        If <var>characteristic</var>'s <a>active notification context set</a> contains
-        {{Navigator/bluetooth|navigator.bluetooth}},
-        remove it.
-      </li>
-      <li>
-        If <var>characteristic</var>'s <a>active notification context set</a> became empty,
-        the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
-        to clear the <code>Notification</code> and <code>Indication</code> bits in
-        <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
-      </li>
-      <li>
-        <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">stopNotifications()</dfn></code> method, when invoked,
+        MUST return <a>a new promise</a> <var>promise</var>
+        and run the following steps <a>in parallel</a>:
+      </p>
+      <ol>
+        <li>
+          Let <var>characteristic</var> be
+          the GATT <a>Characteristic</a> that <code>this</code> represents.
+        </li>
+        <li>
+          If <var>characteristic</var>'s <a>active notification context set</a> contains
+          {{Navigator/bluetooth|navigator.bluetooth}},
+          remove it.
+        </li>
+        <li>
+          If <var>characteristic</var>'s <a>active notification context set</a> became empty,
+          the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
+          to clear the <code>Notification</code> and <code>Indication</code> bits in
+          <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
+        </li>
+        <li>
+          <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
+        </li>
+      </ol>
 
-    <p class="note">
-      Queuing a task to resolve the promise ensures that
-      no <a href="#notification-events">value change events</a> due to notifications
-      arrive after the promise resolves.
-    </p>
+      <p class="note">
+        Queuing a task to resolve the promise ensures that
+        no <a href="#notification-events">value change events</a> due to notifications
+        arrive after the promise resolves.
+      </p>
+    </div>
 
     <section>
       <h4 id="characteristicproperties"><dfn interface>BluetoothCharacteristicProperties</dfn></h4>
@@ -3313,73 +3378,75 @@ spec: permissions
         };
       </pre>
 
-      <p>
-        To <dfn>create a <code>BluetoothCharacteristicProperties</code> instance
-        from the Characteristic</dfn> <var>characteristic</var>,
-        the UA MUST return <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>:
-      </p>
-      <ol class="algorithm">
-        <li>
-          Let <var>propertiesObj</var> be a new instance of {{BluetoothCharacteristicProperties}}.
-        </li>
-        <li>
-          Let <var>properties</var> be
-          the <a>characteristic properties</a> of <var>characteristic</var>.
-        </li>
-        <li>
-          Initialize the attributes of <var>propertiesObj</var> from
-          the corresponding bits in <var>properties</var>:
-          <table class="data">
-            <thead><th>Attribute</th><th>Bit</th></thead>
-            <tr><td><code>broadcast</code></td><td>Broadcast</td></tr>
-            <tr><td><code>read</code></td><td>Read</td></tr>
-            <tr><td><code>writeWithoutResponse</code></td><td>Write Without Response</td></tr>
-            <tr><td><code>write</code></td><td>Write</td></tr>
-            <tr><td><code>notify</code></td><td>Notify</td></tr>
-            <tr><td><code>indicate</code></td><td>Indicate</td></tr>
-            <tr>
-              <td><code>authenticatedSignedWrites</code></td>
-              <td>Authenticated Signed Writes</td>
-            </tr>
-          </table>
-        </li>
-        <li>
-          If the Extended Properties bit of the <a>characteristic properties</a> is not set,
-          initialize <code><var>propertiesObj</var>.reliableWrite</code> and
-          <code><var>propertiesObj</var>.writableAuxiliaries</code> to <code>false</code>.
-          Otherwise, run the following steps:
-          <ol>
-            <li>
-              <a lt="Characteristic Descriptor Discovery">Discover</a> the
-              <a>Characteristic Extended Properties</a> descriptor for <var>characteristic</var>
-              and <a lt="Read Characteristic Descriptors">read its value</a>
-              into <var>extendedProperties</var>.
-              Handle errors as described in <a href="#error-handling"></a>.
-              <p class="issue">
-                <a>Characteristic Extended Properties</a> isn't clear whether
-                the extended properties are immutable for a given Characteristic.
-                If they are, the UA should be allowed to cache them.
-              </p>
-            </li>
-            <li>
-              If the previous step returned an error,
-              <a>reject</a> <var>promise</var> with that error and abort these steps.
-            </li>
-            <li>
-              Initialize <code><var>propertiesObj</var>.reliableWrite</code> from
-              the Reliable Write bit of <var>extendedProperties</var>.
-            </li>
-            <li>
-              Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
-              the Writable Auxiliaries bit of <var>extendedProperties</var>.
-            </li>
-          </ol>
-        </li>
-        <li>
-          <a>Resolve</a> <var>promise</var> with <var>propertiesObj</var>.
-        </li>
-      </ol>
+      <div algorithm>
+        <p>
+          To <dfn>create a <code>BluetoothCharacteristicProperties</code> instance
+          from the Characteristic</dfn> <var>characteristic</var>,
+          the UA MUST return <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+        </p>
+        <ol>
+          <li>
+            Let <var>propertiesObj</var> be a new instance of {{BluetoothCharacteristicProperties}}.
+          </li>
+          <li>
+            Let <var>properties</var> be
+            the <a>characteristic properties</a> of <var>characteristic</var>.
+          </li>
+          <li>
+            Initialize the attributes of <var>propertiesObj</var> from
+            the corresponding bits in <var>properties</var>:
+            <table class="data">
+              <thead><th>Attribute</th><th>Bit</th></thead>
+              <tr><td><code>broadcast</code></td><td>Broadcast</td></tr>
+              <tr><td><code>read</code></td><td>Read</td></tr>
+              <tr><td><code>writeWithoutResponse</code></td><td>Write Without Response</td></tr>
+              <tr><td><code>write</code></td><td>Write</td></tr>
+              <tr><td><code>notify</code></td><td>Notify</td></tr>
+              <tr><td><code>indicate</code></td><td>Indicate</td></tr>
+              <tr>
+                <td><code>authenticatedSignedWrites</code></td>
+                <td>Authenticated Signed Writes</td>
+              </tr>
+            </table>
+          </li>
+          <li>
+            If the Extended Properties bit of the <a>characteristic properties</a> is not set,
+            initialize <code><var>propertiesObj</var>.reliableWrite</code> and
+            <code><var>propertiesObj</var>.writableAuxiliaries</code> to <code>false</code>.
+            Otherwise, run the following steps:
+            <ol>
+              <li>
+                <a lt="Characteristic Descriptor Discovery">Discover</a> the
+                <a>Characteristic Extended Properties</a> descriptor for <var>characteristic</var>
+                and <a lt="Read Characteristic Descriptors">read its value</a>
+                into <var>extendedProperties</var>.
+                Handle errors as described in <a href="#error-handling"></a>.
+                <p class="issue">
+                  <a>Characteristic Extended Properties</a> isn't clear whether
+                  the extended properties are immutable for a given Characteristic.
+                  If they are, the UA should be allowed to cache them.
+                </p>
+              </li>
+              <li>
+                If the previous step returned an error,
+                <a>reject</a> <var>promise</var> with that error and abort these steps.
+              </li>
+              <li>
+                Initialize <code><var>propertiesObj</var>.reliableWrite</code> from
+                the Reliable Write bit of <var>extendedProperties</var>.
+              </li>
+              <li>
+                Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
+                the Writable Auxiliaries bit of <var>extendedProperties</var>.
+              </li>
+            </ol>
+          </li>
+          <li>
+            <a>Resolve</a> <var>promise</var> with <var>propertiesObj</var>.
+          </li>
+        </ol>
+      </div>
     </section>
   </section>
 
@@ -3416,155 +3483,161 @@ spec: permissions
       </p>
     </div>
 
-    <p>
-      To <dfn>create a <code>BluetoothRemoteGATTDescriptor</code> representing</dfn>
-      a Descriptor <var>descriptor</var>,
-      the UA must return <a>a new promise</a> <var>promise</var>
-      and run the following steps <a>in parallel</a>.
-    </p>
-    <ol class="algorithm">
-      <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTDescriptor}}.</li>
-      <li>
-        Initialize <code><var>result</var>.characteristic</code> from
-        the {{BluetoothRemoteGATTCharacteristic}} instance representing
-        the Characteristic in which <var>descriptor</var> appears.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
-      </li>
-      <li>
-        Initialize <code><var>result</var>.value</code> to <code>null</code>.
-        The UA MAY initialize <code><var>result</var>.value</code> to
-        a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
-        the most recently read value from <var>descriptor</var>
-        if this value is available.
-      </li>
-      <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
-    </ol>
+    <div algorithm>
+      <p>
+        To <dfn>create a <code>BluetoothRemoteGATTDescriptor</code> representing</dfn>
+        a Descriptor <var>descriptor</var>,
+        the UA must return <a>a new promise</a> <var>promise</var>
+        and run the following steps <a>in parallel</a>.
+      </p>
+      <ol>
+        <li>Let <var>result</var> be a new instance of {{BluetoothRemoteGATTDescriptor}}.</li>
+        <li>
+          Initialize <code><var>result</var>.characteristic</code> from
+          the {{BluetoothRemoteGATTCharacteristic}} instance representing
+          the Characteristic in which <var>descriptor</var> appears.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
+        </li>
+        <li>
+          Initialize <code><var>result</var>.value</code> to <code>null</code>.
+          The UA MAY initialize <code><var>result</var>.value</code> to
+          a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
+          the most recently read value from <var>descriptor</var>
+          if this value is available.
+        </li>
+        <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTDescriptor">readValue()</dfn></code> method, when invoked,
-      MUST run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.uuid</code> is <a>blacklisted for reads</a>,
-        return <a>a promise rejected with</a> a {{SecurityError}}
-        and abort these steps.
-      </li>
-      <li>
-        If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-        is `false`,
-        return <a>a promise rejected with</a> a {{NetworkError}}
-        and abort these steps.
-      </li>
-      <li>
-        Let <var>descriptor</var> be the <a>Descriptor</a>
-        that <code>this</code> represents.
-      </li>
-      <li>
-        Return a
-        <code>this.characteristic.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-        <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>:
-        <ol>
-          <li>
-            Use either the <a>Read Characteristic Descriptors</a> or
-            the <a>Read Long Characteristic Descriptors</a> sub-procedure
-            to retrieve the value of <var>descriptor</var>.
-            Handle errors as described in <a href="#error-handling"></a>.
-          </li>
-          <li>
-            If the previous step returned an error,
-            <a>reject</a> <var>promise</var> with that error and abort these steps.
-          </li>
-          <li>
-            <a>Queue a task</a> to perform the following steps:
-            <ol>
-              <li>
-                If <var>promise</var> is not in
-                <code>this.characteristic.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
-                <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-              </li>
-              <li>
-                Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
-                and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
-              </li>
-              <li>
-                <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <div algorithm="Descriptor.readValue()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTDescriptor">readValue()</dfn></code> method, when invoked,
+        MUST run the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.uuid</code> is <a>blacklisted for reads</a>,
+          return <a>a promise rejected with</a> a {{SecurityError}}
+          and abort these steps.
+        </li>
+        <li>
+          If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+          is `false`,
+          return <a>a promise rejected with</a> a {{NetworkError}}
+          and abort these steps.
+        </li>
+        <li>
+          Let <var>descriptor</var> be the <a>Descriptor</a>
+          that <code>this</code> represents.
+        </li>
+        <li>
+          Return a
+          <code>this.characteristic.service.device.gatt</code>-<a>connection-checking wrapper</a> around
+          <a>a new promise</a> <var>promise</var>
+          and run the following steps <a>in parallel</a>:
+          <ol>
+            <li>
+              Use either the <a>Read Characteristic Descriptors</a> or
+              the <a>Read Long Characteristic Descriptors</a> sub-procedure
+              to retrieve the value of <var>descriptor</var>.
+              Handle errors as described in <a href="#error-handling"></a>.
+            </li>
+            <li>
+              If the previous step returned an error,
+              <a>reject</a> <var>promise</var> with that error and abort these steps.
+            </li>
+            <li>
+              <a>Queue a task</a> to perform the following steps:
+              <ol>
+                <li>
+                  If <var>promise</var> is not in
+                  <code>this.characteristic.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+                </li>
+                <li>
+                  Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
+                  and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
+                </li>
+                <li>
+                  <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
 
-    <p>
-      The <code><dfn method for="BluetoothRemoteGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
-      MUST  run the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <code>this.uuid</code> is <a>blacklisted for writes</a>,
-        return <a>a promise rejected with</a> a {{SecurityError}}
-        and abort these steps.
-      </li>
-      <li>
-        Let <var>descriptor</var> be the <a>Descriptor</a>
-        that <code>this</code> represents.
-      </li>
-      <li>
-        Let <var>bytes</var> be
-        <a>a copy of the bytes held</a> by <code><var>value</var></code>.
-      </li>
-      <li>
-        If <var>bytes</var> is more than 512 bytes long
-        (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
-        return <a>a promise rejected with</a> an {{InvalidModificationError}}
-        and abort these steps.
-      </li>
-      <li>
-        If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-        is `false`,
-        return <a>a promise rejected with</a> a {{NetworkError}}
-        and abort these steps.
-      </li>
-      <li>
-        Return a
-        <code>this.characteristic.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-        <a>a new promise</a> <var>promise</var>
-        and run the following steps in parallel.
-        <ol>
-          <li>
-            Use either the <a>Write Characteristic Descriptors</a> or
-            the <a>Write Long Characteristic Descriptors</a> sub-procedure
-            to write <var>bytes</var> to <var>descriptor</var>.
-            Handle errors as described in <a href="#error-handling"></a>.
-          </li>
-          <li>
-            If the previous step returned an error,
-            <a>reject</a> <var>promise</var> with that error and abort these steps.
-          </li>
-          <li>
-            <a>Queue a task</a> to perform the following steps:
-            <ol>
-              <li>
-                If <var>promise</var> is not in
-                <code>this.characteristic.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
-                <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-              </li>
-              <li>
-                Set <code>this.value</code> to
-                a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
-              </li>
-              <li>
-                <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </li>
-    </ol>
+    <div algorithm="Descriptor.writeValue()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
+        MUST  run the following steps:
+      </p>
+      <ol>
+        <li>
+          If <code>this.uuid</code> is <a>blacklisted for writes</a>,
+          return <a>a promise rejected with</a> a {{SecurityError}}
+          and abort these steps.
+        </li>
+        <li>
+          Let <var>descriptor</var> be the <a>Descriptor</a>
+          that <code>this</code> represents.
+        </li>
+        <li>
+          Let <var>bytes</var> be
+          <a>a copy of the bytes held</a> by <code><var>value</var></code>.
+        </li>
+        <li>
+          If <var>bytes</var> is more than 512 bytes long
+          (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
+          return <a>a promise rejected with</a> an {{InvalidModificationError}}
+          and abort these steps.
+        </li>
+        <li>
+          If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+          is `false`,
+          return <a>a promise rejected with</a> a {{NetworkError}}
+          and abort these steps.
+        </li>
+        <li>
+          Return a
+          <code>this.characteristic.service.device.gatt</code>-<a>connection-checking wrapper</a> around
+          <a>a new promise</a> <var>promise</var>
+          and run the following steps in parallel.
+          <ol>
+            <li>
+              Use either the <a>Write Characteristic Descriptors</a> or
+              the <a>Write Long Characteristic Descriptors</a> sub-procedure
+              to write <var>bytes</var> to <var>descriptor</var>.
+              Handle errors as described in <a href="#error-handling"></a>.
+            </li>
+            <li>
+              If the previous step returned an error,
+              <a>reject</a> <var>promise</var> with that error and abort these steps.
+            </li>
+            <li>
+              <a>Queue a task</a> to perform the following steps:
+              <ol>
+                <li>
+                  If <var>promise</var> is not in
+                  <code>this.characteristic.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+                </li>
+                <li>
+                  Set <code>this.value</code> to
+                  a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
+                </li>
+                <li>
+                  <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+                </li>
+              </ol>
+            </li>
+          </ol>
+        </li>
+      </ol>
+    </div>
   </section>
 
   <section>
@@ -3669,197 +3742,203 @@ spec: permissions
     <section>
       <h4 id="disconnection-events">Responding to Disconnection</h4>
 
-      <p>
-        When a <a>Bluetooth device</a> <var>device</var>'s <a>ATT Bearer</a> is lost
-        (e.g. because the remote device moved out of range
-        or the user used a platform feature to disconnect it),
-        for each {{BluetoothDevice}} <var>deviceObj</var> the UA MUST
-        <a>queue a task</a> on <var>deviceObj</var>'s <a>relevant settings object</a>'s
-        <a>responsible event loop</a>
-        to perform the following steps:
-      </p>
-      <ol class="algorithm">
-        <li>
-          If <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
-          is not the <a>same device</a> as <var>device</var>,
-          abort these steps.
-        </li>
-        <li>
-          If <code>!<var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>,
-          abort these steps.
-        </li>
-        <li>
-          Set <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-          to `false`.
-        </li>
-        <li>
-          Clear <code><var>deviceObj</var>.gatt@{{[[activeAlgorithms]]}}</code>.
-        </li>
-        <li>
-          <a>Fire an event</a> named {{gattserverdisconnected}}
-          with its {{Event/bubbles}} attribute initialized to `true`
-          at <code><var>deviceObj</var></code>.
-          <p class="note">
-            This event is <em>not</em> fired at the {{BluetoothRemoteGATTServer}}.
-          </p>
-        </li>
-      </ol>
+      <div algorithm="disconnection">
+        <p>
+          When a <a>Bluetooth device</a> <var>device</var>'s <a>ATT Bearer</a> is lost
+          (e.g. because the remote device moved out of range
+          or the user used a platform feature to disconnect it),
+          for each {{BluetoothDevice}} <var>deviceObj</var> the UA MUST
+          <a>queue a task</a> on <var>deviceObj</var>'s <a>relevant settings object</a>'s
+          <a>responsible event loop</a>
+          to perform the following steps:
+        </p>
+        <ol>
+          <li>
+            If <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+            is not the <a>same device</a> as <var>device</var>,
+            abort these steps.
+          </li>
+          <li>
+            If <code>!<var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>,
+            abort these steps.
+          </li>
+          <li>
+            Set <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+            to `false`.
+          </li>
+          <li>
+            Clear <code><var>deviceObj</var>.gatt@{{[[activeAlgorithms]]}}</code>.
+          </li>
+          <li>
+            <a>Fire an event</a> named {{gattserverdisconnected}}
+            with its {{Event/bubbles}} attribute initialized to `true`
+            at <code><var>deviceObj</var></code>.
+            <p class="note">
+              This event is <em>not</em> fired at the {{BluetoothRemoteGATTServer}}.
+            </p>
+          </li>
+        </ol>
+      </div>
     </section>
 
     <section>
       <h4 id="notification-events">Responding to Notifications and Indications</h4>
 
-      <p>
-        When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
-        or <a lt="Characteristic Value Indications">Indication</a>,
-        it must perform the following steps:
-      </p>
-      <ol class="algorithm">
-        <li>
-          For each <var>bluetoothGlobal</var> in
-          the Characteristic's <a>active notification context set</a>,
-          <a>queue a task</a>
-          on the event loop of the script settings object of <var>bluetoothGlobal</var>
-          to do the following sub-steps:
+      <div algorithm="notifications">
+        <p>
+          When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
+          or <a lt="Characteristic Value Indications">Indication</a>,
+          it must perform the following steps:
+        </p>
+        <ol>
+          <li>
+            For each <var>bluetoothGlobal</var> in
+            the Characteristic's <a>active notification context set</a>,
+            <a>queue a task</a>
+            on the event loop of the script settings object of <var>bluetoothGlobal</var>
+            to do the following sub-steps:
 
-          <ol>
-            <li>
-              Let <var>characteristicObject</var> be the {{BluetoothRemoteGATTCharacteristic}} in
-              the <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var>
-              that represents the <a>Characteristic</a>.
-            </li>
-            <li>
-              If <code><var>characteristicObject</var>.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-              is `false`,
-              abort these sub-steps.
-            </li>
-            <li>
-              Set <code><var>characteristicObject</var>.value</code> to
-              a new {{DataView}} wrapping a new {{ArrayBuffer}} holding
-              the new value of the <a>Characteristic</a>.
-            </li>
-            <li>
-              <a>Fire an event</a> named {{characteristicvaluechanged}}
-              with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at <var>characteristicObject</var>.
-            </li>
-          </ol>
-        </li>
-      </ol>
+            <ol>
+              <li>
+                Let <var>characteristicObject</var> be the {{BluetoothRemoteGATTCharacteristic}} in
+                the <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var>
+                that represents the <a>Characteristic</a>.
+              </li>
+              <li>
+                If <code><var>characteristicObject</var>.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+                is `false`,
+                abort these sub-steps.
+              </li>
+              <li>
+                Set <code><var>characteristicObject</var>.value</code> to
+                a new {{DataView}} wrapping a new {{ArrayBuffer}} holding
+                the new value of the <a>Characteristic</a>.
+              </li>
+              <li>
+                <a>Fire an event</a> named {{characteristicvaluechanged}}
+                with its <code>bubbles</code> attribute initialized to <code>true</code>
+                at <var>characteristicObject</var>.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </div>
     </section>
 
     <section>
       <h4 id="service-change-events">Responding to Service Changes</h4>
 
-      <p>
-        The Bluetooth <a>Attribute Caching</a> system allows clients
-        to track changes to <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
-        Before discovering any of these entities for the purpose of exposing them to a web page
-        the UA MUST subscribe to Indications from the
-        <a>Service Changed</a> characteristic, if it exists.
-        When the UA receives an Indication on the Service Changed characteristic,
-        it MUST perform the following steps.
-      </p>
-      <ol class="algorithm">
-        <li>
-          Let <var>removedEntities</var> be the list of entities in
-          the range indicated by the Service Changed characteristic
-          that the UA had discovered before the Indication.
-        </li>
-        <li>
-          Use the <a>Primary Service Discovery</a>, <a>Relationship Discovery</a>, <a>Characteristic Discovery</a>,
-          and <a>Characteristic Descriptor Discovery</a> procedures
-          to re-discover entities in the range indicated by the Service Changed characteristic.
-          The UA MAY skip discovering all or part of the indicated range
-          if it can prove that the results of that discovery
-          could not affect the events fired below.
-        </li>
-        <li>
-          Let <var>addedEntities</var> be the list of entities discovered in the previous step.
-        </li>
-        <li>
-          If an entity with the same definition, ignoring Characteristic and Descriptor values,
-          appears in both <var>removedEntities</var> and <var>addedEntities</var>,
-          remove it from both.
-        </li>
-        <li>
-          Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
-        </li>
-        <li>
-          If the <a lt="same attribute">same</a> <a>Service</a> appears in
-          both <var>removedEntities</var> and <var>addedEntities</var>,
-          remove it from both, and add it to <var>changedServices</var>.
-        </li>
-        <li>
-          For each <a>Characteristic</a> and <a>Descriptor</a>
-          in <var>removedEntities</var> and <var>addedEntities</var>,
-          remove it from its original list,
-          and add its parent <a>Service</a> to <var>changedServices</var>.
-          <span class="note">After this point, <var>removedEntities</var> and <var>addedEntities</var> contain only <a>Service</a>s.</span>
-        </li>
-        <li id="only-notify-for-requested-services">
-          If a <a>Service</a> in <var>addedEntities</var>
-          would not have been returned from any previous call to
-          <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
-          <code>getIncludedService</code>, or <code>getIncludedServices</code>
-          if it had existed at the time of the call,
-          the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
-        </li>
-        <li>
-          Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
-          contain any <a>Service</a> in
-          <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
-        </li>
-        <li>
-          For each {{BluetoothDevice}} <var>deviceObj</var>
-          that is connected to a device in <var>changedDevices</var>,
-          <a>queue a task</a> on its <a>global object</a>'s <a>responsible event loop</a>
-          to do the following steps:
-          <ol>
-            <li>
-              For each <a>Service</a> <var>service</var> in <var>removedEntities</var>:
-              <ol>
-                <li>
-                  If no remaining <a>Service</a> in
-                  <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
-                  has the same UUID as <var>service</var>,
-                  remove the UUID from
-                  <code><var>deviceObj</var>@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-                </li>
-                <li>
-                  If <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
-                  is `"all"` or contains the Service's UUID,
-                  <a>fire an event</a> named {{serviceremoved}}
-                  with its <code>bubbles</code> attribute initialized to <code>true</code>
-                  at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
-                </li>
-                <li>
-                  Remove this {{BluetoothRemoteGATTService}} from the <a>Bluetooth tree</a>.
-                </li>
-              </ol>
-            </li>
-            <li>
-              For each <a>Service</a> in <var>addedEntities</var>,
-              add the Service's UUID to
-              <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-              If <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
-              is `"all"` or contains the Service's UUID,
-              add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
-              and then <a>fire an event</a> named {{serviceadded}}
-              with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at the {{BluetoothRemoteGATTService}}.
-            </li>
-            <li>
-              For each <a>Service</a> in <var>changedServices</var>,
-              if <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
-              is `"all"` or contains the Service's UUID,
-              <a>fire an event</a> named {{servicechanged}}
-              with its <code>bubbles</code> attribute initialized to <code>true</code>
-              at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
-            </li>
-          </ol>
-        </li>
-      </ol>
+      <div algorithm="service changes">
+        <p>
+          The Bluetooth <a>Attribute Caching</a> system allows clients
+          to track changes to <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
+          Before discovering any of these entities for the purpose of exposing them to a web page
+          the UA MUST subscribe to Indications from the
+          <a>Service Changed</a> characteristic, if it exists.
+          When the UA receives an Indication on the Service Changed characteristic,
+          it MUST perform the following steps.
+        </p>
+        <ol>
+          <li>
+            Let <var>removedEntities</var> be the list of entities in
+            the range indicated by the Service Changed characteristic
+            that the UA had discovered before the Indication.
+          </li>
+          <li>
+            Use the <a>Primary Service Discovery</a>, <a>Relationship Discovery</a>, <a>Characteristic Discovery</a>,
+            and <a>Characteristic Descriptor Discovery</a> procedures
+            to re-discover entities in the range indicated by the Service Changed characteristic.
+            The UA MAY skip discovering all or part of the indicated range
+            if it can prove that the results of that discovery
+            could not affect the events fired below.
+          </li>
+          <li>
+            Let <var>addedEntities</var> be the list of entities discovered in the previous step.
+          </li>
+          <li>
+            If an entity with the same definition, ignoring Characteristic and Descriptor values,
+            appears in both <var>removedEntities</var> and <var>addedEntities</var>,
+            remove it from both.
+          </li>
+          <li>
+            Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
+          </li>
+          <li>
+            If the <a lt="same attribute">same</a> <a>Service</a> appears in
+            both <var>removedEntities</var> and <var>addedEntities</var>,
+            remove it from both, and add it to <var>changedServices</var>.
+          </li>
+          <li>
+            For each <a>Characteristic</a> and <a>Descriptor</a>
+            in <var>removedEntities</var> and <var>addedEntities</var>,
+            remove it from its original list,
+            and add its parent <a>Service</a> to <var>changedServices</var>.
+            <span class="note">After this point, <var>removedEntities</var> and <var>addedEntities</var> contain only <a>Service</a>s.</span>
+          </li>
+          <li id="only-notify-for-requested-services">
+            If a <a>Service</a> in <var>addedEntities</var>
+            would not have been returned from any previous call to
+            <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
+            <code>getIncludedService</code>, or <code>getIncludedServices</code>
+            if it had existed at the time of the call,
+            the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
+          </li>
+          <li>
+            Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
+            contain any <a>Service</a> in
+            <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
+          </li>
+          <li>
+            For each {{BluetoothDevice}} <var>deviceObj</var>
+            that is connected to a device in <var>changedDevices</var>,
+            <a>queue a task</a> on its <a>global object</a>'s <a>responsible event loop</a>
+            to do the following steps:
+            <ol>
+              <li>
+                For each <a>Service</a> <var>service</var> in <var>removedEntities</var>:
+                <ol>
+                  <li>
+                    If no remaining <a>Service</a> in
+                    <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+                    has the same UUID as <var>service</var>,
+                    remove the UUID from
+                    <code><var>deviceObj</var>@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+                  </li>
+                  <li>
+                    If <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+                    is `"all"` or contains the Service's UUID,
+                    <a>fire an event</a> named {{serviceremoved}}
+                    with its <code>bubbles</code> attribute initialized to <code>true</code>
+                    at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
+                  </li>
+                  <li>
+                    Remove this {{BluetoothRemoteGATTService}} from the <a>Bluetooth tree</a>.
+                  </li>
+                </ol>
+              </li>
+              <li>
+                For each <a>Service</a> in <var>addedEntities</var>,
+                add the Service's UUID to
+                <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+                If <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
+                is `"all"` or contains the Service's UUID,
+                add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
+                and then <a>fire an event</a> named {{serviceadded}}
+                with its <code>bubbles</code> attribute initialized to <code>true</code>
+                at the {{BluetoothRemoteGATTService}}.
+              </li>
+              <li>
+                For each <a>Service</a> in <var>changedServices</var>,
+                if <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
+                is `"all"` or contains the Service's UUID,
+                <a>fire an event</a> named {{servicechanged}}
+                with its <code>bubbles</code> attribute initialized to <code>true</code>
+                at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
+              </li>
+            </ol>
+          </li>
+        </ol>
+      </div>
     </section>
 
     <section>
@@ -3928,90 +4007,92 @@ spec: permissions
       instead of browser bugs.
     </p>
 
-    <p>
-      When the UA is using a <a>GATT procedure</a>
-      to execute a step in an algorithm or to handle a query to the <a>Bluetooth cache</a>
-      (both referred to as a "step", here),
-      and the GATT procedure returns an <code><a>Error Response</a></code>,
-      the UA MUST perform the following steps:
-    </p>
+    <div algorithm="error handling">
+      <p>
+        When the UA is using a <a>GATT procedure</a>
+        to execute a step in an algorithm or to handle a query to the <a>Bluetooth cache</a>
+        (both referred to as a "step", here),
+        and the GATT procedure returns an <code><a>Error Response</a></code>,
+        the UA MUST perform the following steps:
+      </p>
 
-    <ol class="algorithm">
-      <li>
-        If the <a>procedure times out</a> or
-        the ATT Bearer (described in <a>Profile Fundamentals</a>) is
-        absent or terminated for any reason,
-        return a {{NetworkError}} from the step and abort these steps.
-      </li>
-      <li>
-        Take the following actions depending on the <code>Error Code</code>:
-        <dl class="switch">
-          <dt><code>Invalid Handle</code></dt>
-          <dt><code>Invalid PDU</code></dt>
-          <dt><code>Invalid Offset</code></dt>
-          <dt><code>Attribute Not Found</code></dt>
-          <dt><code>Unsupported Group Type</code></dt>
-          <dd>
-            These error codes indicate that something unexpected happened at the protocol layer,
-            likely either due to a UA or device bug.
-            Return a {{NotSupportedError}} from the step.
-          </dd>
-
-          <dt><code>Invalid Attribute Value Length</code></dt>
-          <dd>
-            Return an {{InvalidModificationError}} from the step.
-          </dd>
-
-          <dt><code>Attribute Not Long</code></dt>
-          <dd>
-            <p>
-              If this error code is received without having used a "Long" sub-procedure,
-              this may indicate a device bug.
+      <ol>
+        <li>
+          If the <a>procedure times out</a> or
+          the ATT Bearer (described in <a>Profile Fundamentals</a>) is
+          absent or terminated for any reason,
+          return a {{NetworkError}} from the step and abort these steps.
+        </li>
+        <li>
+          Take the following actions depending on the <code>Error Code</code>:
+          <dl class="switch">
+            <dt><code>Invalid Handle</code></dt>
+            <dt><code>Invalid PDU</code></dt>
+            <dt><code>Invalid Offset</code></dt>
+            <dt><code>Attribute Not Found</code></dt>
+            <dt><code>Unsupported Group Type</code></dt>
+            <dd>
+              These error codes indicate that something unexpected happened at the protocol layer,
+              likely either due to a UA or device bug.
               Return a {{NotSupportedError}} from the step.
-            </p>
+            </dd>
 
-            <p>
-              Otherwise, retry the step without using a "Long" sub-procedure.
-              If this is impossible due to the length of the value being written,
+            <dt><code>Invalid Attribute Value Length</code></dt>
+            <dd>
+              Return an {{InvalidModificationError}} from the step.
+            </dd>
+
+            <dt><code>Attribute Not Long</code></dt>
+            <dd>
+              <p>
+                If this error code is received without having used a "Long" sub-procedure,
+                this may indicate a device bug.
+                Return a {{NotSupportedError}} from the step.
+              </p>
+
+              <p>
+                Otherwise, retry the step without using a "Long" sub-procedure.
+                If this is impossible due to the length of the value being written,
+                return an {{InvalidModificationError}} from the step.
+              </p>
+            </dd>
+
+            <dt><code>Insufficient Authentication</code></dt>
+            <dt><code>Insufficient Encryption</code></dt>
+            <dt><code>Insufficient Encryption Key Size</code></dt>
+            <dd>
+              The UA SHOULD attempt to increase the security level of the connection.
+              If this attempt fails or the UA doesn't support any higher security,
+              Return a {{SecurityError}} from the step.
+              Otherwise, retry the step at the new higher security level.
+            </dd>
+
+            <dt><code>Insufficient Authorization</code></dt>
+            <dd>
+              Return a {{SecurityError}} from the step.
+            </dd>
+
+            <dt><code>Application Error</code></dt>
+            <dd>
+              If the GATT procedure was a Write,
               return an {{InvalidModificationError}} from the step.
-            </p>
-          </dd>
+              Otherwise, return a {{NotSupportedError}} from the step.
+            </dd>
 
-          <dt><code>Insufficient Authentication</code></dt>
-          <dt><code>Insufficient Encryption</code></dt>
-          <dt><code>Insufficient Encryption Key Size</code></dt>
-          <dd>
-            The UA SHOULD attempt to increase the security level of the connection.
-            If this attempt fails or the UA doesn't support any higher security,
-            Return a {{SecurityError}} from the step.
-            Otherwise, retry the step at the new higher security level.
-          </dd>
-
-          <dt><code>Insufficient Authorization</code></dt>
-          <dd>
-            Return a {{SecurityError}} from the step.
-          </dd>
-
-          <dt><code>Application Error</code></dt>
-          <dd>
-            If the GATT procedure was a Write,
-            return an {{InvalidModificationError}} from the step.
-            Otherwise, return a {{NotSupportedError}} from the step.
-          </dd>
-
-          <dt><code>Read Not Permitted</code></dt>
-          <dt><code>Write Not Permitted</code></dt>
-          <dt><code>Request Not Supported</code></dt>
-          <dt><code>Prepare Queue Full</code></dt>
-          <dt><code>Insufficient Resources</code></dt>
-          <dt><code>Unlikely Error</code></dt>
-          <dt>Anything else</dt>
-          <dd>
-            Return a {{NotSupportedError}} from the step.
-          </dd>
-        </dl>
-      </li>
-    </ol>
+            <dt><code>Read Not Permitted</code></dt>
+            <dt><code>Write Not Permitted</code></dt>
+            <dt><code>Request Not Supported</code></dt>
+            <dt><code>Prepare Queue Full</code></dt>
+            <dt><code>Insufficient Resources</code></dt>
+            <dt><code>Unlikely Error</code></dt>
+            <dt>Anything else</dt>
+            <dd>
+              Return a {{NotSupportedError}} from the step.
+            </dd>
+          </dl>
+        </li>
+      </ol>
+    </div>
   </section>
 </section>
 
@@ -4108,30 +4189,32 @@ spec: permissions
       </p>
     </div>
 
-    <p>
-      To <dfn>ResolveUUIDName</dfn>(<var>name</var>,
-      <var>assigned numbers table</var>, <var>prefix</var>),
-      the UA MUST perform the following steps:
-    </p>
-    <ol class="algorithm">
-      <li>
-        If <var>name</var> is an <code>unsigned long</code>,
-        return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)</code> and abort these steps.
-      </li>
-      <li>
-        If <var>name</var> is a <a>valid UUID</a>,
-        return <var>name</var> and abort these steps.
-      </li>
-      <li>
-        If the string <code><var>prefix</var> + "." + <var>name</var></code>
-        appears in <var>assigned numbers table</var>,
-        let <var>alias</var> be its assigned number,
-        and return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(<var>alias</var>)</code>.
-      </li>
-      <li>
-        Otherwise, throw a {{SyntaxError}}.
-      </li>
-    </ol>
+    <div algorithm>
+      <p>
+        To <dfn>ResolveUUIDName</dfn>(<var>name</var>,
+        <var>assigned numbers table</var>, <var>prefix</var>),
+        the UA MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If <var>name</var> is an <code>unsigned long</code>,
+          return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)</code> and abort these steps.
+        </li>
+        <li>
+          If <var>name</var> is a <a>valid UUID</a>,
+          return <var>name</var> and abort these steps.
+        </li>
+        <li>
+          If the string <code><var>prefix</var> + "." + <var>name</var></code>
+          appears in <var>assigned numbers table</var>,
+          let <var>alias</var> be its assigned number,
+          and return {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(<var>alias</var>)</code>.
+        </li>
+        <li>
+          Otherwise, throw a {{SyntaxError}}.
+        </li>
+      </ol>
+    </div>
 
     <p>
       The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">getService(<var>name</var>)</dfn></code> method, when invoked,
@@ -4185,49 +4268,51 @@ spec: permissions
     to restrict the set of GATT attributes a website can access.
   </p>
 
-  <p>
-    The result of <dfn>parsing the blacklist</dfn> at a URL <var>url</var>
-    is a map from <a>valid UUID</a>s to tokens, or an error,
-    produced by the following algorithm:
-  </p>
-  <ol class="algorithm">
-    <li>Fetch <var>url</var>, and let <var>contents</var> be its body, decoded as UTF-8.</li>
-    <li>Let <var>lines</var> be <var>contents</var> split on <code>'\n'</code>.</li>
-    <li>
-      Let <var>result</var> be an empty map.
-    </li>
-    <li>
-      For each <var>line</var> in <var>lines</var>, do the following sub-steps:
-      <ol>
-        <li>
-          If <var>line</var> is empty or its first character is <code>'#'</code>,
-          continue to the next line.
-        </li>
-        <li>
-          If <var>line</var> consists of just a <a>valid UUID</a>,
-          let <var>uuid</var> be that UUID and
-          let <var>token</var> be "<code>exclude</code>".
-        </li>
-        <li>
-          If <var>line</var> consists of a <a>valid UUID</a>, a space (U+0020),
-          and one of the tokens "<code>exclude-reads</code>" or "<code>exclude-writes</code>",
-          let <var>uuid</var> be that UUID and
-          let <var>token</var> be that token.
-        </li>
-        <li>
-          Otherwise, return an error and abort these steps.
-        </li>
-        <li>
-          If <var>uuid</var> is already in <var>result</var>,
-          return an error and abort these steps.
-        </li>
-        <li>
-          Add a mapping in <var>result</var> from <var>uuid</var> to <var>token</var>.
-        </li>
-      </ol>
-    </li>
-    <li>Return <var>result</var>.</li>
-  </ol>
+  <div algorithm>
+    <p>
+      The result of <dfn>parsing the blacklist</dfn> at a URL <var>url</var>
+      is a map from <a>valid UUID</a>s to tokens, or an error,
+      produced by the following algorithm:
+    </p>
+    <ol>
+      <li>Fetch <var>url</var>, and let <var>contents</var> be its body, decoded as UTF-8.</li>
+      <li>Let <var>lines</var> be <var>contents</var> split on <code>'\n'</code>.</li>
+      <li>
+        Let <var>result</var> be an empty map.
+      </li>
+      <li>
+        For each <var>line</var> in <var>lines</var>, do the following sub-steps:
+        <ol>
+          <li>
+            If <var>line</var> is empty or its first character is <code>'#'</code>,
+            continue to the next line.
+          </li>
+          <li>
+            If <var>line</var> consists of just a <a>valid UUID</a>,
+            let <var>uuid</var> be that UUID and
+            let <var>token</var> be "<code>exclude</code>".
+          </li>
+          <li>
+            If <var>line</var> consists of a <a>valid UUID</a>, a space (U+0020),
+            and one of the tokens "<code>exclude-reads</code>" or "<code>exclude-writes</code>",
+            let <var>uuid</var> be that UUID and
+            let <var>token</var> be that token.
+          </li>
+          <li>
+            Otherwise, return an error and abort these steps.
+          </li>
+          <li>
+            If <var>uuid</var> is already in <var>result</var>,
+            return an error and abort these steps.
+          </li>
+          <li>
+            Add a mapping in <var>result</var> from <var>uuid</var> to <var>token</var>.
+          </li>
+        </ol>
+      </li>
+      <li>Return <var>result</var>.</li>
+    </ol>
+  </div>
 
   <p>
     The <dfn>GATT blacklist</dfn> is the result of <a>parsing the blacklist</a> at
