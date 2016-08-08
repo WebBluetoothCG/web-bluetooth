@@ -2450,6 +2450,19 @@ spec: html
     </div>
 
     <section>
+      <h4 id="persistence">Persistence across connections</h4>
+
+      The Bluetooth <a>Attribute Caching</a> system allows <a>bonded</a> clients
+      to save references to attributes from one connection to the next.
+      Web Bluetooth treats websites as <em>not</em> <a>bonded</a>
+      to devices they have permission to access:
+      {{BluetoothRemoteGATTService}}, {{BluetoothRemoteGATTCharacteristic}},
+      and {{BluetoothRemoteGATTDescriptor}} objects
+      become invalid on <a href="#disconnection-events">disconnection</a>,
+      and the site must retrieved them again when it re-connects.
+    </section>
+
+    <section>
       <h4 id="bluetooth-cache" dfn-type="dfn" data-lt="Bluetooth cache">The Bluetooth cache</h4>
 
       <p>
@@ -2640,7 +2653,8 @@ spec: html
             return <a>a promise rejected with</a> an {{InvalidStateError}} and
             abort these steps.
 
-            Note: This happens when a Service or Characteristic is removed from the device,
+            Note: This happens when a Service or Characteristic is removed from the device
+            or invalidated by a disconnection,
             and then its object is used again.
           </li>
           <li>
@@ -3998,6 +4012,28 @@ spec: html
             Clear <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>.
           </li>
           <li>
+            Let |context| be <code>|deviceObj|.{{[[context]]}}</code>.
+          </li>
+          <li>
+            Remove all entries from <code>|context|.{{[[attributeInstanceMap]]}}</code>
+            whose keys are inside <code>|deviceObj|.{{[[representedDevice]]}}</code>.
+          </li>
+          <li>
+            For each {{BluetoothRemoteGATTService}} |service|
+            in |deviceObj|'s <a>realm</a>,
+            set <code>|service|.{{[[representedService]]}}</code> to `null`.
+          </li>
+          <li>
+            For each {{BluetoothRemoteGATTCharacteristic}} |characteristic|
+            in |deviceObj|'s <a>realm</a>,
+            set <code>|characteristic|.{{[[representedCharacteristic]]}}</code> to `null`.
+          </li>
+          <li>
+            For each {{BluetoothRemoteGATTDescriptor}} |descriptor|
+            in |deviceObj|'s <a>realm</a>,
+            set <code>|descriptor|.{{[[representedDescriptor]]}}</code> to `null`.
+          </li>
+          <li>
             <a>Fire an event</a> named {{gattserverdisconnected}}
             with its {{Event/bubbles}} attribute initialized to `true`
             at <code><var>deviceObj</var></code>.
@@ -4824,6 +4860,9 @@ spec: html
                       </ol>
                     </li>
                   </ol>
+                </li>
+                <li value="16">Definitions
+                  (defines <dfn>bond</dfn>)
                 </li>
               </ol>
             </li>
