@@ -2537,11 +2537,6 @@ spec: permissions
         </p>
         <ol>
           <li>
-            If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-            is `false`,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-          </li>
-          <li>
             <a>Populate the Bluetooth cache</a> with entries matching the description.
           </li>
           <li>
@@ -2589,6 +2584,26 @@ spec: permissions
           </li>
         </ol>
       </div>
+
+      <div algorithm>
+        <p>
+          <dfn>Represented</dfn>(|obj|: Device or GATT Attribute) returns,
+          depending on the type of |obj|:
+        </p>
+        <dl class="switch">
+          <dt>{{BluetoothDevice}}</dt>
+          <dd><code>|obj|.{{[[representedDevice]]}}</code></dd>
+
+          <dt>{{BluetoothRemoteGATTService}}</dt>
+          <dd><code>|obj|.{{[[representedService]]}}</code></dd>
+
+          <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
+          <dd><code>|obj|.{{[[representedCharacteristic]]}}</code></dd>
+
+          <dt>{{BluetoothRemoteGATTDescriptor}}</dt>
+          <dd><code>|obj|.{{[[representedDescriptor]]}}</code></dd>
+        </dl>
+      </div>
     </section>
 
     <section>
@@ -2628,10 +2643,24 @@ spec: permissions
             </dl>
           </li>
           <li>
+            If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+            is `false`,
+            return <a>a promise rejected with</a> with a {{NetworkError}} and
+            abort these steps.
+          </li>
+          <li>
+            If <a>Represented</a>(|attribute|) is `null`,
+            return <a>a promise rejected with</a> an {{InvalidStateError}} and
+            abort these steps.
+
+            Note: This happens when a Service or Characteristic is removed from the device,
+            and then its object is used again.
+          </li>
+          <li>
             <a>Query the Bluetooth cache</a> in <code><var>deviceObj</var></code>
             for entries that:
             <ul>
-              <li>are within the Bluetooth attribute or device represented by <var>attribute</var>,</li>
+              <li>are within <a>Represented</a>(|attribute|),</li>
               <li>have a type described by <var>child type</var>,</li>
               <li>have a UUID that is not <a>blacklisted</a>,</li>
               <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,</li>
@@ -3282,8 +3311,13 @@ spec: permissions
           and abort these steps.
         </li>
         <li>
-          Let <var>characteristic</var> be the <a>Characteristic</a>
-          that <code>this</code> represents.
+          Let |characteristic| be
+          <code>this.{{[[representedCharacteristic]]}}</code>.
+        </li>
+        <li>
+          If |characteristic| is `null`,
+          return <a>a promise rejected with</a> an {{InvalidStateError}} and
+          abort these steps.
         </li>
         <li>
           Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
@@ -3344,10 +3378,6 @@ spec: permissions
           and abort these steps.
         </li>
         <li>
-          Let <var>characteristic</var> be the <a>Characteristic</a>
-          that <code>this</code> represents.
-        </li>
-        <li>
           Let <var>bytes</var> be
           <a>a copy of the bytes held</a> by <code><var>value</var></code>.
         </li>
@@ -3361,6 +3391,15 @@ spec: permissions
           If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
           return <a>a promise rejected with</a> a {{NetworkError}}
           and abort these steps.
+        </li>
+        <li>
+          Let |characteristic| be
+          <code>this.{{[[representedCharacteristic]]}}</code>.
+        </li>
+        <li>
+          If |characteristic| is `null`,
+          return <a>a promise rejected with</a> an {{InvalidStateError}} and
+          abort these steps.
         </li>
         <li>
           Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
@@ -3428,8 +3467,13 @@ spec: permissions
           <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
         </li>
         <li>
-          Let <var>characteristic</var> be
-          the GATT <a>Characteristic</a> that <code>this</code> represents.
+          Let |characteristic| be
+          <code>this.{{[[representedCharacteristic]]}}</code>.
+        </li>
+        <li>
+          If |characteristic| is `null`,
+          return <a>a promise rejected with</a> an {{InvalidStateError}} and
+          abort these steps.
         </li>
         <li>
           If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
@@ -3488,8 +3532,13 @@ spec: permissions
       </p>
       <ol>
         <li>
-          Let <var>characteristic</var> be
-          the GATT <a>Characteristic</a> that <code>this</code> represents.
+          Let |characteristic| be
+          <code>this.{{[[representedCharacteristic]]}}</code>.
+        </li>
+        <li>
+          If |characteristic| is `null`,
+          return <a>a promise rejected with</a> an {{InvalidStateError}} and
+          abort these steps.
         </li>
         <li>
           If <var>characteristic</var>'s <a>active notification context set</a> contains
@@ -3711,8 +3760,13 @@ spec: permissions
           and abort these steps.
         </li>
         <li>
-          Let <var>descriptor</var> be the <a>Descriptor</a>
-          that <code>this</code> represents.
+          Let |descriptor| be
+          <code>this.{{[[representedDescriptor]]}}</code>.
+        </li>
+        <li>
+          If |descriptor| is `null`,
+          return <a>a promise rejected with</a> an {{InvalidStateError}} and
+          abort these steps.
         </li>
         <li>
           Return a
@@ -3764,10 +3818,6 @@ spec: permissions
           and abort these steps.
         </li>
         <li>
-          Let <var>descriptor</var> be the <a>Descriptor</a>
-          that <code>this</code> represents.
-        </li>
-        <li>
           Let <var>bytes</var> be
           <a>a copy of the bytes held</a> by <code><var>value</var></code>.
         </li>
@@ -3782,6 +3832,15 @@ spec: permissions
           is `false`,
           return <a>a promise rejected with</a> a {{NetworkError}}
           and abort these steps.
+        </li>
+        <li>
+          Let |descriptor| be
+          <code>this.{{[[representedDescriptor]]}}</code>.
+        </li>
+        <li>
+          If |descriptor| is `null`,
+          return <a>a promise rejected with</a> an {{InvalidStateError}} and
+          abort these steps.
         </li>
         <li>
           Return a
@@ -4250,7 +4309,6 @@ spec: permissions
         <li>
           Take the following actions depending on the <code>Error Code</code>:
           <dl class="switch">
-            <dt><code>Invalid Handle</code></dt>
             <dt><code>Invalid PDU</code></dt>
             <dt><code>Invalid Offset</code></dt>
             <dt><code>Attribute Not Found</code></dt>
@@ -4259,6 +4317,11 @@ spec: permissions
               These error codes indicate that something unexpected happened at the protocol layer,
               likely either due to a UA or device bug.
               Return a {{NotSupportedError}} from the step.
+            </dd>
+
+            <dt><code>Invalid Handle</code></dt>
+            <dd>
+              Return an {{InvalidStateError}} from the step.
             </dd>
 
             <dt><code>Invalid Attribute Value Length</code></dt>
