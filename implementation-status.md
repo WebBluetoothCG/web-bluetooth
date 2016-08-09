@@ -26,7 +26,7 @@ GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         
 Get Characteristics List  | ✓         | ✓       | 53  | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Get Primary Services List | 53        | 53      | 53  | 53    |         |
-startNotifications returns `this` |   |         |     |       |         |
+{start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
 Advertisements Scanning   |           |         |     |       |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
