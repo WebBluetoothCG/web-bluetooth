@@ -2319,7 +2319,7 @@ spec: permissions
         of the same type on the same <a>GATT Server</a>.
         Attributes are notionally ordered within their <a>GATT Server</a>
         by their <a>Attribute Handle</a>,
-        but while platform interfaces provide these entities in some order,
+        but while platform interfaces provide attributes in some order,
         they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
       </p>
       <p link-for-hint="BluetoothRemoteGATTService">
@@ -2357,9 +2357,9 @@ spec: permissions
         of the hierarchy of Services, Characteristics, and Descriptors
         it has discovered on a device.
         The UA MAY share this cache between multiple origins accessing the same device.
-        Each potential entity in the cache is either known-present, known-absent, or unknown.
-        The cache MUST NOT contain two entities that are for the <a>same attribute</a>.
-        Each known-present entity in the cache is associated with an optional
+        Each potential entry in the cache is either known-present, known-absent, or unknown.
+        The cache MUST NOT contain two entries that are for the <a>same attribute</a>.
+        Each known-present entry in the cache is associated with an optional
         <code>Promise&lt;{{BluetoothRemoteGATTService}}></code>,
         <code>Promise&lt;{{BluetoothRemoteGATTCharacteristic}}></code>,
         or <code>Promise&lt;{{BluetoothRemoteGATTDescriptor}}></code> instance
@@ -2518,7 +2518,7 @@ spec: permissions
             <a>Query the Bluetooth cache</a> in <code><var>deviceObj</var></code>
             for entries that:
             <ul>
-              <li>are within the Bluetooth entity represented by <var>attribute</var>,</li>
+              <li>are within the Bluetooth attribute or device represented by <var>attribute</var>,</li>
               <li>have a type described by <var>child type</var>,</li>
               <li>have a UUID that is not <a>blacklisted</a>,</li>
               <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,</li>
@@ -3832,7 +3832,7 @@ spec: permissions
         <p>
           The Bluetooth <a>Attribute Caching</a> system allows clients
           to track changes to <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
-          Before discovering any of these entities for the purpose of exposing them to a web page
+          Before discovering any of these attributes for the purpose of exposing them to a web page
           the UA MUST subscribe to Indications from the
           <a>Service Changed</a> characteristic, if it exists.
           When the UA receives an Indication on the Service Changed characteristic,
@@ -3840,24 +3840,24 @@ spec: permissions
         </p>
         <ol>
           <li>
-            Let <var>removedEntities</var> be the list of entities in
+            Let <var>removedAttributes</var> be the list of attributes in
             the range indicated by the Service Changed characteristic
             that the UA had discovered before the Indication.
           </li>
           <li>
             Use the <a>Primary Service Discovery</a>, <a>Relationship Discovery</a>, <a>Characteristic Discovery</a>,
             and <a>Characteristic Descriptor Discovery</a> procedures
-            to re-discover entities in the range indicated by the Service Changed characteristic.
+            to re-discover attributes in the range indicated by the Service Changed characteristic.
             The UA MAY skip discovering all or part of the indicated range
             if it can prove that the results of that discovery
             could not affect the events fired below.
           </li>
           <li>
-            Let <var>addedEntities</var> be the list of entities discovered in the previous step.
+            Let <var>addedAttributes</var> be the list of attributes discovered in the previous step.
           </li>
           <li>
-            If an entity with the same definition, ignoring Characteristic and Descriptor values,
-            appears in both <var>removedEntities</var> and <var>addedEntities</var>,
+            If an attribute with the same definition, ignoring Characteristic and Descriptor values,
+            appears in both <var>removedAttributes</var> and <var>addedAttributes</var>,
             remove it from both.
           </li>
           <li>
@@ -3865,28 +3865,28 @@ spec: permissions
           </li>
           <li>
             If the <a lt="same attribute">same</a> <a>Service</a> appears in
-            both <var>removedEntities</var> and <var>addedEntities</var>,
+            both <var>removedAttributes</var> and <var>addedAttributes</var>,
             remove it from both, and add it to <var>changedServices</var>.
           </li>
           <li>
             For each <a>Characteristic</a> and <a>Descriptor</a>
-            in <var>removedEntities</var> and <var>addedEntities</var>,
+            in <var>removedAttributes</var> and <var>addedAttributes</var>,
             remove it from its original list,
             and add its parent <a>Service</a> to <var>changedServices</var>.
-            <span class="note">After this point, <var>removedEntities</var> and <var>addedEntities</var> contain only <a>Service</a>s.</span>
+            <span class="note">After this point, <var>removedAttributes</var> and <var>addedAttributes</var> contain only <a>Service</a>s.</span>
           </li>
           <li id="only-notify-for-requested-services">
-            If a <a>Service</a> in <var>addedEntities</var>
+            If a <a>Service</a> in <var>addedAttributes</var>
             would not have been returned from any previous call to
             <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
             <code>getIncludedService</code>, or <code>getIncludedServices</code>
             if it had existed at the time of the call,
-            the UA MAY remove the <a>Service</a> from <var>addedEntities</var>.
+            the UA MAY remove the <a>Service</a> from <var>addedAttributes</var>.
           </li>
           <li>
             Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
             contain any <a>Service</a> in
-            <var>removedEntities</var>, <var>addedEntities</var>, and <var>changedServices</var>.
+            <var>removedAttributes</var>, <var>addedAttributes</var>, and <var>changedServices</var>.
           </li>
           <li>
             For each {{BluetoothDevice}} <var>deviceObj</var>
@@ -3895,7 +3895,7 @@ spec: permissions
             to do the following steps:
             <ol>
               <li>
-                For each <a>Service</a> <var>service</var> in <var>removedEntities</var>:
+                For each <a>Service</a> <var>service</var> in <var>removedAttributes</var>:
                 <ol>
                   <li>
                     If no remaining <a>Service</a> in
@@ -3917,7 +3917,7 @@ spec: permissions
                 </ol>
               </li>
               <li>
-                For each <a>Service</a> in <var>addedEntities</var>,
+                For each <a>Service</a> in <var>addedAttributes</var>,
                 add the Service's UUID to
                 <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
                 If <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
