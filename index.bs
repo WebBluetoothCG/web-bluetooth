@@ -116,6 +116,7 @@ spec: html
         text: queue a task
         text: relevant settings object
         text: responsible event loop
+        text: the environment settings object's global object
         text: triggered by user activation
 spec: permissions
     type: dfn
@@ -4040,6 +4041,48 @@ spec: permissions
             If an attribute with the same definition, ignoring Characteristic and Descriptor values,
             appears in both <var>removedAttributes</var> and <var>addedAttributes</var>,
             remove it from both.
+          </li>
+          <li>
+            Let |invalidatedAttributes| be
+            the attributes in |removedAttributes| but not |addedAttributes|.
+          </li>
+          <li>
+            For each <a>environment settings object</a> |settings| in the UA,
+            <a>queue a task</a> on its <a>responsible event loop</a> to
+            do the following sub-steps:
+            <ol>
+              <li>
+                For each {{BluetoothRemoteGATTService}} |service|
+                whose <a>relevant settings object</a> is |settings|,
+                if <code>|service|.{{[[representedService]]}}</code>
+                is in |invalidatedAttributes|,
+                set <code>|service|.{{[[representedService]]}}</code> to `null`.
+              </li>
+              <li>
+                For each {{BluetoothRemoteGATTCharacteristic}} |characteristic|
+                whose <a>relevant settings object</a> is |settings|,
+                if <code>|characteristic|.{{[[representedCharacteristic]]}}</code>
+                is in |invalidatedAttributes|,
+                set <code>|characteristic|.{{[[representedCharacteristic]]}}</code> to `null`.
+              </li>
+              <li>
+                For each {{BluetoothRemoteGATTDescriptor}} |descriptor|
+                whose <a>relevant settings object</a> is |settings|,
+                if <code>|descriptor|.{{[[representedDescriptor]]}}</code>
+                is in |invalidatedAttributes|,
+                set <code>|descriptor|.{{[[representedDescriptor]]}}</code> to `null`.
+              </li>
+              <li>
+                Let |global| be |settings|'
+                <a lt="the environment settings object's global object">global object</a>.
+              </li>
+              <li>
+                Remove every entry
+                from <code>|global|.navigator.bluetooth.{{[[attributeInstanceMap]]}}</code>
+                that represents an attribute that
+                is in |invalidatedAttributes|.
+              </li>
+            </ol>
           </li>
           <li>
             Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
