@@ -82,6 +82,7 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     type: dfn
         text: current realm; url: current-realm
         text: fulfilled; url: sec-promise-objects
+        text: internal slot; url: sec-object-internal-methods-and-internal-slots
         text: realm; url: sec-code-realms
     type: method
         text: Array.prototype.map; url: sec-array.prototype.map
@@ -764,12 +765,12 @@ spec: permissions
   </div>
 
   <p>
-    Instances of {{Bluetooth}} are created with the internal slots
+    Instances of {{Bluetooth}} are created with the <a>internal slots</a>
     described in the following table:
   </p>
   <table class="data" dfn-for="Bluetooth" dfn-type="attribute">
     <thead>
-      <th>Internal Slot</th>
+      <th><a>Internal Slot</a></th>
       <th>Initial Value</th>
       <th>Description (non-normative)</th>
     </thead>
@@ -843,7 +844,7 @@ spec: permissions
         For example, the user might have denied GATT access globally.
       </li>
       <li>
-        Set <code>navigator.bluetooth@{{[[referringDevice]]}}</code>
+        Set <code>navigator.bluetooth.{{[[referringDevice]]}}</code>
         to |referringDeviceObj|.
       </li>
     </ol>
@@ -1332,7 +1333,7 @@ spec: permissions
           };
         </pre>
         <p>
-          {{AllowedBluetoothDevice}} instances have an internal slot
+          {{AllowedBluetoothDevice}} instances have an <a>internal slot</a>
           <dfn attribute for="AllowedBluetoothDevice">\[[device]]</dfn>
           that holds a <a>Bluetooth device</a>.
         </p>
@@ -1431,7 +1432,7 @@ spec: permissions
               </li>
               <li>
                 If <code><var>desc</var>.filters</code> is set
-                and <code><var>allowedDevice</var>@{{[[device]]}}</code> does not
+                and <code><var>allowedDevice</var>.{{[[device]]}}</code> does not
                 <a>match a filter</a> in <code><var>desc</var>.filters</code>,
                 continue to the next <var>allowedDevice</var>.
               </li>
@@ -1440,7 +1441,7 @@ spec: permissions
               </li>
               <li>
                 <a>Get the `BluetoothDevice` representing</a>
-                <code><var>allowedDevice</var>@{{[[device]]}}</code>
+                <code><var>allowedDevice</var>.{{[[device]]}}</code>
                 within <code><var>global</var>.navigator.bluetooth</code>,
                 and add the result to <var>matchingDevices</var>.
               </li>
@@ -1497,7 +1498,7 @@ spec: permissions
                 Note: This fires a {{gattserverdisconnected}} event at |deviceObj|.
               </li>
               <li>
-                Set <code><var>deviceObj</var>@{{[[representedDevice]]}}</code> to `null`.
+                Set <code><var>deviceObj</var>.{{[[representedDevice]]}}</code> to `null`.
               </li>
             </ol>
           </li>
@@ -1643,12 +1644,12 @@ spec: permissions
     </div>
 
     <p>
-      Instances of {{BluetoothDevice}} are created with the internal slots
+      Instances of {{BluetoothDevice}} are created with the <a>internal slots</a>
       described in the following table:
     </p>
     <table class="data" dfn-for="BluetoothDevice" dfn-type="attribute">
       <thead>
-        <th>Internal Slot</th>
+        <th><a>Internal Slot</a></th>
         <th>Initial Value</th>
         <th>Description (non-normative)</th>
       </thead>
@@ -1734,31 +1735,31 @@ spec: permissions
         </li>
         <li>
           Find the |allowedDevice| in <code>|data|.{{allowedDevices}}</code>
-          with <code><var>allowedDevice</var>@{{[[device]]}}</code>
+          with <code><var>allowedDevice</var>.{{[[device]]}}</code>
           the <a>same device</a> as <var>device</var>.
           If there is no such object,
           throw a {{SecurityError}} and abort these steps.
         </li>
         <li>
           If there is no key in
-          <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
+          <var>context</var>.{{Bluetooth/[[deviceInstanceMap]]}}
           that is the <a>same device</a> as <var>device</var>,
           run the following sub-steps:
           <ol>
             <li>Let <var>result</var> be a new instance of {{BluetoothDevice}}.</li>
             <li>Initialize all of <var>result</var>'s optional fields to <code>null</code>.</li>
             <li>
-              Initialize <code><var>result</var>@{{[[context]]}}</code>
+              Initialize <code><var>result</var>.{{[[context]]}}</code>
               to <var>context</var>.
             </li>
             <li>
-              Initialize <code><var>result</var>@{{[[representedDevice]]}}</code>
+              Initialize <code><var>result</var>.{{[[representedDevice]]}}</code>
               to <var>device</var>.
             </li>
             <li>
               Initialize <code><var>result</var>.id</code>
               to <code><var>allowedDevice</var>.{{AllowedBluetoothDevice/deviceId}}</code>,
-              and initialize <code><var>result</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+              and initialize <code><var>result</var>.{{BluetoothDevice/[[allowedServices]]}}</code>
               to <code><var>allowedDevice</var>.{{allowedServices}}</code>.
             </li>
             <li>
@@ -1771,22 +1772,22 @@ spec: permissions
             <li>
               Add <var>device</var>'s
               advertised <a>Service UUIDs</a>
-              to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+              to <code>result.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
             </li>
             <li>
               If the <a>Bluetooth cache</a> contains
               known-present Services inside <var>device</var>,
-              add the UUIDs of those Services to <code>result@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+              add the UUIDs of those Services to <code>result.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
             </li>
             <li>
               Add a mapping from <var>device</var> to <var>result</var>
-              in <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}.
+              in <var>context</var>.{{Bluetooth/[[deviceInstanceMap]]}}.
             </li>
           </ol>
         </li>
         <li>
           Return the value in
-          <var>context</var>@{{Bluetooth/[[deviceInstanceMap]]}}
+          <var>context</var>.{{Bluetooth/[[deviceInstanceMap]]}}
           whose key is the <a>same device</a> as <var>device</var>.
         </li>
       </ol>
@@ -2044,7 +2045,7 @@ spec: permissions
           <li>
             For each {{BluetoothDevice}} <var>deviceObj</var> in the UA
             such that <var>device</var> is the <a>same device</a> as
-            <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>,
+            <code><var>deviceObj</var>.{{[[representedDevice]]}}</code>,
             <a>queue a task</a> on
             <var>deviceObj</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a>
             to do the following sub-steps:
@@ -2193,7 +2194,7 @@ spec: permissions
               </li>
               <li>
                 Add a mapping from <var>code</var> to <code>new DataView(<var>bytes</var>)</code>
-                in <code><var>event</var>.manufacturerData@{{BluetoothManufacturerDataMap/[[data]]}}</code>.
+                in <code><var>event</var>.manufacturerData.{{BluetoothManufacturerDataMap/[[data]]}}</code>.
               </li>
             </ol>
           </li>
@@ -2219,7 +2220,7 @@ spec: permissions
               </li>
               <li>
                 Add a mapping from <var>service</var> to <code>new DataView(<var>bytes</var>)</code>
-                in <code><var>event</var>.serviceData@{{BluetoothServiceDataMap/[[data]]}}</code>.
+                in <code><var>event</var>.serviceData.{{BluetoothServiceDataMap/[[data]]}}</code>.
               </li>
             </ol>
           </li>
@@ -2231,13 +2232,13 @@ spec: permissions
         <h5 dfn-type="interface">BluetoothManufacturerDataMap</h5>
 
         <p>
-          Instances of {{BluetoothManufacturerDataMap}} are created with the internal slots
+          Instances of {{BluetoothManufacturerDataMap}} are created with the <a>internal slots</a>
           described in the following table:
         </p>
 
         <table class="data" dfn-for="BluetoothManufacturerDataMap" dfn-type="attribute">
           <thead>
-            <th>Internal Slot</th>
+            <th><a>Internal Slot</a></th>
             <th>Initial Value</th>
             <th>Description (non-normative)</th>
           </thead>
@@ -2260,13 +2261,13 @@ spec: permissions
         <h5 dfn-type="interface">BluetoothServiceDataMap</h5>
 
         <p>
-          Instances of {{BluetoothServiceDataMap}} are created with the internal slots
+          Instances of {{BluetoothServiceDataMap}} are created with the <a>internal slots</a>
           described in the following table:
         </p>
 
         <table class="data" dfn-for="BluetoothServiceDataMap" dfn-type="attribute">
           <thead>
-            <th>Internal Slot</th>
+            <th><a>Internal Slot</a></th>
             <th>Initial Value</th>
             <th>Description (non-normative)</th>
           </thead>
@@ -2441,7 +2442,7 @@ spec: permissions
           </li>
           <li>
             Let <var>context</var> be
-            <code><var>deviceObj</var>@{{BluetoothDevice/[[context]]}}</code>.
+            <code><var>deviceObj</var>.{{BluetoothDevice/[[context]]}}</code>.
           </li>
           <li>
             Let <var>result</var> be a new sequence.
@@ -2451,7 +2452,7 @@ spec: permissions
             <ol>
               <li>
                 If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
-                in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}},
+                in <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}},
                 <a>create a <code>BluetoothRemoteGATTService</code>
                 representing</a> <var>entry</var>,
                 <a>create a <code>BluetoothRemoteGATTCharacteristic</code>
@@ -2460,13 +2461,13 @@ spec: permissions
                 representing</a> <var>entry</var>,
                 depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
                 and add a mapping from <var>entry</var> to the resulting <code>Promise</code>
-                in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}}.
+                in <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
               </li>
               <li>
                 Append to <var>result</var>
                 the <code>Promise&lt;BluetoothGATT*></code> instance
                 associated with <var>entry</var>
-                in <var>context</var>@{{Bluetooth/[[attributeInstanceMap]]}}.
+                in <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
               </li>
             </ol>
           </li>
@@ -2636,13 +2637,13 @@ spec: permissions
     </p>
 
     <p>
-      Instances of {{BluetoothRemoteGATTServer}} are created with the internal slots
+      Instances of {{BluetoothRemoteGATTServer}} are created with the <a>internal slots</a>
       described in the following table:
     </p>
 
     <table class="data" dfn-for="BluetoothRemoteGATTServer" dfn-type="attribute">
       <thead>
-        <th>Internal Slot</th>
+        <th><a>Internal Slot</a></th>
         <th>Initial Value</th>
         <th>Description (non-normative)</th>
       </thead>
@@ -2665,11 +2666,11 @@ spec: permissions
       </p>
       <ol>
         <li>
-          If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
+          If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
           <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
         </li>
         <li>
-          If <code>this.device@{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
+          If <code>this.device.{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
           attempt to create one using the procedures described
           in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
         </li>
@@ -2681,7 +2682,7 @@ spec: permissions
           <a>Queue a task</a> to perform the following sub-steps:
           <ol>
             <li>
-              If <code>this.device@{{[[representedDevice]]}}</code> is `null`,
+              If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
               <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
             </li>
             <li>
@@ -2705,7 +2706,7 @@ spec: permissions
           If <code>this.{{connected}}</code> is <code>false</code>, abort these steps.
         </li>
         <li>
-          Clear <code>this@{{[[activeAlgorithms]]}}</code>.
+          Clear <code>this.{{[[activeAlgorithms]]}}</code>.
         </li>
         <li>
           Set <code>this.{{connected}}</code> to <code>false</code>.
@@ -2719,12 +2720,12 @@ spec: permissions
           </p>
         </li>
         <li>
-          Let <var>device</var> be <code>this.device@{{[[representedDevice]]}}</code>.
+          Let <var>device</var> be <code>this.device.{{[[representedDevice]]}}</code>.
         </li>
         <li>
           <a>In parallel</a>:
           if, for all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA
-          with <code><var>deviceObj</var>@{{[[representedDevice]]}}</code>
+          with <code><var>deviceObj</var>.{{[[representedDevice]]}}</code>
           the <a>same device</a> as <var>device</var>,
           <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
           the UA SHOULD destroy
@@ -2749,7 +2750,7 @@ spec: permissions
         <li>
           If <code><var>gattServer</var>.connected</code> is `true`,
           add <var>promise</var> to
-          <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
+          <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
         </li>
         <li>
           Return the result of <a>transforming</a> <var>promise</var>
@@ -2760,7 +2761,7 @@ spec: permissions
               <ol>
                 <li>
                   If <var>promise</var> is in
-                  <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
+                  <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
                   remove it and return the first argument.
                 </li>
                 <li>
@@ -2777,7 +2778,7 @@ spec: permissions
               <ol>
                 <li>
                   If <var>promise</var> is in
-                  <code><var>gattServer</var>@{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
+                  <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
                   remove it and throw the first argument.
                 </li>
                 <li>
@@ -2801,9 +2802,9 @@ spec: permissions
       </p>
       <ol>
         <li>
-          If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`
+          If <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`
           and <var>service</var> is not in
-          <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
+          <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,
           return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
         </li>
         <li>
@@ -2811,7 +2812,7 @@ spec: permissions
           <i>single</i>=true,<br>
           <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
           <i>uuid</i>=<code><var>service</var></code>,<br>
-          <i>allowedUuids</i>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
+          <i>allowedUuids</i>=<code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
           <i>child type</i>="GATT Primary Service")</span>
         </li>
       </ol>
@@ -2824,17 +2825,17 @@ spec: permissions
       </p>
       <ol>
         <li>
-          If <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`,
+          If <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`,
           and <var>service</var> is present
-          and not in <code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,
+          and not in <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,
           return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
         </li>
         <li>
-          Return <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device@{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
+          Return <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device.{{BluetoothDevice/[[representedDevice]]}}</code>,<br>
           <i>single</i>=false,<br>
           <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
           <i>uuid</i>=<code><var>service</var></code>,<br>
-          <i>allowedUuids</i>=<code>this.device@{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
+          <i>allowedUuids</i>=<code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
           <i>child type</i>="GATT Primary Service")</span>
         </li>
       </ol>
@@ -3151,7 +3152,7 @@ spec: permissions
               <ol>
                 <li>
                   If <var>promise</var> is not in
-                  <code>this.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <code>this.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
                   <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
                 </li>
                 <li>
@@ -3228,7 +3229,7 @@ spec: permissions
               <ol>
                 <li>
                   If <var>promise</var> is not in
-                  <code>this.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <code>this.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
                   <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
                 </li>
                 <li>
@@ -3553,7 +3554,7 @@ spec: permissions
               <ol>
                 <li>
                   If <var>promise</var> is not in
-                  <code>this.characteristic.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
                   <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
                 </li>
                 <li>
@@ -3622,7 +3623,7 @@ spec: permissions
               <ol>
                 <li>
                   If <var>promise</var> is not in
-                  <code>this.characteristic.service.device.gatt@{{[[activeAlgorithms]]}}</code>,
+                  <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
                   <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
                 </li>
                 <li>
@@ -3754,7 +3755,7 @@ spec: permissions
         </p>
         <ol>
           <li>
-            If <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+            If <code><var>deviceObj</var>.{{BluetoothDevice/[[representedDevice]]}}</code>
             is not the <a>same device</a> as <var>device</var>,
             abort these steps.
           </li>
@@ -3767,7 +3768,7 @@ spec: permissions
             to `false`.
           </li>
           <li>
-            Clear <code><var>deviceObj</var>.gatt@{{[[activeAlgorithms]]}}</code>.
+            Clear <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>.
           </li>
           <li>
             <a>Fire an event</a> named {{gattserverdisconnected}}
@@ -3899,13 +3900,13 @@ spec: permissions
                 <ol>
                   <li>
                     If no remaining <a>Service</a> in
-                    <code><var>deviceObj</var>@{{BluetoothDevice/[[representedDevice]]}}</code>
+                    <code><var>deviceObj</var>.{{BluetoothDevice/[[representedDevice]]}}</code>
                     has the same UUID as <var>service</var>,
                     remove the UUID from
-                    <code><var>deviceObj</var>@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+                    <code><var>deviceObj</var>.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
                   </li>
                   <li>
-                    If <code><var>deviceObj</var>@{{BluetoothDevice/[[allowedServices]]}}</code>
+                    If <code><var>deviceObj</var>.{{BluetoothDevice/[[allowedServices]]}}</code>
                     is `"all"` or contains the Service's UUID,
                     <a>fire an event</a> named {{serviceremoved}}
                     with its <code>bubbles</code> attribute initialized to <code>true</code>
@@ -3919,8 +3920,8 @@ spec: permissions
               <li>
                 For each <a>Service</a> in <var>addedAttributes</var>,
                 add the Service's UUID to
-                <code>deviceObj@{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-                If <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
+                <code>deviceObj.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
+                If <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code>
                 is `"all"` or contains the Service's UUID,
                 add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
                 and then <a>fire an event</a> named {{serviceadded}}
@@ -3929,7 +3930,7 @@ spec: permissions
               </li>
               <li>
                 For each <a>Service</a> in <var>changedServices</var>,
-                if <code>deviceObj@{{BluetoothDevice/[[allowedServices]]}}</code>
+                if <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code>
                 is `"all"` or contains the Service's UUID,
                 <a>fire an event</a> named {{servicechanged}}
                 with its <code>bubbles</code> attribute initialized to <code>true</code>
@@ -4356,14 +4357,6 @@ spec: permissions
   <p>
     This specification uses a few conventions and several terms from other specifications.
     This section lists those and links to their primary definitions.
-  </p>
-
-  <p>
-    Inspired by
-    the <a href="https://streams.spec.whatwg.org/#conventions">Streams specification</a>,
-    we use the notation x@\[[y]] to refer to
-    <a href="http://ecma-international.org/ecma-262/6.0/#sec-object-internal-methods-and-internal-slots"
-       >internal slots</a> of an object, instead of saying "the \[[y]] internal slot of x."
   </p>
 
   <p>
