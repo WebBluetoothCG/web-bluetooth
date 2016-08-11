@@ -2,7 +2,7 @@
 This document shows the implementation status of Web Bluetooth on the
 different browsers.
 
-<a href="#chrome"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/chrome/chrome_256x256.png" alt="Chrome browser logo"></a><a href="#opera"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/opera/opera_256x256.png" alt="Opera browser logo"></a><a href="#servo"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/browser.html/browser.html_256x256.png" alt="Servo browser logo"></a><a href="#firefox"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/firefox/firefox_256x256.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/edge/edge_256x256.png" alt="Microsoft Edge browser logo"></a><a href="#microsoft-edge"><img width=128 src="https://raw.githubusercontent.com/alrra/browser-logos/master/safari/safari_256x256.png" alt="Safari browser logo"></a>
+<a href="#chrome"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/chrome/chrome_128x128.png" alt="Chrome browser logo"></a><a href="#opera"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/opera/opera_128x128.png" alt="Opera browser logo"></a><a href="#servo"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/browser.html/browser.html_128x128.png" alt="Servo browser logo"></a><a href="#firefox"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/firefox/firefox_128x128.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/edge/edge_128x128.png" alt="Microsoft Edge browser logo"></a><a href="#microsoft-edge"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/safari/safari_128x128.png" alt="Safari browser logo"></a><a href="#samsung-internet"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/samsung-internet/samsung-internet_128x128.png" alt="Samsung Internet browser logo"></a>
 
 # Chrome
 Work is in progress:
@@ -59,3 +59,6 @@ https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
 # Safari
 https://bugs.webkit.org/show_bug.cgi?id=101034
+
+# Samsung Internet
+http://developer.samsung.com/forum/board/thread/view.do?boardName=SDK&messageId=296269
