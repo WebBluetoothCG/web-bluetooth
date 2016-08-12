@@ -1840,11 +1840,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-1">BluetoothServiceUUID</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothrequestdevicefilter-services" id="ref-for-dom-bluetoothrequestdevicefilter-services-1">services</a>;
   <span class="kt">DOMString</span> <a class="nv idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothrequestdevicefilter-name" id="ref-for-dom-bluetoothrequestdevicefilter-name-1">name</a>;
   <span class="kt">DOMString</span> <a class="nv idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothrequestdevicefilter-nameprefix" id="ref-for-dom-bluetoothrequestdevicefilter-nameprefix-1">namePrefix</a>;
+  <span class="kt">unsigned</span> <span class="kt">short</span> <a class="nv idl-code" data-link-type="dict-member" data-type="unsigned short " href="#dom-bluetoothrequestdevicefilter-manufacturerid" id="ref-for-dom-bluetoothrequestdevicefilter-manufacturerid-1">manufacturerId</a>;
+  <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-2">BluetoothServiceUUID</a> <a class="nv idl-code" data-link-type="dict-member" data-type="BluetoothServiceUUID " href="#dom-bluetoothrequestdevicefilter-servicedatauuid" id="ref-for-dom-bluetoothrequestdevicefilter-servicedatauuid-1">serviceDataUUID</a>;
 };
 
 <span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-requestdeviceoptions">RequestDeviceOptions</dfn> {
   <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-1">BluetoothRequestDeviceFilter</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothRequestDeviceFilter> " href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-1">filters</a>;
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-2">BluetoothServiceUUID</a>> <a class="nv idl-code" data-default="None" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-1">optionalServices</a> = [];
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-3">BluetoothServiceUUID</a>> <a class="nv idl-code" data-default="None" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-1">optionalServices</a> = [];
 };
 
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetooth">Bluetooth</dfn> {
@@ -1874,11 +1876,20 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li> support <em>all</em> the GATT service UUIDs
         in the <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-services">services</dfn> list
         if that member is present, 
-      <li> have a name equal to <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-name">name</dfn> if that member is present, and 
-      <li> have a name starting with <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-nameprefix">namePrefix</dfn> if that member is present. 
+      <li> have a name equal to <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-name">name</dfn> if that member is present, 
+      <li> have a name starting with <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-nameprefix">namePrefix</dfn> if that member is present, 
+      <li> advertise <a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-1">manufacturer specific data</a> with
+        a company identifier code equal to <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-manufacturerid">manufacturerId</dfn> if that member is present, and 
+      <li> advertise <a data-link-type="dfn" href="#service-data" id="ref-for-service-data-1">service data</a> with
+        a UUID equal to <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRequestDeviceFilter" data-dfn-type="dict-member" data-export="" id="dom-bluetoothrequestdevicefilter-servicedatauuid">serviceDataUUID</dfn> if that member is present. 
      </ul>
+     <p> Note that this means that
+      if a device changes its behavior significantly when it connects,
+      for example by not advertising its identifying manufacturer data anymore
+      and instead having the client discover some identifying GATT services,
+      the website may need to include filters for both behaviors. </p>
      <p> After the user selects a device to pair with this origin,
-      the origin is allowed to access to any service whose UUID was listed
+      the origin is allowed to access any service whose UUID was listed
       in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothrequestdevicefilter-services" id="ref-for-dom-bluetoothrequestdevicefilter-services-2">services</a></code> list
       in any element of <code>options.filters</code> or in <code>options.<dfn class="dfn-paneled idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-optionalservices">optionalServices</dfn></code>. </p>
      <p> This implies that if developers filter just by name,
@@ -2017,6 +2028,51 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <td>
      </table>
     </div>
+    <div class="example" id="example-filter-by-manufacturer-service-data">
+     <a class="self-link" href="#example-filter-by-manufacturer-service-data"></a> 
+     <p> Say the devices in the <a href="#example-filter-by-services">previous example</a> also advertise manufacturer or service data as follows: </p>
+     <table class="data">
+      <thead>
+       <tr>
+        <th>Device
+        <th>Manufacturer Data
+        <th>Service Data
+      <tbody>
+       <tr>
+        <td>D1
+        <td>17: 01 02 03
+        <td>
+       <tr>
+        <td>D2
+        <td>
+        <td>A: 01 02 03
+     </table>
+     <p> The following table shows which devices the user can select between
+      for several values of <var>filters</var> passed to <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>. </p>
+     <table class="data">
+      <thead>
+       <tr>
+        <th><var>filters</var>
+        <th>Devices
+      <tbody>
+       <tr>
+        <td>
+<pre class="highlight"><span></span><span class="p">[{</span><span class="nx">manufacturerId</span><span class="o">:</span> <span class="mi">17</span><span class="p">}]</span>
+</pre>
+        <td>D1
+       <tr>
+        <td>
+<pre class="highlight"><span></span><span class="p">[{</span><span class="nx">serviceDataUUID</span><span class="o">:</span> <span class="nx">A</span><span class="p">}]</span>
+</pre>
+        <td>D2
+       <tr>
+        <td>
+<pre class="highlight"><span></span><span class="p">[{</span><span class="nx">manufacturerId</span><span class="o">:</span> <span class="mi">17</span><span class="p">},</span>
+ <span class="p">{</span><span class="nx">serviceDataUUID</span><span class="o">:</span> <span class="nx">A</span><span class="p">}]</span>
+</pre>
+        <td>D1, D2
+     </table>
+    </div>
     <div class="example" id="example-disallowed-filters">
      <a class="self-link" href="#example-disallowed-filters"></a> 
      <p> Filters that either accept or reject all possible devices cause <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>s. </p>
@@ -2100,6 +2156,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         or a service discovery response indicating that
         the device supports a primary (vs included) service with UUID <var>uuid</var>,
         return <code>mismatch</code>. 
+      <li> If <code><var>filter</var>.manufacturerId</code> is present then
+        if <var>device</var> hasn’t advertised <a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-2">manufacturer specific data</a> with a company identifier code equal to <code><var>filter</var>.manufacturerId</code>,
+        return <code>mismatch</code>. 
+      <li> If <code><var>filter</var>.serviceDataUUID</code> is present then
+        if <var>device</var> hasn’t advertised <a data-link-type="dfn" href="#service-data" id="ref-for-service-data-2">service data</a> with a UUID equal to <code><var>filter</var>.serviceDataUUID</code>,
+        return <code>mismatch</code>. 
       <li>Return <code>match</code>.
      </ol>
     </div>
@@ -2125,7 +2187,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <div class="algorithm" data-algorithm="request Bluetooth devices">
      <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="request-bluetooth-devices">request Bluetooth devices</dfn>,
       given a sequence of <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-2">BluetoothRequestDeviceFilter</a></code>s, <var>filters</var>,
-      and a sequence of <code class="idl"><a data-link-type="idl" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-3">BluetoothServiceUUID</a></code>s, <var>optionalServices</var>,
+      and a sequence of <code class="idl"><a data-link-type="idl" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-4">BluetoothServiceUUID</a></code>s, <var>optionalServices</var>,
       the UA MUST run the following steps: </p>
      <p class="note" role="note"> Calls to this algorithm will eventually be able to request multiple devices,
       but for now it only ever returns a single one. </p>
@@ -2143,7 +2205,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
           For each <var>filter</var> in <var>filters</var>,
             do the following steps: 
          <ol>
-          <li> If none of <var>filter</var>’s <code>services</code>, <code>name</code>, or <code>namePrefix</code> members is present,
+          <li> If none of <var>filter</var>’s
+                members is present,
                 throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
           <li>Let <var>canonicalizedFilter</var> be <code>{}</code>.
           <li>
@@ -2179,12 +2242,24 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
                       a <a data-link-type="dfn" href="#bluetooth-device-name" id="ref-for-bluetooth-device-name-5">Bluetooth Device Name</a>. </p>
             <li> Set <code><var>canonicalizedFilter</var>.namePrefix</code> to <code><var>filter</var>.namePrefix</code>. 
            </ol>
+          <li> If <code><var>filter</var>.manufacturerId</code> is present,
+                set <code><var>canonicalizedFilter</var>.manufacturerId</code> to <code><var>filter</var>.manufacturerId</code>. 
+          <li>
+            If <code><var>filter</var>.serviceDataUUID</code> is present, do the following sub-steps. 
+           <ol>
+            <li> Let <var>service</var> be <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-3">BluetoothUUID.getService</a></code>(<code><var>filter</var>.serviceDataUUID)</code>. 
+            <li> If the previous step threw an exception,
+                    throw that exception and abort these steps. 
+            <li> If <var>service</var> is <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-2">blacklisted</a>,
+                    throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
+            <li> Set <code><var>canonicalizedFilter</var>.serviceDataUUID</code> to <var>service</var>. 
+           </ol>
           <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.
          </ol>
-        <li> Let <var>optionalServiceUUIDs</var> be <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>optionalServices</var>, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-3">BluetoothUUID.getService</a></code>)</code>. 
-        <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-4">BluetoothUUID.getService()</a></code> calls threw an exception,
+        <li> Let <var>optionalServiceUUIDs</var> be <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>optionalServices</var>, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-4">BluetoothUUID.getService</a></code>)</code>. 
+        <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-5">BluetoothUUID.getService()</a></code> calls threw an exception,
             throw that exception and abort these steps. 
-        <li> Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-2">blacklisted</a>. 
+        <li> Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-3">blacklisted</a>. 
        </ol>
       <li>
         Let <var>descriptor</var> be 
@@ -2353,7 +2428,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="kt">DOMString</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-bluetoothpermissiondescriptor-deviceid">deviceId</dfn>;
   // These match RequestDeviceOptions.
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-3">BluetoothRequestDeviceFilter</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothRequestDeviceFilter> " id="dom-bluetoothpermissiondescriptor-filters">filters<a class="self-link" href="#dom-bluetoothpermissiondescriptor-filters"></a></dfn>;
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-4">BluetoothServiceUUID</a>> <dfn class="nv idl-code" data-default="None" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices">optionalServices<a class="self-link" href="#dom-bluetoothpermissiondescriptor-optionalservices"></a></dfn> = [];
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-5">BluetoothServiceUUID</a>> <dfn class="nv idl-code" data-default="None" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices">optionalServices<a class="self-link" href="#dom-bluetoothpermissiondescriptor-optionalservices"></a></dfn> = [];
 };
 </pre>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data-type">extra permission data type</a> 
@@ -2832,14 +2907,14 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
                 reading the raw advertisement to get this information,
                 and we want more evidence that it’s useful
                 before adding a field to the API.</p>
-          <dt><a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-1">Manufacturer Specific Data</a>
+          <dt><a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-3">Manufacturer Specific Data</a>
           <dd> Add to <code><var>event</var>.manufacturerData</code> a mapping from the 16-bit Company Identifier Code to
                 an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a></code> containing the manufacturer-specific data. 
           <dt><a data-link-type="dfn" href="#tx-power-level" id="ref-for-tx-power-level-1">TX Power Level</a>
           <dd> Set <code><var>event</var>.txPower</code> to the AD data. 
-          <dt><a data-link-type="dfn" href="#service-data" id="ref-for-service-data-1">Service Data</a> - 16 bit UUID
-          <dt><a data-link-type="dfn" href="#service-data" id="ref-for-service-data-2">Service Data</a> - 32 bit UUID
-          <dt><a data-link-type="dfn" href="#service-data" id="ref-for-service-data-3">Service Data</a> - 128 bit UUID
+          <dt><a data-link-type="dfn" href="#service-data" id="ref-for-service-data-3">Service Data</a> - 16 bit UUID
+          <dt><a data-link-type="dfn" href="#service-data" id="ref-for-service-data-4">Service Data</a> - 32 bit UUID
+          <dt><a data-link-type="dfn" href="#service-data" id="ref-for-service-data-5">Service Data</a> - 128 bit UUID
           <dd> Add to <code><var>event</var>.serviceData</code> a mapping from the <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-2">UUID</a> to
                 an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a></code> containing the service data. 
           <dt><a data-link-type="dfn" href="#appearance" id="ref-for-appearance-2">Appearance</a>
@@ -2860,7 +2935,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <li> Let <var>event</var> be the result of running the steps from <a href="https://dom.spec.whatwg.org/#constructing-events">DOM §3.4 Constructing events</a> except for the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-uuids" id="ref-for-dom-bluetoothadvertisingeventinit-uuids-1">uuids</a></code>, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-manufacturerdata" id="ref-for-dom-bluetoothadvertisingeventinit-manufacturerdata-1">manufacturerData</a></code>,
             and <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-servicedata" id="ref-for-dom-bluetoothadvertisingeventinit-servicedata-1">serviceData</a></code> members. 
         <li> If <code><var>init</var>.uuids</code> is set,
-            initialize <code><var>event</var>.uuids</code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> containing the elements of <code><var>init</var>.uuids.map(<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-5">BluetoothUUID.getService</a></code>)</code>.
+            initialize <code><var>event</var>.uuids</code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code> containing the elements of <code><var>init</var>.uuids.map(<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-6">BluetoothUUID.getService</a></code>)</code>.
             Otherwise initialize <code><var>event</var>.uuids</code> to an empty <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code>. 
         <li>
           For each mapping in <code><var>init</var>.manufacturerData</code>: 
@@ -2875,7 +2950,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
           For each mapping in <code><var>init</var>.serviceData</code>: 
          <ol>
           <li> Let <var>key</var> be the key. 
-          <li> Let <var>service</var> be the result of calling <code>BluetoothUUID.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-6">getService</a></code>(<var>key</var>).</code> 
+          <li> Let <var>service</var> be the result of calling <code>BluetoothUUID.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-7">getService</a></code>(<var>key</var>).</code> 
           <li> Let <var>value</var> be the value. 
           <li> Set <var>value</var> is not a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#BufferSource">BufferSource</a></code>, throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>. 
           <li> Let <var>bytes</var> be a new <a data-link-type="dfn" href="#read-only-arraybuffer" id="ref-for-read-only-arraybuffer-2">read only ArrayBuffer</a> containing <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a> by <var>value</var>. 
@@ -3036,7 +3111,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
             set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
             If <var>uuidCanonicalizer</var> threw an exception,
             return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> that exception and abort these steps. 
-        <li> If <var>uuid</var> is present and is <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-3">blacklisted</a>,
+        <li> If <var>uuid</var> is present and is <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-4">blacklisted</a>,
             return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
         <li>
           Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>: 
@@ -3053,7 +3128,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
          <ul>
           <li>are within the Bluetooth attribute or device represented by <var>attribute</var>,
           <li>have a type described by <var>child type</var>,
-          <li>have a UUID that is not <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-4">blacklisted</a>,
+          <li>have a UUID that is not <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-5">blacklisted</a>,
           <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,
           <li> if <var>allowedUuids</var> is present and not <code>"all"</code>,
                 have a UUID in <var>allowedUuids</var>, and 
@@ -3100,9 +3175,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">boolean</span> <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="boolean" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-3">connected</a>;
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattserver" id="ref-for-bluetoothremotegattserver-7">BluetoothRemoteGATTServer</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-connect" id="ref-for-dom-bluetoothremotegattserver-connect-2">connect</a>();
   <span class="kt">void</span> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-disconnect" id="ref-for-dom-bluetoothremotegattserver-disconnect-2">disconnect</a>();
-  <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-5">BluetoothRemoteGATTService</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservice" id="ref-for-dom-bluetoothremotegattserver-getprimaryservice-2">getPrimaryService</a>(<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-5">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTServer/getPrimaryService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice-service-service">service<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservice-service-service"></a></dfn>);
+  <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-5">BluetoothRemoteGATTService</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservice" id="ref-for-dom-bluetoothremotegattserver-getprimaryservice-2">getPrimaryService</a>(<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-6">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTServer/getPrimaryService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice-service-service">service<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservice-service-service"></a></dfn>);
   <span class="kt">Promise</span>&lt;<span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-6">BluetoothRemoteGATTService</a>>>
-    <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservices" id="ref-for-dom-bluetoothremotegattserver-getprimaryservices-1">getPrimaryServices</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-6">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTServer/getPrimaryServices(service), BluetoothRemoteGATTServer/getPrimaryServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattserver-getprimaryservices-service-service">service<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservices-service-service"></a></dfn>);
+    <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattserver-getprimaryservices" id="ref-for-dom-bluetoothremotegattserver-getprimaryservices-1">getPrimaryServices</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-7">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTServer/getPrimaryServices(service), BluetoothRemoteGATTServer/getPrimaryServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattserver-getprimaryservices-service-service">service<a class="self-link" href="#dom-bluetoothremotegattserver-getprimaryservices-service-service"></a></dfn>);
 };
 </pre>
      <div class="note no-marker" role="note">
@@ -3208,7 +3283,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <ol>
        <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-10">[[allowedServices]]</a></code></code> is not <code>"all"</code> and <var>service</var> is not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-11">[[allowedServices]]</a></code></code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
-       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-1">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-7">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-12">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
+       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-1">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-8">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-12">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
       </ol>
      </div>
      <div class="algorithm" data-algorithm="getPrimaryServices(service)">
@@ -3219,7 +3294,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
           and <var>service</var> is present
           and not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-14">[[allowedServices]]</a></code></code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
-       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-2">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-10">[[representedDevice]]</a></code></code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-8">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-15">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
+       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-2">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-10">[[representedDevice]]</a></code></code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-9">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-15">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
       </ol>
      </div>
     </section>
@@ -3237,9 +3312,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="kt">Promise</span>&lt;<span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-7">BluetoothRemoteGATTCharacteristic</a>>>
     <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getcharacteristics" id="ref-for-dom-bluetoothremotegattservice-getcharacteristics-1">getCharacteristics</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothcharacteristicuuid" id="ref-for-typedefdef-bluetoothcharacteristicuuid-2">BluetoothCharacteristicUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTService/getCharacteristics(characteristic), BluetoothRemoteGATTService/getCharacteristics()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getcharacteristics-characteristic-characteristic">characteristic<a class="self-link" href="#dom-bluetoothremotegattservice-getcharacteristics-characteristic-characteristic"></a></dfn>);
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-9">BluetoothRemoteGATTService</a>>
-    <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservice" id="ref-for-dom-bluetoothremotegattservice-getincludedservice-2">getIncludedService</a>(<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-7">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTService/getIncludedService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getincludedservice-service-service">service<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservice-service-service"></a></dfn>);
+    <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservice" id="ref-for-dom-bluetoothremotegattservice-getincludedservice-2">getIncludedService</a>(<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-8">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTService/getIncludedService(service)" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getincludedservice-service-service">service<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservice-service-service"></a></dfn>);
   <span class="kt">Promise</span>&lt;<span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-10">BluetoothRemoteGATTService</a>>>
-    <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservices" id="ref-for-dom-bluetoothremotegattservice-getincludedservices-1">getIncludedServices</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-8">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTService/getIncludedServices(service), BluetoothRemoteGATTService/getIncludedServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getincludedservices-service-service">service<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservices-service-service"></a></dfn>);
+    <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothremotegattservice-getincludedservices" id="ref-for-dom-bluetoothremotegattservice-getincludedservices-1">getIncludedServices</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-9">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothRemoteGATTService/getIncludedServices(service), BluetoothRemoteGATTService/getIncludedServices()" data-dfn-type="argument" data-export="" id="dom-bluetoothremotegattservice-getincludedservices-service-service">service<a class="self-link" href="#dom-bluetoothremotegattservice-getincludedservices-service-service"></a></dfn>);
 };
 <a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-11">BluetoothRemoteGATTService</a> <span class="kt">implements</span> <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
 <a class="n" data-link-type="idl-name" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-12">BluetoothRemoteGATTService</a> <span class="kt">implements</span> <a class="n" data-link-type="idl-name" href="#characteristiceventhandlers" id="ref-for-characteristiceventhandlers-3">CharacteristicEventHandlers</a>;
@@ -3285,13 +3360,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattservice-getincludedservice">getIncludedService(<var>service</var>)</dfn></code> method
         retrieves an <a data-link-type="dfn" href="#included-service" id="ref-for-included-service-2">Included Service</a> inside this Service.
         When invoked, it MUST return </p>
-      <blockquote> <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-5">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-9">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>undefined</code>,<br> <i>child type</i>="GATT Included Service")</span> </blockquote>
+      <blockquote> <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-5">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-10">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>undefined</code>,<br> <i>child type</i>="GATT Included Service")</span> </blockquote>
      </div>
      <div class="algorithm" data-algorithm="getIncludedServices(service)">
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattservice-getincludedservices">getIncludedServices(<var>service</var>)</dfn></code> method
         retrieves a list of <a data-link-type="dfn" href="#included-service" id="ref-for-included-service-3">Included Service</a>s inside this Service.
         When invoked, it MUST return </p>
-      <blockquote> <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-6">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-10">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>undefined</code>,<br> <i>child type</i>="GATT Included Service")</span> </blockquote>
+      <blockquote> <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-6">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-11">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>undefined</code>,<br> <i>child type</i>="GATT Included Service")</span> </blockquote>
      </div>
     </section>
     <section>
@@ -3915,14 +3990,14 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       This section provides a way for script to look up those UUIDs by name
       so they don’t need to be replicated in each application. </p>
 <pre class="idl highlight def"><span class="kt">interface</span> <dfn class="nv idl-code" data-dfn-type="interface" data-export="" id="bluetoothuuid">BluetoothUUID<a class="self-link" href="#bluetoothuuid"></a></dfn> {
-  <span class="kt">static</span> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-9">UUID</a> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-11">getService</a>((<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <dfn class="nv idl-code" data-dfn-for="BluetoothUUID/getService(name)" data-dfn-type="argument" data-export="" id="dom-bluetoothuuid-getservice-name-name">name<a class="self-link" href="#dom-bluetoothuuid-getservice-name-name"></a></dfn>);
+  <span class="kt">static</span> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-9">UUID</a> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-12">getService</a>((<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <dfn class="nv idl-code" data-dfn-for="BluetoothUUID/getService(name)" data-dfn-type="argument" data-export="" id="dom-bluetoothuuid-getservice-name-name">name<a class="self-link" href="#dom-bluetoothuuid-getservice-name-name"></a></dfn>);
   <span class="kt">static</span> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-10">UUID</a> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothuuid-getcharacteristic" id="ref-for-dom-bluetoothuuid-getcharacteristic-3">getCharacteristic</a>((<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <dfn class="nv idl-code" data-dfn-for="BluetoothUUID/getCharacteristic(name)" data-dfn-type="argument" data-export="" id="dom-bluetoothuuid-getcharacteristic-name-name">name<a class="self-link" href="#dom-bluetoothuuid-getcharacteristic-name-name"></a></dfn>);
   <span class="kt">static</span> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-11">UUID</a> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothuuid-getdescriptor" id="ref-for-dom-bluetoothuuid-getdescriptor-3">getDescriptor</a>((<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <dfn class="nv idl-code" data-dfn-for="BluetoothUUID/getDescriptor(name)" data-dfn-type="argument" data-export="" id="dom-bluetoothuuid-getdescriptor-name-name">name<a class="self-link" href="#dom-bluetoothuuid-getdescriptor-name-name"></a></dfn>);
 
   <span class="kt">static</span> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-12">UUID</a> <a class="nv idl-code" data-link-type="method" href="#dom-bluetoothuuid-canonicaluuid" id="ref-for-dom-bluetoothuuid-canonicaluuid-2">canonicalUUID</a>([<a class="nv idl-code" data-link-type="extended-attribute">EnforceRange</a>] <span class="kt">unsigned</span> <span class="kt">long</span> <dfn class="nv idl-code" data-dfn-for="BluetoothUUID/canonicalUUID(alias)" data-dfn-type="argument" data-export="" id="dom-bluetoothuuid-canonicaluuid-alias-alias">alias<a class="self-link" href="#dom-bluetoothuuid-canonicaluuid-alias-alias"></a></dfn>);
 };
 
-<span class="kt">typedef</span> (<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <a class="nv idl-code" data-link-type="typedef" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-9">BluetoothServiceUUID</a>;
+<span class="kt">typedef</span> (<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <a class="nv idl-code" data-link-type="typedef" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-10">BluetoothServiceUUID</a>;
 <span class="kt">typedef</span> (<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <a class="nv idl-code" data-link-type="typedef" href="#typedefdef-bluetoothcharacteristicuuid" id="ref-for-typedefdef-bluetoothcharacteristicuuid-3">BluetoothCharacteristicUUID</a>;
 <span class="kt">typedef</span> (<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">unsigned</span> <span class="kt">long</span>) <a class="nv idl-code" data-link-type="typedef" href="#typedefdef-bluetoothdescriptoruuid" id="ref-for-typedefdef-bluetoothdescriptoruuid-3">BluetoothDescriptorUUID</a>;
 </pre>
@@ -3936,7 +4011,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <p> <dfn class="dfn-paneled idl-code" data-dfn-type="typedef" data-export="" id="typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</dfn> represents
         16- and 32-bit UUID aliases, <a data-link-type="dfn" href="#valid-uuid" id="ref-for-valid-uuid-4">valid UUID</a>s,
         and names defined in <a data-link-type="biblio" href="#biblio-bluetooth-assigned-services">[BLUETOOTH-ASSIGNED-SERVICES]</a>,
-        or, equivalently, the values for which <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-12">BluetoothUUID.getService()</a></code> does not throw an exception. </p>
+        or, equivalently, the values for which <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-13">BluetoothUUID.getService()</a></code> does not throw an exception. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-type="typedef" data-export="" id="typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</dfn> represents
         16- and 32-bit UUID aliases, <a data-link-type="dfn" href="#valid-uuid" id="ref-for-valid-uuid-5">valid UUID</a>s,
         and names defined in <a data-link-type="biblio" href="#biblio-bluetooth-assigned-characteristics">[BLUETOOTH-ASSIGNED-CHARACTERISTICS]</a>,
@@ -3968,9 +4043,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       MUST return <a data-link-type="dfn" href="#resolveuuidname" id="ref-for-resolveuuidname-3">ResolveUUIDName</a>(<code><var>name</var></code>, <a data-link-type="biblio" href="#biblio-bluetooth-assigned-descriptors">[BLUETOOTH-ASSIGNED-DESCRIPTORS]</a>, "org.bluetooth.descriptor"). </p>
      <div class="example" id="example-d5112950">
       <a class="self-link" href="#example-d5112950"></a> 
-      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-13">BluetoothUUID.getService</a></code>("<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#">cycling_power</a>")</code> returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>. </p>
-      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-14">BluetoothUUID.getService</a></code>("00001801-0000-1000-8000-00805f9b34fb")</code> returns <code>"00001801-0000-1000-8000-00805f9b34fb"</code>. </p>
-      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-15">BluetoothUUID.getService</a></code>("unknown-service")</code> throws a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#syntaxerror">SyntaxError</a></code>. </p>
+      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-14">BluetoothUUID.getService</a></code>("<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#">cycling_power</a>")</code> returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>. </p>
+      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-15">BluetoothUUID.getService</a></code>("00001801-0000-1000-8000-00805f9b34fb")</code> returns <code>"00001801-0000-1000-8000-00805f9b34fb"</code>. </p>
+      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-16">BluetoothUUID.getService</a></code>("unknown-service")</code> throws a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#syntaxerror">SyntaxError</a></code>. </p>
       <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getcharacteristic" id="ref-for-dom-bluetoothuuid-getcharacteristic-5">BluetoothUUID.getCharacteristic</a></code>("<code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml#">ieee_11073-20601_regulatory_certification_data_list</a></code>")</code> returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>. </p>
       <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getdescriptor" id="ref-for-dom-bluetoothuuid-getdescriptor-5">BluetoothUUID.getDescriptor</a></code>("<code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml#">gatt.characteristic_presentation_format</a></code>")</code> returns <code>"00002904-0000-1000-8000-00805f9b34fb"</code>. </p>
      </div>
@@ -4035,9 +4110,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <p> When an algorithm in this specification uses a name defined in this or another specification,
     the name MUST resolve to its initial value,
     ignoring any changes that have been made to the name in the current execution environment.
-    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-6">requestDevice()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-16">BluetoothUUID.getService</a></code>)</code>,
+    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-6">requestDevice()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-17">BluetoothUUID.getService</a></code>)</code>,
     this MUST apply the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code> algorithm defined in <a data-link-type="biblio" href="#biblio-ecmascript">[ECMAScript]</a> with <code><var>filter</var>.services</code> as its <code>this</code> parameter and
-    the algorithm defined in <a href="#standardized-uuids">§6.1 Standardized UUIDs</a> for <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-17">BluetoothUUID.getService</a></code> as its <code>callbackfn</code> parameter,
+    the algorithm defined in <a href="#standardized-uuids">§6.1 Standardized UUIDs</a> for <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-18">BluetoothUUID.getService</a></code> as its <code>callbackfn</code> parameter,
     regardless of any modifications that have been made to <code>window</code>, <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>, <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothUUID</code>, <code>BluetoothUUID.getService</code>, or other objects. </p>
     <p> This specification uses a read-only type
     that is similar to WebIDL’s <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#dom-FrozenArray">FrozenArray</a></code>. </p>
@@ -4716,6 +4791,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <li><a href="#dom-bluetoothadvertisingeventinit-manufacturerdata">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
      <li><a href="#dom-bluetoothadvertisingevent-manufacturerdata">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
     </ul>
+   <li><a href="#dom-bluetoothrequestdevicefilter-manufacturerid">manufacturerId</a><span>, in §3</span>
    <li><a href="#manufacturer-specific-data">Manufacturer Specific Data</a><span>, in §9</span>
    <li><a href="#matches-a-filter">match a filter</a><span>, in §3</span>
    <li><a href="#matches-a-filter">matches a filter</a><span>, in §3</span>
@@ -4806,6 +4882,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <li><a href="#dom-bluetoothadvertisingevent-servicedata">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
     </ul>
    <li><a href="#service-data">Service Data</a><span>, in §9</span>
+   <li><a href="#dom-bluetoothrequestdevicefilter-servicedatauuid">serviceDataUUID</a><span>, in §3</span>
    <li><a href="#serviceeventhandlers">ServiceEventHandlers</a><span>, in §5.6.6</span>
    <li><a href="#eventdef-bluetoothremotegattservice-serviceremoved">serviceremoved</a><span>, in §5.6.2</span>
    <li><a href="#dom-bluetoothrequestdevicefilter-services">services</a><span>, in §3</span>
@@ -5045,6 +5122,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothrequestdevicefilter-services">services</a>;
   <span class="kt">DOMString</span> <a class="nv idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothrequestdevicefilter-name">name</a>;
   <span class="kt">DOMString</span> <a class="nv idl-code" data-link-type="dict-member" data-type="DOMString " href="#dom-bluetoothrequestdevicefilter-nameprefix">namePrefix</a>;
+  <span class="kt">unsigned</span> <span class="kt">short</span> <a class="nv idl-code" data-link-type="dict-member" data-type="unsigned short " href="#dom-bluetoothrequestdevicefilter-manufacturerid">manufacturerId</a>;
+  <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a class="nv idl-code" data-link-type="dict-member" data-type="BluetoothServiceUUID " href="#dom-bluetoothrequestdevicefilter-servicedatauuid">serviceDataUUID</a>;
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-requestdeviceoptions">RequestDeviceOptions</a> {
@@ -5288,6 +5367,18 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <b><a href="#dom-bluetoothrequestdevicefilter-nameprefix">#dom-bluetoothrequestdevicefilter-nameprefix</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothrequestdevicefilter-nameprefix-1">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothrequestdevicefilter-manufacturerid">
+   <b><a href="#dom-bluetoothrequestdevicefilter-manufacturerid">#dom-bluetoothrequestdevicefilter-manufacturerid</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothrequestdevicefilter-manufacturerid-1">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothrequestdevicefilter-servicedatauuid">
+   <b><a href="#dom-bluetoothrequestdevicefilter-servicedatauuid">#dom-bluetoothrequestdevicefilter-servicedatauuid</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothrequestdevicefilter-servicedatauuid-1">3. Device Discovery</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-requestdeviceoptions-optionalservices">
@@ -6187,11 +6278,11 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="typedefdef-bluetoothserviceuuid">
    <b><a href="#typedefdef-bluetoothserviceuuid">#typedefdef-bluetoothserviceuuid</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-1">3. Device Discovery</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-2">(2)</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-3">(3)</a>
-    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-4">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-5">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-6">(2)</a>
-    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-7">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-8">(2)</a>
-    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-9">6.1. Standardized UUIDs</a>
+    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-1">3. Device Discovery</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-2">(2)</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-3">(3)</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-4">(4)</a>
+    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-5">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-6">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-7">(2)</a>
+    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-8">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-typedefdef-bluetoothserviceuuid-9">(2)</a>
+    <li><a href="#ref-for-typedefdef-bluetoothserviceuuid-10">6.1. Standardized UUIDs</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="typedefdef-bluetoothcharacteristicuuid">
@@ -6217,12 +6308,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="dom-bluetoothuuid-getservice">
    <b><a href="#dom-bluetoothuuid-getservice">#dom-bluetoothuuid-getservice</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice-1">3. Device Discovery</a> <a href="#ref-for-dom-bluetoothuuid-getservice-2">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-3">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-4">(4)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice-5">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothuuid-getservice-6">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice-7">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothuuid-getservice-8">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice-9">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-dom-bluetoothuuid-getservice-10">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice-11">6.1. Standardized UUIDs</a> <a href="#ref-for-dom-bluetoothuuid-getservice-12">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-13">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-14">(4)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-15">(5)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice-16">9. Terminology and Conventions</a> <a href="#ref-for-dom-bluetoothuuid-getservice-17">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice-1">3. Device Discovery</a> <a href="#ref-for-dom-bluetoothuuid-getservice-2">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-3">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-4">(4)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-5">(5)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice-6">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothuuid-getservice-7">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice-8">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothuuid-getservice-9">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice-10">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-dom-bluetoothuuid-getservice-11">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice-12">6.1. Standardized UUIDs</a> <a href="#ref-for-dom-bluetoothuuid-getservice-13">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-14">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-15">(4)</a> <a href="#ref-for-dom-bluetoothuuid-getservice-16">(5)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice-17">9. Terminology and Conventions</a> <a href="#ref-for-dom-bluetoothuuid-getservice-18">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothuuid-getcharacteristic">
@@ -6254,8 +6345,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="blacklisted">
    <b><a href="#blacklisted">#blacklisted</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-blacklisted-1">3. Device Discovery</a> <a href="#ref-for-blacklisted-2">(2)</a>
-    <li><a href="#ref-for-blacklisted-3">5.1.2. Navigating the Bluetooth Hierarchy</a> <a href="#ref-for-blacklisted-4">(2)</a>
+    <li><a href="#ref-for-blacklisted-1">3. Device Discovery</a> <a href="#ref-for-blacklisted-2">(2)</a> <a href="#ref-for-blacklisted-3">(3)</a>
+    <li><a href="#ref-for-blacklisted-4">5.1.2. Navigating the Bluetooth Hierarchy</a> <a href="#ref-for-blacklisted-5">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="blacklisted-for-reads">
@@ -6773,7 +6864,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="manufacturer-specific-data">
    <b><a href="#manufacturer-specific-data">#manufacturer-specific-data</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-manufacturer-specific-data-1">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-manufacturer-specific-data-1">3. Device Discovery</a> <a href="#ref-for-manufacturer-specific-data-2">(2)</a>
+    <li><a href="#ref-for-manufacturer-specific-data-3">4.2.1. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="tx-power-level">
@@ -6785,7 +6877,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="service-data">
    <b><a href="#service-data">#service-data</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-service-data-1">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-service-data-2">(2)</a> <a href="#ref-for-service-data-3">(3)</a>
+    <li><a href="#ref-for-service-data-1">3. Device Discovery</a> <a href="#ref-for-service-data-2">(2)</a>
+    <li><a href="#ref-for-service-data-3">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-service-data-4">(2)</a> <a href="#ref-for-service-data-5">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="appearance">
