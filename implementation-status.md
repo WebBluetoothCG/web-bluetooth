@@ -29,6 +29,7 @@ Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         
 Get Primary Services List | 53        | 53      | 53  | 53    |         |
 {start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
 Advertisements Scanning   |           |         |     |       |         |
+Permissions API Integration |         |         |     |       |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
 
