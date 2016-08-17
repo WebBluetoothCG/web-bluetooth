@@ -22,7 +22,8 @@ GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         
 Read Characteristic       | ✓         | ✓       | 53  | ✓     |         |
 Write Characteristic      | ✓         | ✓       | 53  | ✓     |         |
 Characteristic Properties | ✓         | ✓       | 53  | ✓     |         |
-GATT Notifications        | ✓         | &nbsp;&nbsp;✓&nbsp;&nbsp;&nbsp;start <br/> :construction_worker: stop|  53 start  | ✓ |
+Start GATT Notifications  | ✓         | ✓       | 53  | ✓     |         |
+Stop GATT Notifications   | ✓         | 54      |     | ✓     |         |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
 Get Characteristics List  | ✓         | ✓       | 53  | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
