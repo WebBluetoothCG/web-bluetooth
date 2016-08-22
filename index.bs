@@ -99,29 +99,16 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
-        text: global object associated with; url: es-platform-objects
 </pre>
 <pre class="link-defaults">
 spec: html
     type: dfn
-        text: browsing context
-        text: current settings object
-        text: environment settings object
-        text: event handler idl attribute
-        text: global object
+        text: global object; for: /
         text: in parallel
-        text: initialising a new document object
         text: navigated
         text: perform a microtask checkpoint
         text: queue a task
-        text: relevant settings object
-        text: responsible event loop
-        text: the environment settings object's global object
         text: triggered by user activation
-spec: permissions
-    type: dfn
-        text: create a permission storage entry
-        text: retrieve a permission storage entry
 </pre>
 
 <style>
@@ -1513,7 +1500,7 @@ spec: permissions
         and a {{BluetoothPermissionResult}} <var>status</var>, the UA must:
         <ol>
           <li>
-            Let <var>global</var> be the <a>global object associated with</a> <var>status</var>.
+            Let <var>global</var> be the <a>relevant global object</a> for <var>status</var>.
           </li>
           <li>
             Set <code><var>status</var>.{{PermissionStatus/state}}</code>
@@ -2020,7 +2007,7 @@ spec: permissions
         </li>
       </ol>
     </div>
-    
+
     <section>
       <h4 id="advertising-events">Responding to Advertising Events</h4>
 
@@ -4133,7 +4120,7 @@ spec: permissions
               </li>
               <li>
                 Let |global| be |settings|'
-                <a lt="the environment settings object's global object">global object</a>.
+                <a for="environment settings object">global object</a>.
               </li>
               <li>
                 Remove every entry
@@ -4174,7 +4161,8 @@ spec: permissions
           <li>
             For each {{BluetoothDevice}} <var>deviceObj</var>
             that is connected to a device in <var>changedDevices</var>,
-            <a>queue a task</a> on its <a>global object</a>'s <a>responsible event loop</a>
+            <a>queue a task</a> on its <a>relevant global object</a>'s
+            <a>responsible event loop</a>
             to do the following steps:
             <ol>
               <li>
