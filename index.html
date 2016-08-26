@@ -1413,7 +1413,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-08-24">24 August 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-08-26">26 August 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -3940,9 +3940,78 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
             if it can prove that the results of that discovery
             could not affect the events fired below. 
         <li> Let <var>addedAttributes</var> be the list of attributes discovered in the previous step. 
-        <li> If an attribute with the same definition, ignoring Characteristic and Descriptor values,
+        <li>
+          If an attribute with the same definition
+            (see the <a data-link-type="dfn" href="#service-interoperability-requirements" id="ref-for-service-interoperability-requirements-1">Service Interoperability Requirements</a>),
+            ignoring Characteristic and Descriptor values,
             appears in both <var>removedAttributes</var> and <var>addedAttributes</var>,
             remove it from both. 
+         <div class="example" id="example-changed-service">
+          <a class="self-link" href="#example-changed-service"></a> 
+          <p> Given the following device states: </p>
+          <dl>
+           <dt>State 1
+           <dd>
+            <ul>
+             <li>
+              Service A 
+              <ul>
+               <li>Characteristic C: value <code>[1, 2, 3]</code>
+              </ul>
+             <li>Service B
+            </ul>
+           <dt>State 2
+           <dd>
+            <ul>
+             <li>
+              Service A 
+              <ul>
+               <li>Characteristic C: value <code>[3, 2, 1]</code>
+              </ul>
+             <li>Service B
+            </ul>
+           <dt>State 3
+           <dd>
+            <ul>
+             <li>
+              Service A 
+              <ul>
+               <li>Characteristic D: value <code>[3, 2, 1]</code>
+              </ul>
+             <li>Service B
+            </ul>
+           <dt>State 4
+           <dd>
+            <ul>
+             <li>
+              Service A 
+              <ul>
+               <li>Characteristic C: value <code>[1, 2, 3]</code>
+              </ul>
+             <li>
+              Service B 
+              <ul>
+               <li>Include Service A
+              </ul>
+            </ul>
+          </dl>
+          <p> A transition from state 1 to 2 leaves service A with
+                "the same definition, ignoring Characteristic and Descriptor values",
+                which means it’s removed from both <var>removedAttributes</var> and <var>addedAttributes</var>,
+                and it wouldn’t appear in any <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-1">servicechanged</a></code> events. </p>
+          <p> A transition from state 1 to 3 leaves service A with a different definition,
+                because a <a data-link-type="dfn" href="#service-definition" id="ref-for-service-definition-1">service definition</a> includes its characteristic definitions,
+                so it’s left in both <var>removedAttributes</var> and <var>addedAttributes</var>.
+                Then in <a href="#same-service-removed-and-added">step 8</a>,
+                the service is moved to <var>changedServices</var>,
+                which makes it cause a <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-2">servicechanged</a></code> event
+                instead of both a <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded" id="ref-for-eventdef-bluetoothremotegattservice-serviceadded-2">serviceadded</a></code> and <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-1">serviceremoved</a></code>. <a href="#characteristic-descriptor-change-adds-changed-service">Step 9</a> also adds service A to <var>changedServices</var> because
+                characteristic C was removed and characteristic D was added. </p>
+          <p> A transition from state 1 to 4 is similar to the 1->3 transition.
+                Service B is moved to <var>changedServices</var> in <a href="#same-service-removed-and-added">step 8</a>,
+                but no characteristics or descriptors have changed,
+                so it’s not redundantly added in <a href="#characteristic-descriptor-change-adds-changed-service">step 9</a>. </p>
+         </div>
         <li> Let <var>invalidatedAttributes</var> be
             the attributes in <var>removedAttributes</var> but not <var>addedAttributes</var>. 
         <li>
@@ -3964,10 +4033,10 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
                 is in <var>invalidatedAttributes</var>. 
          </ol>
         <li> Let <var>changedServices</var> be a set of <a data-link-type="dfn" href="#service" id="ref-for-service-12">Service</a>s, initially empty. 
-        <li> If the <a data-link-type="dfn" href="#same-attribute" id="ref-for-same-attribute-5">same</a> <a data-link-type="dfn" href="#service" id="ref-for-service-13">Service</a> appears in
+        <li id="same-service-removed-and-added"><a class="self-link" href="#same-service-removed-and-added"></a> If the <a data-link-type="dfn" href="#same-attribute" id="ref-for-same-attribute-5">same</a> <a data-link-type="dfn" href="#service" id="ref-for-service-13">Service</a> appears in
             both <var>removedAttributes</var> and <var>addedAttributes</var>,
             remove it from both, and add it to <var>changedServices</var>. 
-        <li> For each <a data-link-type="dfn" href="#characteristic" id="ref-for-characteristic-14">Characteristic</a> and <a data-link-type="dfn" href="#descriptor" id="ref-for-descriptor-9">Descriptor</a> in <var>removedAttributes</var> and <var>addedAttributes</var>,
+        <li id="characteristic-descriptor-change-adds-changed-service"><a class="self-link" href="#characteristic-descriptor-change-adds-changed-service"></a> For each <a data-link-type="dfn" href="#characteristic" id="ref-for-characteristic-14">Characteristic</a> and <a data-link-type="dfn" href="#descriptor" id="ref-for-descriptor-9">Descriptor</a> in <var>removedAttributes</var> or <var>addedAttributes</var>,
             remove it from its original list,
             and add its parent <a data-link-type="dfn" href="#service" id="ref-for-service-14">Service</a> to <var>changedServices</var>. <span class="note" role="note">After this point, <var>removedAttributes</var> and <var>addedAttributes</var> contain only <a data-link-type="dfn" href="#service" id="ref-for-service-15">Service</a>s.</span> 
         <li id="only-notify-for-requested-services"><a class="self-link" href="#only-notify-for-requested-services"></a> If a <a data-link-type="dfn" href="#service" id="ref-for-service-16">Service</a> in <var>addedAttributes</var> would not have been returned from any previous call to <code>getPrimaryService</code>, <code>getPrimaryServices</code>, <code>getIncludedService</code>, or <code>getIncludedServices</code> if it had existed at the time of the call,
@@ -3982,15 +4051,15 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
            <ol>
             <li> If no remaining <a data-link-type="dfn" href="#service" id="ref-for-service-20">Service</a> in <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-14">[[representedDevice]]</a></code></code> has the same UUID as <var>service</var>,
                     remove the UUID from <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot" id="ref-for-dom-bluetoothdevice-unfiltereduuids-slot-8">[[unfilteredUuids]]</a></code></code>. 
-            <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-16">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-1">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-29">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-21">Service</a>. 
+            <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-16">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-2">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-29">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-21">Service</a>. 
             <li> Remove this <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-30">BluetoothRemoteGATTService</a></code> from the <a data-link-type="dfn" href="#bluetooth-tree" id="ref-for-bluetooth-tree-5">Bluetooth tree</a>. 
            </ol>
           <li> For each <a data-link-type="dfn" href="#service" id="ref-for-service-22">Service</a> in <var>addedAttributes</var>,
                 add the Service’s UUID to <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-unfiltereduuids-slot" id="ref-for-dom-bluetoothdevice-unfiltereduuids-slot-9">[[unfilteredUuids]]</a></code></code>.
                 If <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-17">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID,
-                add the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-31">BluetoothRemoteGATTService</a></code> representing this <a data-link-type="dfn" href="#service" id="ref-for-service-23">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree" id="ref-for-bluetooth-tree-6">Bluetooth tree</a> and then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded" id="ref-for-eventdef-bluetoothremotegattservice-serviceadded-2">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-32">BluetoothRemoteGATTService</a></code>. 
+                add the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-31">BluetoothRemoteGATTService</a></code> representing this <a data-link-type="dfn" href="#service" id="ref-for-service-23">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree" id="ref-for-bluetooth-tree-6">Bluetooth tree</a> and then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded" id="ref-for-eventdef-bluetoothremotegattservice-serviceadded-3">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-32">BluetoothRemoteGATTService</a></code>. 
           <li> For each <a data-link-type="dfn" href="#service" id="ref-for-service-24">Service</a> in <var>changedServices</var>,
-                if <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-18">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-1">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-33">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-25">Service</a>. 
+                if <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-18">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-3">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-33">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-25">Service</a>. 
          </ol>
        </ol>
       </div>
@@ -4016,9 +4085,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a> <a class="nv idl-code" data-link-type="attribute" data-type="EventHandler" href="#dom-serviceeventhandlers-onserviceremoved" id="ref-for-dom-serviceeventhandlers-onserviceremoved-1">onserviceremoved</a>;
 };
 </pre>
-      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceadded">onserviceadded</dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded" id="ref-for-eventdef-bluetoothremotegattservice-serviceadded-3">serviceadded</a></code> event type. </p>
-      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onservicechanged">onservicechanged</dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-2">servicechanged</a></code> event type. </p>
-      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceremoved">onserviceremoved</dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-2">serviceremoved</a></code> event type. </p>
+      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceadded">onserviceadded</dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded" id="ref-for-eventdef-bluetoothremotegattservice-serviceadded-4">serviceadded</a></code> event type. </p>
+      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onservicechanged">onservicechanged</dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-4">servicechanged</a></code> event type. </p>
+      <p> <dfn class="dfn-paneled idl-code" data-dfn-for="ServiceEventHandlers" data-dfn-type="attribute" data-export="" id="dom-serviceeventhandlers-onserviceremoved">onserviceremoved</dfn> is an <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">Event handler IDL attribute</a> for the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-3">serviceremoved</a></code> event type. </p>
      </section>
     </section>
     <section>
@@ -4446,8 +4515,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
               </ol>
             </ol>
            <li value="3">
-            Service Interoperability Requirements 
+            <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="service-interoperability-requirements">Service Interoperability Requirements</dfn> 
             <ol>
+             <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="service-definition">Service Definition</dfn>
              <li value="3">
               Characteristic Definition 
               <ol>
@@ -5014,7 +5084,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     </ul>
    <li><a href="#service-data">Service Data</a><span>, in §9</span>
    <li><a href="#dom-bluetoothrequestdevicefilter-servicedatauuid">serviceDataUUID</a><span>, in §3</span>
+   <li><a href="#service-definition">Service Definition</a><span>, in §9</span>
    <li><a href="#serviceeventhandlers">ServiceEventHandlers</a><span>, in §5.6.6</span>
+   <li><a href="#service-interoperability-requirements">Service Interoperability Requirements</a><span>, in §9</span>
    <li><a href="#eventdef-bluetoothremotegattservice-serviceremoved">serviceremoved</a><span>, in §5.6.2</span>
    <li><a href="#dom-bluetoothrequestdevicefilter-services">services</a><span>, in §3</span>
    <li><a href="#service-uuid-data-type">Service UUID Data Type</a><span>, in §9</span>
@@ -6353,22 +6425,22 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <b><a href="#eventdef-bluetoothremotegattservice-serviceadded">#eventdef-bluetoothremotegattservice-serviceadded</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceadded-1">3. Device Discovery</a>
-    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceadded-2">5.6.5. Responding to Service Changes</a>
-    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceadded-3">5.6.6. IDL event handlers</a>
+    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceadded-2">5.6.5. Responding to Service Changes</a> <a href="#ref-for-eventdef-bluetoothremotegattservice-serviceadded-3">(2)</a>
+    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceadded-4">5.6.6. IDL event handlers</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="eventdef-bluetoothremotegattservice-servicechanged">
    <b><a href="#eventdef-bluetoothremotegattservice-servicechanged">#eventdef-bluetoothremotegattservice-servicechanged</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-servicechanged-1">5.6.5. Responding to Service Changes</a>
-    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-servicechanged-2">5.6.6. IDL event handlers</a>
+    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-servicechanged-1">5.6.5. Responding to Service Changes</a> <a href="#ref-for-eventdef-bluetoothremotegattservice-servicechanged-2">(2)</a> <a href="#ref-for-eventdef-bluetoothremotegattservice-servicechanged-3">(3)</a>
+    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-servicechanged-4">5.6.6. IDL event handlers</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="eventdef-bluetoothremotegattservice-serviceremoved">
    <b><a href="#eventdef-bluetoothremotegattservice-serviceremoved">#eventdef-bluetoothremotegattservice-serviceremoved</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceremoved-1">5.6.5. Responding to Service Changes</a>
-    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceremoved-2">5.6.6. IDL event handlers</a>
+    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceremoved-1">5.6.5. Responding to Service Changes</a> <a href="#ref-for-eventdef-bluetoothremotegattservice-serviceremoved-2">(2)</a>
+    <li><a href="#ref-for-eventdef-bluetoothremotegattservice-serviceremoved-3">5.6.6. IDL event handlers</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="clean-up-the-disconnected-device">
@@ -6835,6 +6907,18 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <li><a href="#ref-for-characteristic-10">5.5. BluetoothRemoteGATTDescriptor</a>
     <li><a href="#ref-for-characteristic-11">5.6.4. Responding to Notifications and Indications</a> <a href="#ref-for-characteristic-12">(2)</a>
     <li><a href="#ref-for-characteristic-13">5.6.5. Responding to Service Changes</a> <a href="#ref-for-characteristic-14">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="service-interoperability-requirements">
+   <b><a href="#service-interoperability-requirements">#service-interoperability-requirements</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-service-interoperability-requirements-1">5.6.5. Responding to Service Changes</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="service-definition">
+   <b><a href="#service-definition">#service-definition</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-service-definition-1">5.6.5. Responding to Service Changes</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="characteristic-properties">
