@@ -518,8 +518,9 @@ spec: html
     };
 
     dictionary RequestDeviceOptions {
-      required sequence&lt;BluetoothRequestDeviceFilter> filters;
+      sequence&lt;BluetoothRequestDeviceFilter> filters;
       sequence&lt;BluetoothServiceUUID> optionalServices = [];
+      boolean acceptAllDevices = false;
     };
 
     interface Bluetooth {
@@ -580,6 +581,15 @@ spec: html
       for example by not advertising its identifying manufacturer data anymore
       and instead having the client discover some identifying GATT services,
       the website may need to include filters for both behaviors.
+    </p>
+    <p>
+      In rare cases,
+      a device may not advertise enough distinguishing information
+      to let a site filter out uninteresting devices.
+      In those cases, a site can set
+      <dfn dict-member for="RequestDeviceOptions">acceptAllDevices</dfn> to `true`
+      and omit all {{RequestDeviceOptions/filters}}.
+      This puts the burden of selecting the right device entirely on the site's users.
     </p>
     <p>
       After the user selects a device to pair with this origin,
@@ -785,17 +795,27 @@ spec: html
     </table>
   </div>
 
-  <div class="example" id="example-disallowed-filters">
+  <div class="example" id="example-disallowed-filters"
+       link-for-hint="RequestDeviceOptions">
     <p>
       Filters that either accept or reject all possible devices cause {{TypeError}}s.
+      To accept all devices, use {{acceptAllDevices}} instead.
     </p>
 
     <table class="data">
-      <thead><th><var>filters</var></th><th>Notes</th></thead>
+      <thead><th>Call</th><th>Notes</th></thead>
       <tr>
         <td>
           <pre highlight="js">
-            []
+            requestDevice({})
+          </pre>
+        </td>
+        <td>A absent list of filters doesn't accept any devices.</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            requestDevice({filters:[]})
           </pre>
         </td>
         <td>An empty list of filters doesn't accept any devices.</td>
@@ -803,7 +823,7 @@ spec: html
       <tr>
         <td>
           <pre highlight="js">
-            [{}]
+            requestDevice({filters:[{}]})
           </pre>
         </td>
         <td>An empty filter accepts all devices, and so isn't allowed either.</td>
@@ -811,7 +831,33 @@ spec: html
       <tr>
         <td>
           <pre highlight="js">
-            [{namePrefix: ""}]
+            requestDevice({
+              acceptAllDevices:true
+            })
+          </pre>
+        </td>
+        <td>
+          Explicitly accept all devices with {{acceptAllDevices}}.
+          This does <em>not</em> produce a {{TypeError}}.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            requestDevice({
+              filters: [...],
+              acceptAllDevices:true
+            })
+          </pre>
+        </td>
+        <td>{{acceptAllDevices}} would override any {{filters}}.</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            requestDevice({
+              filters:[{namePrefix: ""}]
+            })
           </pre>
         </td>
         <td>`namePrefix`, if present, must be non-empty to filter devices.</td>
@@ -964,11 +1010,20 @@ spec: html
       when invoked, MUST return <a>a new promise</a> |promise|
       and run the following steps <a>in parallel</a>:
     </p>
-    <ol>
+    <ol link-for-hint="RequestDeviceOptions">
+      <li>
+        If <code>|options|.{{filters}}</code> is present
+        and <code>|options|.{{acceptAllDevices}}</code> is `true`,
+        or if <code>|options|.{{filters}}</code> is not present
+        and <code>|options|.{{acceptAllDevices}}</code> is `false`,
+        throw a {{TypeError}}.
+      </li>
       <li>
         <a>Request Bluetooth devices</a>,
-        passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
-        and <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>,
+        passing <code>|options|.{{filters}}</code>
+        if <code>|options|.{{acceptAllDevices}}</code> is `false`
+        or the <i>acceptAllDevices</i> flag otherwise,
+        and passing <code>|options|.{{optionalServices}}</code>,
         and let |devices| be the result.
       </li>
       <li>
@@ -988,7 +1043,8 @@ spec: html
   <div algorithm>
     <p>
       To <dfn>request Bluetooth devices</dfn>,
-      given a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|,
+      given either a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|
+      or an |acceptAllDevices| flag,
       and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
       the UA MUST run the following steps:
     </p>
@@ -1006,7 +1062,8 @@ spec: html
         do the following sub-steps:
         <ol>
           <li>
-            If <code>|filters|.length === 0</code>,
+            If |acceptAllDevices| isn't set
+            and <code>|filters|.length === 0</code>,
             throw a {{TypeError}}
             and abort these steps.
           </li>
@@ -1015,7 +1072,12 @@ spec: html
             <var>requiredServiceUUIDs</var> be a new {{Set}}.
           </li>
           <li>
-            For each |filter| in |filters|,
+            If |acceptAllDevices| is set,
+            then set |requiredServiceUUIDs| to the set of all UUIDs.
+          </li>
+          <li>
+            If |acceptAllDevices| isn't set,
+            then for each |filter| in |filters|,
             do the following steps:
             <ol>
               <li>
@@ -1144,12 +1206,18 @@ spec: html
         </ol>
       </li>
       <li>
+        Let |acceptAllDevicesBool| be `true`
+        if the <var>acceptAllDevices</var> flag is set</i>,
+        or `false` otherwise.
+      </li>
+      <li>
         Let |descriptor| be
         <pre highlight="js">
         {
           name: "bluetooth",
           filters: <var>uuidFilters</var>,
           optionalServices: <var>optionalServiceUUIDs</var>,
+          acceptAllDevices: <var>acceptAllDevicesBool</var>,
         }
         </pre>
       </li>
@@ -1169,7 +1237,8 @@ spec: html
         and let <var>scanResult</var> be the result.
       </li>
       <li>
-        Remove devices from <var>scanResult</var> if
+        If |acceptAllDevices| isn't set,
+        remove devices from <var>scanResult</var> if
         they do not <a>match a filter</a>
         in <var>uuidFilters</var>.
       </li>
@@ -1411,6 +1480,7 @@ spec: html
             // These match RequestDeviceOptions.
             sequence&lt;BluetoothRequestDeviceFilter> filters;
             sequence&lt;BluetoothServiceUUID> optionalServices = [];
+            boolean acceptAllDevices = false;
           };
         </pre>
       </dd>
@@ -1476,11 +1546,20 @@ spec: html
           and a {{BluetoothPermissionResult}} <var>status</var>,
           the UA MUST run the following steps:
         </p>
-        <ol>
+        <ol link-for-hint="BluetoothPermissionDescriptor">
+          <li>
+            If <code>|options|.{{filters}}</code> is present
+            and <code>|options|.{{acceptAllDevices}}</code> is `true`,
+            or if <code>|options|.{{filters}}</code> is not present
+            and <code>|options|.{{acceptAllDevices}}</code> is `false`,
+            throw a {{TypeError}}.
+          </li>
           <li>
             <a>Request Bluetooth devices</a>,
-            passing <code>|options|.{{RequestDeviceOptions/filters}}</code>
-            and <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>,
+            passing <code>|options|.{{filters}}</code>
+            if <code>|options|.{{acceptAllDevices}}</code> is `false`
+            or the <i>acceptAllDevices</i> flag otherwise,
+            and passing <code>|options|.{{optionalServices}}</code>,
             propagating any exception,
             and let |devices| be the result.
           </li>
