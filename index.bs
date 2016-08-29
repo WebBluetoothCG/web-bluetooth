@@ -527,7 +527,7 @@ spec: html
       [SecureContext]
       readonly attribute BluetoothDevice? referringDevice;
       [SecureContext]
-      Promise&lt;BluetoothDevice> requestDevice(RequestDeviceOptions options);
+      Promise&lt;BluetoothDevice> requestDevice(optional RequestDeviceOptions options);
     };
     Bluetooth implements EventTarget;
     Bluetooth implements BluetoothDeviceEventHandlers;
@@ -1017,6 +1017,9 @@ spec: html
         or if <code>|options|.{{filters}}</code> is not present
         and <code>|options|.{{acceptAllDevices}}</code> is `false`,
         throw a {{TypeError}}.
+
+        Note: This enforces that
+        exactly one of {{filters}} or <code>{{acceptAllDevices}}:true</code> is present.
       </li>
       <li>
         <a>Request Bluetooth devices</a>,
@@ -1047,6 +1050,10 @@ spec: html
       or an |acceptAllDevices| flag,
       and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
       the UA MUST run the following steps:
+    </p>
+    <p class="note">
+      Note: These steps can block,
+      so uses of this algorithm must be <a>in parallel</a>.
     </p>
     <p class="note">
       Calls to this algorithm will eventually be able to request multiple devices,
@@ -1553,6 +1560,9 @@ spec: html
             or if <code>|options|.{{filters}}</code> is not present
             and <code>|options|.{{acceptAllDevices}}</code> is `false`,
             throw a {{TypeError}}.
+
+            Note: This enforces that
+            exactly one of {{filters}} or <code>{{acceptAllDevices}}:true</code> is present.
           </li>
           <li>
             <a>Request Bluetooth devices</a>,
