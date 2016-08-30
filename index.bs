@@ -1025,7 +1025,7 @@ spec: html
         <a>Request Bluetooth devices</a>,
         passing <code>|options|.{{filters}}</code>
         if <code>|options|.{{acceptAllDevices}}</code> is `false`
-        or the <i>acceptAllDevices</i> flag otherwise,
+        or `null` otherwise,
         and passing <code>|options|.{{optionalServices}}</code>,
         and let |devices| be the result.
       </li>
@@ -1046,8 +1046,8 @@ spec: html
   <div algorithm>
     <p>
       To <dfn>request Bluetooth devices</dfn>,
-      given either a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|
-      or an |acceptAllDevices| flag,
+      given a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|,
+      which can be `null` to represent that all devices can match,
       and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
       the UA MUST run the following steps:
     </p>
@@ -1069,8 +1069,7 @@ spec: html
         do the following sub-steps:
         <ol>
           <li>
-            If |acceptAllDevices| isn't set
-            and <code>|filters|.length === 0</code>,
+            If <code>|filters| !== null && |filters|.length === 0</code>,
             throw a {{TypeError}}
             and abort these steps.
           </li>
@@ -1079,11 +1078,11 @@ spec: html
             <var>requiredServiceUUIDs</var> be a new {{Set}}.
           </li>
           <li>
-            If |acceptAllDevices| is set,
+            If |filters| is `null`,
             then set |requiredServiceUUIDs| to the set of all UUIDs.
           </li>
           <li>
-            If |acceptAllDevices| isn't set,
+            If |filters| isn't `null`,
             then for each |filter| in |filters|,
             do the following steps:
             <ol>
@@ -1213,18 +1212,13 @@ spec: html
         </ol>
       </li>
       <li>
-        Let |acceptAllDevicesBool| be `true`
-        if the <var>acceptAllDevices</var> flag is set</i>,
-        or `false` otherwise.
-      </li>
-      <li>
         Let |descriptor| be
         <pre highlight="js">
         {
           name: "bluetooth",
           filters: <var>uuidFilters</var>,
           optionalServices: <var>optionalServiceUUIDs</var>,
-          acceptAllDevices: <var>acceptAllDevicesBool</var>,
+          acceptAllDevices: <var>filters</var> !== null,
         }
         </pre>
       </li>
@@ -1244,7 +1238,7 @@ spec: html
         and let <var>scanResult</var> be the result.
       </li>
       <li>
-        If |acceptAllDevices| isn't set,
+        If |filters| isn't null,
         remove devices from <var>scanResult</var> if
         they do not <a>match a filter</a>
         in <var>uuidFilters</var>.
@@ -1568,7 +1562,7 @@ spec: html
             <a>Request Bluetooth devices</a>,
             passing <code>|options|.{{filters}}</code>
             if <code>|options|.{{acceptAllDevices}}</code> is `false`
-            or the <i>acceptAllDevices</i> flag otherwise,
+            or `null` otherwise,
             and passing <code>|options|.{{optionalServices}}</code>,
             propagating any exception,
             and let |devices| be the result.
