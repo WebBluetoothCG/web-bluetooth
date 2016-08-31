@@ -2896,35 +2896,74 @@ spec: html
     <div algorithm>
       <p>
         The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code> method, when invoked,
-        MUST return <a>a new promise</a> <var>promise</var> and
-        run the following steps <a>in parallel</a>:
+        MUST perform the following steps:
       </p>
       <ol>
+        <li>Let |promise| be <a>a new promise</a>.</li>
         <li>
           If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
-          <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+          <a>queue a task</a> to <a>reject</a> |promise| with a {{NetworkError}},
+          return |promise|,
+          and abort these steps.
         </li>
         <li>
-          If <code>this.device.{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
-          attempt to create one using the procedures described
-          in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
+          Add |promise| to <code>this.{{[[activeAlgorithms]]}}</code>.
         </li>
         <li>
-          If this attempt fails,
-          <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-        </li>
-        <li>
-          <a>Queue a task</a> to perform the following sub-steps:
+          Return |promise| and run the following steps <a>in parallel</a>:
           <ol>
             <li>
-              If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
-              <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+              If <code>this.device.{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
+              do the following sub-steps:
+              <ol>
+                <li id="create-an-att-bearer">
+                  Attempt to create an <a>ATT Bearer</a> using the procedures described
+                  in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
+                  Abort this attempt if |promise| is removed from <code>this.{{[[activeAlgorithms]]}}</code>.
+
+                  Note: These procedures can wait forever
+                  if a connectable advertisement isn't received.
+                  The website should call {{disconnect()}}
+                  if it no longer wants to connect.
+                </li>
+                <li>
+                  If this attempt was aborted because
+                  |promise| was removed from <code>this.{{[[activeAlgorithms]]}}</code>,
+                  <a>reject</a> <var>promise</var> with an {{AbortError}} and abort these steps.
+                </li>
+                <li>
+                  If this attempt failed for another reason,
+                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
+                </li>
+              </ol>
             </li>
             <li>
-              Set `this.connected` to `true`.
-            </li>
-            <li>
-              <a>Resolve</a> <var>promise</var> with <code>this</code>.
+              <a>Queue a task</a> to perform the following sub-steps:
+              <ol>
+                <li>
+                  If |promise| is not in <code>this.{{[[activeAlgorithms]]}}</code>,
+                  <a>reject</a> <var>promise</var> with an {{AbortError}},
+                  <a>garbage-collect the connection</a> of
+                  <code>this.{{[[representedDevice]]}}</code>,
+                  and abort these steps.
+                </li>
+                <li>
+                  Remove |promise| from <code>this.{{[[activeAlgorithms]]}}</code>.
+                </li>
+                <li>
+                  If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
+                  <a>reject</a> <var>promise</var> with a {{NetworkError}},
+                  <a>garbage-collect the connection</a> of
+                  <code>this.{{[[representedDevice]]}}</code>,
+                  and abort these steps.
+                </li>
+                <li>
+                  Set `this.connected` to `true`.
+                </li>
+                <li>
+                  <a>Resolve</a> <var>promise</var> with <code>this</code>.
+                </li>
+              </ol>
             </li>
           </ol>
         </li>
@@ -2938,6 +2977,9 @@ spec: html
       </p>
       <ol>
         <li>
+          Clear <code>this.{{[[activeAlgorithms]]}}</code>
+          to abort any <a href="#create-an-att-bearer">active `connect()` calls</a>.
+        <li>
           If <code>this.{{connected}}</code> is <code>false</code>, abort these steps.
         </li>
         <li>
@@ -2947,13 +2989,45 @@ spec: html
           Let <var>device</var> be <code>this.device.{{[[representedDevice]]}}</code>.
         </li>
         <li>
-          <a>In parallel</a>:
-          if, for all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA
-          with <code><var>deviceObj</var>.{{[[representedDevice]]}}</code>
-          the <a>same device</a> as <var>device</var>,
-          <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
-          the UA SHOULD destroy
-          <var>device</var>'s <a>ATT Bearer</a>.
+          <a>Garbage-collect the connection</a> of |device|.
+        </li>
+      </ol>
+    </div>
+
+    <div algorithm>
+      <p>
+        To <dfn>garbage-collect the connection</dfn> of a |device|,
+        the UA must, do the following steps <a>in parallel</a>:
+      </p>
+      <ol>
+        <li>
+          If systems that aren't using this API,
+          either inside or outside of the UA,
+          are using the <var>device</var>'s <a>ATT Bearer</a>,
+          abort this algorithm.
+        </li>
+        <li>
+          For all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA:
+          <ol>
+            <li>
+              If <code><var>deviceObj</var>.{{[[representedDevice]]}}</code> is
+              not the <a>same device</a> as <var>device</var>,
+              continue to the next |deviceObj|.
+            </li>
+            <li>
+              If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+              is `true`,
+              abort this algorithm.
+            </li>
+            <li>
+              If <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>
+              contains the {{Promise}} of a call to {{connect()}},
+              abort this algorithm.
+            </li>
+          </ol>
+        </li>
+        <li>
+          Destroy <var>device</var>'s <a>ATT Bearer</a>.
         </li>
       </ol>
     </div>
