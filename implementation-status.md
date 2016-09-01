@@ -19,15 +19,15 @@ Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓     
 Referring Device (Physical Web) |     |         |     |       |         |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
-Read Characteristic       | ✓         | ✓       | 53  | ✓     |         |
-Write Characteristic      | ✓         | ✓       | 53  | ✓     |         |
-Characteristic Properties | ✓         | ✓       | 53  | ✓     |         |
-Start GATT Notifications  | ✓         | ✓       | 53  | ✓     |         |
+Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
+Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
+Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
+Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Stop GATT Notifications   | ✓         | 54      |     | ✓     |         |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
-Get Characteristics List  | ✓         | ✓       | 53  | ✓     |         |
+Get Characteristics List  | ✓         | ✓       | ✓   | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
-Get Primary Services List | 53        | 53      | 53  | 53    |         |
+Get Primary Services List | 53        | 53      | ✓   | ✓     |         |
 {start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
 Advertisements Scanning   |           |         |     |       |         |
 Permissions API Integration |         |         |     |       |         |
