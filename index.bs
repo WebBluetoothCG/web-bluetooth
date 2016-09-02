@@ -101,6 +101,9 @@ spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
 </pre>
 <pre class="link-defaults">
+spec: fingerprinting-guidance
+    type: dfn
+        text: fingerprinting surface
 spec: html
     type: dfn
         text: global object; for: /
@@ -510,6 +513,24 @@ spec: html
         for a website to trigger a scan, which reduces the frequency of scans some,
         but it would still be better for more platforms to expose the <a>Privacy Feature</a>.
     </section>
+  </section>
+
+  <section class="non-normative">
+    <h3 id="availability-fingerprint">Exposing Bluetooth availability</h3>
+
+    <em>This section is non-normative.</em>
+
+    <p>
+      <code>navigator.bluetooth.{{getAvailability()}}</code>
+      exposes whether a Bluetooth radio is available on the user's system.
+      Some users might consider this private,
+      although it's hard to imagine the damage that would result from revealing it.
+      This information also increases the UA's <a>fingerprinting surface</a> by a bit.
+      This function returns a {{Promise}},
+      so UAs have the option of asking the user what value they want to return,
+      but we expect the increased risk to be small enough that
+      UAs will choose not to prompt.
+    </p>
   </section>
 </section>
 
@@ -1797,6 +1818,10 @@ spec: html
     <p>
       The <dfn attribute for="ValueEvent">value</dfn> attribute
       must return the value it was initialized to.
+    </p>
+
+    <p class="issue" id="ValueEvent-too-generic">
+      Such a generic event type belongs in [[HTML]] or [[DOM]], not here.
     </p>
   </section>
 </section>
