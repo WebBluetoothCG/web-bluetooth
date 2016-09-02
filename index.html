@@ -1842,15 +1842,16 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 };
 
 <span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-requestdeviceoptions">RequestDeviceOptions</dfn> {
-  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-1">BluetoothRequestDeviceFilter</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothRequestDeviceFilter> " href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-1">filters</a>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-1">BluetoothRequestDeviceFilter</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothRequestDeviceFilter> " href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-1">filters</a>;
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-3">BluetoothServiceUUID</a>> <a class="nv idl-code" data-default="None" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-1">optionalServices</a> = [];
+  <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-1">acceptAllDevices</a> = <span class="kt">false</span>;
 };
 
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetooth">Bluetooth</dfn> {
   [<a class="nv idl-code" data-link-type="extended-attribute">SecureContext</a>]
   <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-1">BluetoothDevice</a>? <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice?" href="#dom-bluetooth-referringdevice" id="ref-for-dom-bluetooth-referringdevice-1">referringDevice</a>;
   [<a class="nv idl-code" data-link-type="extended-attribute">SecureContext</a>]
-  <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-2">BluetoothDevice</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-3">requestDevice</a>(<a class="n" data-link-type="idl-name" href="#dictdef-requestdeviceoptions" id="ref-for-dictdef-requestdeviceoptions-1">RequestDeviceOptions</a> <dfn class="nv idl-code" data-dfn-for="Bluetooth/requestDevice(options)" data-dfn-type="argument" data-export="" id="dom-bluetooth-requestdevice-options-options">options<a class="self-link" href="#dom-bluetooth-requestdevice-options-options"></a></dfn>);
+  <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-2">BluetoothDevice</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-3">requestDevice</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-requestdeviceoptions" id="ref-for-dictdef-requestdeviceoptions-1">RequestDeviceOptions</a> <dfn class="nv idl-code" data-dfn-for="Bluetooth/requestDevice(options), Bluetooth/requestDevice()" data-dfn-type="argument" data-export="" id="dom-bluetooth-requestdevice-options-options">options<a class="self-link" href="#dom-bluetooth-requestdevice-options-options"></a></dfn>);
 };
 <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth-2">Bluetooth</a> <span class="kt">implements</span> <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
 <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth-3">Bluetooth</a> <span class="kt">implements</span> <a class="n" data-link-type="idl-name" href="#bluetoothdeviceeventhandlers" id="ref-for-bluetoothdeviceeventhandlers-1">BluetoothDeviceEventHandlers</a>;
@@ -1885,12 +1886,19 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       for example by not advertising its identifying manufacturer data anymore
       and instead having the client discover some identifying GATT services,
       the website may need to include filters for both behaviors. </p>
+     <p> In rare cases,
+      a device may not advertise enough distinguishing information
+      to let a site filter out uninteresting devices.
+      In those cases, a site can set <dfn class="dfn-paneled idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-acceptalldevices">acceptAllDevices</dfn> to <code>true</code> and omit all <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-2">filters</a></code>.
+      This puts the burden of selecting the right device entirely on the site’s users.
+      If a site uses <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-2">acceptAllDevices</a></code>,
+      it will only be able to use services listed in <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-2">optionalServices</a></code>. </p>
      <p> After the user selects a device to pair with this origin,
       the origin is allowed to access any service whose UUID was listed
       in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothrequestdevicefilter-services" id="ref-for-dom-bluetoothrequestdevicefilter-services-2">services</a></code> list
       in any element of <code>options.filters</code> or in <code>options.<dfn class="dfn-paneled idl-code" data-dfn-for="RequestDeviceOptions" data-dfn-type="dict-member" data-export="" id="dom-requestdeviceoptions-optionalservices">optionalServices</dfn></code>. </p>
      <p> This implies that if developers filter just by name,
-      they must use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-2">optionalServices</a></code> to get access to any services. </p>
+      they must use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-3">optionalServices</a></code> to get access to any services. </p>
     </div>
     <div class="example" id="example-filter-by-services">
      <a class="self-link" href="#example-filter-by-services"></a> 
@@ -2059,26 +2067,47 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <td>D1, D2
      </table>
     </div>
-    <div class="example" id="example-disallowed-filters">
+    <div class="example" data-link-for-hint="RequestDeviceOptions" id="example-disallowed-filters">
      <a class="self-link" href="#example-disallowed-filters"></a> 
-     <p> Filters that either accept or reject all possible devices cause <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>s. </p>
+     <p> Filters that either accept or reject all possible devices cause <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>s.
+      To accept all devices, use <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-3">acceptAllDevices</a></code> instead. </p>
      <table class="data">
       <thead>
        <tr>
-        <th><var>filters</var>
+        <th>Call
         <th>Notes
       <tbody>
        <tr>
         <td>
-<pre class="highlight"><span></span><span class="p">[]</span></pre>
+<pre class="highlight"><span></span><span class="nx">requestDevice</span><span class="p">({})</span></pre>
+        <td>A absent list of filters doesn’t accept any devices.
+       <tr>
+        <td>
+<pre class="highlight"><span></span><span class="nx">requestDevice</span><span class="p">({</span><span class="nx">filters</span><span class="o">:</span><span class="p">[]})</span></pre>
         <td>An empty list of filters doesn’t accept any devices.
        <tr>
         <td>
-<pre class="highlight"><span></span><span class="p">[{}]</span></pre>
+<pre class="highlight"><span></span><span class="nx">requestDevice</span><span class="p">({</span><span class="nx">filters</span><span class="o">:</span><span class="p">[{}]})</span></pre>
         <td>An empty filter accepts all devices, and so isn’t allowed either.
        <tr>
         <td>
-<pre class="highlight"><span></span><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span></pre>
+<pre class="highlight"><span></span><span class="nx">requestDevice</span><span class="p">({</span>
+  <span class="nx">acceptAllDevices</span><span class="o">:</span><span class="kc">true</span>
+<span class="p">})</span></pre>
+        <td> Explicitly accept all devices with <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-4">acceptAllDevices</a></code>.
+          This does <em>not</em> produce a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>. 
+       <tr>
+        <td>
+<pre class="highlight"><span></span><span class="nx">requestDevice</span><span class="p">({</span>
+  <span class="nx">filters</span><span class="o">:</span> <span class="p">[...],</span>
+  <span class="nx">acceptAllDevices</span><span class="o">:</span><span class="kc">true</span>
+<span class="p">})</span></pre>
+        <td><code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-5">acceptAllDevices</a></code> would override any <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-3">filters</a></code>.
+       <tr>
+        <td>
+<pre class="highlight"><span></span><span class="nx">requestDevice</span><span class="p">({</span>
+  <span class="nx">filters</span><span class="o">:</span><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span>
+<span class="p">})</span></pre>
         <td><code>namePrefix</code>, if present, must be non-empty to filter devices.
      </table>
     </div>
@@ -2158,9 +2187,17 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <div class="algorithm" data-algorithm="requestDevice(options)">
      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export="" id="dom-bluetooth-requestdevice">requestDevice(<var>options</var>)</dfn></code> method,
       when invoked, MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
-     <ol>
+     <ol data-link-for-hint="RequestDeviceOptions">
+      <li>
+        If <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-4">filters</a></code></code> is present
+        and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-6">acceptAllDevices</a></code></code> is <code>true</code>,
+        or if <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-5">filters</a></code></code> is not present
+        and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-7">acceptAllDevices</a></code></code> is <code>false</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
+       <p class="note" role="note">Note: This enforces that
+        exactly one of <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-6">filters</a></code> or <code><code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-8">acceptAllDevices</a></code>:true</code> is present.</p>
       <li> <a data-link-type="dfn" href="#request-bluetooth-devices" id="ref-for-request-bluetooth-devices-1">Request Bluetooth devices</a>,
-        passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-2">filters</a></code></code> and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-3">optionalServices</a></code></code>,
+        passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-7">filters</a></code></code> if <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-9">acceptAllDevices</a></code></code> is <code>false</code> or <code>null</code> otherwise,
+        and passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-4">optionalServices</a></code></code>,
         and let <var>devices</var> be the result. 
       <li> If the previous step threw an exception, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with that exception and abort these steps. 
       <li> If <var>devices</var> is an empty sequence, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notfounderror">NotFoundError</a></code> and abort these steps. 
@@ -2170,8 +2207,11 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <div class="algorithm" data-algorithm="request Bluetooth devices">
      <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="request-bluetooth-devices">request Bluetooth devices</dfn>,
       given a sequence of <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-2">BluetoothRequestDeviceFilter</a></code>s, <var>filters</var>,
+      which can be <code>null</code> to represent that all devices can match,
       and a sequence of <code class="idl"><a data-link-type="idl" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-4">BluetoothServiceUUID</a></code>s, <var>optionalServices</var>,
       the UA MUST run the following steps: </p>
+     <p class="note" role="note"> Note: These steps can block,
+      so uses of this algorithm must be <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>. </p>
      <p class="note" role="note"> Calls to this algorithm will eventually be able to request multiple devices,
       but for now it only ever returns a single one. </p>
      <ol>
@@ -2181,11 +2221,14 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         In order to convert the arguments from service names and aliases to just <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-1">UUID</a>s,
         do the following sub-steps: 
        <ol>
-        <li> If <code><var>filters</var>.length === 0</code>,
+        <li> If <code><var>filters</var> !== null &amp;&amp; <var>filters</var>.length === 0</code>,
             throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
         <li> Let <var>uuidFilters</var> be a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array-objects">Array</a></code> and <var>requiredServiceUUIDs</var> be a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-set-objects">Set</a></code>. 
+        <li> If <var>filters</var> is <code>null</code>,
+            then set <var>requiredServiceUUIDs</var> to the set of all UUIDs. 
         <li>
-          For each <var>filter</var> in <var>filters</var>,
+          If <var>filters</var> isn’t <code>null</code>,
+            then for each <var>filter</var> in <var>filters</var>,
             do the following steps: 
          <ol>
           <li> If none of <var>filter</var>’s
@@ -2250,6 +2293,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <span class="nx">name</span><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
   <span class="nx">filters</span><span class="o">:</span> <var><span class="nx">uuidFilters</span></var><span class="p">,</span>
   <span class="nx">optionalServices</span><span class="o">:</span> <var><span class="nx">optionalServiceUUIDs</span></var><span class="p">,</span>
+  <span class="nx">acceptAllDevices</span><span class="o">:</span> <var><span class="nx">filters</span></var> <span class="o">!==</span> <span class="kc">null</span><span class="p">,</span>
 <span class="p">}</span></pre>
       <li>
         Let <var>state</var> be <var>descriptor</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-state">permission state</a>. 
@@ -2257,7 +2301,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li> If <var>state</var> is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a></code>, return <code>[]</code> and abort these steps. 
       <li> <a data-link-type="dfn" href="#scan-for-devices" id="ref-for-scan-for-devices-1">Scan for devices</a> with <var>requiredServiceUUIDs</var> as the <i>set of <a data-link-type="dfn" href="#service" id="ref-for-service-2">Service</a> UUIDs</i>,
         and let <var>scanResult</var> be the result. 
-      <li> Remove devices from <var>scanResult</var> if
+      <li> If <var>filters</var> isn’t null,
+        remove devices from <var>scanResult</var> if
         they do not <a data-link-type="dfn" href="#matches-a-filter" id="ref-for-matches-a-filter-3">match a filter</a> in <var>uuidFilters</var>. 
       <li id="requestDevice-prompt">
        <a class="self-link" href="#requestDevice-prompt"></a> Even if <var>scanResult</var> is empty, <a data-link-type="dfn" href="https://w3c.github.io/permissions/#prompt-the-user-to-choose">prompt the user to choose</a> one of the devices in <var>scanResult</var>,
@@ -2407,8 +2452,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 <pre class="idl highlight def"><span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothpermissiondescriptor">BluetoothPermissionDescriptor</dfn> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a> {
   <span class="kt">DOMString</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-bluetoothpermissiondescriptor-deviceid">deviceId</dfn>;
   // These match RequestDeviceOptions.
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-3">BluetoothRequestDeviceFilter</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothRequestDeviceFilter> " id="dom-bluetoothpermissiondescriptor-filters">filters<a class="self-link" href="#dom-bluetoothpermissiondescriptor-filters"></a></dfn>;
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-5">BluetoothServiceUUID</a>> <dfn class="nv idl-code" data-default="None" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices">optionalServices<a class="self-link" href="#dom-bluetoothpermissiondescriptor-optionalservices"></a></dfn> = [];
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter" id="ref-for-dictdef-bluetoothrequestdevicefilter-3">BluetoothRequestDeviceFilter</a>> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothRequestDeviceFilter> " id="dom-bluetoothpermissiondescriptor-filters">filters</dfn>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid-5">BluetoothServiceUUID</a>> <dfn class="nv dfn-paneled idl-code" data-default="None" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices">optionalServices</dfn> = [];
+  <span class="kt">boolean</span> <dfn class="nv dfn-paneled idl-code" data-default="false" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-bluetoothpermissiondescriptor-acceptalldevices">acceptAllDevices</dfn> = <span class="kt">false</span>;
 };
 </pre>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data-type">extra permission data type</a> 
@@ -2449,9 +2495,18 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <dd class="algorithm" data-algorithm="permission request">
        <p> Given a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondescriptor" id="ref-for-dictdef-bluetoothpermissiondescriptor-1">BluetoothPermissionDescriptor</a></code> <var>options</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothpermissionresult" id="ref-for-bluetoothpermissionresult-1">BluetoothPermissionResult</a></code> <var>status</var>,
           the UA MUST run the following steps: </p>
-       <ol>
+       <ol data-link-for-hint="BluetoothPermissionDescriptor">
+        <li>
+          If <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-filters" id="ref-for-dom-bluetoothpermissiondescriptor-filters-1">filters</a></code></code> is present
+            and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-acceptalldevices" id="ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-1">acceptAllDevices</a></code></code> is <code>true</code>,
+            or if <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-filters" id="ref-for-dom-bluetoothpermissiondescriptor-filters-2">filters</a></code></code> is not present
+            and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-acceptalldevices" id="ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-2">acceptAllDevices</a></code></code> is <code>false</code>,
+            throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>. 
+         <p class="note" role="note">Note: This enforces that
+            exactly one of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-filters" id="ref-for-dom-bluetoothpermissiondescriptor-filters-3">filters</a></code> or <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-acceptalldevices" id="ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-3">acceptAllDevices</a></code>:true</code> is present.</p>
         <li> <a data-link-type="dfn" href="#request-bluetooth-devices" id="ref-for-request-bluetooth-devices-2">Request Bluetooth devices</a>,
-            passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-3">filters</a></code></code> and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices-4">optionalServices</a></code></code>,
+            passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-filters" id="ref-for-dom-bluetoothpermissiondescriptor-filters-4">filters</a></code></code> if <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-acceptalldevices" id="ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-4">acceptAllDevices</a></code></code> is <code>false</code> or <code>null</code> otherwise,
+            and passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-optionalservices" id="ref-for-dom-bluetoothpermissiondescriptor-optionalservices-1">optionalServices</a></code></code>,
             propagating any exception,
             and let <var>devices</var> be the result. 
         <li> Set <code><var>status</var>.devices</code> to
@@ -4792,6 +4847,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
   <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
+   <li>
+    acceptAllDevices
+    <ul>
+     <li><a href="#dom-requestdeviceoptions-acceptalldevices">dict-member for RequestDeviceOptions</a><span>, in §3</span>
+     <li><a href="#dom-bluetoothpermissiondescriptor-acceptalldevices">dict-member for BluetoothPermissionDescriptor</a><span>, in §3.1</span>
+    </ul>
    <li><a href="#dom-bluetoothremotegattserver-activealgorithms-slot">[[activeAlgorithms]]</a><span>, in §5.2</span>
    <li><a href="#active-notification-context-set">active notification context set</a><span>, in §5.4</span>
    <li><a href="#ad-structure">AD structure</a><span>, in §9</span>
@@ -5308,15 +5369,16 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-requestdeviceoptions">RequestDeviceOptions</a> {
-  <span class="kt">required</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter">BluetoothRequestDeviceFilter</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothRequestDeviceFilter> " href="#dom-requestdeviceoptions-filters">filters</a>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter">BluetoothRequestDeviceFilter</a>> <a class="nv idl-code" data-link-type="dict-member" data-type="sequence<BluetoothRequestDeviceFilter> " href="#dom-requestdeviceoptions-filters">filters</a>;
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a>> <a class="nv idl-code" data-default="None" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices">optionalServices</a> = [];
+  <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-requestdeviceoptions-acceptalldevices">acceptAllDevices</a> = <span class="kt">false</span>;
 };
 
 <span class="kt">interface</span> <a class="nv" href="#bluetooth">Bluetooth</a> {
   [<a class="nv idl-code" data-link-type="extended-attribute">SecureContext</a>]
   <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a>? <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice?" href="#dom-bluetooth-referringdevice">referringDevice</a>;
   [<a class="nv idl-code" data-link-type="extended-attribute">SecureContext</a>]
-  <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-requestdevice">requestDevice</a>(<a class="n" data-link-type="idl-name" href="#dictdef-requestdeviceoptions">RequestDeviceOptions</a> <a class="nv" href="#dom-bluetooth-requestdevice-options-options">options</a>);
+  <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-requestdevice">requestDevice</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-requestdeviceoptions">RequestDeviceOptions</a> <a class="nv" href="#dom-bluetooth-requestdevice-options-options">options</a>);
 };
 <a class="n" data-link-type="idl-name" href="#bluetooth">Bluetooth</a> <span class="kt">implements</span> <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>;
 <a class="n" data-link-type="idl-name" href="#bluetooth">Bluetooth</a> <span class="kt">implements</span> <a class="n" data-link-type="idl-name" href="#bluetoothdeviceeventhandlers">BluetoothDeviceEventHandlers</a>;
@@ -5328,6 +5390,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   // These match RequestDeviceOptions.
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothrequestdevicefilter">BluetoothRequestDeviceFilter</a>> <a class="nv" data-type="sequence<BluetoothRequestDeviceFilter> " href="#dom-bluetoothpermissiondescriptor-filters">filters</a>;
   <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a>> <a class="nv" data-default="None" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothpermissiondescriptor-optionalservices">optionalServices</a> = [];
+  <span class="kt">boolean</span> <a class="nv" data-default="false" data-type="boolean " href="#dom-bluetoothpermissiondescriptor-acceptalldevices">acceptAllDevices</a> = <span class="kt">false</span>;
 };
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-allowedbluetoothdevice">AllowedBluetoothDevice</a> {
@@ -5528,8 +5591,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <aside class="dfn-panel" data-for="dom-requestdeviceoptions-filters">
    <b><a href="#dom-requestdeviceoptions-filters">#dom-requestdeviceoptions-filters</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-requestdeviceoptions-filters-1">3. Device Discovery</a> <a href="#ref-for-dom-requestdeviceoptions-filters-2">(2)</a>
-    <li><a href="#ref-for-dom-requestdeviceoptions-filters-3">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-dom-requestdeviceoptions-filters-1">3. Device Discovery</a> <a href="#ref-for-dom-requestdeviceoptions-filters-2">(2)</a> <a href="#ref-for-dom-requestdeviceoptions-filters-3">(3)</a> <a href="#ref-for-dom-requestdeviceoptions-filters-4">(4)</a> <a href="#ref-for-dom-requestdeviceoptions-filters-5">(5)</a> <a href="#ref-for-dom-requestdeviceoptions-filters-6">(6)</a> <a href="#ref-for-dom-requestdeviceoptions-filters-7">(7)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothrequestdevicefilter-services">
@@ -5562,11 +5624,16 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <li><a href="#ref-for-dom-bluetoothrequestdevicefilter-servicedatauuid-1">3. Device Discovery</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-requestdeviceoptions-acceptalldevices">
+   <b><a href="#dom-requestdeviceoptions-acceptalldevices">#dom-requestdeviceoptions-acceptalldevices</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-1">3. Device Discovery</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-2">(2)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-3">(3)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-4">(4)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-5">(5)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-6">(6)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-7">(7)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-8">(8)</a> <a href="#ref-for-dom-requestdeviceoptions-acceptalldevices-9">(9)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="dom-requestdeviceoptions-optionalservices">
    <b><a href="#dom-requestdeviceoptions-optionalservices">#dom-requestdeviceoptions-optionalservices</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-requestdeviceoptions-optionalservices-1">3. Device Discovery</a> <a href="#ref-for-dom-requestdeviceoptions-optionalservices-2">(2)</a> <a href="#ref-for-dom-requestdeviceoptions-optionalservices-3">(3)</a>
-    <li><a href="#ref-for-dom-requestdeviceoptions-optionalservices-4">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-dom-requestdeviceoptions-optionalservices-1">3. Device Discovery</a> <a href="#ref-for-dom-requestdeviceoptions-optionalservices-2">(2)</a> <a href="#ref-for-dom-requestdeviceoptions-optionalservices-3">(3)</a> <a href="#ref-for-dom-requestdeviceoptions-optionalservices-4">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetooth-deviceinstancemap-slot">
@@ -5646,6 +5713,24 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <b><a href="#dom-bluetoothpermissiondescriptor-deviceid">#dom-bluetoothpermissiondescriptor-deviceid</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothpermissiondescriptor-deviceid-1">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothpermissiondescriptor-filters">
+   <b><a href="#dom-bluetoothpermissiondescriptor-filters">#dom-bluetoothpermissiondescriptor-filters</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothpermissiondescriptor-filters-1">3.1. Permission API Integration</a> <a href="#ref-for-dom-bluetoothpermissiondescriptor-filters-2">(2)</a> <a href="#ref-for-dom-bluetoothpermissiondescriptor-filters-3">(3)</a> <a href="#ref-for-dom-bluetoothpermissiondescriptor-filters-4">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothpermissiondescriptor-optionalservices">
+   <b><a href="#dom-bluetoothpermissiondescriptor-optionalservices">#dom-bluetoothpermissiondescriptor-optionalservices</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothpermissiondescriptor-optionalservices-1">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothpermissiondescriptor-acceptalldevices">
+   <b><a href="#dom-bluetoothpermissiondescriptor-acceptalldevices">#dom-bluetoothpermissiondescriptor-acceptalldevices</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-1">3.1. Permission API Integration</a> <a href="#ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-2">(2)</a> <a href="#ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-3">(3)</a> <a href="#ref-for-dom-bluetoothpermissiondescriptor-acceptalldevices-4">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-allowedbluetoothdevice">
