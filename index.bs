@@ -533,6 +533,10 @@ spec: html
 
     interface Bluetooth {
       [SecureContext]
+      Promise&lt;boolean> getAvailability();
+      [SecureContext]
+      attribute EventHandler onavailabilitychanged;
+      [SecureContext]
       readonly attribute BluetoothDevice? referringDevice;
       [SecureContext]
       Promise&lt;BluetoothDevice> requestDevice(optional RequestDeviceOptions options);
@@ -543,6 +547,14 @@ spec: html
     Bluetooth implements ServiceEventHandlers;
   </pre>
   <div class="note" heading="{{Bluetooth}} members">
+    <p>
+      {{Bluetooth/getAvailability()}} informs the page
+      whether Bluetooth is available at all.
+      An adapter that's disabled through software should count as available.
+      Changes in availability,
+      for example when the user physically attaches or detaches an adapter,
+      are reported through the {{availabilitychanged}} event.
+    </p>
     <p>
       {{Bluetooth/referringDevice}} gives access to
       the device from which the user opened this page, if any.
@@ -1696,6 +1708,96 @@ spec: html
         </ol>
       </dd>
     </dl>
+  </section>
+
+  <section>
+    <h3 id="availability">Overall Bluetooth availability</h3>
+
+    <p>
+      The UA may be running on a computer that has no Bluetooth radio.
+      {{requestDevice()}} handles this by failing to discover any devices,
+      which results in a {{NotFoundError}},
+      but websites may be able to handle it more gracefully.
+    </p>
+
+    <div class="example" id="example-getavailability">
+      <p>
+        To show Bluetooth UI only to users who have a Bluetooth adapter:
+      </p>
+      <pre highlight="js">
+      let bluetoothUI = document.querySelector('#bluetoothUI');
+      navigator.bluetooth.<a idl>getAvailability()</a>.then(available => {
+        bluetoothUI.hidden = !available;
+      });
+      navigator.bluetooth.addEventListener('<a idl>availabilitychanged</a>', e => {
+        bluetoothUI.hidden = !e.value;
+      });
+      </pre>
+    </div>
+
+    <div algorithm>
+      <p>
+        The <code><dfn method for="Bluetooth">getAvailability()</dfn></code> method,
+        when invoked, MUST return <a>a new promise</a> |promise|
+        and run the following steps <a>in parallel</a>:
+      </p>
+      <ol>
+        <li>
+          If the UA has the ability to use Bluetooth,
+          <a>queue a task</a> to <a>resolve</a> |promise| with `true`.
+        </li>
+        <li>
+          Otherwise, <a>queue a task</a> to <a>resolve</a> |promise| with `false`.
+        </li>
+      </ol>
+
+      Note: the promise is resolved <a>in parallel</a>
+      to let the UA call out to other systems
+      to determine whether Bluetooth is available.
+    </div>
+
+    <div algorithm="availabilitychanged">
+      <p>
+        If the UA becomes able or disable to use Bluetooth,
+        for example because a radio was physically attached or detached,
+        the UA must run the following steps:
+      </p>
+      <ol>
+        <li>
+          Let |available| be `true` if the UA is newly able to use Bluetooth,
+          or `false` otherwise.
+        </li>
+        <li>
+          For each <a>global object</a> |global|,
+          <a>queue a task</a> on its <a>responsible event loop</a> to
+          <a>fire an event</a> named {{availabilitychanged}}
+          using the {{ValueEvent}} interface
+          at <code>|global|.navigator.bluetooth</code>
+          with its {{ValueEvent/value}} attribute initialized to |available|.
+        </li>
+      </ol>
+    </div>
+
+    <pre class="idl">
+      [Constructor(DOMString type, optional ValueEventInit initDict)]
+      interface ValueEvent : Event {
+        readonly attribute any value;
+      };
+
+      dictionary ValueEventInit : EventInit {
+        any value = null;
+      };
+    </pre>
+
+    <p>
+      {{ValueEvent}} instances are constructed
+      as specified in [[DOM#constructing-events]].
+    </p>
+
+    <p>
+      The <dfn attribute for="ValueEvent">value</dfn> attribute
+      must return the value it was initialized to.
+    </p>
   </section>
 </section>
 
@@ -4027,6 +4129,13 @@ spec: html
           Fired on a {{BluetoothDevice}}
           when an <a href="#advertising-event-algorithm">advertising event
           is received from that device</a>.
+        </dd>
+
+        <dt><dfn event for="Bluetooth"><code>availabilitychanged</code></dfn></dt>
+        <dd>
+          Fired on {{Bluetooth|navigator.bluetooth}}
+          when the Bluetooth system as a whole
+          becomes available or unavailable to the UA.
         </dd>
 
         <dt><dfn event for="BluetoothRemoteGATTCharacteristic"><code>characteristicvaluechanged</code></dfn></dt>
