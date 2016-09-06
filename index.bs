@@ -96,6 +96,10 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
         text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
         text: TypedArray; url: sec-typedarray-constructors
 
+spec: fingerprinting-guidance; urlPrefix: https://w3c.github.io/fingerprinting-guidance/#
+    type: dfn
+        text: fingerprinting surface; url: dfn-fingerprinting-surface
+
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
@@ -1747,8 +1751,8 @@ spec: html
       </p>
       <pre highlight="js">
       let bluetoothUI = document.querySelector('#bluetoothUI');
-      navigator.bluetooth.<a idl>getAvailability()</a>.then(available => {
-        bluetoothUI.hidden = !available;
+      navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
+        bluetoothUI.hidden = !isAvailable;
       });
       navigator.bluetooth.addEventListener('<a idl>availabilitychanged</a>', e => {
         bluetoothUI.hidden = !e.value;
@@ -1763,6 +1767,12 @@ spec: html
         and run the following steps <a>in parallel</a>:
       </p>
       <ol>
+        <li id="override-availability">
+          If the user has configured the UA to
+          return a particular answer from this function for the current origin,
+          <a>queue a task</a> to <a>resolve</a> |promise| with the configured answer,
+          and abort these steps.
+        </li>
         <li>
           If the UA has the ability to use Bluetooth,
           <a>queue a task</a> to <a>resolve</a> |promise| with `true`.
@@ -1781,20 +1791,28 @@ spec: html
       <p>
         If the UA becomes able or unable to use Bluetooth,
         for example because a radio was physically attached or detached,
-        the UA must run the following steps:
+        or the user has changed
+        their <a href="#override-availability">configuration</a> for
+        the answer returned from {{getAvailability()}},
+        the UA must <a>queue a task</a> on
+        each <a>global object</a> |global|'s <a>responsible event loop</a>
+        to run the following steps:
       </p>
       <ol>
         <li>
-          Let |available| be `true` if the UA is newly able to use Bluetooth,
-          or `false` otherwise.
+          Let |oldAvailability| be
+          the value {{getAvailability()}} would have returned before the change.
         </li>
         <li>
-          For each <a>global object</a> |global|,
-          <a>queue a task</a> on its <a>responsible event loop</a> to
+          Let |newAvailability| be
+          the value {{getAvailability()}} would return after the change.
+        </li>
+        <li>
+          If |oldAvailability| is not the same as |newAvailability|,
           <a>fire an event</a> named {{availabilitychanged}}
           using the {{ValueEvent}} interface
           at <code>|global|.navigator.bluetooth</code>
-          with its {{ValueEvent/value}} attribute initialized to |available|.
+          with its {{ValueEvent/value}} attribute initialized to |newAvailability|.
         </li>
       </ol>
     </div>
