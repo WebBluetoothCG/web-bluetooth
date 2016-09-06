@@ -3521,6 +3521,12 @@ spec: html
         The set for a given characteristic holds
         the {{Navigator/bluetooth|navigator.bluetooth}} objects for
         each <a>Realm</a> that has registered for notifications.
+        All notifications become inactive when a device is disconnected.
+        A site that wants to keep getting notifications after reconnecting
+        needs to call {{startNotifications()}} again,
+        and there is an unavoidable risk that
+        some notifications will be missed
+        in the gap before {{startNotifications()}} takes effect.
       </span>
     </p>
 
@@ -4105,8 +4111,28 @@ spec: html
           </li>
           <li>
             For each {{BluetoothRemoteGATTCharacteristic}} |characteristic|
-            in |deviceObj|'s <a>realm</a>,
-            set <code>|characteristic|.{{[[representedCharacteristic]]}}</code> to `null`.
+            in |deviceObj|'s <a>realm</a>, do the following sub-steps:
+            <ol>
+              <li>
+                Let |notificationContexts| be
+                <code>|characteristic|.{{[[representedCharacteristic]]}}</code>'s
+                <a>active notification context set</a>.
+              <li>
+                Remove |context| from |notificationContexts|.
+              </li>
+              <li>
+                If |notificationContexts| became empty
+                and there is still an <a>ATT Bearer</a>
+                to <code>|deviceObj|.{{[[representedDevice]]}}</code>,
+                the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
+                to clear the <code>Notification</code> and <code>Indication</code> bits in
+                <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
+              </li>
+              <li>
+                Set <code>|characteristic|.{{[[representedCharacteristic]]}}</code>
+                to `null`.
+              </li>
+            </ol>
           </li>
           <li>
             For each {{BluetoothRemoteGATTDescriptor}} |descriptor|
