@@ -28,7 +28,7 @@ Stop GATT Notifications   | ✓         | 54      |     | ✓     |         |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
 Get Characteristics List  | ✓         | ✓       | ✓   | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
-Get Primary Services List | 53        | 53      | ✓   | ✓     |         |
+Get Primary Services List | ✓         | ✓      | ✓   | ✓     |         |
 {start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
 Advertisements Scanning   |           |         |     |       |         |
 Permissions API Integration |         |         |     |       |         |
