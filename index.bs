@@ -1305,6 +1305,7 @@ spec: html
         the {{BluetoothPermissionData/allowedDevices}} list
         of {{"bluetooth"}}'s <a>extra permission data</a> for
         at least the <a>current settings object</a>,
+        for its {{AllowedBluetoothDevice/mayUseGATT}} field to be `true`,
         and for all the services in the union of <var>requiredServiceUUIDs</var>
         and <var>optionalServiceUUIDs</var>
         to appear in its {{AllowedBluetoothDevice/allowedServices}} list,
@@ -1528,6 +1529,7 @@ spec: html
         <pre class="idl">
           dictionary AllowedBluetoothDevice {
             required DOMString deviceId;
+            required boolean mayUseGATT;
             // An allowedServices of "all" means all services are allowed.
             required (DOMString or sequence&lt;UUID>) allowedServices;
           };
@@ -1540,10 +1542,20 @@ spec: html
           <dfn attribute for="AllowedBluetoothDevice">\[[device]]</dfn>
           that holds a <a>Bluetooth device</a>.
         </p>
+      </dd>
+
+      <dt>
+        <a>extra permission data constraints</a>
+      </dt>
+      <dd>
         <p>
           Distinct elements of {{BluetoothPermissionData/allowedDevices}}
           must have different {{AllowedBluetoothDevice/[[device]]}}s
           and different {{AllowedBluetoothDevice/deviceId}}s.
+        </p>
+        <p>
+          If {{AllowedBluetoothDevice/mayUseGATT}} is `false`,
+          {{AllowedBluetoothDevice/allowedServices}} must be `[]`.
         </p>
         <div class="note" id="note-device-id-tracking">
           <p>
@@ -1950,7 +1962,7 @@ spec: html
 
       <p>
         {{BluetoothDevice/gatt}} provides a way to interact with this device's GATT server
-        if the site has permission to use any of its services.
+        if the site has permission to do so.
       </p>
 
       <p>
@@ -2124,11 +2136,18 @@ spec: html
       </p>
       <ol>
         <li>
-          If <code>this.{{[[allowedServices]]}}</code> is an empty list,
-          return `null`.
+          If {{"bluetooth"}}'s <a>extra permission data</a>
+          for `this`'s <a>relevant settings object</a>
+          has an {{AllowedBluetoothDevice}} |allowedDevice|
+          in its {{BluetoothPermissionData/allowedDevices}} list
+          with <code>|allowedDevice|.{{AllowedBluetoothDevice/[[device]]}}</code>
+          the <a>same device</a> as <code>this.{{[[representedDevice]]}}</code>
+          and <code>|allowedDevice|.{{AllowedBluetoothDevice/mayUseGATT}}</code>
+          equal to `true`,
+          return <code>this.{{[[gatt]]}}</code>.
         </li>
         <li>
-          Return <code>this.{{[[gatt]]}}</code>.
+          Otherwise, return `null`.
         </li>
       </ol>
     </div>
