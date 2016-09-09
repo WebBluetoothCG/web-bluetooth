@@ -1923,7 +1923,6 @@ spec: html
         readonly attribute DOMString id;
         readonly attribute DOMString? name;
         readonly attribute BluetoothRemoteGATTServer? gatt;
-        readonly attribute FrozenArray&lt;UUID> uuids;
 
         Promise&lt;void> watchAdvertisements();
         void unwatchAdvertisements();
@@ -1951,12 +1950,6 @@ spec: html
       <p>
         {{BluetoothDevice/gatt}} provides a way to interact with this device's GATT server
         if the site has permission to use any of its services.
-      </p>
-
-      <p>
-        {{BluetoothDevice/uuids}} lists
-        the UUIDs of GATT services known to be on the device,
-        that the current origin is allowed to access.
       </p>
 
       <p>
@@ -2012,36 +2005,6 @@ spec: html
           a {{referringDevice}} that advertised a URL on that origin.
         </td>
       </tr>
-      <tr>
-        <td><dfn>\[[unfilteredUuids]]</dfn></td>
-        <td><code>new {{Set}}()</code></td>
-        <td>
-          Service UUIDs known to be in this device's <a>GATT Server</a>.
-          This set may be incomplete if the UA hasn't run a full service discovery.
-        </td>
-      </tr>
-      <tr>
-        <td><dfn>\[[cachedAllowedServices]]</dfn></td>
-        <td><code>undefined</code></td>
-        <td>
-          Value of {{[[allowedServices]]}} the last time {{[[filteredUuids]]}} was updated.
-        </td>
-      </tr>
-      <tr>
-        <td><dfn>\[[cachedUnfilteredUuids]]</dfn></td>
-        <td><code>undefined</code></td>
-        <td>
-          Value of {{[[unfilteredUuids]]}} the last time {{[[filteredUuids]]}} was updated.
-        </td>
-      </tr>
-      <tr>
-        <td><dfn>\[[filteredUuids]]</dfn></td>
-        <td><code>undefined</code></td>
-        <td>
-          Cached value of {{BluetoothDevice/uuids}}.
-          Up to date if {{[[cachedAllowedServices]]}} is equal to {{[[allowedServices]]}}.
-        </td>
-      </tr>
     </table>
 
     <div algorithm>
@@ -2094,16 +2057,6 @@ spec: html
               Initialize <code><var>result</var>.watchingAdvertisements</code> to `false`.
             </li>
             <li>
-              Add <var>device</var>'s
-              advertised <a>Service UUIDs</a>
-              to <code>result.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-            </li>
-            <li>
-              If the <a>Bluetooth cache</a> contains
-              known-present Services inside <var>device</var>,
-              add the UUIDs of those Services to <code>result.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-            </li>
-            <li>
               Add a mapping from <var>device</var> to <var>result</var>
               in <var>context</var>.{{Bluetooth/[[deviceInstanceMap]]}}.
             </li>
@@ -2129,43 +2082,6 @@ spec: html
         </li>
         <li>
           Return <code>this.{{[[gatt]]}}</code>.
-        </li>
-      </ol>
-    </div>
-
-    <div algorithm>
-      <p>
-        Getting the <code><dfn attribute for="BluetoothDevice">uuids</dfn></code> attribute
-        MUST perform the following steps:
-      </p>
-      <ol>
-        <li>
-          If {{[[cachedAllowedServices]]}} is not equal to {{[[allowedServices]]}}
-          or {{[[cachedUnfilteredUuids]]}} is not equal to {{[[unfilteredUuids]]}},
-          perform the following sub-steps:
-          <ol>
-            <li>
-              Set {{[[cachedAllowedServices]]}} to a copy of {{[[allowedServices]]}}.
-            </li>
-            <li>
-              Set {{[[cachedUnfilteredUuids]]}} to a copy of {{[[unfilteredUuids]]}}.
-            </li>
-            <li>
-              Set {{[[filteredUuids]]}} to a new {{FrozenArray}} consisting of:
-              <dl class="switch">
-                <dt>If {{BluetoothDevice/[[allowedServices]]}} is `"all"`</dt>
-                <dd>the elements of {{BluetoothDevice/[[unfilteredUuids]]}}</dd>
-                <dt>Otherwise,</dt>
-                <dd>
-                  the intersection of
-                  {{BluetoothDevice/[[unfilteredUuids]]}} and {{BluetoothDevice/[[allowedServices]]}}.
-                </dd>
-              </dl>
-            </li>
-          </ol>
-        </li>
-        <li>
-          Return {{[[filteredUuids]]}}.
         </li>
       </ol>
     </div>
@@ -4630,13 +4546,6 @@ spec: html
                 For each <a>Service</a> <var>service</var> in <var>removedAttributes</var>:
                 <ol>
                   <li>
-                    If no remaining <a>Service</a> in
-                    <code><var>deviceObj</var>.{{BluetoothDevice/[[representedDevice]]}}</code>
-                    has the same UUID as <var>service</var>,
-                    remove the UUID from
-                    <code><var>deviceObj</var>.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-                  </li>
-                  <li>
                     If <code><var>deviceObj</var>.{{BluetoothDevice/[[allowedServices]]}}</code>
                     is `"all"` or contains the Service's UUID,
                     <a>fire an event</a> named {{serviceremoved}}
@@ -4650,9 +4559,7 @@ spec: html
               </li>
               <li>
                 For each <a>Service</a> in <var>addedAttributes</var>,
-                add the Service's UUID to
-                <code>deviceObj.{{BluetoothDevice/[[unfilteredUuids]]}}</code>.
-                If <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code>
+                if <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code>
                 is `"all"` or contains the Service's UUID,
                 add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
                 and then <a>fire an event</a> named {{serviceadded}}
