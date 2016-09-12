@@ -1426,7 +1426,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth Scanning</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-09-09">9 September 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-09-12">12 September 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1525,37 +1525,38 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <a class="self-link" href="#example-ibeacon"></a> 
       <p> To discover what iBeacons are nearby and measure their distance,
         a website could use code like the following: </p>
-<pre class="highlight"><span class="kd">function</span> <span class="nx">recordNearbyBeacon</span><span class="p">(</span><span class="nx">major</span><span class="p">,</span> <span class="nx">minor</span><span class="p">,</span> <span class="nx">pathLossVs1m</span><span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-<span class="kd">let</span> <span class="nx">myBeaconUuid</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]);</span>
+<pre class="highlight"><span class="kd">function</span> recordNearbyBeacon<span class="p">(</span>major<span class="p">,</span> minor<span class="p">,</span> pathLossVs1m<span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
+<span class="kd">let</span> myBeaconUuid <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">(</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
 
-<span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan-1"><span class="nx">requestLEScan</span></a><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[{</span><span class="nx">manufacturerId</span><span class="o">:</span> <span class="mh">0x004C</span><span class="p">}],</span>
-  <span class="nx">options</span><span class="o">:</span> <span class="p">{</span>
-    <span class="nx">keepRepeatedDevices</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan-1">requestLEScan</a><span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span><span class="p">{</span>manufacturerId<span class="o">:</span> <span class="mh">0x004C</span><span class="p">}</span><span class="p">]</span><span class="p">,</span>
+  options<span class="o">:</span> <span class="p">{</span>
+    keepRepeatedDevices<span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
   <span class="p">}</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(()</span> <span class="o">=></span> <span class="p">{</span>
-  <span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'</span><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived"><span class="s1">advertisementreceived</span></a><span class="s1">'</span><span class="p">,</span> <span class="nx">event</span> <span class="o">=></span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">appleData</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">manufacturerData</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><span class="mh">0x004C</span></a><span class="p">);</span>
-    <span class="k">if</span> <span class="p">(</span><span class="nx">appleData</span><span class="p">.</span><span class="nx">byteLength</span> <span class="o">!=</span> <span class="mi">23</span> <span class="o">||</span>
-        <span class="nx">appleData</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="o">!==</span> <span class="mh">0x0215</span><span class="p">)</span> <span class="p">{</span>
-      <span class="c1">// Isn’t an iBeacon.</span>
-      <span class="k">return</span><span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span><span class="p">(</span><span class="p">)</span> <span class="o">=></span> <span class="p">{</span>
+  navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListener<span class="p">(</span><span class="s1">'</span><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived"><span class="s1">advertisementreceived</span></a><span class="s1">'</span><span class="p">,</span> event <span class="o">=></span> <span class="p">{</span>
+    <span class="kd">let</span> appleData <span class="o">=</span> event<span class="p">.</span>manufacturerData<span class="p">.</span>get<span class="p">(</span><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><span class="mh">0x004C</span></a><span class="p">)</span><span class="p">;</span>
+    <span class="k">if</span> <span class="p">(</span>appleData<span class="p">.</span>byteLength <span class="o">!=</span> <span class="mi">23</span> <span class="o">||</span>
+        appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="o">!==</span> <span class="mh">0x0215</span><span class="p">)</span> <span class="p">{</span>
+      <span class="c1">// Isn’t an iBeacon.
+</span>      <span class="k">return</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="kd">let</span> <span class="nx">uuidArray</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">appleData</span><span class="p">.</span><span class="nx">buffer</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> <span class="nx">i</span> <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> <span class="nx">i</span> <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> <span class="nx">i</span><span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span><span class="nx">uuidArray</span><span class="p">[</span><span class="nx">i</span><span class="p">]</span> <span class="o">!=</span> <span class="nx">myBeaconUuid</span><span class="p">[</span><span class="nx">i</span><span class="p">])</span> <span class="p">{</span>
-        <span class="c1">// Not my class of beacon.</span>
-        <span class="k">return</span><span class="p">;</span>
+    <span class="kd">let</span> uuidArray <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">(</span>appleData<span class="p">.</span>buffer<span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> i <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> i <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> i<span class="o">++</span><span class="p">)</span> <span class="p">{</span>
+      <span class="k">if</span> <span class="p">(</span>uuidArray<span class="p">[</span>i<span class="p">]</span> <span class="o">!=</span> myBeaconUuid<span class="p">[</span>i<span class="p">]</span><span class="p">)</span> <span class="p">{</span>
+        <span class="c1">// Not my class of beacon.
+</span>        <span class="k">return</span><span class="p">;</span>
       <span class="p">}</span>
     <span class="p">}</span>
-    <span class="kd">let</span> <span class="nx">major</span> <span class="o">=</span> <span class="nx">appleData</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-    <span class="kd">let</span> <span class="nx">minor</span> <span class="o">=</span> <span class="nx">appleData</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-    <span class="kd">let</span> <span class="nx">txPowerAt1m</span> <span class="o">=</span> <span class="o">-</span><span class="nx">appleData</span><span class="p">.</span><span class="nx">getInt8</span><span class="p">(</span><span class="mi">22</span><span class="p">);</span>
-    <span class="kd">let</span> <span class="nx">pathLossVs1m</span> <span class="o">=</span> <span class="nx">txPowerAt1m</span> <span class="o">-</span> <span class="nx">event</span><span class="p">.</span><span class="nx">rssi</span><span class="p">;</span>
+    <span class="kd">let</span> major <span class="o">=</span> appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span><span class="p">;</span>
+    <span class="kd">let</span> minor <span class="o">=</span> appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span><span class="p">;</span>
+    <span class="kd">let</span> txPowerAt1m <span class="o">=</span> <span class="o">-</span>appleData<span class="p">.</span>getInt8<span class="p">(</span><span class="mi">22</span><span class="p">)</span><span class="p">;</span>
+    <span class="kd">let</span> pathLossVs1m <span class="o">=</span> txPowerAt1m <span class="o">-</span> event<span class="p">.</span>rssi<span class="p">;</span>
 
-    <span class="nx">recordNearbyBeacon</span><span class="p">(</span><span class="nx">major</span><span class="p">,</span> <span class="nx">minor</span><span class="p">,</span> <span class="nx">pathLossVs1m</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">})</span></pre>
+    recordNearbyBeacon<span class="p">(</span>major<span class="p">,</span> minor<span class="p">,</span> pathLossVs1m<span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">)</span>
+</pre>
      </div>
     </section>
    </section>
@@ -1658,11 +1659,12 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <li id="scanning-permission">
        <a class="self-link" href="#scanning-permission"></a> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#request-permission-to-use">Request permission to use</a> 
 <pre class="highlight"><span class="p">{</span>
-  <span class="nx">name</span><span class="o">:</span> <a data-link-type="idl" href="#dom-permissionname-bluetooth-le-scan" id="ref-for-dom-permissionname-bluetooth-le-scan-1"><span class="s2">"bluetooth-le-scan"</span></a><span class="p">,</span>
-  <span class="nx">filters</span><span class="o">:</span> <var><span class="nx">options</span></var><span class="p">.</span><span class="nx">filters</span><span class="p">,</span>
-  <span class="nx">keepRepeatedDevices</span><span class="o">:</span> <var><span class="nx">options</span></var><span class="p">.</span><span class="nx">keepRepeatedDevices</span><span class="p">,</span>
-  <span class="nx">acceptAllAdvertisements</span><span class="o">:</span> <var><span class="nx">options</span></var><span class="p">.</span><span class="nx">acceptAllAdvertisements</span><span class="p">,</span>
-<span class="p">}</span></pre>
+  name<span class="o">:</span> <a data-link-type="idl" href="#dom-permissionname-bluetooth-le-scan" id="ref-for-dom-permissionname-bluetooth-le-scan-1"><span class="s2">"bluetooth-le-scan"</span></a><span class="p">,</span>
+  filters<span class="o">:</span> <var>options</var><span class="p">.</span>filters<span class="p">,</span>
+  keepRepeatedDevices<span class="o">:</span> <var>options</var><span class="p">.</span>keepRepeatedDevices<span class="p">,</span>
+  acceptAllAdvertisements<span class="o">:</span> <var>options</var><span class="p">.</span>acceptAllAdvertisements<span class="p">,</span>
+<span class="p">}</span>
+</pre>
        <p class="note" role="note">Note: This may require that this algorithm was <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">triggered by user activation</a>.</p>
       <li> If the result is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a></code>,
         reject <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror">NotAllowedError</a></code> and abort these steps. 
@@ -1821,10 +1823,11 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
           <li>
             If the <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-state">permission state</a> of 
 <pre class="highlight"><span class="p">{</span>
-  <span class="nx">name</span><span class="o">:</span> <span class="s2">"bluetooth-le-scan"</span><span class="p">,</span>
-  <span class="nx">filters</span><span class="o">:</span> <var><span class="nx">activeScan</span></var><span class="p">.</span><span class="nx">filters</span><span class="p">,</span>
-  <span class="nx">keepRepeatedDevices</span><span class="o">:</span> <var><span class="nx">activeScan</span></var><span class="p">.</span><span class="nx">keepRepeatedDevices</span>
-<span class="p">}</span></pre>
+  name<span class="o">:</span> <span class="s2">"bluetooth-le-scan"</span><span class="p">,</span>
+  filters<span class="o">:</span> <var>activeScan</var><span class="p">.</span>filters<span class="p">,</span>
+  keepRepeatedDevices<span class="o">:</span> <var>activeScan</var><span class="p">.</span>keepRepeatedDevices
+<span class="p">}</span>
+</pre>
            <p>is not <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-granted">"granted"</a></code>,
                 call <code><var>activeScan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop-3">stop()</a></code></code>.</p>
          </ol>

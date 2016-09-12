@@ -1426,7 +1426,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-09-09">9 September 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-09-12">12 September 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1490,11 +1490,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <li><a href="#remote-device-identifiers"><span class="secno">2.4.1</span> <span class="content">Identifiers for remote Bluetooth devices</span></a>
         <li><a href="#ua-bluetooth-address"><span class="secno">2.4.2</span> <span class="content">The UA’s Bluetooth address</span></a>
        </ol>
+      <li><a href="#availability-fingerprint"><span class="secno">2.5</span> <span class="content">Exposing Bluetooth availability</span></a>
      </ol>
     <li>
      <a href="#device-discovery"><span class="secno">3</span> <span class="content">Device Discovery</span></a>
      <ol class="toc">
       <li><a href="#permission-api-integration"><span class="secno">3.1</span> <span class="content">Permission API Integration</span></a>
+      <li><a href="#availability"><span class="secno">3.2</span> <span class="content">Overall Bluetooth availability</span></a>
      </ol>
     <li>
      <a href="#device-representation"><span class="secno">4</span> <span class="content">Device Representation</span></a>
@@ -1603,33 +1605,33 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <a class="self-link" href="#example-heart-rate-monitor"></a> 
       <p> To discover and retrieve data from a standard heart rate monitor,
         a website would use code like the following: </p>
-<pre class="highlight"><span class="kd">let</span> <span class="nx">chosenHeartRateService</span> <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
+<pre class="highlight"><span class="kd">let</span> chosenHeartRateService <span class="o">=</span> <span class="kc">null</span><span class="p">;</span>
 
-<span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-1"><span class="nx">requestDevice</span></a><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[{</span>
-    <span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="s1">'heart_rate'</span><span class="p">],</span>
-  <span class="p">}]</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">device</span> <span class="o">=></span> <span class="nx">device</span><span class="p">.</span><span class="nx">gatt</span><span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattserver-connect" id="ref-for-dom-bluetoothremotegattserver-connect-1"><span class="nx">connect</span><span class="p">()</span></a><span class="p">)</span>
-<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">server</span> <span class="o">=></span> <span class="nx">server</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattserver-getprimaryservice" id="ref-for-dom-bluetoothremotegattserver-getprimaryservice-1"><span class="nx">getPrimaryService</span></a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#"><span class="s1">'heart_rate'</span></a><span class="p">))</span>
-<span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">service</span> <span class="o">=></span> <span class="p">{</span>
-  <span class="nx">chosenHeartRateService</span> <span class="o">=</span> <span class="nx">service</span><span class="p">;</span>
-  <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">all</span><span class="p">([</span>
-    <span class="nx">service</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic-1"><span class="nx">getCharacteristic</span></a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#"><span class="s1">'body_sensor_location'</span></a><span class="p">)</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">handleBodySensorLocationCharacteristic</span><span class="p">),</span>
-    <span class="nx">service</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic-2"><span class="nx">getCharacteristic</span></a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><span class="s1">'heart_rate_measurement'</span></a><span class="p">)</span>
-      <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">handleHeartRateMeasurementCharacteristic</span><span class="p">),</span>
-  <span class="p">]);</span>
-<span class="p">});</span>
+navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-1">requestDevice</a><span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span><span class="p">{</span>
+    services<span class="o">:</span> <span class="p">[</span><span class="s1">'heart_rate'</span><span class="p">]</span><span class="p">,</span>
+  <span class="p">}</span><span class="p">]</span>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span>device <span class="o">=></span> device<span class="p">.</span>gatt<span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattserver-connect" id="ref-for-dom-bluetoothremotegattserver-connect-1">connect<span class="p">(</span><span class="p">)</span></a><span class="p">)</span>
+<span class="p">.</span>then<span class="p">(</span>server <span class="o">=></span> server<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattserver-getprimaryservice" id="ref-for-dom-bluetoothremotegattserver-getprimaryservice-1">getPrimaryService</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#"><span class="s1">'heart_rate'</span></a><span class="p">)</span><span class="p">)</span>
+<span class="p">.</span>then<span class="p">(</span>service <span class="o">=></span> <span class="p">{</span>
+  chosenHeartRateService <span class="o">=</span> service<span class="p">;</span>
+  <span class="k">return</span> Promise<span class="p">.</span>all<span class="p">(</span><span class="p">[</span>
+    service<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic-1">getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#"><span class="s1">'body_sensor_location'</span></a><span class="p">)</span>
+      <span class="p">.</span>then<span class="p">(</span>handleBodySensorLocationCharacteristic<span class="p">)</span><span class="p">,</span>
+    service<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic-2">getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><span class="s1">'heart_rate_measurement'</span></a><span class="p">)</span>
+      <span class="p">.</span>then<span class="p">(</span>handleHeartRateMeasurementCharacteristic<span class="p">)</span><span class="p">,</span>
+  <span class="p">]</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 
-<span class="kd">function</span> <span class="nx">handleBodySensorLocationCharacteristic</span><span class="p">(</span><span class="nx">characteristic</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">characteristic</span> <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="s2">"Unknown sensor location."</span><span class="p">);</span>
-    <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">resolve</span><span class="p">();</span>
+<span class="kd">function</span> handleBodySensorLocationCharacteristic<span class="p">(</span>characteristic<span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span>characteristic <span class="o">===</span> <span class="kc">null</span><span class="p">)</span> <span class="p">{</span>
+    console<span class="p">.</span>log<span class="p">(</span><span class="s2">"Unknown sensor location."</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">return</span> Promise<span class="p">.</span>resolve<span class="p">(</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">characteristic</span><span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-readvalue" id="ref-for-dom-bluetoothremotegattcharacteristic-readvalue-1"><span class="nx">readValue</span><span class="p">()</span></a>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">sensorLocationData</span> <span class="o">=></span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">sensorLocation</span> <span class="o">=</span> <span class="nx">sensorLocationData</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-    <span class="k">switch</span> <span class="p">(</span><span class="nx">sensorLocation</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> characteristic<span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-readvalue" id="ref-for-dom-bluetoothremotegattcharacteristic-readvalue-1">readValue<span class="p">(</span><span class="p">)</span></a>
+  <span class="p">.</span>then<span class="p">(</span>sensorLocationData <span class="o">=></span> <span class="p">{</span>
+    <span class="kd">let</span> sensorLocation <span class="o">=</span> sensorLocationData<span class="p">.</span>getUint8<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">switch</span> <span class="p">(</span>sensorLocation<span class="p">)</span> <span class="p">{</span>
       <span class="k">case</span> <span class="mi">0</span><span class="o">:</span> <span class="k">return</span> <span class="s1">'Other'</span><span class="p">;</span>
       <span class="k">case</span> <span class="mi">1</span><span class="o">:</span> <span class="k">return</span> <span class="s1">'Chest'</span><span class="p">;</span>
       <span class="k">case</span> <span class="mi">2</span><span class="o">:</span> <span class="k">return</span> <span class="s1">'Wrist'</span><span class="p">;</span>
@@ -1639,74 +1641,78 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <span class="k">case</span> <span class="mi">6</span><span class="o">:</span> <span class="k">return</span> <span class="s1">'Foot'</span><span class="p">;</span>
       <span class="k">default</span><span class="o">:</span> <span class="k">return</span> <span class="s1">'Unknown'</span><span class="p">;</span>
     <span class="p">}</span>
-  <span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">location</span> <span class="o">=></span> <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">location</span><span class="p">));</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span>location <span class="o">=></span> console<span class="p">.</span>log<span class="p">(</span>location<span class="p">)</span><span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kd">function</span> <span class="nx">handleHeartRateMeasurementCharacteristic</span><span class="p">(</span><span class="nx">characteristic</span><span class="p">)</span> <span class="p">{</span>
-  <span class="k">return</span> <span class="nx">characteristic</span><span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-startnotifications" id="ref-for-dom-bluetoothremotegattcharacteristic-startnotifications-1"><span class="nx">startNotifications</span><span class="p">()</span></a>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="kr">char</span> <span class="o">=></span> <span class="p">{</span>
-    <span class="nx">characteristic</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'</span><a class="idl-code" data-link-type="event" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged" id="ref-for-eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged-1"><span class="s1">characteristicvaluechanged</span></a><span class="s1">'</span><span class="p">,</span>
-                                    <span class="nx">onHeartRateChanged</span><span class="p">);</span>
-  <span class="p">});</span>
+<span class="kd">function</span> handleHeartRateMeasurementCharacteristic<span class="p">(</span>characteristic<span class="p">)</span> <span class="p">{</span>
+  <span class="k">return</span> characteristic<span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-startnotifications" id="ref-for-dom-bluetoothremotegattcharacteristic-startnotifications-1">startNotifications<span class="p">(</span><span class="p">)</span></a>
+  <span class="p">.</span>then<span class="p">(</span><span class="kr">char</span> <span class="o">=></span> <span class="p">{</span>
+    characteristic<span class="p">.</span>addEventListener<span class="p">(</span><span class="s1">'</span><a class="idl-code" data-link-type="event" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged" id="ref-for-eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged-1"><span class="s1">characteristicvaluechanged</span></a><span class="s1">'</span><span class="p">,</span>
+                                    onHeartRateChanged<span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
 
-<span class="kd">function</span> <span class="nx">onHeartRateChanged</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">characteristic</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">target</span><span class="p">;</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">(</span><span class="nx">parseHeartRate</span><span class="p">(</span><span class="nx">characteristic</span><span class="p">.</span><a class="idl-code" data-link-type="attribute" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value-1"><span class="nx">value</span></a><span class="p">));</span>
-<span class="p">}</span></pre>
+<span class="kd">function</span> onHeartRateChanged<span class="p">(</span>event<span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> characteristic <span class="o">=</span> event<span class="p">.</span>target<span class="p">;</span>
+  console<span class="p">.</span>log<span class="p">(</span>parseHeartRate<span class="p">(</span>characteristic<span class="p">.</span><a class="idl-code" data-link-type="attribute" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value-1">value</a><span class="p">)</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
       <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><code>heart<em>rate</em>measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code> stored
         in a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-1">BluetoothRemoteGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value-2">value</a></code> field. </p>
-<pre class="highlight"><span class="kd">function</span> <span class="nx">parseHeartRate</span><span class="p">(</span><span class="nx">data</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">let</span> <span class="nx">flags</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="mi">0</span><span class="p">);</span>
-  <span class="kd">let</span> <span class="nx">rate16Bits</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">;</span>
-  <span class="kd">let</span> <span class="nx">result</span> <span class="o">=</span> <span class="p">{};</span>
-  <span class="kd">let</span> <span class="nx">index</span> <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">rate16Bits</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">heartRate</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">);</span>
-    <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+<pre class="highlight"><span class="kd">function</span> parseHeartRate<span class="p">(</span>data<span class="p">)</span> <span class="p">{</span>
+  <span class="kd">let</span> flags <span class="o">=</span> data<span class="p">.</span>getUint8<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">let</span> rate16Bits <span class="o">=</span> flags <span class="o">&amp;</span> <span class="mh">0x1</span><span class="p">;</span>
+  <span class="kd">let</span> result <span class="o">=</span> <span class="p">{</span><span class="p">}</span><span class="p">;</span>
+  <span class="kd">let</span> index <span class="o">=</span> <span class="mi">1</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span>rate16Bits<span class="p">)</span> <span class="p">{</span>
+    result<span class="p">.</span>heartRate <span class="o">=</span> data<span class="p">.</span>getUint16<span class="p">(</span>index<span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+    index <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">heartRate</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint8</span><span class="p">(</span><span class="nx">index</span><span class="p">);</span>
-    <span class="nx">index</span> <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
+    result<span class="p">.</span>heartRate <span class="o">=</span> data<span class="p">.</span>getUint8<span class="p">(</span>index<span class="p">)</span><span class="p">;</span>
+    index <span class="o">+=</span> <span class="mi">1</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="kd">let</span> <span class="nx">contactDetected</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x2</span><span class="p">;</span>
-  <span class="kd">let</span> <span class="nx">contactSensorPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x4</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">contactSensorPresent</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">contactDetected</span> <span class="o">=</span> <span class="o">!!</span><span class="nx">contactDetected</span><span class="p">;</span>
+  <span class="kd">let</span> contactDetected <span class="o">=</span> flags <span class="o">&amp;</span> <span class="mh">0x2</span><span class="p">;</span>
+  <span class="kd">let</span> contactSensorPresent <span class="o">=</span> flags <span class="o">&amp;</span> <span class="mh">0x4</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span>contactSensorPresent<span class="p">)</span> <span class="p">{</span>
+    result<span class="p">.</span>contactDetected <span class="o">=</span> <span class="o">!</span><span class="o">!</span>contactDetected<span class="p">;</span>
   <span class="p">}</span>
-  <span class="kd">let</span> <span class="nx">energyPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x8</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">energyPresent</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">energyExpended</span> <span class="o">=</span> <span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">);</span>
-    <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
+  <span class="kd">let</span> energyPresent <span class="o">=</span> flags <span class="o">&amp;</span> <span class="mh">0x8</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span>energyPresent<span class="p">)</span> <span class="p">{</span>
+    result<span class="p">.</span>energyExpended <span class="o">=</span> data<span class="p">.</span>getUint16<span class="p">(</span>index<span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">)</span><span class="p">;</span>
+    index <span class="o">+=</span> <span class="mi">2</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="kd">let</span> <span class="nx">rrIntervalPresent</span> <span class="o">=</span> <span class="nx">flags</span> <span class="o">&amp;</span> <span class="mh">0x10</span><span class="p">;</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">rrIntervalPresent</span><span class="p">)</span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">rrIntervals</span> <span class="o">=</span> <span class="p">[];</span>
-    <span class="k">for</span> <span class="p">(;</span> <span class="nx">index</span> <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> <span class="nx">data</span><span class="p">.</span><span class="nx">byteLength</span><span class="p">;</span> <span class="nx">index</span> <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
-      <span class="nx">rrIntervals</span><span class="p">.</span><span class="nx">push</span><span class="p">(</span><span class="nx">data</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="nx">index</span><span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">));</span>
+  <span class="kd">let</span> rrIntervalPresent <span class="o">=</span> flags <span class="o">&amp;</span> <span class="mh">0x10</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span>rrIntervalPresent<span class="p">)</span> <span class="p">{</span>
+    <span class="kd">let</span> rrIntervals <span class="o">=</span> <span class="p">[</span><span class="p">]</span><span class="p">;</span>
+    <span class="k">for</span> <span class="p">(</span><span class="p">;</span> index <span class="o">+</span> <span class="mi">1</span> <span class="o">&lt;</span> data<span class="p">.</span>byteLength<span class="p">;</span> index <span class="o">+=</span> <span class="mi">2</span><span class="p">)</span> <span class="p">{</span>
+      rrIntervals<span class="p">.</span>push<span class="p">(</span>data<span class="p">.</span>getUint16<span class="p">(</span>index<span class="p">,</span> <span class="cm">/*littleEndian=*/</span><span class="kc">true</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
     <span class="p">}</span>
-    <span class="nx">result</span><span class="p">.</span><span class="nx">rrIntervals</span> <span class="o">=</span> <span class="nx">rrIntervals</span><span class="p">;</span>
+    result<span class="p">.</span>rrIntervals <span class="o">=</span> rrIntervals<span class="p">;</span>
   <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">result</span><span class="p">;</span>
-<span class="p">}</span></pre>
+  <span class="k">return</span> result<span class="p">;</span>
+<span class="p">}</span>
+</pre>
       <p> <code>onHeartRateChanged()</code> might log an object like </p>
 <pre class="highlight"><span class="p">{</span>
-  <span class="nx">heartRate</span><span class="o">:</span> <span class="mi">70</span><span class="p">,</span>
-  <span class="nx">contactDetected</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-  <span class="nx">energyExpended</span><span class="o">:</span> <span class="mi">750</span><span class="p">,</span>     <span class="c1">// Meaning 750kJ.</span>
-  <span class="nx">rrIntervals</span><span class="o">:</span> <span class="p">[</span><span class="mi">890</span><span class="p">,</span> <span class="mi">870</span><span class="p">]</span>  <span class="c1">// Meaning .87s and .85s.</span>
-<span class="p">}</span></pre>
+  heartRate<span class="o">:</span> <span class="mi">70</span><span class="p">,</span>
+  contactDetected<span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  energyExpended<span class="o">:</span> <span class="mi">750</span><span class="p">,</span>     <span class="c1">// Meaning 750kJ.
+</span>  rrIntervals<span class="o">:</span> <span class="p">[</span><span class="mi">890</span><span class="p">,</span> <span class="mi">870</span><span class="p">]</span>  <span class="c1">// Meaning .87s and .85s.
+</span><span class="p">}</span>
+</pre>
       <p> If the heart rate sensor reports the <code>energyExpended</code> field,
         the web application can reset its value to <code>0</code> by writing to the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">heart_rate_control_point</a></code> characteristic: </p>
-<pre class="highlight"><span class="kd">function</span> <span class="nx">resetEnergyExpended</span><span class="p">()</span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="nx">chosenHeartRateService</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nb">Promise</span><span class="p">.</span><span class="nx">reject</span><span class="p">(</span><span class="k">new</span> <span class="nb">Error</span><span class="p">(</span><span class="s1">'No heart rate sensor selected yet.'</span><span class="p">));</span>
+<pre class="highlight"><span class="kd">function</span> resetEnergyExpended<span class="p">(</span><span class="p">)</span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span><span class="o">!</span>chosenHeartRateService<span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> Promise<span class="p">.</span>reject<span class="p">(</span><span class="k">new</span> Error<span class="p">(</span><span class="s1">'No heart rate sensor selected yet.'</span><span class="p">)</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="k">return</span> <span class="nx">chosenHeartRateService</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic-3"><span class="nx">getCharacteristic</span></a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#"><span class="s1">'heart_rate_control_point'</span></a><span class="p">)</span>
-  <span class="p">.</span><span class="nx">then</span><span class="p">(</span><span class="nx">controlPoint</span> <span class="o">=></span> <span class="p">{</span>
-    <span class="kd">let</span> <span class="nx">resetEnergyExpended</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">([</span><span class="mi">1</span><span class="p">]);</span>
-    <span class="k">return</span> <span class="nx">controlPoint</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-writevalue" id="ref-for-dom-bluetoothremotegattcharacteristic-writevalue-1"><span class="nx">writeValue</span></a><span class="p">(</span><span class="nx">resetEnergyExpended</span><span class="p">);</span>
-  <span class="p">});</span>
-<span class="p">}</span></pre>
+  <span class="k">return</span> chosenHeartRateService<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic-3">getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#"><span class="s1">'heart_rate_control_point'</span></a><span class="p">)</span>
+  <span class="p">.</span>then<span class="p">(</span>controlPoint <span class="o">=></span> <span class="p">{</span>
+    <span class="kd">let</span> resetEnergyExpended <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">(</span><span class="p">[</span><span class="mi">1</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
+    <span class="k">return</span> controlPoint<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-writevalue" id="ref-for-dom-bluetoothremotegattcharacteristic-writevalue-1">writeValue</a><span class="p">(</span>resetEnergyExpended<span class="p">)</span><span class="p">;</span>
+  <span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span>
+</pre>
      </div>
     </section>
    </section>
@@ -1843,6 +1849,18 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         but it would still be better for more platforms to expose the <a data-link-type="dfn" href="#privacy-feature" id="ref-for-privacy-feature-3">Privacy Feature</a>. </p>
      </section>
     </section>
+    <section class="non-normative">
+     <h3 class="heading settled" data-level="2.5" id="availability-fingerprint"><span class="secno">2.5. </span><span class="content">Exposing Bluetooth availability</span><a class="self-link" href="#availability-fingerprint"></a></h3>
+     <p><em>This section is non-normative.</em></p>
+     <p> <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-1">getAvailability()</a></code></code> exposes whether a Bluetooth radio is available on the user’s system.
+      Some users might consider this private,
+      although it’s hard to imagine the damage that would result from revealing it.
+      This information also increases the UA’s <a data-link-type="dfn" href="https://w3c.github.io/fingerprinting-guidance/#dfn-fingerprinting-surface">fingerprinting surface</a> by a bit.
+      This function returns a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a></code>,
+      so UAs have the option of asking the user what value they want to return,
+      but we expect the increased risk to be small enough that
+      UAs will choose not to prompt. </p>
+    </section>
    </section>
    <section>
     <h2 class="heading settled" data-level="3" id="device-discovery"><span class="secno">3. </span><span class="content">Device Discovery</span><span id="requestDevice-secure-context"></span><a class="self-link" href="#device-discovery"></a></h2>
@@ -1862,6 +1880,10 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetooth">Bluetooth</dfn> {
   [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
+  <span class="kt">Promise</span>&lt;<span class="kt">boolean</span>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-2">getAvailability</a>();
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
+  <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a> <dfn class="nv idl-code" data-dfn-for="Bluetooth" data-dfn-type="attribute" data-export="" data-type="EventHandler" id="dom-bluetooth-onavailabilitychanged">onavailabilitychanged<a class="self-link" href="#dom-bluetooth-onavailabilitychanged"></a></dfn>;
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
   <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-1">BluetoothDevice</a>? <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice?" href="#dom-bluetooth-referringdevice" id="ref-for-dom-bluetooth-referringdevice-1">referringDevice</a>;
   [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice-2">BluetoothDevice</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-3">requestDevice</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-requestdeviceoptions" id="ref-for-dictdef-requestdeviceoptions-1">RequestDeviceOptions</a> <dfn class="nv idl-code" data-dfn-for="Bluetooth/requestDevice(options), Bluetooth/requestDevice()" data-dfn-type="argument" data-export="" id="dom-bluetooth-requestdevice-options-options">options<a class="self-link" href="#dom-bluetooth-requestdevice-options-options"></a></dfn>);
@@ -1873,6 +1895,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 </pre>
     <div class="note no-marker" role="note">
      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth-6">Bluetooth</a></code> members</div>
+     <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-3">getAvailability()</a></code> informs the page
+      whether Bluetooth is available at all.
+      An adapter that’s disabled through software should count as available.
+      Changes in availability,
+      for example when the user physically attaches or detaches an adapter,
+      are reported through the <code class="idl"><a data-link-type="idl" href="#eventdef-bluetooth-availabilitychanged" id="ref-for-eventdef-bluetooth-availabilitychanged-1">availabilitychanged</a></code> event. </p>
      <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-referringdevice" id="ref-for-dom-bluetooth-referringdevice-2">referringDevice</a></code> gives access to
       the device from which the user opened this page, if any.
       For example, an <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
@@ -1939,29 +1967,32 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <td><i>&lt;none></i>
      </table>
      <p> If the website calls </p>
-<pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]}</span> <span class="p">]</span>
-<span class="p">});</span></pre>
+<pre class="highlight">navigator<span class="p">.</span>bluetooth<span class="p">.</span>requestDevice<span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span> <span class="p">{</span>services<span class="o">:</span> <span class="p">[</span>A<span class="p">,</span> B<span class="p">]</span><span class="p">}</span> <span class="p">]</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
      <p> the user will be shown a dialog containing devices D1 and D2.
       If the user selects D1, the website will not be able to access services C or D.
       If the user selects D2, the website will not be able to access service E. </p>
      <p> On the other hand, if the website calls </p>
-<pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[</span>
-    <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]},</span>
-    <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">C</span><span class="p">,</span> <span class="nx">D</span><span class="p">]}</span>
+<pre class="highlight">navigator<span class="p">.</span>bluetooth<span class="p">.</span>requestDevice<span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span>
+    <span class="p">{</span>services<span class="o">:</span> <span class="p">[</span>A<span class="p">,</span> B<span class="p">]</span><span class="p">}</span><span class="p">,</span>
+    <span class="p">{</span>services<span class="o">:</span> <span class="p">[</span>C<span class="p">,</span> D<span class="p">]</span><span class="p">}</span>
   <span class="p">]</span>
-<span class="p">});</span></pre>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
      <p> the dialog will contain devices D1, D2, and D3,
       and if the user selects D1,
       the website will be able to access services A, B, C, and D. </p>
      <p> The <code>optionalServices</code> list doesn’t add any devices
       to the dialog the user sees,
       but it does affect which services the website can use from the device the user picks. </p>
-<pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[</span> <span class="p">{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">A</span><span class="p">,</span> <span class="nx">B</span><span class="p">]}</span> <span class="p">],</span>
-  <span class="nx">optionalServices</span><span class="o">:</span> <span class="p">[</span><span class="nx">E</span><span class="p">]</span>
-<span class="p">});</span></pre>
+<pre class="highlight">navigator<span class="p">.</span>bluetooth<span class="p">.</span>requestDevice<span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span> <span class="p">{</span>services<span class="o">:</span> <span class="p">[</span>A<span class="p">,</span> B<span class="p">]</span><span class="p">}</span> <span class="p">]</span><span class="p">,</span>
+  optionalServices<span class="o">:</span> <span class="p">[</span>E<span class="p">]</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
      <p> Shows a dialog containing D1 and D2,
       but not D4, since D4 doesn’t contain the required services.
       If the user selects D2, unlike in the first example,
@@ -2008,32 +2039,37 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <tbody>
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>name<span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D5
         <td>
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"Device"</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>namePrefix<span class="o">:</span> <span class="s2">"Device"</span><span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D3, D4
         <td>
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"First De"</span><span class="p">},</span>
- <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"First Device"</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>name<span class="o">:</span> <span class="s2">"First De"</span><span class="p">}</span><span class="p">,</span>
+ <span class="p">{</span>name<span class="o">:</span> <span class="s2">"First Device"</span><span class="p">}</span><span class="p">]</span>
+</pre>
         <td><i>&lt;none></i>
         <td> D1 only advertises a prefix of its name,
           so trying to match its whole name fails. 
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"First"</span><span class="p">},</span>
- <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>namePrefix<span class="o">:</span> <span class="s2">"First"</span><span class="p">}</span><span class="p">,</span>
+ <span class="p">{</span>name<span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D1, D5
         <td>
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">C</span><span class="p">],</span>
-  <span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">"Device"</span><span class="p">},</span>
- <span class="p">{</span><span class="nx">name</span><span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>services<span class="o">:</span> <span class="p">[</span>C<span class="p">]</span><span class="p">,</span>
+  namePrefix<span class="o">:</span> <span class="s2">"Device"</span><span class="p">}</span><span class="p">,</span>
+ <span class="p">{</span>name<span class="o">:</span> <span class="s2">"Unique Name"</span><span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D3, D5
         <td>
      </table>
@@ -2067,16 +2103,19 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <tbody>
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">manufacturerId</span><span class="o">:</span> <span class="mi">17</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>manufacturerId<span class="o">:</span> <span class="mi">17</span><span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D1
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">serviceDataUUID</span><span class="o">:</span> <span class="nx">A</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>serviceDataUUID<span class="o">:</span> A<span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D2
        <tr>
         <td>
-<pre class="highlight"><span class="p">[{</span><span class="nx">manufacturerId</span><span class="o">:</span> <span class="mi">17</span><span class="p">},</span>
- <span class="p">{</span><span class="nx">serviceDataUUID</span><span class="o">:</span> <span class="nx">A</span><span class="p">}]</span></pre>
+<pre class="highlight"><span class="p">[</span><span class="p">{</span>manufacturerId<span class="o">:</span> <span class="mi">17</span><span class="p">}</span><span class="p">,</span>
+ <span class="p">{</span>serviceDataUUID<span class="o">:</span> A<span class="p">}</span><span class="p">]</span>
+</pre>
         <td>D1, D2
      </table>
     </div>
@@ -2092,35 +2131,41 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <tbody>
        <tr>
         <td>
-<pre class="highlight"><span class="nx">requestDevice</span><span class="p">({})</span></pre>
+<pre class="highlight">requestDevice<span class="p">(</span><span class="p">{</span><span class="p">}</span><span class="p">)</span>
+</pre>
         <td>A absent list of filters doesn’t accept any devices.
        <tr>
         <td>
-<pre class="highlight"><span class="nx">requestDevice</span><span class="p">({</span><span class="nx">filters</span><span class="o">:</span><span class="p">[]})</span></pre>
+<pre class="highlight">requestDevice<span class="p">(</span><span class="p">{</span>filters<span class="o">:</span><span class="p">[</span><span class="p">]</span><span class="p">}</span><span class="p">)</span>
+</pre>
         <td>An empty list of filters doesn’t accept any devices.
        <tr>
         <td>
-<pre class="highlight"><span class="nx">requestDevice</span><span class="p">({</span><span class="nx">filters</span><span class="o">:</span><span class="p">[{}]})</span></pre>
+<pre class="highlight">requestDevice<span class="p">(</span><span class="p">{</span>filters<span class="o">:</span><span class="p">[</span><span class="p">{</span><span class="p">}</span><span class="p">]</span><span class="p">}</span><span class="p">)</span>
+</pre>
         <td>An empty filter accepts all devices, and so isn’t allowed either.
        <tr>
         <td>
-<pre class="highlight"><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">acceptAllDevices</span><span class="o">:</span><span class="kc">true</span>
-<span class="p">})</span></pre>
+<pre class="highlight">requestDevice<span class="p">(</span><span class="p">{</span>
+  acceptAllDevices<span class="o">:</span><span class="kc">true</span>
+<span class="p">}</span><span class="p">)</span>
+</pre>
         <td> Explicitly accept all devices with <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-4">acceptAllDevices</a></code>.
           This does <em>not</em> produce a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>. 
        <tr>
         <td>
-<pre class="highlight"><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[...],</span>
-  <span class="nx">acceptAllDevices</span><span class="o">:</span><span class="kc">true</span>
-<span class="p">})</span></pre>
+<pre class="highlight">requestDevice<span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span><span class="p">...</span><span class="p">]</span><span class="p">,</span>
+  acceptAllDevices<span class="o">:</span><span class="kc">true</span>
+<span class="p">}</span><span class="p">)</span>
+</pre>
         <td><code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices-5">acceptAllDevices</a></code> would override any <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters-3">filters</a></code>.
        <tr>
         <td>
-<pre class="highlight"><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span><span class="p">[{</span><span class="nx">namePrefix</span><span class="o">:</span> <span class="s2">""</span><span class="p">}]</span>
-<span class="p">})</span></pre>
+<pre class="highlight">requestDevice<span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span><span class="p">[</span><span class="p">{</span>namePrefix<span class="o">:</span> <span class="s2">""</span><span class="p">}</span><span class="p">]</span>
+<span class="p">}</span><span class="p">)</span>
+</pre>
         <td><code>namePrefix</code>, if present, must be non-empty to filter devices.
      </table>
     </div>
@@ -2303,11 +2348,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li>
         Let <var>descriptor</var> be 
 <pre class="highlight"><span class="p">{</span>
-  <span class="nx">name</span><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
-  <span class="nx">filters</span><span class="o">:</span> <var><span class="nx">uuidFilters</span></var><span class="p">,</span>
-  <span class="nx">optionalServices</span><span class="o">:</span> <var><span class="nx">optionalServiceUUIDs</span></var><span class="p">,</span>
-  <span class="nx">acceptAllDevices</span><span class="o">:</span> <var><span class="nx">filters</span></var> <span class="o">!==</span> <span class="kc">null</span><span class="p">,</span>
-<span class="p">}</span></pre>
+  name<span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
+  filters<span class="o">:</span> <var>uuidFilters</var><span class="p">,</span>
+  optionalServices<span class="o">:</span> <var>optionalServiceUUIDs</var><span class="p">,</span>
+  acceptAllDevices<span class="o">:</span> <var>filters</var> <span class="o">!==</span> <span class="kc">null</span><span class="p">,</span>
+<span class="p">}</span>
+</pre>
       <li>
         Let <var>state</var> be <var>descriptor</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-state">permission state</a>. 
        <p class="note" role="note">Note: <var>state</var> will be <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a></code> in <a data-link-type="dfn" href="https://w3c.github.io/webappsec-secure-contexts/#non-secure-context">non-secure contexts</a> because <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-1">"bluetooth"</a></code> doesn’t set the <a data-link-type="dfn" href="https://w3c.github.io/permissions/#allowed-in-non-secure-contexts">allowed in non-secure contexts</a> flag.</p>
@@ -2423,38 +2469,40 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       and query which permissions they have. </p>
      <div class="example" id="example-permission-api-request">
       <a class="self-link" href="#example-permission-api-request"></a> 
-      <p> Sites can use <code class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">permissions</span><span class="p">.</span><code class="idl highlight"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request"><span class="nx"><span class="nx">request</span></span></a></code><span class="p">({</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name"><span class="nx">name</span></a><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span> <span class="p">...})</span></code> as an alternate spelling of <code class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><code class="idl highlight"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-5"><span class="nx"><span class="nx">requestDevice</span></span><span class="p"><span class="p">()</span></span></a></code></code>. </p>
-<pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">permissions</span><span class="p">.</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request"><span class="nx">request</span></a><span class="p">({</span>
-  <span class="nx">name</span><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[{</span>
-    <span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="s1">'heart_rate'</span><span class="p">],</span>
-  <span class="p">}]</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=></span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-1"><span class="nx">devices</span></a><span class="p">.</span><span class="nx">length</span> <span class="o">></span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">result</span><span class="p">.</span><span class="nx">devices</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+      <p> Sites can use <code class="highlight">navigator<span class="p">.</span>permissions<span class="p">.</span><code class="idl highlight"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request">request</a></code><span class="p">(</span><span class="p">{</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span> <span class="p">...</span><span class="p">}</span><span class="p">)</span></code> as an alternate spelling of <code class="highlight">navigator<span class="p">.</span>bluetooth<span class="p">.</span><code class="idl highlight"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-5">requestDevice<span class="p"><span class="p">(</span></span><span class="p"><span class="p">)</span></span></a></code></code>. </p>
+<pre class="highlight">navigator<span class="p">.</span>permissions<span class="p">.</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request">request</a><span class="p">(</span><span class="p">{</span>
+  name<span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
+  filters<span class="o">:</span> <span class="p">[</span><span class="p">{</span>
+    services<span class="o">:</span> <span class="p">[</span><span class="s1">'heart_rate'</span><span class="p">]</span><span class="p">,</span>
+  <span class="p">}</span><span class="p">]</span>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span>result <span class="o">=></span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span>result<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-1">devices</a><span class="p">.</span>length <span class="o">></span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> result<span class="p">.</span>devices<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <a data-link-type="idl" href="https://heycam.github.io/webidl/#dfn-DOMException"><span class="nx">DOMException</span></a><span class="p">(</span><span class="s2">"Chooser cancelled"</span><span class="p">,</span> <span class="s2">"NotFoundError"</span><span class="p">);</span>
+    <span class="k">throw</span> <span class="k">new</span> <a data-link-type="idl" href="https://heycam.github.io/webidl/#dfn-DOMException">DOMException</a><span class="p">(</span><span class="s2">"Chooser cancelled"</span><span class="p">,</span> <span class="s2">"NotFoundError"</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">device</span> <span class="o">=></span> <span class="p">{</span>
-  <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">lastDevice</span> <span class="o">=</span> <span class="nx">device</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id-1"><span class="nx">id</span></a><span class="p">;</span>
-<span class="p">});</span></pre>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span>device <span class="o">=></span> <span class="p">{</span>
+  sessionStorage<span class="p">.</span>lastDevice <span class="o">=</span> device<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id-1">id</a><span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
       <p> The <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondescriptor-deviceid" id="ref-for-dom-bluetoothpermissiondescriptor-deviceid-1">deviceId</a></code> member
         is ignored in calls to <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-request">request()</a></code>. </p>
      </div>
      <div class="example" id="example-permission-api-query">
       <a class="self-link" href="#example-permission-api-query"></a> 
       <p> Once a site has been granted access to a set of devices,
-        it can use <code class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">permissions</span><span class="p">.</span><code class="idl highlight"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-query"><span class="nx"><span class="nx">query</span></span></a></code><span class="p">({</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name"><span class="nx">name</span></a><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span> <span class="p">...})</span></code> to retrieve those devices after a reload. </p>
-<pre class="highlight"><span class="nx">navigator</span><span class="p">.</span><span class="nx">permissions</span><span class="p">.</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-query"><span class="nx">query</span></a><span class="p">({</span>
-  <span class="nx">name</span><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
-  <span class="nx">deviceId</span><span class="o">:</span> <span class="nx">sessionStorage</span><span class="p">.</span><span class="nx">lastDevice</span><span class="p">,</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">result</span> <span class="o">=></span> <span class="p">{</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">result</span><span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-2"><span class="nx">devices</span></a><span class="p">.</span><span class="nx">length</span> <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
-    <span class="k">return</span> <span class="nx">result</span><span class="p">.</span><span class="nx">devices</span><span class="p">[</span><span class="mi">0</span><span class="p">];</span>
+        it can use <code class="highlight">navigator<span class="p">.</span>permissions<span class="p">.</span><code class="idl highlight"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-query">query</a></code><span class="p">(</span><span class="p">{</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a><span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span> <span class="p">...</span><span class="p">}</span><span class="p">)</span></code> to retrieve those devices after a reload. </p>
+<pre class="highlight">navigator<span class="p">.</span>permissions<span class="p">.</span><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissions-query">query</a><span class="p">(</span><span class="p">{</span>
+  name<span class="o">:</span> <span class="s2">"bluetooth"</span><span class="p">,</span>
+  deviceId<span class="o">:</span> sessionStorage<span class="p">.</span>lastDevice<span class="p">,</span>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span>result <span class="o">=></span> <span class="p">{</span>
+  <span class="k">if</span> <span class="p">(</span>result<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothpermissionresult-devices" id="ref-for-dom-bluetoothpermissionresult-devices-2">devices</a><span class="p">.</span>length <span class="o">==</span> <span class="mi">1</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">return</span> result<span class="p">.</span>devices<span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="p">;</span>
   <span class="p">}</span> <span class="k">else</span> <span class="p">{</span>
-    <span class="k">throw</span> <span class="k">new</span> <a data-link-type="idl" href="https://heycam.github.io/webidl/#dfn-DOMException"><span class="nx">DOMException</span></a><span class="p">(</span><span class="s2">"Lost permission"</span><span class="p">,</span> <span class="s2">"NotFoundError"</span><span class="p">);</span>
+    <span class="k">throw</span> <span class="k">new</span> <a data-link-type="idl" href="https://heycam.github.io/webidl/#dfn-DOMException">DOMException</a><span class="p">(</span><span class="s2">"Lost permission"</span><span class="p">,</span> <span class="s2">"NotFoundError"</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(...);</span></pre>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span><span class="p">...</span><span class="p">)</span><span class="p">;</span>
+</pre>
      </div>
      <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="PermissionName" data-dfn-type="enum-value" data-export="" id="dom-permissionname-bluetooth">"bluetooth"</dfn> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#powerful-feature">powerful feature</a>’s
       permission-related algorithms and types
@@ -2582,6 +2630,68 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
          </ol>
        </ol>
      </dl>
+    </section>
+    <section>
+     <h3 class="heading settled" data-level="3.2" id="availability"><span class="secno">3.2. </span><span class="content">Overall Bluetooth availability</span><a class="self-link" href="#availability"></a></h3>
+     <p> The UA may be running on a computer that has no Bluetooth radio. <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-6">requestDevice()</a></code> handles this by failing to discover any devices,
+      which results in a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notfounderror">NotFoundError</a></code>,
+      but websites may be able to handle it more gracefully. </p>
+     <div class="example" id="example-getavailability">
+      <a class="self-link" href="#example-getavailability"></a> 
+      <p> To show Bluetooth UI only to users who have a Bluetooth adapter: </p>
+<pre class="highlight"><span class="kd">let</span> bluetoothUI <span class="o">=</span> document<span class="p">.</span>querySelector<span class="p">(</span><span class="s1">'#bluetoothUI'</span><span class="p">)</span><span class="p">;</span>
+navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-4">getAvailability<span class="p">(</span><span class="p">)</span></a><span class="p">.</span>then<span class="p">(</span>isAvailable <span class="o">=></span> <span class="p">{</span>
+  bluetoothUI<span class="p">.</span>hidden <span class="o">=</span> <span class="o">!</span>isAvailable<span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListener<span class="p">(</span><span class="s1">'</span><a data-link-type="idl" href="#eventdef-bluetooth-availabilitychanged" id="ref-for-eventdef-bluetooth-availabilitychanged-2"><span class="s1">availabilitychanged</span></a><span class="s1">'</span><span class="p">,</span> e <span class="o">=></span> <span class="p">{</span>
+  bluetoothUI<span class="p">.</span>hidden <span class="o">=</span> <span class="o">!</span>e<span class="p">.</span>value<span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
+     </div>
+     <div class="algorithm" data-algorithm="getAvailability()">
+      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export="" id="dom-bluetooth-getavailability">getAvailability()</dfn></code> method,
+        when invoked, MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: </p>
+      <ol>
+       <li id="override-availability"><a class="self-link" href="#override-availability"></a> If the user has configured the UA to
+          return a particular answer from this function for the current origin, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a> <var>promise</var> with the configured answer,
+          and abort these steps. 
+       <li> If the UA has the ability to use Bluetooth, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a> <var>promise</var> with <code>true</code>. 
+       <li> Otherwise, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a> <var>promise</var> with <code>false</code>. 
+      </ol>
+      <p class="note" role="note">Note: the promise is resolved <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a> to let the UA call out to other systems
+      to determine whether Bluetooth is available.</p>
+     </div>
+     <div class="algorithm" data-algorithm="availabilitychanged" id="availability-changed-algorithm">
+      <p> If the UA becomes able or unable to use Bluetooth,
+        for example because a radio was physically attached or detached,
+        or the user has changed
+        their <a href="#override-availability">configuration</a> for
+        the answer returned from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-5">getAvailability()</a></code>,
+        the UA must <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on
+        each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object">global object</a> <var>global</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to run the following steps: </p>
+      <ol>
+       <li> Let <var>oldAvailability</var> be
+          the value <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-6">getAvailability()</a></code> would have returned before the change. 
+       <li> Let <var>newAvailability</var> be
+          the value <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability-7">getAvailability()</a></code> would return after the change. 
+       <li> If <var>oldAvailability</var> is not the same as <var>newAvailability</var>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetooth-availabilitychanged" id="ref-for-eventdef-bluetooth-availabilitychanged-3">availabilitychanged</a></code> using the <code class="idl"><a data-link-type="idl" href="#valueevent" id="ref-for-valueevent-1">ValueEvent</a></code> interface
+          at <code><var>global</var>.navigator.bluetooth</code> with its <code class="idl"><a data-link-type="idl" href="#dom-valueevent-value" id="ref-for-dom-valueevent-value-1">value</a></code> attribute initialized to <var>newAvailability</var>. 
+      </ol>
+     </div>
+<pre class="idl highlight def">[<dfn class="nv idl-code" data-dfn-for="ValueEvent" data-dfn-type="constructor" data-export="" data-lt="ValueEvent(type, initDict)|ValueEvent(type)" id="dom-valueevent-valueevent">Constructor<a class="self-link" href="#dom-valueevent-valueevent"></a></dfn>(<span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="ValueEvent/ValueEvent(type, initDict)" data-dfn-type="argument" data-export="" id="dom-valueevent-valueevent-type-initdict-type">type<a class="self-link" href="#dom-valueevent-valueevent-type-initdict-type"></a></dfn>, <span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-valueeventinit" id="ref-for-dictdef-valueeventinit-1">ValueEventInit</a> <dfn class="nv idl-code" data-dfn-for="ValueEvent/ValueEvent(type, initDict)" data-dfn-type="argument" data-export="" id="dom-valueevent-valueevent-type-initdict-initdict">initDict<a class="self-link" href="#dom-valueevent-valueevent-type-initdict-initdict"></a></dfn>)]
+<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="valueevent">ValueEvent</dfn> : <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#event">Event</a> {
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">any</span> <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="any" href="#dom-valueevent-value" id="ref-for-dom-valueevent-value-2">value</a>;
+};
+
+<span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-valueeventinit">ValueEventInit</dfn> : <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#dictdef-eventinit">EventInit</a> {
+  <span class="kt">any</span> <dfn class="nv idl-code" data-default="null" data-dfn-for="ValueEventInit" data-dfn-type="dict-member" data-export="" data-type="any " id="dom-valueeventinit-value">value<a class="self-link" href="#dom-valueeventinit-value"></a></dfn> = <span class="kt">null</span>;
+};
+</pre>
+     <p> <code class="idl"><a data-link-type="idl" href="#valueevent" id="ref-for-valueevent-2">ValueEvent</a></code> instances are constructed
+      as specified in <a href="https://dom.spec.whatwg.org/#constructing-events">DOM Standard §constructing-events</a>. </p>
+     <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="ValueEvent" data-dfn-type="attribute" data-export="" id="dom-valueevent-value">value</dfn> attribute
+      must return the value it was initialized to. </p>
+     <p class="issue" id="ValueEvent-too-generic"><a class="self-link" href="#ValueEvent-too-generic"></a> Such a generic event type belongs in <a data-link-type="biblio" href="#biblio-html">[HTML]</a> or <a data-link-type="biblio" href="#biblio-dom">[DOM]</a>, not here. </p>
     </section>
    </section>
    <section>
@@ -2874,32 +2984,33 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
           to request devices with certain manufacturer data,
           so the iBeacon will need to rotate its advertisements to include a known service
           in order for users to select this device in the <code>requestDevice</code> dialog. </p>
-<pre class="highlight"><span class="kd">var</span> <span class="nx">known_service</span> <span class="o">=</span> <span class="s2">"A service in the iBeacon’s GATT server"</span><span class="p">;</span>
-<span class="k">return</span> <span class="nx">navigator</span><span class="p">.</span><span class="nx">bluetooth</span><span class="p">.</span><span class="nx">requestDevice</span><span class="p">({</span>
-  <span class="nx">filters</span><span class="o">:</span> <span class="p">[{</span><span class="nx">services</span><span class="o">:</span> <span class="p">[</span><span class="nx">known_service</span><span class="p">]}]</span>
-<span class="p">}).</span><span class="nx">then</span><span class="p">(</span><span class="nx">device</span> <span class="o">=></span> <span class="p">{</span>
-  <span class="nx">device</span><span class="p">.</span><span class="nx">watchAdvertisements</span><span class="p">();</span>
-  <span class="nx">device</span><span class="p">.</span><span class="nx">addEventListener</span><span class="p">(</span><span class="s1">'advertisementreceived'</span><span class="p">,</span> <span class="nx">interpretIBeacon</span><span class="p">);</span>
-<span class="p">});</span>
+<pre class="highlight"><span class="kd">var</span> known_service <span class="o">=</span> <span class="s2">"A service in the iBeacon’s GATT server"</span><span class="p">;</span>
+<span class="k">return</span> navigator<span class="p">.</span>bluetooth<span class="p">.</span>requestDevice<span class="p">(</span><span class="p">{</span>
+  filters<span class="o">:</span> <span class="p">[</span><span class="p">{</span>services<span class="o">:</span> <span class="p">[</span>known_service<span class="p">]</span><span class="p">}</span><span class="p">]</span>
+<span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span>device <span class="o">=></span> <span class="p">{</span>
+  device<span class="p">.</span>watchAdvertisements<span class="p">(</span><span class="p">)</span><span class="p">;</span>
+  device<span class="p">.</span>addEventListener<span class="p">(</span><span class="s1">'advertisementreceived'</span><span class="p">,</span> interpretIBeacon<span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
 
-<span class="kd">function</span> <span class="nx">interpretIBeacon</span><span class="p">(</span><span class="nx">event</span><span class="p">)</span> <span class="p">{</span>
-  <span class="kd">var</span> <span class="nx">rssi</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">rssi</span><span class="p">;</span>
-  <span class="kd">var</span> <span class="nx">appleData</span> <span class="o">=</span> <span class="nx">event</span><span class="p">.</span><span class="nx">manufacturerData</span><span class="p">.</span><span class="nx">get</span><span class="p">(</span><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><span class="mh">0x004C</span></a><span class="p">);</span>
-  <span class="k">if</span> <span class="p">(</span><span class="nx">appleData</span><span class="p">.</span><span class="nx">byteLength</span> <span class="o">!=</span> <span class="mi">23</span> <span class="o">||</span>
-    <span class="nx">appleData</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="o">!==</span> <span class="mh">0x0215</span><span class="p">)</span> <span class="p">{</span>
-    <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">({</span><span class="nx">isBeacon</span><span class="o">:</span> <span class="kc">false</span><span class="p">});</span>
+<span class="kd">function</span> interpretIBeacon<span class="p">(</span>event<span class="p">)</span> <span class="p">{</span>
+  <span class="kd">var</span> rssi <span class="o">=</span> event<span class="p">.</span>rssi<span class="p">;</span>
+  <span class="kd">var</span> appleData <span class="o">=</span> event<span class="p">.</span>manufacturerData<span class="p">.</span>get<span class="p">(</span><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><span class="mh">0x004C</span></a><span class="p">)</span><span class="p">;</span>
+  <span class="k">if</span> <span class="p">(</span>appleData<span class="p">.</span>byteLength <span class="o">!=</span> <span class="mi">23</span> <span class="o">||</span>
+    appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="o">!==</span> <span class="mh">0x0215</span><span class="p">)</span> <span class="p">{</span>
+    console<span class="p">.</span>log<span class="p">(</span><span class="p">{</span>isBeacon<span class="o">:</span> <span class="kc">false</span><span class="p">}</span><span class="p">)</span><span class="p">;</span>
   <span class="p">}</span>
-  <span class="kd">var</span> <span class="nx">uuidArray</span> <span class="o">=</span> <span class="k">new</span> <span class="nx">Uint8Array</span><span class="p">(</span><span class="nx">appleData</span><span class="p">.</span><span class="nx">buffer</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">major</span> <span class="o">=</span> <span class="nx">appleData</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">minor</span> <span class="o">=</span> <span class="nx">appleData</span><span class="p">.</span><span class="nx">getUint16</span><span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="kc">false</span><span class="p">);</span>
-  <span class="kd">var</span> <span class="nx">txPowerAt1m</span> <span class="o">=</span> <span class="o">-</span><span class="nx">appleData</span><span class="p">.</span><span class="nx">getInt8</span><span class="p">(</span><span class="mi">22</span><span class="p">);</span>
-  <span class="nx">console</span><span class="p">.</span><span class="nx">log</span><span class="p">({</span>
-      <span class="nx">isBeacon</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-      <span class="nx">uuidArray</span><span class="p">,</span>
-      <span class="nx">major</span><span class="p">,</span>
-      <span class="nx">minor</span><span class="p">,</span>
-      <span class="nx">pathLossVs1m</span><span class="o">:</span> <span class="nx">txPowerAt1m</span> <span class="o">-</span> <span class="nx">rssi</span><span class="p">});</span>
-<span class="p">});</span></pre>
+  <span class="kd">var</span> uuidArray <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">(</span>appleData<span class="p">.</span>buffer<span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> major <span class="o">=</span> appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> minor <span class="o">=</span> appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span><span class="p">;</span>
+  <span class="kd">var</span> txPowerAt1m <span class="o">=</span> <span class="o">-</span>appleData<span class="p">.</span>getInt8<span class="p">(</span><span class="mi">22</span><span class="p">)</span><span class="p">;</span>
+  console<span class="p">.</span>log<span class="p">(</span><span class="p">{</span>
+      isBeacon<span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+      uuidArray<span class="p">,</span>
+      major<span class="p">,</span>
+      minor<span class="p">,</span>
+      pathLossVs1m<span class="o">:</span> txPowerAt1m <span class="o">-</span> rssi<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+<span class="p">}</span><span class="p">)</span><span class="p">;</span>
+</pre>
        <p> The format of iBeacon advertisements was derived from <a href="http://www.warski.org/blog/2014/01/how-ibeacons-work/">How do iBeacons work?</a> by Adam Warski. </p>
       </div>
       <div class="algorithm" data-algorithm="received advertising event" id="advertising-event-algorithm">
@@ -2924,12 +3035,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
         <li>
           Let <var>event</var> be 
 <pre class="highlight"><span class="p">{</span>
-  <span class="nx">bubbles</span><span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
-  <span class="nx">device</span><span class="o">:</span> <var><span class="nx">deviceObj</span></var><span class="p">,</span>
-  <span class="nx">uuids</span><span class="o">:</span> <span class="p">[],</span>
-  <span class="nx">manufacturerData</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Map</span><span class="p">(),</span>
-  <span class="nx">serviceData</span><span class="o">:</span> <span class="k">new</span> <span class="nx">Map</span><span class="p">()</span>
-<span class="p">}</span></pre>
+  bubbles<span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
+  device<span class="o">:</span> <var>deviceObj</var><span class="p">,</span>
+  uuids<span class="o">:</span> <span class="p">[</span><span class="p">]</span><span class="p">,</span>
+  manufacturerData<span class="o">:</span> <span class="k">new</span> Map<span class="p">(</span><span class="p">)</span><span class="p">,</span>
+  serviceData<span class="o">:</span> <span class="k">new</span> Map<span class="p">(</span><span class="p">)</span>
+<span class="p">}</span>
+</pre>
         <li> If the <a data-link-type="dfn" href="#rssi" id="ref-for-rssi-1">received signal strength</a> is available
             for any packet in <var>adv</var>,
             set <code><var>event</var>.rssi</code> to this signal strength in dBm. 
@@ -3936,6 +4048,9 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
        <dt><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="event" data-export="" id="eventdef-bluetoothdevice-advertisementreceived"><code>advertisementreceived</code></dfn>
        <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-40">BluetoothDevice</a></code> when an <a href="#advertising-event-algorithm">advertising event
           is received from that device</a>. 
+       <dt><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="event" data-export="" id="eventdef-bluetooth-availabilitychanged"><code>availabilitychanged</code></dfn>
+       <dd> Fired on <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth-13">navigator.bluetooth</a></code> when <a href="#availability-changed-algorithm">the Bluetooth system as a whole
+          becomes available or unavailable to the UA</a>. 
        <dt><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="event" data-export="" id="eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged"><code>characteristicvaluechanged</code></dfn>
        <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-25">BluetoothRemoteGATTCharacteristic</a></code> when its value changes,
           either as a result of
@@ -4392,7 +4507,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <section>
     <h2 class="heading settled" data-level="8" id="navigator-extensions"><span class="secno">8. </span><span class="content">Extensions to the Navigator Interface</span><a class="self-link" href="#navigator-extensions"></a></h2>
 <pre class="idl highlight def"><span class="kt">partial</span> <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/webappapis.html#navigator">Navigator</a> {
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth-13">Bluetooth</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="Navigator" data-dfn-type="attribute" data-export="" data-readonly="" data-type="Bluetooth" id="dom-navigator-bluetooth">bluetooth</dfn>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth-14">Bluetooth</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="Navigator" data-dfn-type="attribute" data-export="" data-readonly="" data-type="Bluetooth" id="dom-navigator-bluetooth">bluetooth</dfn>;
 };
 </pre>
    </section>
@@ -4403,7 +4518,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <p> When an algorithm in this specification uses a name defined in this or another specification,
     the name MUST resolve to its initial value,
     ignoring any changes that have been made to the name in the current execution environment.
-    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-6">requestDevice()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-17">BluetoothUUID.getService</a></code>)</code>,
+    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice-7">requestDevice()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>filter</var>.services, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-17">BluetoothUUID.getService</a></code>)</code>,
     this MUST apply the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code> algorithm defined in <a data-link-type="biblio" href="#biblio-ecmascript">[ECMAScript]</a> with <code><var>filter</var>.services</code> as its <code>this</code> parameter and
     the algorithm defined in <a href="#standardized-uuids">§6.1 Standardized UUIDs</a> for <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-18">BluetoothUUID.getService</a></code> as its <code>callbackfn</code> parameter,
     regardless of any modifications that have been made to <code>window</code>, <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>, <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothUUID</code>, <code>BluetoothUUID.getService</code>, or other objects. </p>
@@ -4947,6 +5062,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <li><a href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a><span>, in §3</span>
    <li><a href="#attribute-type">Attribute Type</a><span>, in §9</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-authenticatedsignedwrites">authenticatedSignedWrites</a><span>, in §5.4.1</span>
+   <li><a href="#eventdef-bluetooth-availabilitychanged">availabilitychanged</a><span>, in §5.6.2</span>
    <li><a href="#bd_addr">BD_ADDR</a><span>, in §9</span>
    <li><a href="#blacklisted">blacklisted</a><span>, in §7</span>
    <li><a href="#blacklisted-for-reads">blacklisted for reads</a><span>, in §7</span>
@@ -5068,6 +5184,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <li><a href="#eventdef-bluetoothdevice-gattserverdisconnected">gattserverdisconnected</a><span>, in §5.6.2</span>
    <li><a href="#general-discovery-procedure">General Discovery Procedure</a><span>, in §9</span>
    <li><a href="#generic-attribute-profile">Generic Attribute Profile</a><span>, in §9</span>
+   <li><a href="#dom-bluetooth-getavailability">getAvailability()</a><span>, in §3.2</span>
    <li><a href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic(characteristic)</a><span>, in §5.3</span>
    <li><a href="#dom-bluetoothuuid-getcharacteristic">getCharacteristic(name)</a><span>, in §6.1</span>
    <li><a href="#dom-bluetoothremotegattservice-getcharacteristics">getCharacteristics(characteristic)</a><span>, in §5.3</span>
@@ -5114,6 +5231,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <li><a href="#dom-bluetoothcharacteristicproperties-notify">notify</a><span>, in §5.4.1</span>
    <li><a href="#observation-procedure">Observation Procedure</a><span>, in §9</span>
    <li><a href="#observer">Observer</a><span>, in §9</span>
+   <li><a href="#dom-bluetooth-onavailabilitychanged">onavailabilitychanged</a><span>, in §3</span>
    <li><a href="#dom-characteristiceventhandlers-oncharacteristicvaluechanged">oncharacteristicvaluechanged</a><span>, in §5.6.6</span>
    <li><a href="#dom-bluetoothdeviceeventhandlers-ongattserverdisconnected">ongattserverdisconnected</a><span>, in §5.6.6</span>
    <li><a href="#dom-serviceeventhandlers-onserviceadded">onserviceadded</a><span>, in §5.6.6</span>
@@ -5239,9 +5357,15 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <li>
     value
     <ul>
+     <li><a href="#dom-valueeventinit-value">dict-member for ValueEventInit</a><span>, in §3.2</span>
+     <li><a href="#dom-valueevent-value">attribute for ValueEvent</a><span>, in §3.2</span>
      <li><a href="#dom-bluetoothremotegattcharacteristic-value">attribute for BluetoothRemoteGATTCharacteristic</a><span>, in §5.4</span>
      <li><a href="#dom-bluetoothremotegattdescriptor-value">attribute for BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
     </ul>
+   <li><a href="#valueevent">ValueEvent</a><span>, in §3.2</span>
+   <li><a href="#dictdef-valueeventinit">ValueEventInit</a><span>, in §3.2</span>
+   <li><a href="#dom-valueevent-valueevent">ValueEvent(type)</a><span>, in §3.2</span>
+   <li><a href="#dom-valueevent-valueevent">ValueEvent(type, initDict)</a><span>, in §3.2</span>
    <li><a href="#dom-bluetoothdevice-watchadvertisements">watchAdvertisements()</a><span>, in §4.2</span>
    <li><a href="#dom-bluetoothdevice-watchingadvertisements">watchingAdvertisements</a><span>, in §4.2</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-writableauxiliaries">writableAuxiliaries</a><span>, in §5.4.1</span>
@@ -5273,7 +5397,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <li><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#">shortened local name</a>
     </ul>
    <li>
-    <a data-link-type="biblio">[WHATWG-DOM]</a> defines the following terms:
+    <a data-link-type="biblio">[DOM]</a> defines the following terms:
     <ul>
      <li><a href="https://dom.spec.whatwg.org/#event">Event</a>
      <li><a href="https://dom.spec.whatwg.org/#dictdef-eventinit">EventInit</a>
@@ -5306,6 +5430,11 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <ul>
      <li><a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without bom</a>
      <li><a href="https://encoding.spec.whatwg.org/#utf-8-encode">utf-8 encode</a>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[fingerprinting-guidance]</a> defines the following terms:
+    <ul>
+     <li><a href="https://w3c.github.io/fingerprinting-guidance/#dfn-fingerprinting-surface">fingerprinting surface</a>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
@@ -5403,6 +5532,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <dd><a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735">Supplement to the Bluetooth Core Specification Version 6</a>. 14 July 2015. URL: <a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735">https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735</a>
    <dt id="biblio-bluetooth42">[BLUETOOTH42]
    <dd><a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439">BLUETOOTH SPECIFICATION Version 4.2</a>. 2 December 2014. URL: <a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439">https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439</a>
+   <dt id="biblio-dom">[DOM]
+   <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-ecmascript">[ECMAScript]
    <dd><a href="https://tc39.github.io/ecma262/">ECMAScript Language Specification</a>. URL: <a href="https://tc39.github.io/ecma262/">https://tc39.github.io/ecma262/</a>
    <dt id="biblio-html">[HTML]
@@ -5419,8 +5550,6 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <dd>Mike West. <a href="https://w3c.github.io/webappsec-secure-contexts/">Secure Contexts</a>. 19 July 2016. WD. URL: <a href="https://w3c.github.io/webappsec-secure-contexts/">https://w3c.github.io/webappsec-secure-contexts/</a>
    <dt id="biblio-webidl-1">[WebIDL-1]
    <dd>Cameron McCormack; Boris Zbarsky. <a href="https://heycam.github.io/webidl/">WebIDL Level 1</a>. 8 March 2016. CR. URL: <a href="https://heycam.github.io/webidl/">https://heycam.github.io/webidl/</a>
-   <dt id="biblio-whatwg-dom">[WHATWG-DOM]
-   <dd>Anne van Kesteren. <a href="https://dom.spec.whatwg.org/">DOM Standard</a>. Living Standard. URL: <a href="https://dom.spec.whatwg.org/">https://dom.spec.whatwg.org/</a>
    <dt id="biblio-whatwg-encoding">[WHATWG-ENCODING]
    <dd>Anne van Kesteren. <a href="https://encoding.spec.whatwg.org/">Encoding Standard</a>. Living Standard. URL: <a href="https://encoding.spec.whatwg.org/">https://encoding.spec.whatwg.org/</a>
   </dl>
@@ -5428,6 +5557,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
   <dl>
    <dt id="biblio-csp3">[CSP3]
    <dd>Mike West. <a href="https://w3c.github.io/webappsec-csp/">Content Security Policy Level 3</a>. 1 September 2016. WD. URL: <a href="https://w3c.github.io/webappsec-csp/">https://w3c.github.io/webappsec-csp/</a>
+   <dt id="biblio-fingerprinting-guidance">[FINGERPRINTING-GUIDANCE]
+   <dd>Nick Doty. <a href="https://www.w3.org/TR/fingerprinting-guidance/">Fingerprinting Guidance for Web Specification Authors (Draft)</a>. 24 November 2015. NOTE. URL: <a href="https://www.w3.org/TR/fingerprinting-guidance/">https://www.w3.org/TR/fingerprinting-guidance/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl def"><span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothrequestdevicefilter">BluetoothRequestDeviceFilter</a> {
@@ -5445,6 +5576,10 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 };
 
 <span class="kt">interface</span> <a class="nv" href="#bluetooth">Bluetooth</a> {
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
+  <span class="kt">Promise</span>&lt;<span class="kt">boolean</span>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-getavailability">getAvailability</a>();
+  [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
+  <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a> <a class="nv" data-type="EventHandler" href="#dom-bluetooth-onavailabilitychanged">onavailabilitychanged</a>;
   [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
   <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a>? <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="BluetoothDevice?" href="#dom-bluetooth-referringdevice">referringDevice</a>;
   [<a class="nv idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>]
@@ -5474,6 +5609,15 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
 
 <span class="kt">interface</span> <a class="nv" href="#bluetoothpermissionresult">BluetoothPermissionResult</a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#permissionstatus">PermissionStatus</a> {
   <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice">BluetoothDevice</a>> <a class="nv" data-type="FrozenArray<BluetoothDevice>" href="#dom-bluetoothpermissionresult-devices">devices</a>;
+};
+
+[<a class="nv" href="#dom-valueevent-valueevent">Constructor</a>(<span class="kt">DOMString</span> <a class="nv" href="#dom-valueevent-valueevent-type-initdict-type">type</a>, <span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-valueeventinit">ValueEventInit</a> <a class="nv" href="#dom-valueevent-valueevent-type-initdict-initdict">initDict</a>)]
+<span class="kt">interface</span> <a class="nv" href="#valueevent">ValueEvent</a> : <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#event">Event</a> {
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">any</span> <a class="nv idl-code" data-link-type="attribute" data-readonly="" data-type="any" href="#dom-valueevent-value">value</a>;
+};
+
+<span class="kt">dictionary</span> <a class="nv" href="#dictdef-valueeventinit">ValueEventInit</a> : <a class="n" data-link-type="idl-name" href="https://dom.spec.whatwg.org/#dictdef-eventinit">EventInit</a> {
+  <span class="kt">any</span> <a class="nv" data-default="null" data-type="any " href="#dom-valueeventinit-value">value</a> = <span class="kt">null</span>;
 };
 
 <span class="kt">interface</span> <a class="nv idl-code" data-link-type="interface" href="#bluetoothdevice">BluetoothDevice</a> {
@@ -5630,6 +5774,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
           appear to leak the unique, immutable device address. <a href="#issue-d71e7a2a"> ↵ </a></div>
    <div class="issue"> We need a way for a site to register to receive an event
     when an interesting device comes within range. <a href="#issue-e5c688d4"> ↵ </a></div>
+   <div class="issue"> Such a generic event type belongs in <a data-link-type="biblio" href="#biblio-html">[HTML]</a> or <a data-link-type="biblio" href="#biblio-dom">[DOM]</a>, not here. <a href="#ValueEvent-too-generic"> ↵ </a></div>
    <div class="issue"> <a data-link-type="dfn" href="#characteristic-extended-properties">Characteristic Extended Properties</a> isn’t clear whether
                   the extended properties are immutable for a given Characteristic.
                   If they are, the UA should be allowed to cache them. <a href="#issue-86b7fbfd"> ↵ </a></div>
@@ -5655,7 +5800,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <li><a href="#ref-for-bluetooth-8">4.2. BluetoothDevice</a> <a href="#ref-for-bluetooth-9">(2)</a> <a href="#ref-for-bluetooth-10">(3)</a>
     <li><a href="#ref-for-bluetooth-11">5.1.2. The Bluetooth cache</a>
     <li><a href="#ref-for-bluetooth-12">5.4. BluetoothRemoteGATTCharacteristic</a>
-    <li><a href="#ref-for-bluetooth-13">8. Extensions to the Navigator Interface</a>
+    <li><a href="#ref-for-bluetooth-13">5.6.2. Event types</a>
+    <li><a href="#ref-for-bluetooth-14">8. Extensions to the Navigator Interface</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-requestdeviceoptions-filters">
@@ -5748,7 +5894,8 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
     <li><a href="#ref-for-dom-bluetooth-requestdevice-2">2.1. Device access is powerful</a>
     <li><a href="#ref-for-dom-bluetooth-requestdevice-3">3. Device Discovery</a> <a href="#ref-for-dom-bluetooth-requestdevice-4">(2)</a>
     <li><a href="#ref-for-dom-bluetooth-requestdevice-5">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-dom-bluetooth-requestdevice-6">9. Terminology and Conventions</a>
+    <li><a href="#ref-for-dom-bluetooth-requestdevice-6">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-dom-bluetooth-requestdevice-7">9. Terminology and Conventions</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="request-bluetooth-devices">
@@ -5865,6 +6012,32 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <ul>
     <li><a href="#ref-for-revoke-bluetooth-access-1">2.1. Device access is powerful</a>
     <li><a href="#ref-for-revoke-bluetooth-access-2">4.2. BluetoothDevice</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetooth-getavailability">
+   <b><a href="#dom-bluetooth-getavailability">#dom-bluetooth-getavailability</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetooth-getavailability-1">2.5. Exposing Bluetooth availability</a>
+    <li><a href="#ref-for-dom-bluetooth-getavailability-2">3. Device Discovery</a> <a href="#ref-for-dom-bluetooth-getavailability-3">(2)</a>
+    <li><a href="#ref-for-dom-bluetooth-getavailability-4">3.2. Overall Bluetooth availability</a> <a href="#ref-for-dom-bluetooth-getavailability-5">(2)</a> <a href="#ref-for-dom-bluetooth-getavailability-6">(3)</a> <a href="#ref-for-dom-bluetooth-getavailability-7">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="valueevent">
+   <b><a href="#valueevent">#valueevent</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-valueevent-1">3.2. Overall Bluetooth availability</a> <a href="#ref-for-valueevent-2">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dictdef-valueeventinit">
+   <b><a href="#dictdef-valueeventinit">#dictdef-valueeventinit</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-valueeventinit-1">3.2. Overall Bluetooth availability</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-valueevent-value">
+   <b><a href="#dom-valueevent-value">#dom-valueevent-value</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-valueevent-value-1">3.2. Overall Bluetooth availability</a> <a href="#ref-for-dom-valueevent-value-2">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetooth-device">
@@ -6541,6 +6714,13 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
    <b><a href="#eventdef-bluetoothdevice-advertisementreceived">#eventdef-bluetoothdevice-advertisementreceived</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived-1">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived-2">(2)</a> <a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived-3">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="eventdef-bluetooth-availabilitychanged">
+   <b><a href="#eventdef-bluetooth-availabilitychanged">#eventdef-bluetooth-availabilitychanged</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-eventdef-bluetooth-availabilitychanged-1">3. Device Discovery</a>
+    <li><a href="#ref-for-eventdef-bluetooth-availabilitychanged-2">3.2. Overall Bluetooth availability</a> <a href="#ref-for-eventdef-bluetooth-availabilitychanged-3">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">
