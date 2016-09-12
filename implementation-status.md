@@ -13,6 +13,7 @@ Work is in progress:
 
 Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
+getAvailability()         |           |         |     |       |         |
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       | See notes
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Manufacturer/Service data |         |         |     |       |         |
