@@ -79,6 +79,9 @@ spec: BLUETOOTH-ASSIGNED
         text: Shortened Local Name; url: https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#
 
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
+    type: abstract-op
+        text: CanonicalNumericIndexString; url: sec-canonicalnumericindexstring
+        text: IsInteger; url: sec-isinteger
     type: dfn
         text: current realm; url: current-realm
         text: fulfilled; url: sec-promise-objects
@@ -86,6 +89,7 @@ spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
         text: realm; url: sec-code-realms
     type: method
         text: Array.prototype.map; url: sec-array.prototype.map
+        text: [[OwnPropertyKeys]]; for: Object; url: sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
     type: interface
         text: Array; url: sec-array-objects
         text: ArrayBuffer; url: sec-arraybuffer-constructor
@@ -529,16 +533,22 @@ spec: html
   <h2 id="device-discovery" oldids="requestDevice-secure-context">Device Discovery</h2>
 
   <pre class="idl">
-    dictionary BluetoothRequestDeviceFilter {
+    dictionary BluetoothDataFilterInit {
+      BufferSource dataPrefix;
+      BufferSource mask;
+    };
+    dictionary BluetoothLEScanFilterInit {
       sequence&lt;BluetoothServiceUUID> services;
       DOMString name;
       DOMString namePrefix;
-      unsigned short manufacturerId;
-      BluetoothServiceUUID serviceDataUUID;
+      // Maps unsigned shorts to BluetoothDataFilters.
+      object manufacturerData;
+      // Maps BluetoothServiceUUIDs to BluetoothDataFilters.
+      object serviceData;
     };
 
     dictionary RequestDeviceOptions {
-      sequence&lt;BluetoothRequestDeviceFilter> filters;
+      sequence&lt;BluetoothLEScanFilterInit> filters;
       sequence&lt;BluetoothServiceUUID> optionalServices = [];
       boolean acceptAllDevices = false;
     };
@@ -584,31 +594,37 @@ spec: html
     <ul>
       <li>
         support <em>all</em> the GATT service UUIDs
-        in the <dfn dict-member for="BluetoothRequestDeviceFilter">services</dfn> list
+        in the <dfn dict-member for="BluetoothLEScanFilterInit">services</dfn> list
         if that member is present,
       </li>
       <li>
-        have a name equal to <dfn dict-member for="BluetoothRequestDeviceFilter">name</dfn>
+        have a name equal to <dfn dict-member for="BluetoothLEScanFilterInit">name</dfn>
         if that member is present,
       </li>
       <li>
-        have a name starting with <dfn dict-member for="BluetoothRequestDeviceFilter">namePrefix</dfn>
+        have a name starting with <dfn dict-member for="BluetoothLEScanFilterInit">namePrefix</dfn>
         if that member is present,
       </li>
       <li>
-        advertise <a>manufacturer specific data</a> with
-        a company identifier code equal to
-        <dfn dict-member for="BluetoothRequestDeviceFilter">manufacturerId</dfn>
+        advertise <a>manufacturer specific data</a> matching all of the key/value pairs in
+        <dfn dict-member for="BluetoothLEScanFilterInit">manufacturerData</dfn>
         if that member is present, and
       </li>
       <li>
-        advertise <a>service data</a> with
-        a UUID equal to <dfn dict-member for="BluetoothRequestDeviceFilter">serviceDataUUID</dfn>
+        advertise <a>service data</a> matching all of the key/value pairs in
+        <dfn dict-member for="BluetoothLEScanFilterInit">serviceData</dfn>
         if that member is present.
       </li>
     </ul>
+    <p link-for-hint="BluetoothDataFilterInit">
+      Both <a>Manufacturer Specific Data</a> and <a>Service Data</a>
+      map a key to an array of bytes.
+      {{BluetoothDataFilterInit}} filters these arrays.
+      An array matches if it has a |prefix| such that
+      <code>|prefix| & {{mask}}</code> is equal to <code>{{dataPrefix}} & {{mask}}</code>.
+    </p>
     <p>
-      Note that this means that
+      Note that
       if a device changes its behavior significantly when it connects,
       for example by not advertising its identifying manufacturer data anymore
       and instead having the client discover some identifying GATT services,
@@ -628,7 +644,7 @@ spec: html
     <p>
       After the user selects a device to pair with this origin,
       the origin is allowed to access any service whose UUID was listed
-      in the {{BluetoothRequestDeviceFilter/services}} list
+      in the {{BluetoothLEScanFilterInit/services}} list
       in any element of <code>options.filters</code>
       or in <code>options.<dfn dict-member for="RequestDeviceOptions">optionalServices</dfn></code>.
     </p>
@@ -804,7 +820,7 @@ spec: html
       <tr>
         <td>
           <pre highlight="js">
-            [{manufacturerId: 17}]
+            [{manufacturerData: {17: {}}}]
           </pre>
         </td>
         <td>D1</td>
@@ -812,7 +828,7 @@ spec: html
       <tr>
         <td>
           <pre highlight="js">
-            [{serviceDataUUID: A}]
+            [{serviceData: {"A": {}}}]
           </pre>
         </td>
         <td>D2</td>
@@ -820,11 +836,63 @@ spec: html
       <tr>
         <td>
           <pre highlight="js">
-            [{manufacturerId: 17},
-             {serviceDataUUID: A}]
+            [{manufacturerData: {17: {}}},
+             {serviceData: {"A": {}}}]
           </pre>
         </td>
         <td>D1, D2</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerData: {
+               17: {dataPrefix: new Uint8Array([1, 2, 3])},
+            }}]
+          </pre>
+        </td>
+        <td>D1</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerData: {
+               17: {dataPrefix: new Uint8Array([1, 2, 3, 4])},
+            }}]
+          </pre>
+        </td>
+        <td><i>&lt;none></i></td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerData: {
+               17: {dataPrefix: new Uint8Array([1])},
+            }}]
+          </pre>
+        </td>
+        <td>D1</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerData: {
+               17: {dataPrefix: new Uint8Array([0x91, 0xAA]),
+                    mask: new Uint8Array([0x0F, 0x57])},
+            }}]
+          </pre>
+        </td>
+        <td>D1</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            [{manufacturerData: {
+               17: {},
+               18: {},
+            }}]
+          </pre>
+        </td>
+        <td><i>&lt;none></i></td>
       </tr>
     </table>
   </div>
@@ -895,6 +963,32 @@ spec: html
           </pre>
         </td>
         <td>`namePrefix`, if present, must be non-empty to filter devices.</td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            requestDevice({
+              filters:[{manufacturerData: {}}]
+            })
+          </pre>
+        </td>
+        <td>
+          {{BluetoothLEScanFilterInit/manufacturerData}}, if present,
+          must be non-empty to filter devices.
+        </td>
+      </tr>
+      <tr>
+        <td>
+          <pre highlight="js">
+            requestDevice({
+              filters:[{serviceData: {}}]
+            })
+          </pre>
+        </td>
+        <td>
+          {{BluetoothLEScanFilterInit/serviceData}}, if present,
+          must be non-empty to filter devices.
+        </td>
       </tr>
     </table>
   </div>
@@ -991,40 +1085,79 @@ spec: html
       <dfn local-lt="match a filter|matches any filter">matches a filter</dfn> <var>filter</var>
       if the following steps return `match`:
     </p>
-    <ol>
+    <ol link-for-hint="BluetoothLEScanFilterInit">
       <li>
-        If <code><var>filter</var>.name</code> is present then,
+        If <code><var>filter</var>.{{name}}</code> is present then,
         if <var>device</var>'s <a>Bluetooth Device Name</a> isn't complete
         and equal to <code><var>filter</var>.name</code>,
         return `mismatch`.
       </li>
       <li>
-        If <code><var>filter</var>.namePrefix</code> is present then
+        If <code><var>filter</var>.{{namePrefix}}</code> is present then
         if <var>device</var>'s <a>Bluetooth Device Name</a> isn't present
         or doesn't start with <code><var>filter</var>.namePrefix</code>,
         return `mismatch`.
       </li>
       <li>
-        For each <var>uuid</var> in <code><var>filter</var>.services</code>,
+        For each <var>uuid</var> in <code><var>filter</var>.{{services}}</code>,
         if the UA has not received advertising data, an <a>extended inquiry response</a>,
         or a service discovery response indicating that
         the device supports a primary (vs included) service with UUID <var>uuid</var>,
         return `mismatch`.
       </li>
       <li>
-        If <code><var>filter</var>.manufacturerId</code> is present then
+        If <code><var>filter</var>.{{manufacturerData}}</code> is present then
+        for each |manufacturerId| in
+        <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>,
         if <var>device</var> hasn't advertised <a>manufacturer specific data</a>
-        with a company identifier code equal to
-        <code><var>filter</var>.manufacturerId</code>,
+        with a company identifier code that stringifies in base 10 to |manufacturerId|
+        and with data that <a for="BluetoothDataFilterInit">matches</a>
+        <code>|filter|.{{manufacturerData}}[|manufacturerId|]</code>
         return `mismatch`.
       </li>
       <li>
-        If <code><var>filter</var>.serviceDataUUID</code> is present then
+        If <code><var>filter</var>.{{serviceData}}</code> is present then
+        for each |uuid| in
+        <code>|filter|.{{serviceData}}.{{Object/[[OwnPropertyKeys]]}}()</code>,
         if <var>device</var> hasn't advertised <a>service data</a>
-        with a UUID equal to <code><var>filter</var>.serviceDataUUID</code>,
+        with a UUID whose 128-bit form is |uuid|
+        and with data that <a for="BluetoothDataFilterInit">matches</a>
+        <code>|filter|.{{serviceData}}[|manufacturerId|]</code>,
         return `mismatch`.
       </li>
       <li>Return `match`.</li>
+    </ol>
+  </div>
+
+  <div algorithm>
+    <p>
+      An array of bytes |data|
+      <dfn for="BluetoothDataFilterInit" export>matches</dfn> a {{BluetoothDataFilterInit}} |filter|
+      if the following steps return `match`.
+    </p>
+    <p class="note">
+      Note: This algorithm assumes that |filter| has already been
+      <a for="BluetoothDataFilterInit" lt="canonicalizing">canonicalized</a>.
+    </p>
+    <ol link-for-hint="BluetoothDataFilterInit">
+      <li>
+        Let |expectedPrefix| be <a>a copy of the bytes held</a> by <code>|filter|.{{dataPrefix}}</code>.
+      </li>
+      <li>
+        Let |mask| be <a>a copy of the bytes held</a> by <code>|filter|.{{mask}}</code>.
+      </li>
+      <li>
+        If |data| has fewer bytes than |expectedPrefix|, return `mismatch`.
+      </li>
+      <li>
+        For each `1` bit in |mask|,
+        if the corresponding bit in |data| is not equal to
+        the corresponding bit in |expectedPrefix|,
+        return `mismatch`.
+      </li>
+      <li>
+        Return `match`.
+      </li>
     </ol>
   </div>
 
@@ -1080,7 +1213,7 @@ spec: html
   <div algorithm>
     <p>
       To <dfn>request Bluetooth devices</dfn>,
-      given a sequence of {{BluetoothRequestDeviceFilter}}s, |filters|,
+      given a sequence of {{BluetoothLEScanFilterInit}}s, |filters|,
       which can be `null` to represent that all devices can match,
       and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
       the UA MUST run the following steps:
@@ -1121,114 +1254,13 @@ spec: html
             do the following steps:
             <ol>
               <li>
-                If none of <var>filter</var>'s
-                members is present,
-                throw a {{TypeError}}
-                and abort these steps.
-              </li>
-              <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
-              <li>
-                If <code><var>filter</var>.services</code> is present, do the following sub-steps:
-                <ol>
-                  <li>
-                    If <code><var>filter</var>.services.length === 0</code>,
-                    throw a {{TypeError}}
-                    and abort these steps.
-                  </li>
-                  <li>
-                    Let <var>services</var> be
-                    <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
-                    {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
-                  </li>
-                  <li>
-                    If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-                    throw that exception and abort these steps.
-                  </li>
-                  <li>
-                    If any service in <var>services</var> is <a>blacklisted</a>,
-                    throw a {{SecurityError}}
-                    and abort these steps.
-                  </li>
-                  <li>
-                    Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.
-                  </li>
-                  <li>Add the elements of <var>services</var> to <var>requiredServiceUUIDs</var>.</li>
-                </ol>
+                Append the result of <a for="BluetoothLEScanFilterInit">canonicalizing</a> |filter|
+                to |uuidFilters|.
               </li>
               <li>
-                If <code><var>filter</var>.name</code> is present, do the following sub-steps.
-                <ol>
-                  <li>
-                    If the <a lt="utf-8 encode">UTF-8 encoding</a>
-                    of <code><var>filter</var>.name</code>
-                    is more than 248 bytes long,
-                    throw a {{TypeError}}
-                    and abort these steps.
-
-                    <p class="note">
-                      248 is the maximum number of UTF-8 code units in
-                      a <a>Bluetooth Device Name</a>.
-                    </p>
-                  </li>
-                  <li>
-                    Set <code><var>canonicalizedFilter</var>.name</code>
-                    to <code><var>filter</var>.name</code>.
-                  </li>
-                </ol>
+                Add the contents of <code>|uuidFilters|.services</code>
+                to |requiredServiceUUIDs|.
               </li>
-              <li>
-                If <code><var>filter</var>.namePrefix</code> is present, do the following sub-steps.
-                <ol>
-                  <li>
-                    If <code><var>filter</var>.namePrefix.length === 0</code>
-                    or if the <a lt="utf-8 encode">UTF-8 encoding</a>
-                    of <code><var>filter</var>.namePrefix</code>
-                    is more than 248 bytes long,
-                    throw a {{TypeError}}
-                    and abort these steps.
-
-                    <p class="note">
-                      248 is the maximum number of UTF-8 code units in
-                      a <a>Bluetooth Device Name</a>.
-                    </p>
-                  </li>
-                  <li>
-                    Set <code><var>canonicalizedFilter</var>.namePrefix</code>
-                    to <code><var>filter</var>.namePrefix</code>.
-                  </li>
-                </ol>
-              </li>
-
-              <li>
-                If <code>|filter|.manufacturerId</code> is present,
-                set <code>|canonicalizedFilter|.manufacturerId</code>
-                to <code>|filter|.manufacturerId</code>.
-              </li>
-
-              <li>
-                If <code>|filter|.serviceDataUUID</code> is present, do the following sub-steps.
-                <ol>
-                  <li>
-                    Let |service| be
-                    {{BluetoothUUID/getService()|BluetoothUUID.getService}}(<code>|filter|.serviceDataUUID)</code>.
-                  </li>
-                  <li>
-                    If the previous step threw an exception,
-                    throw that exception and abort these steps.
-                  </li>
-                  <li>
-                    If |service| is <a>blacklisted</a>,
-                    throw a {{SecurityError}}
-                    and abort these steps.
-                  </li>
-                  <li>
-                    Set <code>|canonicalizedFilter|.serviceDataUUID</code>
-                    to |service|.
-                  </li>
-                </ol>
-              </li>
-
-              <li>Append <var>canonicalizedFilter</var> to <var>uuidFilters</var>.</li>
             </ol>
           </li>
           <li>
@@ -1324,6 +1356,204 @@ spec: html
       </li>
       <li>
         Return <code>[|deviceObj|]</code>.
+      </li>
+    </ol>
+  </div>
+
+  <div algorithm="canonicalizing an LE scan filter">
+    <p>
+      The result of <dfn for="BluetoothLEScanFilterInit" export>canonicalizing</dfn>
+      the {{BluetoothLEScanFilterInit}} |filter|,
+      is the {{BluetoothLEScanFilterInit}} returned from the following steps:
+    </p>
+    <ol>
+      <li>
+        If none of <var>filter</var>'s
+        members is present,
+        throw a {{TypeError}}
+        and abort these steps.
+      </li>
+      <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
+      <li>
+        If <code><var>filter</var>.{{BluetoothLEScanFilterInit/services}}</code> is present,
+        do the following sub-steps:
+        <ol>
+          <li>
+            If <code><var>filter</var>.services.length === 0</code>,
+            throw a {{TypeError}}
+            and abort these steps.
+          </li>
+          <li>
+            Let <var>services</var> be
+            <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
+                    {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+          </li>
+          <li>
+            If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls
+            threw an exception,
+            throw that exception and abort these steps.
+          </li>
+          <li>
+            If any service in <var>services</var> is <a>blacklisted</a>,
+            throw a {{SecurityError}}
+            and abort these steps.
+          </li>
+          <li>
+            Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.
+          </li>
+        </ol>
+      </li>
+      <li>
+        If <code><var>filter</var>.{{BluetoothLEScanFilterInit/name}}</code> is present,
+        do the following sub-steps.
+        <ol>
+          <li>
+            If the <a lt="utf-8 encode">UTF-8 encoding</a>
+            of <code><var>filter</var>.name</code>
+            is more than 248 bytes long,
+            throw a {{TypeError}}
+            and abort these steps.
+
+            <p class="note">
+              248 is the maximum number of UTF-8 code units in
+              a <a>Bluetooth Device Name</a>.
+            </p>
+          </li>
+          <li>
+            Set <code><var>canonicalizedFilter</var>.name</code>
+            to <code><var>filter</var>.name</code>.
+          </li>
+        </ol>
+      </li>
+      <li>
+        If <code><var>filter</var>.{{BluetoothLEScanFilterInit/namePrefix}}</code> is present,
+        do the following sub-steps.
+        <ol>
+          <li>
+            If <code><var>filter</var>.namePrefix.length === 0</code>
+            or if the <a lt="utf-8 encode">UTF-8 encoding</a>
+            of <code><var>filter</var>.namePrefix</code>
+            is more than 248 bytes long,
+            throw a {{TypeError}}
+            and abort these steps.
+
+            <p class="note">
+              248 is the maximum number of UTF-8 code units in
+              a <a>Bluetooth Device Name</a>.
+            </p>
+          </li>
+          <li>
+            Set <code><var>canonicalizedFilter</var>.namePrefix</code>
+            to <code><var>filter</var>.namePrefix</code>.
+          </li>
+        </ol>
+      </li>
+
+      <li>
+        Set <code>|canonicalizedFilter|.manufacturerData</code> to `{}`.
+      </li>
+      <li>
+        If <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}</code> is present,
+        do the following sub-steps for each |key| in
+        <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>.
+        If there are no such keys, throw a {{TypeError}} and abort these steps.
+        <ol>
+          <li>
+            Let |manufacturerId| be <a abstract-op>CanonicalNumericIndexString</a>(|key|).
+          </li>
+          <li>
+            If |manufacturerId| is `undefined` or `-0`,
+            or <a abstract-op>IsInteger</a>(|manufacturerId|) is `false`,
+            or |manufacturerId| is outside the range from 0–65535 inclusive,
+            throw a {{TypeError}} and abort these steps.
+          </li>
+          <li>
+            Let |dataFilter| be
+            <code>|filter|.manufacturerData[|manufacturerId|]</code>,
+            <a>converted to an IDL value</a> of type {{BluetoothDataFilterInit}}.
+            If this conversion throws an exception, propagate it and abort these steps.
+          </li>
+          <li>
+            Set <code>|canonicalizedFilter|.manufacturerData[|manufacturerId|]</code> to be
+            the result of <a for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
+            <a>converted to an ECMAScript value</a>.
+            If this throws an exception, propagate that exception and abort these steps.
+          </li>
+        </ol>
+      </li>
+
+      <li>
+        Set <code>|canonicalizedFilter|.serviceData</code> to `{}`.
+      </li>
+      <li>
+        If <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}</code> is present,
+        do the following sub-steps for each |key| in
+        <code>|filter|.serviceData.{{Object/[[OwnPropertyKeys]]}}()</code>.
+        If there are no such keys, throw a {{TypeError}} and abort these steps.
+        <ol>
+          <li>
+            Let |serviceName| be <a abstract-op>CanonicalNumericIndexString</a>(|key|).
+          </li>
+          <li>
+            If |serviceName| is `undefined`, set |serviceName| to |key|.
+          </li>
+          <li>
+            Let |service| be
+            <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|serviceName|)</code>.
+          </li>
+          <li>
+            If the previous step threw an exception,
+            throw that exception and abort these steps.
+          </li>
+          <li>
+            If |service| is <a>blacklisted</a>,
+            throw a {{SecurityError}}
+            and abort these steps.
+          </li>
+          <li>
+            Let |dataFilter| be
+            <code>|filter|.serviceData[|service|]</code>,
+            <a>converted to an IDL value</a> of type {{BluetoothDataFilterInit}}.
+            If this conversion throws an exception, propagate it and abort these steps.
+          </li>
+          <li>
+            Set <code>|canonicalizedFilter|.serviceData[|service|]</code> to be
+            the result of <a for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
+            <a>converted to an ECMAScript value</a>.
+            If this throws an exception, propagate that exception and abort these steps.
+          </li>
+        </ol>
+      </li>
+
+      <li>Return |canonicalizedFilter|.</li>
+    </ol>
+  </div>
+
+  <div algorithm="canonicalizing a data filter">
+    <p>
+      The result of <dfn for="BluetoothDataFilterInit" export>canonicalizing</dfn>
+      the {{BluetoothDataFilterInit}} |filter|,
+      is the {{BluetoothDataFilterInit}} returned from the following steps:
+    </p>
+    <ol>
+      <li>
+        If <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code> is present,
+        let |dataPrefix| be <a>a copy of the bytes held</a>
+        by <code>|filter|.dataPrefix</code>.
+        Otherwise, let |dataPrefix| be an empty sequence of bytes.
+      </li>
+      <li>
+        If <code>|filter|.{{BluetoothDataFilterInit/mask}}</code> is present,
+        let |mask| be <a>a copy of the bytes held</a>
+        by <code>|filter|.mask</code>.
+        Otherwise, let |mask| be a sequence of `0xFF` bytes the same length as |dataPrefix|.
+      </li>
+      <li>
+        If |mask| is not the same length as |dataPrefix|,
+        throw a {{TypeError}} and abort these steps.
+      </li>
+      <li>
+        Return `{dataPrefix: new Uint8Array(|dataPrefix|), mask: new Uint8Array(|mask|)}`.
       </li>
     </ol>
   </div>
@@ -1514,7 +1744,7 @@ spec: html
           dictionary BluetoothPermissionDescriptor : PermissionDescriptor {
             DOMString deviceId;
             // These match RequestDeviceOptions.
-            sequence&lt;BluetoothRequestDeviceFilter> filters;
+            sequence&lt;BluetoothLEScanFilterInit> filters;
             sequence&lt;BluetoothServiceUUID> optionalServices = [];
             boolean acceptAllDevices = false;
           };
