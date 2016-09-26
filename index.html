@@ -2380,6 +2380,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
         the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondata-alloweddevices" id="ref-for-dom-bluetoothpermissiondata-alloweddevices-1">allowedDevices</a></code> list
         of <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-2">"bluetooth"</a></code>'s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a> for
         at least the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object">current settings object</a>,
+        for its <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-mayusegatt" id="ref-for-dom-allowedbluetoothdevice-mayusegatt-1">mayUseGATT</a></code> field to be <code>true</code>,
         and for all the services in the union of <var>requiredServiceUUIDs</var> and <var>optionalServiceUUIDs</var> to appear in its <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-1">allowedServices</a></code> list,
         in addition to any services that were already there. 
       <li> The UA MAY <a data-link-type="dfn" href="#populate-the-bluetooth-cache" id="ref-for-populate-the-bluetooth-cache-1">populate the Bluetooth cache</a> with
@@ -2523,6 +2524,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
        <p><code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondata" id="ref-for-dictdef-bluetoothpermissiondata-1">BluetoothPermissionData</a></code>, defined as:</p>
 <pre class="idl highlight def"><span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-allowedbluetoothdevice">AllowedBluetoothDevice</dfn> {
   <span class="kt">required</span> <span class="kt">DOMString</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="AllowedBluetoothDevice" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-allowedbluetoothdevice-deviceid">deviceId</dfn>;
+  <span class="kt">required</span> <span class="kt">boolean</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="AllowedBluetoothDevice" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-allowedbluetoothdevice-mayusegatt">mayUseGATT</dfn>;
   // An allowedServices of "all" means all services are allowed.
   <span class="kt">required</span> (<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid-1">UUID</a>>) <dfn class="nv dfn-paneled idl-code" data-dfn-for="AllowedBluetoothDevice" data-dfn-type="dict-member" data-export="" data-type="(DOMString or sequence<UUID>) " id="dom-allowedbluetoothdevice-allowedservices">allowedServices</dfn>;
 };
@@ -2531,8 +2533,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
 };
 </pre>
        <p> <code class="idl"><a data-link-type="idl" href="#dictdef-allowedbluetoothdevice" id="ref-for-dictdef-allowedbluetoothdevice-2">AllowedBluetoothDevice</a></code> instances have an <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-object-internal-methods-and-internal-slots">internal slot</a> <dfn class="dfn-paneled idl-code" data-dfn-for="AllowedBluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-allowedbluetoothdevice-device-slot">[[device]]</dfn> that holds a <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-10">Bluetooth device</a>. </p>
+      <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data-constraints">extra permission data constraints</a> 
+      <dd>
        <p> Distinct elements of <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondata-alloweddevices" id="ref-for-dom-bluetoothpermissiondata-alloweddevices-2">allowedDevices</a></code> must have different <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-1">[[device]]</a></code>s
           and different <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-deviceid" id="ref-for-dom-allowedbluetoothdevice-deviceid-1">deviceId</a></code>s. </p>
+       <p> If <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-mayusegatt" id="ref-for-dom-allowedbluetoothdevice-mayusegatt-2">mayUseGATT</a></code> is <code>false</code>, <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-2">allowedServices</a></code> must be <code>[]</code>. </p>
        <div class="note" id="note-device-id-tracking" role="note">
         <a class="self-link" href="#note-device-id-tracking"></a> 
         <p> A <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-deviceid" id="ref-for-dom-allowedbluetoothdevice-deviceid-2">deviceId</a></code> allows a site to track that
@@ -2620,7 +2625,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
                     the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-1">same device</a> as <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-1">[[representedDevice]]</a></code></code>, and 
             <li> <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-deviceid" id="ref-for-dom-allowedbluetoothdevice-deviceid-3">deviceId</a></code> === <var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id-2">id</a></code></code>, 
            </ul>
-            then update <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-1">[[allowedServices]]</a></code></code> to be <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-2">allowedServices</a></code></code>,
+            then update <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-1">[[allowedServices]]</a></code></code> to be <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-3">allowedServices</a></code></code>,
                 and continue to the next <var>deviceObj</var>. 
           <li> Otherwise, detach <var>deviceObj</var> from its device by running the remaining steps. 
           <li>
@@ -2763,7 +2768,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         the user <a href="#note-device-id-tracking">wants to expose that fact to script</a>. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-name">name</dfn> is the human-readable name of the device. </p>
       <p> <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-gatt" id="ref-for-dom-bluetoothdevice-gatt-2">gatt</a></code> provides a way to interact with this device’s GATT server
-        if the site has permission to use any of its services. </p>
+        if the site has permission to do so. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-watchingadvertisements">watchingAdvertisements</dfn> is true if
         the UA is currently scanning for advertisements from this device
         and firing events for them. </p>
@@ -2793,7 +2798,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
        <tr>
         <td><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</dfn>
         <td>&lt;always set in prose>
-        <td> This device’s <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-3">allowedServices</a></code> list for this origin
+        <td> This device’s <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-4">allowedServices</a></code> list for this origin
           or <code>"all"</code> if all services are allowed.
           For example, a UA may grant an origin access to all services on
           a <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-referringdevice" id="ref-for-dom-bluetooth-referringdevice-4">referringDevice</a></code> that advertised a URL on that origin. 
@@ -2816,7 +2821,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
          <li> Initialize <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-context-slot" id="ref-for-dom-bluetoothdevice-context-slot-1">[[context]]</a></code></code> to <var>context</var>. 
          <li> Initialize <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-3">[[representedDevice]]</a></code></code> to <var>device</var>. 
          <li> Initialize <code><var>result</var>.id</code> to <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-deviceid" id="ref-for-dom-allowedbluetoothdevice-deviceid-4">deviceId</a></code></code>,
-              and initialize <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-2">[[allowedServices]]</a></code></code> to <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-4">allowedServices</a></code></code>. 
+              and initialize <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-2">[[allowedServices]]</a></code></code> to <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-5">allowedServices</a></code></code>. 
          <li> If <var>device</var> has a partial or complete <a data-link-type="dfn" href="#bluetooth-device-name" id="ref-for-bluetooth-device-name-9">Bluetooth Device Name</a>,
               set <code><var>result</var>.name</code> to that string. 
          <li> Initialize <code><var>result</var>.watchingAdvertisements</code> to <code>false</code>. 
@@ -2829,9 +2834,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> Getting the <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDevice" data-dfn-type="attribute" data-export="" id="dom-bluetoothdevice-gatt">gatt</dfn></code> attribute
         MUST perform the following steps: </p>
       <ol>
-       <li> If <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-3">[[allowedServices]]</a></code></code> is an empty list,
-          return <code>null</code>. 
-       <li> Return <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-gatt-slot" id="ref-for-dom-bluetoothdevice-gatt-slot-1">[[gatt]]</a></code></code>. 
+       <li> If <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-7">"bluetooth"</a></code>'s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a> for <code>this</code>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a> has an <code class="idl"><a data-link-type="idl" href="#dictdef-allowedbluetoothdevice" id="ref-for-dictdef-allowedbluetoothdevice-4">AllowedBluetoothDevice</a></code> <var>allowedDevice</var> in its <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondata-alloweddevices" id="ref-for-dom-bluetoothpermissiondata-alloweddevices-5">allowedDevices</a></code> list
+          with <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-6">[[device]]</a></code></code> the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-5">same device</a> as <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-4">[[representedDevice]]</a></code></code> and <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-mayusegatt" id="ref-for-dom-allowedbluetoothdevice-mayusegatt-3">mayUseGATT</a></code></code> equal to <code>true</code>,
+          return <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-gatt-slot" id="ref-for-dom-bluetoothdevice-gatt-slot-1">[[gatt]]</a></code></code>. 
+       <li> Otherwise, return <code>null</code>. 
       </ol>
      </div>
      <p class="note" role="note"> Scanning costs power,
@@ -2971,7 +2977,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         <li> Let <var>device</var> be the <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device-15">Bluetooth device</a> that sent the advertising event. 
         <li>
           For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-27">BluetoothDevice</a></code> <var>deviceObj</var> in the UA
-            such that <var>device</var> is the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-5">same device</a> as <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-4">[[representedDevice]]</a></code></code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to do the following sub-steps: 
+            such that <var>device</var> is the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-6">same device</a> as <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-5">[[representedDevice]]</a></code></code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to do the following sub-steps: 
          <ol>
           <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchingadvertisements" id="ref-for-dom-bluetoothdevice-watchingadvertisements-7">watchingAdvertisements</a></code></code> is <code>false</code>,
                 abort these sub-steps. 
@@ -3224,7 +3230,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           depending on the type of <var>obj</var>: </p>
        <dl class="switch">
         <dt><code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-30">BluetoothDevice</a></code>
-        <dd><code><var>obj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-5">[[representedDevice]]</a></code></code>
+        <dd><code><var>obj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-6">[[representedDevice]]</a></code></code>
         <dt><code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-5">BluetoothRemoteGATTService</a></code>
         <dd><code><var>obj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattservice-representedservice-slot" id="ref-for-dom-bluetoothremotegattservice-representedservice-slot-1">[[representedService]]</a></code></code>
         <dt><code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-6">BluetoothRemoteGATTCharacteristic</a></code>
@@ -3291,14 +3297,14 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
      <section>
       <h4 class="heading settled" data-level="5.1.4" id="identifying-attributes"><span class="secno">5.1.4. </span><span class="content">Identifying Services, Characteristics, and Descriptors</span><a class="self-link" href="#identifying-attributes"></a></h4>
       <p> When checking whether two Services, Characteristics, or Descriptors <var>a</var> and <var>b</var> are the <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="same-attribute">same attribute</dfn>,
-        the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var> are inside the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-6">same device</a> and have the same <a data-link-type="dfn" href="#attribute-handle" id="ref-for-attribute-handle-5">Attribute Handle</a>,
+        the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var> are inside the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-7">same device</a> and have the same <a data-link-type="dfn" href="#attribute-handle" id="ref-for-attribute-handle-5">Attribute Handle</a>,
         but MAY use any algorithm it wants with the constraint that <var>a</var> and <var>b</var> MUST NOT be considered the <a data-link-type="dfn" href="#same-attribute" id="ref-for-same-attribute-2">same attribute</a> if
         they fit any of the following conditions: </p>
       <ul>
        <li>They are not both Services, both Characteristics, or both Descriptors.
        <li>They are both Services, but are not both primary or both secondary services.
        <li>They have different UUIDs.
-       <li> Their parent Devices aren’t the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-7">same device</a> or
+       <li> Their parent Devices aren’t the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-8">same device</a> or
           their parent Services or Characteristics aren’t the <a data-link-type="dfn" href="#same-attribute" id="ref-for-same-attribute-3">same attribute</a>. 
       </ul>
       <p class="note" role="note"> This definition is loose because platform APIs expose their own notion of identity
@@ -3356,7 +3362,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         MUST perform the following steps: </p>
       <ol>
        <li>Let <var>promise</var> be <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a>.
-       <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-6">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+       <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-7">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
           return <var>promise</var>,
           and abort these steps. 
        <li> Add <var>promise</var> to <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-1">[[activeAlgorithms]]</a></code></code>. 
@@ -3364,7 +3370,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
          Return <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: 
         <ol>
          <li>
-           If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-7">[[representedDevice]]</a></code></code> has no <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-4">ATT Bearer</a>,
+           If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-8">[[representedDevice]]</a></code></code> has no <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-4">ATT Bearer</a>,
               do the following sub-steps: 
           <ol>
            <li id="create-an-att-bearer">
@@ -3382,10 +3388,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
          <li>
            <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to perform the following sub-steps: 
           <ol>
-           <li> If <var>promise</var> is not in <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-4">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#aborterror">AbortError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection-1">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-8">[[representedDevice]]</a></code></code>,
+           <li> If <var>promise</var> is not in <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-4">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#aborterror">AbortError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection-1">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-9">[[representedDevice]]</a></code></code>,
                   and abort these steps. 
            <li> Remove <var>promise</var> from <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-5">[[activeAlgorithms]]</a></code></code>. 
-           <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-9">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection-2">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-10">[[representedDevice]]</a></code></code>,
+           <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-10">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection-2">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-11">[[representedDevice]]</a></code></code>,
                   and abort these steps. 
            <li> Set <code>this.connected</code> to <code>true</code>. 
            <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">Resolve</a> <var>promise</var> with <code>this</code>. 
@@ -3400,7 +3406,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
        <li> Clear <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-6">[[activeAlgorithms]]</a></code></code> to abort any <a href="#create-an-att-bearer">active <code>connect()</code> calls</a>. 
        <li> If <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-4">connected</a></code></code> is <code>false</code>, abort these steps. 
        <li> <a data-link-type="dfn" href="#clean-up-the-disconnected-device" id="ref-for-clean-up-the-disconnected-device-1">Clean up the disconnected device</a> <code>this.device</code>. 
-       <li> Let <var>device</var> be <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-11">[[representedDevice]]</a></code></code>. 
+       <li> Let <var>device</var> be <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-12">[[representedDevice]]</a></code></code>. 
        <li> <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection-3">Garbage-collect the connection</a> of <var>device</var>. 
       </ol>
      </div>
@@ -3415,8 +3421,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
        <li>
          For all <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-34">BluetoothDevice</a></code>s <code><var>deviceObj</var></code> in the whole UA: 
         <ol>
-         <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-12">[[representedDevice]]</a></code></code> is
-              not the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-8">same device</a> as <var>device</var>,
+         <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-13">[[representedDevice]]</a></code></code> is
+              not the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-9">same device</a> as <var>device</var>,
               continue to the next <var>deviceObj</var>. 
          <li> If <code><var>deviceObj</var>.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-5">connected</a></code></code> is <code>true</code>,
               abort this algorithm. 
@@ -3462,20 +3468,20 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattserver-getprimaryservice">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
         MUST perform the following steps: </p>
       <ol>
-       <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-4">[[allowedServices]]</a></code></code> is not <code>"all"</code> and <var>service</var> is not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-5">[[allowedServices]]</a></code></code>,
+       <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-3">[[allowedServices]]</a></code></code> is not <code>"all"</code> and <var>service</var> is not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-4">[[allowedServices]]</a></code></code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
-       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-1">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-8">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-6">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
+       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-1">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-8">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-5">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
       </ol>
      </div>
      <div class="algorithm" data-algorithm="getPrimaryServices(service)">
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export="" data-lt="getPrimaryServices(service)|getPrimaryServices()" id="dom-bluetoothremotegattserver-getprimaryservices">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
         MUST perform the following steps: </p>
       <ol>
-       <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-7">[[allowedServices]]</a></code></code> is not <code>"all"</code>,
+       <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-6">[[allowedServices]]</a></code></code> is not <code>"all"</code>,
           and <var>service</var> is present
-          and not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-8">[[allowedServices]]</a></code></code>,
+          and not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-7">[[allowedServices]]</a></code></code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
-       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-2">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-13">[[representedDevice]]</a></code></code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-9">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-9">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
+       <li> Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren-2">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-14">[[representedDevice]]</a></code></code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-9">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-8">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span> 
       </ol>
      </div>
     </section>
@@ -3977,11 +3983,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         simply named the <a data-link-type="dfn" href="#bluetooth-tree" id="ref-for-bluetooth-tree-1">Bluetooth tree</a>. </p>
       <ul>
        <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth-6">navigator.bluetooth</a></code> are the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-38">BluetoothDevice</a></code> objects representing
-          devices in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondata-alloweddevices" id="ref-for-dom-bluetoothpermissiondata-alloweddevices-5">allowedDevices</a></code> list
-          in <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-7">"bluetooth"</a></code>'s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a> for <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth-7">navigator.bluetooth</a></code>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>,
+          devices in the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissiondata-alloweddevices" id="ref-for-dom-bluetoothpermissiondata-alloweddevices-6">allowedDevices</a></code> list
+          in <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-8">"bluetooth"</a></code>'s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a> for <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth-7">navigator.bluetooth</a></code>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>,
           in an unspecified order. 
        <li> The <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-tree-child">children</a> of a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-39">BluetoothDevice</a></code> are the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-22">BluetoothRemoteGATTService</a></code> objects representing
-          Primary and Secondary <a data-link-type="dfn" href="#service" id="ref-for-service-10">Service</a>s on its <a data-link-type="dfn" href="#gatt-server" id="ref-for-gatt-server-6">GATT Server</a> whose UUIDs are on the origin and device’s <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-5">allowedServices</a></code> list.
+          Primary and Secondary <a data-link-type="dfn" href="#service" id="ref-for-service-10">Service</a>s on its <a data-link-type="dfn" href="#gatt-server" id="ref-for-gatt-server-6">GATT Server</a> whose UUIDs are on the origin and device’s <code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-allowedservices" id="ref-for-dom-allowedbluetoothdevice-allowedservices-6">allowedServices</a></code> list.
           The order of the primary services MUST be consistent with the order returned by
           the <a data-link-type="dfn" href="#discover-primary-service-by-service-uuid" id="ref-for-discover-primary-service-by-service-uuid-1">Discover Primary Service by Service UUID</a> procedure,
           but secondary services and primary services with different UUIDs may be in any order. 
@@ -4032,7 +4038,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           or the user used a platform feature to disconnect it),
           for each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice-42">BluetoothDevice</a></code> <var>deviceObj</var> the UA MUST <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a> to perform the following steps: </p>
        <ol>
-        <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-14">[[representedDevice]]</a></code></code> is not the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-9">same device</a> as <var>device</var>,
+        <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-15">[[representedDevice]]</a></code></code> is not the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device-10">same device</a> as <var>device</var>,
             abort these steps. 
         <li> If <code>!<var>deviceObj</var>.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-11">connected</a></code></code>,
             abort these steps. 
@@ -4045,7 +4051,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         <li> Set <code><var>deviceObj</var>.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-12">connected</a></code></code> to <code>false</code>. 
         <li> Clear <code><var>deviceObj</var>.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-15">[[activeAlgorithms]]</a></code></code>. 
         <li> Let <var>context</var> be <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-context-slot" id="ref-for-dom-bluetoothdevice-context-slot-3">[[context]]</a></code></code>. 
-        <li> Remove all entries from <code><var>context</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot" id="ref-for-dom-bluetooth-attributeinstancemap-slot-4">[[attributeInstanceMap]]</a></code></code> whose keys are inside <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-15">[[representedDevice]]</a></code></code>. 
+        <li> Remove all entries from <code><var>context</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot" id="ref-for-dom-bluetooth-attributeinstancemap-slot-4">[[attributeInstanceMap]]</a></code></code> whose keys are inside <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-16">[[representedDevice]]</a></code></code>. 
         <li> For each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-27">BluetoothRemoteGATTService</a></code> <var>service</var> in <var>deviceObj</var>’s <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-code-realms">realm</a>,
             set <code><var>service</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattservice-representedservice-slot" id="ref-for-dom-bluetoothremotegattservice-representedservice-slot-3">[[representedService]]</a></code></code> to <code>null</code>. 
         <li>
@@ -4054,7 +4060,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           <li> Let <var>notificationContexts</var> be <code><var>characteristic</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot-7">[[representedCharacteristic]]</a></code></code>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set-5">active notification context set</a>. 
           <li> Remove <var>context</var> from <var>notificationContexts</var>. 
           <li> If <var>notificationContexts</var> became empty
-                and there is still an <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-9">ATT Bearer</a> to <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-16">[[representedDevice]]</a></code></code>,
+                and there is still an <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer-9">ATT Bearer</a> to <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-17">[[representedDevice]]</a></code></code>,
                 the UA SHOULD use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors-3">Characteristic Descriptors</a> procedures
                 to clear the <code>Notification</code> and <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration-3">Client Characteristic Configuration</a> descriptor. 
           <li> Set <code><var>characteristic</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot-8">[[representedCharacteristic]]</a></code></code> to <code>null</code>. 
@@ -4218,14 +4224,14 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           <li>
             For each <a data-link-type="dfn" href="#service" id="ref-for-service-19">Service</a> <var>service</var> in <var>removedAttributes</var>: 
            <ol>
-            <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-10">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-2">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-29">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-20">Service</a>. 
+            <li> If <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-9">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceremoved" id="ref-for-eventdef-bluetoothremotegattservice-serviceremoved-2">serviceremoved</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-29">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-20">Service</a>. 
             <li> Remove this <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-30">BluetoothRemoteGATTService</a></code> from the <a data-link-type="dfn" href="#bluetooth-tree" id="ref-for-bluetooth-tree-5">Bluetooth tree</a>. 
            </ol>
           <li> For each <a data-link-type="dfn" href="#service" id="ref-for-service-21">Service</a> in <var>addedAttributes</var>,
-                if <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-11">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID,
+                if <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-10">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID,
                 add the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-31">BluetoothRemoteGATTService</a></code> representing this <a data-link-type="dfn" href="#service" id="ref-for-service-22">Service</a> to the <a data-link-type="dfn" href="#bluetooth-tree" id="ref-for-bluetooth-tree-6">Bluetooth tree</a> and then <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-serviceadded" id="ref-for-eventdef-bluetoothremotegattservice-serviceadded-3">serviceadded</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-32">BluetoothRemoteGATTService</a></code>. 
           <li> For each <a data-link-type="dfn" href="#service" id="ref-for-service-23">Service</a> in <var>changedServices</var>,
-                if <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-12">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-3">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-33">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-24">Service</a>. 
+                if <code>deviceObj.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot-11">[[allowedServices]]</a></code></code> is <code>"all"</code> or contains the Service’s UUID, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattservice-servicechanged" id="ref-for-eventdef-bluetoothremotegattservice-servicechanged-3">servicechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at the <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice-33">BluetoothRemoteGATTService</a></code> representing the <a data-link-type="dfn" href="#service" id="ref-for-service-24">Service</a>. 
          </ol>
        </ol>
       </div>
@@ -5171,6 +5177,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#matches-a-filter">match a filter</a><span>, in §3</span>
    <li><a href="#matches-a-filter">matches a filter</a><span>, in §3</span>
    <li><a href="#matches-a-filter">matches any filter</a><span>, in §3</span>
+   <li><a href="#dom-allowedbluetoothdevice-mayusegatt">mayUseGATT</a><span>, in §3.1</span>
    <li>
     name
     <ul>
@@ -5415,6 +5422,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
      <li><a href="https://w3c.github.io/permissions/#permissionstatus">PermissionStatus</a>
      <li><a href="https://w3c.github.io/permissions/#allowed-in-non-secure-contexts">allowed in non-secure contexts</a>
      <li><a href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a>
+     <li><a href="https://w3c.github.io/permissions/#extra-permission-data-constraints">extra permission data constraints</a>
      <li><a href="https://w3c.github.io/permissions/#extra-permission-data-type">extra permission data type</a>
      <li><a href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a>
      <li><a href="https://w3c.github.io/permissions/#permission-descriptor-type">permission descriptor type</a>
@@ -5551,6 +5559,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-allowedbluetoothdevice">AllowedBluetoothDevice</a> {
   <span class="kt">required</span> <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-allowedbluetoothdevice-deviceid">deviceId</a>;
+  <span class="kt">required</span> <span class="kt">boolean</span> <a class="nv" data-type="boolean " href="#dom-allowedbluetoothdevice-mayusegatt">mayUseGATT</a>;
   // An allowedServices of "all" means all services are allowed.
   <span class="kt">required</span> (<span class="kt">DOMString</span> <span class="kt">or</span> <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-uuid">UUID</a>>) <a class="nv" data-type="(DOMString or sequence<UUID>) " href="#dom-allowedbluetoothdevice-allowedservices">allowedServices</a>;
 };
@@ -5866,8 +5875,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <ul>
     <li><a href="#ref-for-dom-permissionname-bluetooth-1">3. Device Discovery</a> <a href="#ref-for-dom-permissionname-bluetooth-2">(2)</a>
     <li><a href="#ref-for-dom-permissionname-bluetooth-3">3.1. Permission API Integration</a> <a href="#ref-for-dom-permissionname-bluetooth-4">(2)</a> <a href="#ref-for-dom-permissionname-bluetooth-5">(3)</a>
-    <li><a href="#ref-for-dom-permissionname-bluetooth-6">4.2. BluetoothDevice</a>
-    <li><a href="#ref-for-dom-permissionname-bluetooth-7">5.6.1. Bluetooth Tree</a>
+    <li><a href="#ref-for-dom-permissionname-bluetooth-6">4.2. BluetoothDevice</a> <a href="#ref-for-dom-permissionname-bluetooth-7">(2)</a>
+    <li><a href="#ref-for-dom-permissionname-bluetooth-8">5.6.1. Bluetooth Tree</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-bluetoothpermissiondescriptor">
@@ -5904,6 +5913,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#dictdef-allowedbluetoothdevice">#dictdef-allowedbluetoothdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-allowedbluetoothdevice-1">3.1. Permission API Integration</a> <a href="#ref-for-dictdef-allowedbluetoothdevice-2">(2)</a> <a href="#ref-for-dictdef-allowedbluetoothdevice-3">(3)</a>
+    <li><a href="#ref-for-dictdef-allowedbluetoothdevice-4">4.2. BluetoothDevice</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-allowedbluetoothdevice-deviceid">
@@ -5913,13 +5923,21 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     <li><a href="#ref-for-dom-allowedbluetoothdevice-deviceid-4">4.2. BluetoothDevice</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="dom-allowedbluetoothdevice-mayusegatt">
+   <b><a href="#dom-allowedbluetoothdevice-mayusegatt">#dom-allowedbluetoothdevice-mayusegatt</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-mayusegatt-1">3. Device Discovery</a>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-mayusegatt-2">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-mayusegatt-3">4.2. BluetoothDevice</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="dom-allowedbluetoothdevice-allowedservices">
    <b><a href="#dom-allowedbluetoothdevice-allowedservices">#dom-allowedbluetoothdevice-allowedservices</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-1">3. Device Discovery</a>
-    <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-2">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-3">4.2. BluetoothDevice</a> <a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-4">(2)</a>
-    <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-5">5.6.1. Bluetooth Tree</a>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-2">3.1. Permission API Integration</a> <a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-3">(2)</a>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-4">4.2. BluetoothDevice</a> <a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-5">(2)</a>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-allowedservices-6">5.6.1. Bluetooth Tree</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-bluetoothpermissiondata">
@@ -5934,15 +5952,15 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <ul>
     <li><a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-1">3. Device Discovery</a>
     <li><a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-2">3.1. Permission API Integration</a> <a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-3">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-4">4.2. BluetoothDevice</a>
-    <li><a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-5">5.6.1. Bluetooth Tree</a>
+    <li><a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-4">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-5">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothpermissiondata-alloweddevices-6">5.6.1. Bluetooth Tree</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-allowedbluetoothdevice-device-slot">
    <b><a href="#dom-allowedbluetoothdevice-device-slot">#dom-allowedbluetoothdevice-device-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-allowedbluetoothdevice-device-slot-1">3.1. Permission API Integration</a> <a href="#ref-for-dom-allowedbluetoothdevice-device-slot-2">(2)</a> <a href="#ref-for-dom-allowedbluetoothdevice-device-slot-3">(3)</a> <a href="#ref-for-dom-allowedbluetoothdevice-device-slot-4">(4)</a>
-    <li><a href="#ref-for-dom-allowedbluetoothdevice-device-slot-5">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-device-slot-5">4.2. BluetoothDevice</a> <a href="#ref-for-dom-allowedbluetoothdevice-device-slot-6">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothpermissionresult">
@@ -6012,11 +6030,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#same-bluetooth-device">#same-bluetooth-device</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-same-bluetooth-device-1">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-same-bluetooth-device-2">4.2. BluetoothDevice</a> <a href="#ref-for-same-bluetooth-device-3">(2)</a> <a href="#ref-for-same-bluetooth-device-4">(3)</a>
-    <li><a href="#ref-for-same-bluetooth-device-5">4.2.1. Responding to Advertising Events</a>
-    <li><a href="#ref-for-same-bluetooth-device-6">5.1.4. Identifying Services, Characteristics, and Descriptors</a> <a href="#ref-for-same-bluetooth-device-7">(2)</a>
-    <li><a href="#ref-for-same-bluetooth-device-8">5.2. BluetoothRemoteGATTServer</a>
-    <li><a href="#ref-for-same-bluetooth-device-9">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-same-bluetooth-device-2">4.2. BluetoothDevice</a> <a href="#ref-for-same-bluetooth-device-3">(2)</a> <a href="#ref-for-same-bluetooth-device-4">(3)</a> <a href="#ref-for-same-bluetooth-device-5">(4)</a>
+    <li><a href="#ref-for-same-bluetooth-device-6">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-same-bluetooth-device-7">5.1.4. Identifying Services, Characteristics, and Descriptors</a> <a href="#ref-for-same-bluetooth-device-8">(2)</a>
+    <li><a href="#ref-for-same-bluetooth-device-9">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-same-bluetooth-device-10">5.6.3. Responding to Disconnection</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothdevice">
@@ -6068,11 +6086,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#dom-bluetoothdevice-representeddevice-slot">#dom-bluetoothdevice-representeddevice-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-1">3.1. Permission API Integration</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-2">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-3">4.2. BluetoothDevice</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-4">4.2.1. Responding to Advertising Events</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-5">5.1.2. The Bluetooth cache</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-6">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-7">(2)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-8">(3)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-9">(4)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-10">(5)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-11">(6)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-12">(7)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-13">(8)</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-14">5.6.3. Responding to Disconnection</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-15">(2)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-16">(3)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-3">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-4">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-5">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-6">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-7">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-8">(2)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-9">(3)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-10">(4)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-11">(5)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-12">(6)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-13">(7)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-14">(8)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-15">5.6.3. Responding to Disconnection</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-16">(2)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot-17">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothdevice-gatt-slot">
@@ -6085,9 +6103,9 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#dom-bluetoothdevice-allowedservices-slot">#dom-bluetoothdevice-allowedservices-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-1">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-2">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-3">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-4">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-5">(2)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-6">(3)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-7">(4)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-8">(5)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-9">(6)</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-10">5.6.5. Responding to Service Changes</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-11">(2)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-12">(3)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-2">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-3">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-4">(2)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-5">(3)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-6">(4)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-7">(5)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-8">(6)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-9">5.6.5. Responding to Service Changes</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-10">(2)</a> <a href="#ref-for-dom-bluetoothdevice-allowedservices-slot-11">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="get-the-bluetoothdevice-representing">
