@@ -31,6 +31,7 @@ Get Characteristics List  | ✓         | ✓       | ✓   | ✓     |         
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Get Primary Services List | ✓         | ✓      | ✓   | ✓     |         |
 {start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
+TypeError for bad UUIDs   |           |         |     |       |         |
 Advertisements Scanning   |           |         |     |       |         |
 Permissions API Integration |         |         |     |       |         |
 
