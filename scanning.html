@@ -1526,27 +1526,20 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
       <p> To discover what iBeacons are nearby and measure their distance,
         a website could use code like the following: </p>
 <pre class="highlight"><span class="kd">function</span> recordNearbyBeacon<span class="p">(</span>major<span class="p">,</span> minor<span class="p">,</span> pathLossVs1m<span class="p">)</span> <span class="p">{</span> <span class="p">...</span> <span class="p">}</span>
-<span class="kd">let</span> myBeaconUuid <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">(</span><span class="p">[</span><span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span><span class="p">]</span><span class="p">)</span><span class="p">;</span>
-
 navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan-1">requestLEScan</a><span class="p">(</span><span class="p">{</span>
-  filters<span class="o">:</span> <span class="p">[</span><span class="p">{</span>manufacturerId<span class="o">:</span> <span class="mh">0x004C</span><span class="p">}</span><span class="p">]</span><span class="p">,</span>
+  filters<span class="o">:</span> <span class="p">[</span><span class="p">{</span>manufacturerData<span class="o">:</span> <span class="p">{</span><span class="mh">0x004C</span><span class="o">:</span> <span class="p">{</span>dataPrefix<span class="o">:</span> <span class="k">new</span> Uint8Array<span class="p">(</span><span class="p">[</span>
+    <span class="mh">0x02</span><span class="p">,</span> <span class="mh">0x15</span><span class="p">,</span> <span class="c1">// iBeacon identifier.
+</span>    <span class="mi">0</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">3</span><span class="p">,</span> <span class="mi">4</span><span class="p">,</span> <span class="mi">5</span><span class="p">,</span> <span class="mi">6</span><span class="p">,</span> <span class="mi">7</span><span class="p">,</span> <span class="mi">8</span><span class="p">,</span> <span class="mi">9</span><span class="p">,</span> <span class="mi">10</span><span class="p">,</span> <span class="mi">11</span><span class="p">,</span> <span class="mi">12</span><span class="p">,</span> <span class="mi">13</span><span class="p">,</span> <span class="mi">14</span><span class="p">,</span> <span class="mi">15</span>  <span class="c1">// My beacon UUID.
+</span>  <span class="p">]</span><span class="p">)</span><span class="p">}</span><span class="p">}</span><span class="p">}</span><span class="p">]</span><span class="p">,</span>
   options<span class="o">:</span> <span class="p">{</span>
     keepRepeatedDevices<span class="o">:</span> <span class="kc">true</span><span class="p">,</span>
   <span class="p">}</span>
 <span class="p">}</span><span class="p">)</span><span class="p">.</span>then<span class="p">(</span><span class="p">(</span><span class="p">)</span> <span class="o">=></span> <span class="p">{</span>
   navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListener<span class="p">(</span><span class="s1">'</span><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived"><span class="s1">advertisementreceived</span></a><span class="s1">'</span><span class="p">,</span> event <span class="o">=></span> <span class="p">{</span>
     <span class="kd">let</span> appleData <span class="o">=</span> event<span class="p">.</span>manufacturerData<span class="p">.</span>get<span class="p">(</span><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><span class="mh">0x004C</span></a><span class="p">)</span><span class="p">;</span>
-    <span class="k">if</span> <span class="p">(</span>appleData<span class="p">.</span>byteLength <span class="o">!=</span> <span class="mi">23</span> <span class="o">||</span>
-        appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span> <span class="o">!==</span> <span class="mh">0x0215</span><span class="p">)</span> <span class="p">{</span>
+    <span class="k">if</span> <span class="p">(</span>appleData<span class="p">.</span>byteLength <span class="o">!=</span> <span class="mi">23</span><span class="p">)</span> <span class="p">{</span>
       <span class="c1">// Isn’t an iBeacon.
 </span>      <span class="k">return</span><span class="p">;</span>
-    <span class="p">}</span>
-    <span class="kd">let</span> uuidArray <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">(</span>appleData<span class="p">.</span>buffer<span class="p">,</span> <span class="mi">2</span><span class="p">,</span> <span class="mi">16</span><span class="p">)</span><span class="p">;</span>
-    <span class="k">for</span> <span class="p">(</span><span class="kd">let</span> i <span class="o">=</span> <span class="mi">0</span><span class="p">;</span> i <span class="o">&lt;</span> <span class="mi">16</span><span class="p">;</span> i<span class="o">++</span><span class="p">)</span> <span class="p">{</span>
-      <span class="k">if</span> <span class="p">(</span>uuidArray<span class="p">[</span>i<span class="p">]</span> <span class="o">!=</span> myBeaconUuid<span class="p">[</span>i<span class="p">]</span><span class="p">)</span> <span class="p">{</span>
-        <span class="c1">// Not my class of beacon.
-</span>        <span class="k">return</span><span class="p">;</span>
-      <span class="p">}</span>
     <span class="p">}</span>
     <span class="kd">let</span> major <span class="o">=</span> appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">18</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span><span class="p">;</span>
     <span class="kd">let</span> minor <span class="o">=</span> appleData<span class="p">.</span>getUint16<span class="p">(</span><span class="mi">20</span><span class="p">,</span> <span class="kc">false</span><span class="p">)</span><span class="p">;</span>
@@ -1602,16 +1595,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    </section>
    <section>
     <h2 class="heading settled" data-level="4" id="scanning"><span class="secno">4. </span><span class="content">Scanning for BLE advertisements</span><a class="self-link" href="#scanning"></a></h2>
-<pre class="idl highlight def"><span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</dfn> {
-  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilterInit" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-bluetoothlescanfilterinit-name">name<a class="self-link" href="#dom-bluetoothlescanfilterinit-name"></a></dfn>;
-  <span class="kt">DOMString</span> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilterInit" data-dfn-type="dict-member" data-export="" data-type="DOMString " id="dom-bluetoothlescanfilterinit-nameprefix">namePrefix<a class="self-link" href="#dom-bluetoothlescanfilterinit-nameprefix"></a></dfn>;
-  <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilterInit" data-dfn-type="dict-member" data-export="" data-type="BluetoothServiceUUID " id="dom-bluetoothlescanfilterinit-serviceuuid">serviceUUID<a class="self-link" href="#dom-bluetoothlescanfilterinit-serviceuuid"></a></dfn>;
-  <span class="kt">unsigned</span> <span class="kt">short</span> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilterInit" data-dfn-type="dict-member" data-export="" data-type="unsigned short " id="dom-bluetoothlescanfilterinit-manufacturerid">manufacturerId<a class="self-link" href="#dom-bluetoothlescanfilterinit-manufacturerid"></a></dfn>;
-  <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilterInit" data-dfn-type="dict-member" data-export="" data-type="BluetoothServiceUUID " id="dom-bluetoothlescanfilterinit-servicedatauuid">serviceDataUUID<a class="self-link" href="#dom-bluetoothlescanfilterinit-servicedatauuid"></a></dfn>;
-};
-
-<span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</dfn> {
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit-1">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanoptions-filters">filters<a class="self-link" href="#dom-bluetoothlescanoptions-filters"></a></dfn>;
+<pre class="idl highlight def"><span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</dfn> {
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanoptions-filters">filters<a class="self-link" href="#dom-bluetoothlescanoptions-filters"></a></dfn>;
   <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-keeprepeateddevices" id="ref-for-dom-bluetoothlescanoptions-keeprepeateddevices-1">keepRepeatedDevices</a> = <span class="kt">false</span>;
   <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-acceptalladvertisements" id="ref-for-dom-bluetoothlescanoptions-acceptalladvertisements-1">acceptAllAdvertisements</a> = <span class="kt">false</span>;
 };
@@ -1715,13 +1700,29 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
     </div>
     <section>
      <h3 class="heading settled" data-level="4.1" id="scan-control"><span class="secno">4.1. </span><span class="content">Controlling a BLE scan</span><a class="self-link" href="#scan-control"></a></h3>
-<pre class="idl highlight def">[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter-2">Constructor</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit-2">BluetoothLEScanFilterInit</a> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilter/BluetoothLEScanFilter(init)" data-dfn-type="argument" data-export="" id="dom-bluetoothlescanfilter-bluetoothlescanfilter-init-init">init<a class="self-link" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter-init-init"></a></dfn>)]
+<pre class="idl highlight def">[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothdatafilter-bluetoothdatafilter" id="ref-for-dom-bluetoothdatafilter-bluetoothdatafilter-1">Constructor</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothdatafilterinit">BluetoothDataFilterInit</a> <dfn class="nv idl-code" data-dfn-for="BluetoothDataFilter/BluetoothDataFilter(init)" data-dfn-type="argument" data-export="" id="dom-bluetoothdatafilter-bluetoothdatafilter-init-init">init<a class="self-link" href="#dom-bluetoothdatafilter-bluetoothdatafilter-init-init"></a></dfn>)]
+<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothdatafilter">BluetoothDataFilter</dfn> {
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">ArrayBuffer</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothDataFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="ArrayBuffer" id="dom-bluetoothdatafilter-dataprefix">dataPrefix</dfn>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">ArrayBuffer</span> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothDataFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="ArrayBuffer" id="dom-bluetoothdatafilter-mask">mask</dfn>;
+};
+
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter" id="ref-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-1">Constructor</a>(<span class="kt">optional</span> <span class="kt">object</span> <dfn class="nv idl-code" data-dfn-for="BluetoothManufacturerDataFilter/BluetoothManufacturerDataFilter(init)" data-dfn-type="argument" data-export="" id="dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-init-init">init<a class="self-link" href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-init-init"></a></dfn>)]
+<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter</dfn> {
+  <span class="kt">readonly</span> <span class="kt">maplike</span>&lt;<span class="kt">unsigned</span> <span class="kt">short</span>, <a class="n" data-link-type="idl-name" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter-1">BluetoothDataFilter</a>>;
+};
+
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter" id="ref-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter-1">Constructor</a>(<span class="kt">optional</span> <span class="kt">object</span> <dfn class="nv idl-code" data-dfn-for="BluetoothServiceDataFilter/BluetoothServiceDataFilter(init)" data-dfn-type="argument" data-export="" id="dom-bluetoothservicedatafilter-bluetoothservicedatafilter-init-init">init<a class="self-link" href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter-init-init"></a></dfn>)]
+<span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothservicedatafilter">BluetoothServiceDataFilter</dfn> {
+  <span class="kt">readonly</span> <span class="kt">maplike</span>&lt;<a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>, <a class="n" data-link-type="idl-name" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter-2">BluetoothDataFilter</a>>;
+};
+
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter-2">Constructor</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilter/BluetoothLEScanFilter(init)" data-dfn-type="argument" data-export="" id="dom-bluetoothlescanfilter-bluetoothlescanfilter-init-init">init<a class="self-link" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter-init-init"></a></dfn>)]
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothlescanfilter">BluetoothLEScanFilter</dfn> {
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">DOMString</span>? <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="DOMString?" id="dom-bluetoothlescanfilter-name">name</dfn>;
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">DOMString</span>? <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="DOMString?" id="dom-bluetoothlescanfilter-nameprefix">namePrefix<a class="self-link" href="#dom-bluetoothlescanfilter-nameprefix"></a></dfn>;
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>? <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="UUID?" id="dom-bluetoothlescanfilter-serviceuuid">serviceUUID<a class="self-link" href="#dom-bluetoothlescanfilter-serviceuuid"></a></dfn>;
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">unsigned</span> <span class="kt">short</span>? <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="unsigned short?" id="dom-bluetoothlescanfilter-manufacturerid">manufacturerId<a class="self-link" href="#dom-bluetoothlescanfilter-manufacturerid"></a></dfn>;
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>? <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="UUID?" id="dom-bluetoothlescanfilter-servicedatauuid">serviceDataUUID<a class="self-link" href="#dom-bluetoothlescanfilter-servicedatauuid"></a></dfn>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>>? <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="FrozenArray<UUID>?" id="dom-bluetoothlescanfilter-services">services</dfn>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothmanufacturerdatafilter" id="ref-for-bluetoothmanufacturerdatafilter-1">BluetoothManufacturerDataFilter</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="BluetoothManufacturerDataFilter" id="dom-bluetoothlescanfilter-manufacturerdata">manufacturerData</dfn>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothservicedatafilter" id="ref-for-bluetoothservicedatafilter-1">BluetoothServiceDataFilter</a> <dfn class="nv dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="attribute" data-export="" data-readonly="" data-type="BluetoothServiceDataFilter" id="dom-bluetoothlescanfilter-servicedata">serviceData</dfn>;
 };
 
 <span class="kt">interface</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="interface" data-export="" id="bluetoothlescan">BluetoothLEScan</dfn> {
@@ -1742,16 +1743,18 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
      <div class="algorithm" data-algorithm="BluetoothLEScanFilter(|init|)">
       <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanFilter" data-dfn-type="constructor" data-export="" id="dom-bluetoothlescanfilter-bluetoothlescanfilter">BluetoothLEScanFilter(<var>init</var>)</dfn> constructor, when invoked MUST perform the following steps: </p>
       <ol class="algorithm">
-       <li> Initialize all fields to <code>null</code>. 
+       <li> Initialize all nullable fields to <code>null</code>. 
        <li>
          If no member of <var>init</var> is present, throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code>. 
         <p class="note" role="note">Note: A filter can’t implicitly allow all advertisements.
           Use <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanoptions-acceptalladvertisements" id="ref-for-dom-bluetoothlescanoptions-acceptalladvertisements-2">acceptAllAdvertisements</a></code> to explicitly do it.</p>
-       <li> For each <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-present">present</a> member in <var>init</var>,
-          set <code>this</code>'s attribute with a matching identifier to the value of the member.
-          If the member’s type is <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a></code>,
-          pass its value through <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">BluetoothUUID.getService()</a></code> to get the value with which to initialize the attribute.
-          If any of these calls throw an exception,
+       <li> Initialize <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-manufacturerdata" id="ref-for-dom-bluetoothlescanfilter-manufacturerdata-1">manufacturerData</a></code> as <code>new BluetoothManufacturerDataFilter(<var>init</var>.<code class="idl"><a data-link-type="idl" href="index.html#dom-bluetoothlescanfilterinit-manufacturerdata">manufacturerData</a></code>)</code>. 
+       <li> Initialize <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-servicedata" id="ref-for-dom-bluetoothlescanfilter-servicedata-1">serviceData</a></code> as <code>new BluetoothManufacturerDataFilter(<var>init</var>.<code class="idl"><a data-link-type="idl" href="index.html#dom-bluetoothlescanfilterinit-servicedata">serviceData</a></code>)</code>. 
+       <li> If <code><var>init</var>.<code class="idl"><a data-link-type="idl" href="index.html#dom-bluetoothlescanfilterinit-services">services</a></code></code> is present,
+          initialize <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-services" id="ref-for-dom-bluetoothlescanfilter-services-1">services</a></code></code> as <code><code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">BluetoothUUID.getService</a></code>(<var>init</var>.<code class="idl"><a data-link-type="idl" href="index.html#dom-bluetoothlescanfilterinit-services">services</a></code></code>. 
+       <li> For each other <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-present">present</a> member in <var>init</var>,
+          set <code>this</code>'s attribute with a matching identifier to the value of the member. 
+       <li> If any of the above calls threw an exception,
           propagate that exception from this constructor. 
       </ol>
      </div>
@@ -1766,6 +1769,48 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
           in any <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-activescans-slot" id="ref-for-dom-bluetooth-activescans-slot-5">[[activeScans]]</a></code> set in the whole UA. 
       </ol>
      </div>
+     <div class="algorithm" data-algorithm="BluetoothManufacturerDataFilter(|init|)">
+      <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothManufacturerDataFilter" data-dfn-type="constructor" data-export="" id="dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter(<var>init</var>)</dfn> constructor, when invoked, MUST perform the following steps: </p>
+      <ol>
+       <li> If <var>init</var> is not present
+          or <code><var>init</var>.<code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a></code>()</code> is empty,
+          then <code>this</code> has no <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>.
+          Abort these steps. 
+       <li> Let <var>canonicalInit</var> be the <code>manufacturerData</code> field of the result of <a data-link-type="dfn" href="index.html#bluetoothlescanfilterinit-canonicalizing">canonicalizing</a> <code>{manufacturerData: <var>init</var>}</code>.
+          If this throws an exception,
+          propagate that exception from this constructor and abort these steps. 
+       <li> <code>this</code>'s <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a> map from each <var>key</var> in <code><var>canonicalInit</var>.<code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a></code>()</code>,
+          parsed as a base-10 integer,
+          to its value of <code>new <code class="idl"><a data-link-type="idl" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter-3">BluetoothDataFilter</a></code>(<var>canonicalInit</var>[<var>key</var>])</code>. 
+      </ol>
+     </div>
+     <div class="algorithm" data-algorithm="BluetoothServiceDataFilter(|init|)">
+      <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothServiceDataFilter" data-dfn-type="constructor" data-export="" id="dom-bluetoothservicedatafilter-bluetoothservicedatafilter">BluetoothServiceDataFilter(<var>init</var>)</dfn> constructor, when invoked, MUST perform the following steps: </p>
+      <ol>
+       <li> If <var>init</var> is not present
+          or <code><var>init</var>.<code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a></code>()</code> is empty,
+          then <code>this</code> has no <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>.
+          Abort these steps. 
+       <li> Let <var>canonicalInit</var> be the <code>serviceData</code> field of the result of <a data-link-type="dfn" href="index.html#bluetoothlescanfilterinit-canonicalizing">canonicalizing</a> <code>{serviceData: <var>init</var>}</code>.
+          If this throws an exception,
+          propagate that exception from this constructor and abort these steps. 
+       <li> <code>this</code>'s <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a> map from each <var>key</var> in <code><var>canonicalInit</var>.<code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a></code>()</code>,
+          to its value of <code>new <code class="idl"><a data-link-type="idl" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter-4">BluetoothDataFilter</a></code>(<var>canonicalInit</var>[<var>key</var>])</code>. 
+      </ol>
+     </div>
+     <div class="algorithm" data-algorithm="BluetoothDataFilter(|init|)">
+      <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDataFilter" data-dfn-type="constructor" data-export="" id="dom-bluetoothdatafilter-bluetoothdatafilter">BluetoothDataFilter(<var>init</var>)</dfn> constructor, when invoked, MUST perform the following steps: </p>
+      <ol>
+       <li> Let <var>canonicalInit</var> be
+          the result of <a data-link-type="dfn" href="index.html#bluetoothdatafilterinit-canonicalizing">canonicalizing</a> <var>init</var>.
+          If this throws an exception,
+          propagate that exception from this constructor and abort these steps. 
+       <li> Initialize <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdatafilter-dataprefix" id="ref-for-dom-bluetoothdatafilter-dataprefix-1">dataPrefix</a></code></code> as
+          a <a data-link-type="dfn" href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">read only ArrayBuffer</a> whose contents are <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a> by <code><var>canonicalInit</var>.<code class="idl"><a data-link-type="idl" href="index.html#dom-bluetoothdatafilterinit-dataprefix">dataPrefix</a></code></code>. 
+       <li> Initialize <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdatafilter-mask" id="ref-for-dom-bluetoothdatafilter-mask-1">mask</a></code></code> as
+          a <a data-link-type="dfn" href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">read only ArrayBuffer</a> whose contents are <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a> by <code><var>canonicalInit</var>.<code class="idl"><a data-link-type="idl" href="index.html#dom-bluetoothdatafilterinit-mask">mask</a></code></code>. 
+      </ol>
+     </div>
     </section>
     <section>
      <h3 class="heading settled" data-level="4.2" id="permission"><span class="secno">4.2. </span><span class="content">Permission to scan</span><a class="self-link" href="#permission"></a></h3>
@@ -1777,7 +1822,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
       <dd>
 <pre class="idl highlight def"><span class="kt">dictionary</span> <dfn class="nv dfn-paneled idl-code" data-dfn-type="dictionary" data-export="" id="dictdef-bluetoothlescanpermissiondescriptor">BluetoothLEScanPermissionDescriptor</dfn> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a> {
   // These match BluetoothLEScanOptions.
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit-3">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanpermissiondescriptor-filters">filters<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-filters"></a></dfn>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <dfn class="nv idl-code" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothlescanpermissiondescriptor-filters">filters<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-filters"></a></dfn>;
   <span class="kt">boolean</span> <dfn class="nv idl-code" data-default="false" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">keepRepeatedDevices<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices"></a></dfn> = <span class="kt">false</span>;
   <span class="kt">boolean</span> <dfn class="nv idl-code" data-default="false" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export="" data-type="boolean " id="dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements">acceptAllAdvertisements<a class="self-link" href="#dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements"></a></dfn> = <span class="kt">false</span>;
 };
@@ -1882,12 +1927,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
           and <code><var>filter</var>.namePrefix</code> is a prefix of it. 
        <li> If <code><var>filter</var>.serviceUUID</code> is non-<code>null</code>,
           it is equal to a <a data-link-type="dfn" href="#service-uuid" id="ref-for-service-uuid-1">Service UUID</a> in <var>event</var>. 
-       <li> If <code><var>filter</var>.manufacturerId</code> is non-<code>null</code>,
-          it is equal to the Company Identifier Code
-          in some <a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-1">Manufacturer Specific Data</a> in <var>event</var>. 
-       <li> If <code><var>filter</var>.serviceDataUUID</code> is non-<code>null</code>,
-          it is the 128-bit UUID representation of the UUID
-          in some <a data-link-type="dfn" href="#service-data" id="ref-for-service-data-1">Service Data</a> in <var>event</var>. 
+       <li> For each (<var>id</var>, <var>filter</var>) in <code><var>filter</var>.manufacturerData</code>’s <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>,
+          some <a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data-1">Manufacturer Specific Data</a> in <var>event</var> has a Company Identifier Code of <var>id</var>,
+          and whose array of bytes <a data-link-type="dfn" href="index.html#bluetoothdatafilterinit-matches">matches</a> <var>filter</var>. 
+       <li> For each (<var>uuid</var>, <var>filter</var>) in <code><var>filter</var>.serviceData</code>’s <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>,
+          some <a data-link-type="dfn" href="#service-data" id="ref-for-service-data-1">Service Data</a> in <var>event</var> has a UUID whose 128-bit representation is <var>uuid</var>,
+          and whose array of bytes <a data-link-type="dfn" href="index.html#bluetoothdatafilterinit-matches">matches</a> <var>filter</var>. 
       </ul>
      </div>
     </section>
@@ -2204,15 +2249,21 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <li><a href="#adv_ind">ADV_IND</a><span>, in §7</span>
    <li><a href="#advnonconnind">ADVNONCONNIND</a><span>, in §7</span>
    <li><a href="#advscanind">ADVSCANIND</a><span>, in §7</span>
+   <li><a href="#bluetoothdatafilter">BluetoothDataFilter</a><span>, in §4.1</span>
+   <li><a href="#dom-bluetoothdatafilter-bluetoothdatafilter">BluetoothDataFilter(init)</a><span>, in §4.1</span>
    <li><a href="#bluetoothlescan">BluetoothLEScan</a><span>, in §4.1</span>
    <li><a href="#dom-permissionname-bluetooth-le-scan">"bluetooth-le-scan"</a><span>, in §4.2</span>
    <li><a href="#bluetoothlescanfilter">BluetoothLEScanFilter</a><span>, in §4.1</span>
    <li><a href="#dom-bluetoothlescanfilter-bluetoothlescanfilter">BluetoothLEScanFilter(init)</a><span>, in §4.1</span>
-   <li><a href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a><span>, in §4</span>
    <li><a href="#dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</a><span>, in §4</span>
    <li><a href="#dictdef-bluetoothlescanpermissiondescriptor">BluetoothLEScanPermissionDescriptor</a><span>, in §4.2</span>
    <li><a href="#bluetoothlescanpermissionresult">BluetoothLEScanPermissionResult</a><span>, in §4.2</span>
+   <li><a href="#bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter</a><span>, in §4.1</span>
+   <li><a href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter(init)</a><span>, in §4.1</span>
+   <li><a href="#bluetoothservicedatafilter">BluetoothServiceDataFilter</a><span>, in §4.1</span>
+   <li><a href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter">BluetoothServiceDataFilter(init)</a><span>, in §4.1</span>
    <li><a href="#complete-local-name">Complete Local Name</a><span>, in §7</span>
+   <li><a href="#dom-bluetoothdatafilter-dataprefix">dataPrefix</a><span>, in §4.1</span>
    <li><a href="#device-address">Device Address</a><span>, in §7</span>
    <li>
     filters
@@ -2229,31 +2280,17 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
      <li><a href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">dict-member for BluetoothLEScanPermissionDescriptor</a><span>, in §4.2</span>
     </ul>
    <li><a href="#local-name">Local Name</a><span>, in §7</span>
-   <li>
-    manufacturerId
-    <ul>
-     <li><a href="#dom-bluetoothlescanfilterinit-manufacturerid">dict-member for BluetoothLEScanFilterInit</a><span>, in §4</span>
-     <li><a href="#dom-bluetoothlescanfilter-manufacturerid">attribute for BluetoothLEScanFilter</a><span>, in §4.1</span>
-    </ul>
+   <li><a href="#dom-bluetoothlescanfilter-manufacturerdata">manufacturerData</a><span>, in §4.1</span>
    <li><a href="#manufacturer-specific-data">Manufacturer Specific Data</a><span>, in §7</span>
+   <li><a href="#dom-bluetoothdatafilter-mask">mask</a><span>, in §4.1</span>
    <li>
     match
     <ul>
      <li><a href="#bluetoothlescan-match">dfn for BluetoothLEScan</a><span>, in §5.1</span>
      <li><a href="#bluetoothlescanfilter-match">dfn for BluetoothLEScanFilter</a><span>, in §5.1</span>
     </ul>
-   <li>
-    name
-    <ul>
-     <li><a href="#dom-bluetoothlescanfilterinit-name">dict-member for BluetoothLEScanFilterInit</a><span>, in §4</span>
-     <li><a href="#dom-bluetoothlescanfilter-name">attribute for BluetoothLEScanFilter</a><span>, in §4.1</span>
-    </ul>
-   <li>
-    namePrefix
-    <ul>
-     <li><a href="#dom-bluetoothlescanfilterinit-nameprefix">dict-member for BluetoothLEScanFilterInit</a><span>, in §4</span>
-     <li><a href="#dom-bluetoothlescanfilter-nameprefix">attribute for BluetoothLEScanFilter</a><span>, in §4.1</span>
-    </ul>
+   <li><a href="#dom-bluetoothlescanfilter-name">name</a><span>, in §4.1</span>
+   <li><a href="#dom-bluetoothlescanfilter-nameprefix">namePrefix</a><span>, in §4.1</span>
    <li><a href="#observer">Observer</a><span>, in §7</span>
    <li><a href="#passive-scanning">Passive Scanning</a><span>, in §7</span>
    <li><a href="#privacy-feature">Privacy Feature</a><span>, in §7</span>
@@ -2262,20 +2299,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <li><a href="#dom-bluetooth-requestlescan">requestLEScan(options)</a><span>, in §4</span>
    <li><a href="#dom-bluetoothdevice-returnedfromscans-slot">[[returnedFromScans]]</a><span>, in §6</span>
    <li><a href="#dom-bluetoothlescanpermissionresult-scans">scans</a><span>, in §4.2</span>
+   <li><a href="#dom-bluetoothlescanfilter-servicedata">serviceData</a><span>, in §4.1</span>
    <li><a href="#service-data">Service Data</a><span>, in §7</span>
-   <li>
-    serviceDataUUID
-    <ul>
-     <li><a href="#dom-bluetoothlescanfilterinit-servicedatauuid">dict-member for BluetoothLEScanFilterInit</a><span>, in §4</span>
-     <li><a href="#dom-bluetoothlescanfilter-servicedatauuid">attribute for BluetoothLEScanFilter</a><span>, in §4.1</span>
-    </ul>
+   <li><a href="#dom-bluetoothlescanfilter-services">services</a><span>, in §4.1</span>
    <li><a href="#service-uuid">Service UUID</a><span>, in §7</span>
-   <li>
-    serviceUUID
-    <ul>
-     <li><a href="#dom-bluetoothlescanfilterinit-serviceuuid">dict-member for BluetoothLEScanFilterInit</a><span>, in §4</span>
-     <li><a href="#dom-bluetoothlescanfilter-serviceuuid">attribute for BluetoothLEScanFilter</a><span>, in §4.1</span>
-    </ul>
    <li><a href="#shortened-local-name">Shortened Local Name</a><span>, in §7</span>
    <li><a href="#dom-bluetoothlescan-stop">stop()</a><span>, in §4.1</span>
   </ul>
@@ -2286,6 +2313,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
     <ul>
      <li><a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a>
      <li><a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
+     <li><a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
@@ -2329,7 +2357,16 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <li>
     <a data-link-type="biblio">[web-bluetooth]</a> defines the following terms:
     <ul>
+     <li><a href="index.html#dictdef-bluetoothdatafilterinit">BluetoothDataFilterInit</a>
+     <li><a href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>
+     <li><a href="index.html#bluetoothlescanfilterinit-canonicalizing">canonicalizing</a>
+     <li><a href="index.html#dom-bluetoothdatafilterinit-dataprefix">dataPrefix</a>
+     <li><a href="index.html#dom-bluetoothlescanfilterinit-manufacturerdata">manufacturerData</a>
+     <li><a href="index.html#dom-bluetoothdatafilterinit-mask">mask</a>
+     <li><a href="index.html#bluetoothdatafilterinit-matches">matches</a>
      <li><a href="index.html#dom-allowedbluetoothdevice-mayusegatt">mayUseGATT</a>
+     <li><a href="index.html#dom-bluetoothlescanfilterinit-servicedata">serviceData</a>
+     <li><a href="index.html#dom-bluetoothlescanfilterinit-services">services</a>
     </ul>
    <li>
     <a data-link-type="biblio">[web-bluetooth]</a> defines the following terms:
@@ -2337,13 +2374,13 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-permissionname-bluetooth">"bluetooth"</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">Bluetooth</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdevice">BluetoothDevice</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived">advertisementreceived</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device">bluetooth device</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event">fire an advertisementreceived event</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing">get the bluetoothdevice representing</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">getService(name)</a>
+     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">read only arraybuffer</a>
      <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device">same bluetooth device</a>
     </ul>
    <li>
@@ -2355,6 +2392,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
      <li><a href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a>
      <li><a href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>
      <li><a href="https://heycam.github.io/webidl/#unknownerror">UnknownError</a>
+     <li><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a>
+     <li><a href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>
      <li><a href="https://heycam.github.io/webidl/#dfn-present">present</a>
     </ul>
   </ul>
@@ -2388,16 +2427,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <dd>Mike West. <a href="https://w3c.github.io/webappsec-secure-contexts/">Secure Contexts</a>. 15 September 2016. CR. URL: <a href="https://w3c.github.io/webappsec-secure-contexts/">https://w3c.github.io/webappsec-secure-contexts/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
-<pre class="idl def"><span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a> {
-  <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-bluetoothlescanfilterinit-name">name</a>;
-  <span class="kt">DOMString</span> <a class="nv" data-type="DOMString " href="#dom-bluetoothlescanfilterinit-nameprefix">namePrefix</a>;
-  <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a class="nv" data-type="BluetoothServiceUUID " href="#dom-bluetoothlescanfilterinit-serviceuuid">serviceUUID</a>;
-  <span class="kt">unsigned</span> <span class="kt">short</span> <a class="nv" data-type="unsigned short " href="#dom-bluetoothlescanfilterinit-manufacturerid">manufacturerId</a>;
-  <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a> <a class="nv" data-type="BluetoothServiceUUID " href="#dom-bluetoothlescanfilterinit-servicedatauuid">serviceDataUUID</a>;
-};
-
-<span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</a> {
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanoptions-filters">filters</a>;
+<pre class="idl def"><span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</a> {
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanoptions-filters">filters</a>;
   <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-keeprepeateddevices">keepRepeatedDevices</a> = <span class="kt">false</span>;
   <span class="kt">boolean</span> <a class="nv idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-bluetoothlescanoptions-acceptalladvertisements">acceptAllAdvertisements</a> = <span class="kt">false</span>;
 };
@@ -2407,13 +2438,29 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
   <span class="kt">Promise</span>&lt;<a class="n" data-link-type="idl-name" href="#bluetoothlescan">BluetoothLEScan</a>> <a class="nv idl-code" data-link-type="method" href="#dom-bluetooth-requestlescan">requestLEScan</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanoptions">BluetoothLEScanOptions</a> <a class="nv" href="#dom-bluetooth-requestlescan-options-options">options</a>);
 };
 
-[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter">Constructor</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a> <a class="nv" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter-init-init">init</a>)]
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothdatafilter-bluetoothdatafilter">Constructor</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothdatafilterinit">BluetoothDataFilterInit</a> <a class="nv" href="#dom-bluetoothdatafilter-bluetoothdatafilter-init-init">init</a>)]
+<span class="kt">interface</span> <a class="nv" href="#bluetoothdatafilter">BluetoothDataFilter</a> {
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">ArrayBuffer</span> <a class="nv" data-readonly="" data-type="ArrayBuffer" href="#dom-bluetoothdatafilter-dataprefix">dataPrefix</a>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">ArrayBuffer</span> <a class="nv" data-readonly="" data-type="ArrayBuffer" href="#dom-bluetoothdatafilter-mask">mask</a>;
+};
+
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">Constructor</a>(<span class="kt">optional</span> <span class="kt">object</span> <a class="nv" href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-init-init">init</a>)]
+<span class="kt">interface</span> <a class="nv" href="#bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter</a> {
+  <span class="kt">readonly</span> <span class="kt">maplike</span>&lt;<span class="kt">unsigned</span> <span class="kt">short</span>, <a class="n" data-link-type="idl-name" href="#bluetoothdatafilter">BluetoothDataFilter</a>>;
+};
+
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter">Constructor</a>(<span class="kt">optional</span> <span class="kt">object</span> <a class="nv" href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter-init-init">init</a>)]
+<span class="kt">interface</span> <a class="nv" href="#bluetoothservicedatafilter">BluetoothServiceDataFilter</a> {
+  <span class="kt">readonly</span> <span class="kt">maplike</span>&lt;<a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>, <a class="n" data-link-type="idl-name" href="#bluetoothdatafilter">BluetoothDataFilter</a>>;
+};
+
+[<a class="nv idl-code" data-link-type="constructor" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter">Constructor</a>(<span class="kt">optional</span> <a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a> <a class="nv" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter-init-init">init</a>)]
 <span class="kt">interface</span> <a class="nv" href="#bluetoothlescanfilter">BluetoothLEScanFilter</a> {
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">DOMString</span>? <a class="nv" data-readonly="" data-type="DOMString?" href="#dom-bluetoothlescanfilter-name">name</a>;
   <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">DOMString</span>? <a class="nv" data-readonly="" data-type="DOMString?" href="#dom-bluetoothlescanfilter-nameprefix">namePrefix</a>;
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>? <a class="nv" data-readonly="" data-type="UUID?" href="#dom-bluetoothlescanfilter-serviceuuid">serviceUUID</a>;
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">unsigned</span> <span class="kt">short</span>? <a class="nv" data-readonly="" data-type="unsigned short?" href="#dom-bluetoothlescanfilter-manufacturerid">manufacturerId</a>;
-  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>? <a class="nv" data-readonly="" data-type="UUID?" href="#dom-bluetoothlescanfilter-servicedatauuid">serviceDataUUID</a>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <span class="kt">FrozenArray</span>&lt;<a class="n" data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>>? <a class="nv" data-readonly="" data-type="FrozenArray<UUID>?" href="#dom-bluetoothlescanfilter-services">services</a>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter</a> <a class="nv" data-readonly="" data-type="BluetoothManufacturerDataFilter" href="#dom-bluetoothlescanfilter-manufacturerdata">manufacturerData</a>;
+  <span class="kt">readonly</span> <span class="kt">attribute</span> <a class="n" data-link-type="idl-name" href="#bluetoothservicedatafilter">BluetoothServiceDataFilter</a> <a class="nv" data-readonly="" data-type="BluetoothServiceDataFilter" href="#dom-bluetoothlescanfilter-servicedata">serviceData</a>;
 };
 
 <span class="kt">interface</span> <a class="nv" href="#bluetoothlescan">BluetoothLEScan</a> {
@@ -2428,7 +2475,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
 
 <span class="kt">dictionary</span> <a class="nv" href="#dictdef-bluetoothlescanpermissiondescriptor">BluetoothLEScanPermissionDescriptor</a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a> {
   // These match BluetoothLEScanOptions.
-  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanpermissiondescriptor-filters">filters</a>;
+  <span class="kt">sequence</span>&lt;<a class="n" data-link-type="idl-name" href="index.html#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>> <a class="nv" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothlescanpermissiondescriptor-filters">filters</a>;
   <span class="kt">boolean</span> <a class="nv" data-default="false" data-type="boolean " href="#dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices">keepRepeatedDevices</a> = <span class="kt">false</span>;
   <span class="kt">boolean</span> <a class="nv" data-default="false" data-type="boolean " href="#dom-bluetoothlescanpermissiondescriptor-acceptalladvertisements">acceptAllAdvertisements</a> = <span class="kt">false</span>;
 };
@@ -2445,14 +2492,6 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <div class="issue"> Consider filtering the result to active scans that
               match the fields of the descriptor. <a href="#issue-should-query-filter"> ↵ </a></div>
   </div>
-  <aside class="dfn-panel" data-for="dictdef-bluetoothlescanfilterinit">
-   <b><a href="#dictdef-bluetoothlescanfilterinit">#dictdef-bluetoothlescanfilterinit</a></b><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit-1">4. Scanning for BLE advertisements</a>
-    <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit-2">4.1. Controlling a BLE scan</a>
-    <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit-3">4.2. Permission to scan</a>
-   </ul>
-  </aside>
   <aside class="dfn-panel" data-for="dictdef-bluetoothlescanoptions">
    <b><a href="#dictdef-bluetoothlescanoptions">#dictdef-bluetoothlescanoptions</a></b><b>Referenced in:</b>
    <ul>
@@ -2482,6 +2521,36 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
     <li><a href="#ref-for-dom-bluetooth-requestlescan-6">7. Terminology and conventions</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="bluetoothdatafilter">
+   <b><a href="#bluetoothdatafilter">#bluetoothdatafilter</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothdatafilter-1">4.1. Controlling a BLE scan</a> <a href="#ref-for-bluetoothdatafilter-2">(2)</a> <a href="#ref-for-bluetoothdatafilter-3">(3)</a> <a href="#ref-for-bluetoothdatafilter-4">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothdatafilter-dataprefix">
+   <b><a href="#dom-bluetoothdatafilter-dataprefix">#dom-bluetoothdatafilter-dataprefix</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothdatafilter-dataprefix-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothdatafilter-mask">
+   <b><a href="#dom-bluetoothdatafilter-mask">#dom-bluetoothdatafilter-mask</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothdatafilter-mask-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="bluetoothmanufacturerdatafilter">
+   <b><a href="#bluetoothmanufacturerdatafilter">#bluetoothmanufacturerdatafilter</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothmanufacturerdatafilter-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="bluetoothservicedatafilter">
+   <b><a href="#bluetoothservicedatafilter">#bluetoothservicedatafilter</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothservicedatafilter-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="bluetoothlescanfilter">
    <b><a href="#bluetoothlescanfilter">#bluetoothlescanfilter</a></b><b>Referenced in:</b>
    <ul>
@@ -2494,6 +2563,24 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <b><a href="#dom-bluetoothlescanfilter-name">#dom-bluetoothlescanfilter-name</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-name-1">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-services">
+   <b><a href="#dom-bluetoothlescanfilter-services">#dom-bluetoothlescanfilter-services</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanfilter-services-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-manufacturerdata">
+   <b><a href="#dom-bluetoothlescanfilter-manufacturerdata">#dom-bluetoothlescanfilter-manufacturerdata</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanfilter-manufacturerdata-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-servicedata">
+   <b><a href="#dom-bluetoothlescanfilter-servicedata">#dom-bluetoothlescanfilter-servicedata</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanfilter-servicedata-1">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothlescan">
@@ -2547,6 +2634,24 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-stop-1">4.1. Controlling a BLE scan</a> <a href="#ref-for-dom-bluetoothlescan-stop-2">(2)</a>
     <li><a href="#ref-for-dom-bluetoothlescan-stop-3">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">
+   <b><a href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothservicedatafilter-bluetoothservicedatafilter">
+   <b><a href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter">#dom-bluetoothservicedatafilter-bluetoothservicedatafilter</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter-1">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothdatafilter-bluetoothdatafilter">
+   <b><a href="#dom-bluetoothdatafilter-bluetoothdatafilter">#dom-bluetoothdatafilter-bluetoothdatafilter</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothdatafilter-bluetoothdatafilter-1">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-permissionname-bluetooth-le-scan">
