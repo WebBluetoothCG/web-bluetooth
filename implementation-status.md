@@ -18,23 +18,35 @@ Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
 getAvailability()         |           |         |     |       |         |
 Referring Device (Physical Web) |     |         |     |       |         |
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
+└ Service list            | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Manufacturer/Service data |         |         |     |       |         |
 └ acceptAllDevices        |           |         |     |       |         |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
-Permissions API Integration |         |         |     |       |         |
+permissions.request()     |           |         |     |       |         |
+permissions.query()       |           |         |     |       |         |
+permissions.revoke()      |           |         |     |       |         |
+watchAdvertisements()     |           |         |     |       |         |
+Persistent Device IDs     |           |         |     |       |         |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
-Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
-Get Primary Services List | ✓         | ✓      | ✓   | ✓     |         |
-Get Characteristics List  | ✓         | ✓       | ✓   | ✓     |         |
+getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     |         |
+getIncludedService*()     |           |         |     |       |         |
+getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     |         |
 Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
 Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
 Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Stop GATT Notifications   | ✓         | 54      |     | ✓     |         |
 {start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
-TypeError for bad UUIDs   | 55        | 55      | 55  | 55    |         |
+Descriptors               |           |         |     |       |         |
+Event bubbling            |           |         |     |       |         |
+Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
+Service Changed Event     |           |         |     |       |         |
+BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
+TypeError for bad UUIDs   | 55        | 55      | 55  | 55    | 55      |
+GATT Blacklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
+Low-latency Blacklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 
