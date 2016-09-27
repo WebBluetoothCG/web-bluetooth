@@ -11,29 +11,36 @@ Work is in progress:
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled, or the web page must have an [origin trial meta tag or header](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md) with a token requested from [http://bit.ly/WebBluetoothOriginTrial](http://bit.ly/WebBluetoothOriginTrial).
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
+## [GATT Communication API](https://webbluetoothcg.github.io/web-bluetooth/)
+
 Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
 getAvailability()         |           |         |     |       |         |
-Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       | See notes
+Referring Device (Physical Web) |     |         |     |       |         |
+Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Manufacturer/Service data |         |         |     |       |         |
 └ acceptAllDevices        |           |         |     |       |         |
-Referring Device (Physical Web) |     |         |     |       |         |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
+Permissions API Integration |         |         |     |       |         |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
-Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
-Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
-Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
-Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
-Stop GATT Notifications   | ✓         | 54      |     | ✓     |         |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
-Get Characteristics List  | ✓         | ✓       | ✓   | ✓     |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Get Primary Services List | ✓         | ✓      | ✓   | ✓     |         |
+Get Characteristics List  | ✓         | ✓       | ✓   | ✓     |         |
+Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
+Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
+Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
+Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
+Stop GATT Notifications   | ✓         | 54      |     | ✓     |         |
 {start,stop}Notifications returns `this` | 54 | 54 | 54 | 54  |         |
 TypeError for bad UUIDs   | 55        | 55      | 55  | 55    |         |
+
+## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
+
+Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
+------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
 Advertisements Scanning   |           |         |     |       |         |
-Permissions API Integration |         |         |     |       |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
 
