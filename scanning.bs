@@ -74,21 +74,38 @@ Markup Shorthands: css no, markdown yes
 spec: ECMAScript; urlPrefix: https://tc39.github.io/ecma262/#
     type: method
         text: Array.prototype.map; url: sec-array.prototype.map
+        text: [[OwnPropertyKeys]]; for: Object; url: sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys
     type: interface
         text: TypeError; url: sec-native-error-types-used-in-this-standard-typeerror
+
+spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
+    type: dfn
+        text: a copy of the bytes held; url: dfn-get-buffer-source-copy
+
 spec: web-bluetooth; urlPrefix: index.html#
+    type: dfn
+        text: canonicalizing
+            for: BluetoothDataFilterInit; url: bluetoothdatafilterinit-canonicalizing
+            for: BluetoothLEScanFilterInit; url: bluetoothlescanfilterinit-canonicalizing
+        for: BluetoothDataFilterInit; text: matches; url: bluetoothdatafilterinit-matches
+    type: dictionary; urlPrefix: dictdef-
+        text: BluetoothDataFilterInit
+        text: BluetoothLEScanFilterInit
     type: dict-member
         for: AllowedBluetoothDevice; text: mayUseGATT; url: dom-allowedbluetoothdevice-mayusegatt
+        for: BluetoothLEScanFilterInit; urlPrefix: dom-bluetoothlescanfilterinit-
+            text: manufacturerData
+            text: serviceData
+            text: services
+        for: BluetoothDataFilterInit; urlPrefix: dom-bluetoothdatafilterinit-
+            text: dataPrefix
+            text: mask
 </pre>
 <pre class="link-defaults">
-spec: html
+spec:web-bluetooth
     type: dfn
-        text: in parallel
-        text: queue a task
-        text: relevant settings object
-        text: responsible event loop
-        text: triggered by user activation
-spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
+        text: read only arraybuffer
+    type:enum-value; for:PermissionName; text:"bluetooth"
 </pre>
 
 <style>
@@ -131,10 +148,11 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
       </p>
       <pre highlight="js">
         function recordNearbyBeacon(major, minor, pathLossVs1m) { ... }
-        let myBeaconUuid = new Uint8Array([0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15]);
-
         navigator.bluetooth.<a idl for="Bluetooth" lt="requestLEScan()">requestLEScan</a>({
-          filters: [{manufacturerId: 0x004C}],
+          filters: [{manufacturerData: {0x004C: {dataPrefix: new Uint8Array([
+            0x02, 0x15, // iBeacon identifier.
+            0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15  // My beacon UUID.
+          ])}}}],
           options: {
             keepRepeatedDevices: true,
           }
@@ -143,17 +161,9 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
             let appleData = event.manufacturerData.get(<a
                 href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers"
                 title="Apple, Inc.'s Company Identifier">0x004C</a>);
-            if (appleData.byteLength != 23 ||
-                appleData.getUint16(0, false) !== 0x0215) {
+            if (appleData.byteLength != 23) {
               // Isn't an iBeacon.
               return;
-            }
-            let uuidArray = new Uint8Array(appleData.buffer, 2, 16);
-            for (let i = 0; i < 16; i++) {
-              if (uuidArray[i] != myBeaconUuid[i]) {
-                // Not my class of beacon.
-                return;
-              }
             }
             let major = appleData.getUint16(18, false);
             let minor = appleData.getUint16(20, false);
@@ -231,14 +241,6 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
   <h2 id="scanning">Scanning for BLE advertisements</h2>
 
   <pre class="idl">
-    dictionary BluetoothLEScanFilterInit {
-      DOMString name;
-      DOMString namePrefix;
-      BluetoothServiceUUID serviceUUID;
-      unsigned short manufacturerId;
-      BluetoothServiceUUID serviceDataUUID;
-    };
-
     dictionary BluetoothLEScanOptions {
       sequence&lt;BluetoothLEScanFilterInit> filters;
       boolean keepRepeatedDevices = false;
@@ -388,13 +390,29 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
     <h3 id="scan-control">Controlling a BLE scan</h3>
 
     <pre class="idl">
+      [Constructor(optional BluetoothDataFilterInit init)]
+      interface BluetoothDataFilter {
+        readonly attribute ArrayBuffer dataPrefix;
+        readonly attribute ArrayBuffer mask;
+      };
+
+      [Constructor(optional object init)]
+      interface BluetoothManufacturerDataFilter {
+        readonly maplike&lt;unsigned short, BluetoothDataFilter>;
+      };
+
+      [Constructor(optional object init)]
+      interface BluetoothServiceDataFilter {
+        readonly maplike&lt;UUID, BluetoothDataFilter>;
+      };
+
       [Constructor(optional BluetoothLEScanFilterInit init)]
       interface BluetoothLEScanFilter {
         readonly attribute DOMString? name;
         readonly attribute DOMString? namePrefix;
-        readonly attribute UUID? serviceUUID;
-        readonly attribute unsigned short? manufacturerId;
-        readonly attribute UUID? serviceDataUUID;
+        readonly attribute FrozenArray&lt;UUID>? services;
+        readonly attribute BluetoothManufacturerDataFilter manufacturerData;
+        readonly attribute BluetoothServiceDataFilter serviceData;
       };
 
       interface BluetoothLEScan {
@@ -423,7 +441,7 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
       </p>
       <ol class="algorithm">
         <li>
-          Initialize all fields to `null`.
+          Initialize all nullable fields to `null`.
         </li>
         <li>
           If no member of |init| is present, throw a {{TypeError}}.
@@ -432,12 +450,24 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
           Use {{BluetoothLEScanOptions/acceptAllAdvertisements}} to explicitly do it.
         </li>
         <li>
-          For each <a>present</a> member in |init|,
+          Initialize {{BluetoothLEScanFilter/manufacturerData}} as
+          <code>new BluetoothManufacturerDataFilter(|init|.{{BluetoothLEScanFilterInit/manufacturerData}})</code>.
+        </li>
+        <li>
+          Initialize {{BluetoothLEScanFilter/serviceData}} as
+          <code>new BluetoothManufacturerDataFilter(|init|.{{BluetoothLEScanFilterInit/serviceData}})</code>.
+        </li>
+        <li>
+          If <code>|init|.{{BluetoothLEScanFilterInit/services}}</code> is present,
+          initialize <code>this.{{BluetoothLEScanFilter/services}}</code> as
+          <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|init|.{{BluetoothLEScanFilterInit/services}}</code>.
+        </li>
+        <li>
+          For each other <a>present</a> member in |init|,
           set `this`'s attribute with a matching identifier to the value of the member.
-          If the member's type is {{BluetoothServiceUUID}},
-          pass its value through {{BluetoothUUID/getService()|BluetoothUUID.getService()}}
-          to get the value with which to initialize the attribute.
-          If any of these calls throw an exception,
+        </li>
+        <li>
+          If any of the above calls threw an exception,
           propagate that exception from this constructor.
         </li>
       </ol>
@@ -456,6 +486,86 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
           while still receiving any advertisements that
           <a for="BluetoothLEScan">match</a> any scan
           in any {{[[activeScans]]}} set in the whole UA.
+        </li>
+      </ol>
+    </div>
+
+    <div algorithm>
+      <p>
+        The <dfn constructor for="BluetoothManufacturerDataFilter">BluetoothManufacturerDataFilter(|init|)</dfn>
+        constructor, when invoked, MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If |init| is not present
+          or <code>|init|.{{Object/[[OwnPropertyKeys]]}}()</code> is empty,
+          then `this` has no <a>map entries</a>.
+          Abort these steps.
+        </li>
+        <li>
+          Let |canonicalInit| be the `manufacturerData` field of the result of
+          <a for="BluetoothLEScanFilterInit">canonicalizing</a> <code>{manufacturerData: |init|}</code>.
+          If this throws an exception,
+          propagate that exception from this constructor and abort these steps.
+        </li>
+        <li>
+          `this`'s <a>map entries</a> map from each |key| in
+          <code>|canonicalInit|.{{Object/[[OwnPropertyKeys]]}}()</code>,
+          parsed as a base-10 integer,
+          to its value of <code>new {{BluetoothDataFilter}}(|canonicalInit|[|key|])</code>.
+        </li>
+      </ol>
+    </div>
+
+    <div algorithm>
+      <p>
+        The <dfn constructor for="BluetoothServiceDataFilter">BluetoothServiceDataFilter(|init|)</dfn>
+        constructor, when invoked, MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          If |init| is not present
+          or <code>|init|.{{Object/[[OwnPropertyKeys]]}}()</code> is empty,
+          then `this` has no <a>map entries</a>.
+          Abort these steps.
+        </li>
+        <li>
+          Let |canonicalInit| be the `serviceData` field of the result of
+          <a for="BluetoothLEScanFilterInit">canonicalizing</a> <code>{serviceData: |init|}</code>.
+          If this throws an exception,
+          propagate that exception from this constructor and abort these steps.
+        </li>
+        <li>
+          `this`'s <a>map entries</a> map from each |key| in
+          <code>|canonicalInit|.{{Object/[[OwnPropertyKeys]]}}()</code>,
+          to its value of <code>new {{BluetoothDataFilter}}(|canonicalInit|[|key|])</code>.
+        </li>
+      </ol>
+    </div>
+
+    <div algorithm>
+      <p>
+        The <dfn constructor for="BluetoothDataFilter">BluetoothDataFilter(|init|)</dfn>
+        constructor, when invoked, MUST perform the following steps:
+      </p>
+      <ol>
+        <li>
+          Let |canonicalInit| be
+          the result of <a for="BluetoothDataFilterInit">canonicalizing</a> |init|.
+          If this throws an exception,
+          propagate that exception from this constructor and abort these steps.
+        </li>
+        <li>
+          Initialize <code>this.{{BluetoothDataFilter/dataPrefix}}</code> as
+          a <a>read only ArrayBuffer</a> whose contents are
+          <a>a copy of the bytes held</a> by
+          <code>|canonicalInit|.{{BluetoothDataFilterInit/dataPrefix}}</code>.
+        </li>
+        <li>
+          Initialize <code>this.{{BluetoothDataFilter/mask}}</code> as
+          a <a>read only ArrayBuffer</a> whose contents are
+          <a>a copy of the bytes held</a> by
+          <code>|canonicalInit|.{{BluetoothDataFilterInit/mask}}</code>.
         </li>
       </ol>
     </div>
@@ -677,14 +787,17 @@ spec:web-bluetooth-1; type:enum-value; for:PermissionName; text:"bluetooth"
           it is equal to a <a>Service UUID</a> in |event|.
         </li>
         <li>
-          If <code>|filter|.manufacturerId</code> is non-`null`,
-          it is equal to the Company Identifier Code
-          in some <a>Manufacturer Specific Data</a> in |event|.
+          For each (|id|, |filter|) in <code>|filter|.manufacturerData</code>'s <a>map entries</a>,
+          some <a>Manufacturer Specific Data</a> in |event|
+          has a Company Identifier Code of |id|,
+          and whose array of bytes <a for="BluetoothDataFilterInit">matches</a> |filter|.
         </li>
         <li>
-          If <code>|filter|.serviceDataUUID</code> is non-`null`,
-          it is the 128-bit UUID representation of the UUID
-          in some <a>Service Data</a> in |event|.
+          For each (|uuid|, |filter|) in
+          <code>|filter|.serviceData</code>'s <a>map entries</a>,
+          some <a>Service Data</a> in |event|
+          has a UUID whose 128-bit representation is |uuid|,
+          and whose array of bytes <a for="BluetoothDataFilterInit">matches</a> |filter|.
         </li>
       </ul>
     </div>
