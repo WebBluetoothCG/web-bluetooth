@@ -13,8 +13,8 @@ Work is in progress:
 
 ## [GATT Communication API](https://webbluetoothcg.github.io/web-bluetooth/)
 
-Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
-------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
+Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
+------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
 getAvailability()         |           |         |     |       |         |
 Referring Device (Physical Web) |     |         |     |       |         |
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
@@ -50,8 +50,8 @@ Low-latency Blacklist Updates | ✓     | ✓       | ✓   | ✓     | ✓     
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 
-Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS
-------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-:
+Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
+------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
 Advertisements Scanning   |           |         |     |       |         |
 
 Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/current-versions/](https://googlechrome.github.io/current-versions/).
@@ -67,6 +67,10 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
   * Note that Bluetooth daemon needs to run with experimental interfaces: `sudo /usr/sbin/bluetoothd -E`
 * [Windows](https://crbug.com/507419): Requires Windows 8.1.
   * Discover only manually paired devices.
+
+### Unsupported platforms
+
+* Android WebView: Will be supported in the future.
 * iOS: Uses the web exposed APIs as provided by the [WKWebView](https://developer.apple.com/library/ios/documentation/WebKit/Reference/WKWebView_Ref/), no implementation planned in the Chromium codebase.
 
 # Opera
