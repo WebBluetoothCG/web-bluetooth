@@ -11,10 +11,10 @@ Work is in progress:
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled, or the web page must have an [origin trial meta tag or header](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md) with a token requested from [http://bit.ly/WebBluetoothOriginTrial](http://bit.ly/WebBluetoothOriginTrial).
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 
-Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows | iOS | Android WebView 
-------------------------- | :-------: | :-----: | :-: | :---: | :-----: | :-: | ---------------
+Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
+------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
 getAvailability()         |           |         |     |       |         |
-Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       | See notes
+Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Manufacturer/Service data |         |         |     |       |         |
 └ acceptAllDevices        |           |         |     |       |         |
@@ -48,6 +48,10 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
   * Note that Bluetooth daemon needs to run with experimental interfaces: `sudo /usr/sbin/bluetoothd -E`
 * [Windows](https://crbug.com/507419): Requires Windows 8.1.
   * Discover only manually paired devices.
+
+### Unsupported platforms
+
+* Android WebView: Will be supported in the future.
 * iOS: Uses the web exposed APIs as provided by the [WKWebView](https://developer.apple.com/library/ios/documentation/WebKit/Reference/WKWebView_Ref/), no implementation planned in the Chromium codebase.
 
 # Opera
