@@ -1426,7 +1426,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-09-30">30 September 2016</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2016-10-10">10 October 2016</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1657,7 +1657,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
   console<span class="p">.</span>log<span class="p">(</span>parseHeartRate<span class="p">(</span>characteristic<span class="p">.</span><a class="idl-code" data-link-type="attribute" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value-1">value</a><span class="p">)</span><span class="p">)</span><span class="p">;</span>
 <span class="p">}</span>
 </pre>
-      <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><code>heart<em>rate</em>measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code> stored
+      <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"><code>heart_rate_measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a></code> stored
         in a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic-1">BluetoothRemoteGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value-2">value</a></code> field. </p>
 <pre class="highlight"><span class="kd">function</span> parseHeartRate<span class="p">(</span>data<span class="p">)</span> <span class="p">{</span>
   <span class="kd">let</span> flags <span class="o">=</span> data<span class="p">.</span>getUint8<span class="p">(</span><span class="mi">0</span><span class="p">)</span><span class="p">;</span>
@@ -2392,6 +2392,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
         Let <var>state</var> be <var>descriptor</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-state">permission state</a>. 
        <p class="note" role="note">Note: <var>state</var> will be <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a></code> in <a data-link-type="dfn" href="https://w3c.github.io/webappsec-secure-contexts/#non-secure-context">non-secure contexts</a> because <code class="idl"><a data-link-type="idl" href="#dom-permissionname-bluetooth" id="ref-for-dom-permissionname-bluetooth-1">"bluetooth"</a></code> doesn’t set the <a data-link-type="dfn" href="https://w3c.github.io/permissions/#allowed-in-non-secure-contexts">allowed in non-secure contexts</a> flag.</p>
       <li> If <var>state</var> is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a></code>, return <code>[]</code> and abort these steps. 
+      <li> If the UA can prove that no devices could possibly be found in the next step,
+        for example because there is no Bluetooth adapter with which to scan,
+        or because the filters can’t be matched by any possible advertising packet,
+        the UA MAY return <code>[]</code> and abort these steps. 
       <li> <a data-link-type="dfn" href="#scan-for-devices" id="ref-for-scan-for-devices-1">Scan for devices</a> with <var>requiredServiceUUIDs</var> as the <i>set of <a data-link-type="dfn" href="#service" id="ref-for-service-2">Service</a> UUIDs</i>,
         and let <var>scanResult</var> be the result. 
       <li> If <var>filters</var> isn’t null,
