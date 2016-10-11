@@ -45,6 +45,7 @@ Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         
 Service Changed Event     |           |         |     |       |         |
 BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
 TypeError for bad UUIDs   | 55        | 55      | 55  | 55    | 55      |
+Invalidate objects upon disconnect |  |         |     |       |         |
 GATT Blacklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
 Low-latency Blacklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
 
