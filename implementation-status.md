@@ -33,6 +33,7 @@ watchAdvertisements()     |           |         |     |       |         |
 Persistent Device IDs     |           |         |     |       |         |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
+Hanging connect() abortable by disconnect() |  | |    |       |         |
 getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     |         |
 getIncludedService*()     |           |         |     |       |         |
 getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     |         |
