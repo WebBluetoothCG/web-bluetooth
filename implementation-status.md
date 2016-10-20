@@ -10,6 +10,9 @@ Work is in progress:
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled, or the web page must have an [origin trial meta tag or header](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md) with a token requested from [http://bit.ly/WebBluetoothOriginTrial](http://bit.ly/WebBluetoothOriginTrial).
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
+* Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
+
+
 
 ## [GATT Communication API](https://webbluetoothcg.github.io/web-bluetooth/)
 
