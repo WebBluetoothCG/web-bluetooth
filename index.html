@@ -3503,6 +3503,14 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
        <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot-7">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
           return <var>promise</var>,
           and abort these steps. 
+       <li>
+         If the UA is currently using the Bluetooth system,
+          it MAY <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+          return <var>promise</var>,
+          and abort these steps. 
+        <p class="issue" id="issue-5b83e689"><a class="self-link" href="#issue-5b83e689"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+          but for now sites need to serialize their use of this API
+          and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
        <li> Add <var>promise</var> to <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot-1">[[activeAlgorithms]]</a></code></code>. 
        <li>
          Return <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: 
@@ -3804,6 +3812,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         <ol>
          <li> If the <code>Read</code> bit is not set
               in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-1">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps. 
+         <li>
+           If the UA is currently using the Bluetooth system,
+              it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
+          <p class="issue" id="issue-37151a33"><a class="self-link" href="#issue-37151a33"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
          <li> Use any combination of the sub-procedures in
               the <a data-link-type="dfn" href="#characteristic-value-read" id="ref-for-characteristic-value-read-1">Characteristic Value Read</a> procedure
               to retrieve the value of <var>characteristic</var>.
@@ -3842,6 +3856,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         <ol>
          <li> If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
               in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-2">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps. 
+         <li>
+           If the UA is currently using the Bluetooth system,
+              it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
+          <p class="issue" id="issue-37151a330"><a class="self-link" href="#issue-37151a330"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
          <li> Use any combination of the sub-procedures in
               the <a data-link-type="dfn" href="#characteristic-value-write" id="ref-for-characteristic-value-write-1">Characteristic Value Write</a> procedure
               to write <var>bytes</var> to <var>characteristic</var>.
@@ -3883,6 +3903,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties-3">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a></code> and abort these steps. 
        <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set-1">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth-2">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a> <var>promise</var> with <code>this</code> and abort these steps. 
        <li> If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-8">connected</a></code></code> is <code>false</code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
+       <li>
+         If the UA is currently using the Bluetooth system,
+          it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
+        <p class="issue" id="issue-5b83e6890"><a class="self-link" href="#issue-5b83e6890"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+          but for now sites need to serialize their use of this API
+          and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
        <li> Use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors-1">Characteristic Descriptors</a> procedures
           to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration-1">Client Characteristic Configuration</a> descriptor
           is set, matching the constraints
@@ -4060,6 +4086,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
        <li>
          Return a <code>this.characteristic.service.device.gatt</code>-<a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper-4">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>: 
         <ol>
+         <li>
+           If the UA is currently using the Bluetooth system,
+              it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
+          <p class="issue" id="issue-37151a331"><a class="self-link" href="#issue-37151a331"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
          <li> Use either the <a data-link-type="dfn" href="#read-characteristic-descriptors" id="ref-for-read-characteristic-descriptors-2">Read Characteristic Descriptors</a> or
               the <a data-link-type="dfn" href="#read-long-characteristic-descriptors" id="ref-for-read-long-characteristic-descriptors-1">Read Long Characteristic Descriptors</a> sub-procedure
               to retrieve the value of <var>descriptor</var>.
@@ -4095,6 +4127,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
        <li>
          Return a <code>this.characteristic.service.device.gatt</code>-<a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper-5">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps in parallel. 
         <ol>
+         <li>
+           If the UA is currently using the Bluetooth system,
+              it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
+          <p class="issue" id="issue-37151a332"><a class="self-link" href="#issue-37151a332"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
          <li> Use either the <a data-link-type="dfn" href="#write-characteristic-descriptors" id="ref-for-write-characteristic-descriptors-1">Write Characteristic Descriptors</a> or
               the <a data-link-type="dfn" href="#write-long-characteristic-descriptors" id="ref-for-write-long-characteristic-descriptors-1">Write Long Characteristic Descriptors</a> sub-procedure
               to write <var>bytes</var> to <var>descriptor</var>.
@@ -5900,9 +5938,27 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <div class="issue"> We need a way for a site to register to receive an event
     when an interesting device comes within range. <a href="#issue-e5c688d4"> ↵ </a></div>
    <div class="issue"> Such a generic event type belongs in <a data-link-type="biblio" href="#biblio-html">[HTML]</a> or <a data-link-type="biblio" href="#biblio-dom">[DOM]</a>, not here. <a href="#ValueEvent-too-generic"> ↵ </a></div>
+   <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+          but for now sites need to serialize their use of this API
+          and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-5b83e689"> ↵ </a></div>
+   <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-37151a33"> ↵ </a></div>
+   <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-37151a330"> ↵ </a></div>
+   <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+          but for now sites need to serialize their use of this API
+          and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-5b83e6890"> ↵ </a></div>
    <div class="issue"> <a data-link-type="dfn" href="#characteristic-extended-properties">Characteristic Extended Properties</a> isn’t clear whether
                   the extended properties are immutable for a given Characteristic.
                   If they are, the UA should be allowed to cache them. <a href="#issue-86b7fbfd"> ↵ </a></div>
+   <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-37151a331"> ↵ </a></div>
+   <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
+              but for now sites need to serialize their use of this API
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-37151a332"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="dictdef-bluetoothdatafilterinit">
    <b><a href="#dictdef-bluetoothdatafilterinit">#dictdef-bluetoothdatafilterinit</a></b><b>Referenced in:</b>
