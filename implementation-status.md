@@ -64,7 +64,6 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 
 * [Android](https://crbug.com/471536): Requires Android 6, Marshmallow or later.
  * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop and later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
- * [Android Chooser UI](https://crbug.com/436280) works but has some bugs.
 * [Mac](https://crbug.com/364359): Requires OS X Yosemite or later.
   * Some MacBooks may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and [BlueZ](http://www.bluez.org/) 5.41+ installed. Read [How to get Chrome Web Bluetooth working on Linux](https://acassis.wordpress.com/2016/06/28/how-to-get-chrome-web-bluetooth-working-on-linux/).
