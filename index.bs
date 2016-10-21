@@ -122,6 +122,34 @@ spec: html
   .argument-list { display: inline-block; vertical-align: top; }
   /* Show self-links for various elements. This is incompatible with nearby floats. */
   .note, .why, .example, .issue { overflow: inherit; }
+
+  .unstable::before {
+    content: "This section is not stable.";
+    float: right;
+    color: red;
+  }
+  .unstable {
+    background-image: url("data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' width='300' height='290'><text transform='rotate(-45)' text-anchor='middle' font-family='sans-serif' font-weight='bold' font-size='70' y='210' opacity='.1'>Unstable</text></svg>");
+    background-repeat: repeat
+  }
+
+ .unstable.example:not(.no-marker)::before {
+     content: "Example " counter(example) " (Unstable)";
+     float: none;
+ }
+
+ .note {
+     background-color: rgba(145, 235, 145, .2);
+ }
+ .example {
+     background-color: rgba(240, 230, 170, .2);
+ }
+ .def {
+     background-color: rgba(85, 170, 255, .2);
+ }
+ .issue {
+     background-color: rgba(235, 145, 145, .2);
+ }
 </style>
 
 <section>
@@ -578,7 +606,7 @@ spec: html
       for example when the user physically attaches or detaches an adapter,
       are reported through the {{availabilitychanged}} event.
     </p>
-    <p>
+    <p class="unstable">
       {{Bluetooth/referringDevice}} gives access to
       the device from which the user opened this page, if any.
       For example, an <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
@@ -606,18 +634,18 @@ spec: html
         have a name starting with <dfn dict-member for="BluetoothLEScanFilterInit">namePrefix</dfn>
         if that member is present,
       </li>
-      <li>
+      <li class="unstable">
         advertise <a>manufacturer specific data</a> matching all of the key/value pairs in
         <dfn dict-member for="BluetoothLEScanFilterInit">manufacturerData</dfn>
         if that member is present, and
       </li>
-      <li>
+      <li class="unstable">
         advertise <a>service data</a> matching all of the key/value pairs in
         <dfn dict-member for="BluetoothLEScanFilterInit">serviceData</dfn>
         if that member is present.
       </li>
     </ul>
-    <p link-for-hint="BluetoothDataFilterInit">
+    <p link-for-hint="BluetoothDataFilterInit" class="unstable">
       Both <a>Manufacturer Specific Data</a> and <a>Service Data</a>
       map a key to an array of bytes.
       {{BluetoothDataFilterInit}} filters these arrays.
@@ -631,7 +659,7 @@ spec: html
       and instead having the client discover some identifying GATT services,
       the website may need to include filters for both behaviors.
     </p>
-    <p>
+    <p class="unstable">
       In rare cases,
       a device may not advertise enough distinguishing information
       to let a site filter out uninteresting devices.
@@ -799,7 +827,7 @@ spec: html
     </table>
   </div>
 
-  <div class="example" id="example-filter-by-manufacturer-service-data">
+  <div class="example unstable" id="example-filter-by-manufacturer-service-data">
     <p>
       Say the devices in the <a href="#example-filter-by-services">previous example</a>
       also advertise manufacturer or service data as follows:
@@ -1047,6 +1075,7 @@ spec: html
     </tr>
   </table>
 
+  <div class="unstable">
   <p>
     Getting <code>navigator.bluetooth.<dfn attribute for="Bluetooth">referringDevice</dfn></code>
     must return {{[[referringDevice]]}}.
@@ -1087,6 +1116,7 @@ spec: html
         to |referringDeviceObj|.
       </li>
     </ol>
+  </div>
   </div>
 
   <div algorithm>
@@ -1698,7 +1728,7 @@ spec: html
     when an interesting device comes within range.
   </p>
 
-  <section>
+  <section class="unstable">
     <h3 id="permission-api-integration">Permission API Integration</h3>
 
     <p>
@@ -1991,7 +2021,7 @@ spec: html
     </dl>
   </section>
 
-  <section>
+  <section class="unstable">
     <h3 id="availability">Overall Bluetooth availability</h3>
 
     <p>
@@ -2368,7 +2398,7 @@ spec: html
       and should call {{unwatchAdvertisements()}} to stop using power as soon as possible.
     </p>
 
-    <div algorithm>
+    <div algorithm class="unstable">
       <p>
         The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code> method,
         when invoked,
@@ -2406,7 +2436,7 @@ spec: html
       </ol>
     </div>
 
-    <div algorithm>
+    <div algorithm class="unstable">
       <p>
         The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code> method,
         when invoked,
@@ -2425,7 +2455,7 @@ spec: html
       </ol>
     </div>
 
-    <section>
+    <section class="unstable">
       <h4 id="advertising-events">Responding to Advertising Events</h4>
 
       <p>
@@ -3612,7 +3642,7 @@ spec: html
       </blockquote>
     </div>
 
-    <div algorithm>
+    <div algorithm class="unstable">
       <p>
         The <code><dfn method for="BluetoothRemoteGATTService">getIncludedService(<var>service</var>)</dfn></code> method
         retrieves an <a>Included Service</a> inside this Service.
@@ -3628,7 +3658,7 @@ spec: html
       </blockquote>
     </div>
 
-    <div algorithm>
+    <div algorithm class="unstable">
       <p>
         The <code><dfn method for="BluetoothRemoteGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
         retrieves a list of <a>Included Service</a>s inside this Service.
@@ -3756,7 +3786,7 @@ spec: html
       </ol>
     </div>
 
-    <div algorithm>
+    <div algorithm class="unstable">
       <p>
         The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
         retrieves a <a>Descriptor</a> inside this Characteristic.
@@ -3772,7 +3802,7 @@ spec: html
       </blockquote>
     </div>
 
-    <div algorithm>
+    <div algorithm class="unstable">
       <p>
         The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
         retrieves a list of <a>Descriptor</a>s inside this Characteristic.
@@ -4186,7 +4216,7 @@ spec: html
     </section>
   </section>
 
-  <section>
+  <section class="unstable">
     <h3 oldids="bluetoothgattdescriptor"
         dfn-type="interface">BluetoothRemoteGATTDescriptor</h3>
 
@@ -4430,7 +4460,7 @@ spec: html
   <section>
     <h3 id="events">Events</h3>
 
-    <section>
+    <section class="unstable">
       <h4 id="bluetooth-tree" dfn-type="dfn">Bluetooth Tree</h4>
 
       <p>
@@ -4672,7 +4702,7 @@ spec: html
       </div>
     </section>
 
-    <section>
+    <section class="unstable">
       <h4 id="service-change-events">Responding to Service Changes</h4>
 
       <div algorithm="service changes">
