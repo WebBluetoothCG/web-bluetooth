@@ -42,7 +42,7 @@ Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
 Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Stop GATT Notifications   | ✓         | ✓      |     | ✓     |         |
-{start,stop}Notifications returns `this` | 54 | ✓ | ✓  | ✓   |         |
+{start,stop}Notifications returns `this` | ✓ | ✓ | ✓  | ✓   |         |
 Descriptors               |           |         |     |       |         |
 Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
