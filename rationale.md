@@ -131,3 +131,31 @@ Disconnection can easily take effect synchronously
 We're also not signaling any error conditions from the disconnection:
 if other operations were in flight, they'll return a NetworkError,
 which still allows the possibility that they took effect.
+
+## Why is the blacklist at https://github.com/WebBluetoothCG/registries a custom file format?
+
+The initial blacklist design desired the simplest solution that supported:
+- Comments
+- Pairs of validated UUIDs, possibly labeled with an exclusion tokens
+
+The minimal text file definition is simple, UUIDs are separated from tokens
+by only a space and listed one per line.
+There are no needs for additional structural parsing complexity.
+
+A solution such as JSON does not support comments, UUID or token validation,
+but adds structural parsing complexity.
+
+E.g.
+
+```
+00001812-0000-1000-8000-00805f9b34fb
+00002a02-0000-1000-8000-00805f9b34fb exclude-writes
+```
+
+```
+versus:
+{
+  "00001812-0000-1000-8000-00805f9b34fb": "excludes",
+  "00002a02-0000-1000-8000-00805f9b34fb": "exclude-writes"
+}
+```
