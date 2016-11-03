@@ -48,8 +48,8 @@ Service Changed Event     |           |         |     |       |         |
 BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
 TypeError for bad UUIDs   | 55        | 55      | 55  | 55    | 55      |
 Invalidate GATT attributes upon disconnect | 👷 | 👷    | 👷  | 👷    | 👷      |
-GATT Blacklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
-Low-latency Blacklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
+GATT Blocklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
+Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 

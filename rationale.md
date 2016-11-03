@@ -132,9 +132,9 @@ We're also not signaling any error conditions from the disconnection:
 if other operations were in flight, they'll return a NetworkError,
 which still allows the possibility that they took effect.
 
-## Why is the blacklist at https://github.com/WebBluetoothCG/registries a custom file format?
+## Why is the blocklist at https://github.com/WebBluetoothCG/registries a custom file format?
 
-The initial blacklist design desired the simplest solution that supported:
+The initial blocklist design desired the simplest solution that supported:
 - Comments
 - Pairs of validated UUIDs, possibly labeled with an exclusion tokens
 
