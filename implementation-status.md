@@ -6,13 +6,11 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2016-10-21**.
+* Notes updated **2016-11-02**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled, or the web page must have an [origin trial meta tag or header](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md) with a token requested from [http://bit.ly/WebBluetoothOriginTrial](http://bit.ly/WebBluetoothOriginTrial).
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
-
-
 
 ## [GATT Communication API](https://webbluetoothcg.github.io/web-bluetooth/)
 
@@ -24,7 +22,7 @@ Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓     
 └ Service list            | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Manufacturer/Service data |         |         |     |       |         |
-└ acceptAllDevices        |           |         |     |       |         |
+└ acceptAllDevices        | 👷        | 👷      | 👷  | 👷    | 👷      |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 permissions.request()     |           |         |     |       |         |
 permissions.query()       |           |         |     |       |         |
@@ -43,13 +41,13 @@ Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         
 Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Stop GATT Notifications   | ✓         | ✓      |     | ✓     |         |
 {start,stop}Notifications returns `this` | ✓ | ✓ | ✓  | ✓   |         |
-Descriptors               |           |         |     |       |         |
+Descriptors               | 👷        | 👷      |     | 👷    |         |
 Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Service Changed Event     |           |         |     |       |         |
 BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
 TypeError for bad UUIDs   | 55        | 55      | 55  | 55    | 55      |
-Invalidate objects upon disconnect |  |         |     |       |         |
+Invalidate GATT attributes upon disconnect | 👷 | 👷    | 👷  | 👷    | 👷      |
 GATT Blocklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
 Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
 

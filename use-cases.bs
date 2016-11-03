@@ -1,0 +1,300 @@
+<pre class='metadata'>
+Title: Web Bluetooth Use Cases
+Repository: WebBluetoothCG/web-bluetooth
+Status: CG-DRAFT
+ED: http://webbluetoothcg.github.io/web-bluetooth/use-cases.html
+Shortname: web-bluetooth
+Level: 1
+Editor: See contributors on GitHub, , https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors
+Abstract: This specification provides a collection of use cases for Bluetooth in the web platform.
+
+Group: web-bluetooth-cg
+!Participate: <a href="https://www.w3.org/community/web-bluetooth/">Join the W3C Community Group</a>
+!Participate: <a href="https://github.com/WebBluetoothCG/web-bluetooth">Fix the text through GitHub</a>
+!Participate: <a href="mailto:public-web-bluetooth@w3.org">public-web-bluetooth@w3.org</a> (<a href="https://lists.w3.org/Archives/Public/public-web-bluetooth/" rel="discussion">archives</a>)
+!Participate: <a href="irc://irc.w3.org:6665/#web-bluetooth">IRC: #web-bluetooth on W3C's IRC</a>
+
+Max ToC Depth: 2
+Markup Shorthands: css no, markdown yes
+</pre>
+
+<pre class=biblio>
+{
+  "BLUETOOTH42": {
+    "href": "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=286439",
+    "title": "BLUETOOTH SPECIFICATION Version 4.2",
+    "publisher": "Bluetooth SIG",
+    "date": "2 December 2014"
+  }
+}
+</pre>
+
+<section>
+  <h2 id="introduction">Introduction</h2>
+
+  <p>We intend to define an API that uses <a href="https://developer.bluetooth.org/">Bluetooth</a> to discover and communicate with devices.
+    This document collects use cases for such an API.
+</section>
+
+<section>
+  <h2 id="usecases_and_requirements">Use-Cases and Requirements</h2>
+  <section>
+    <h3 id="usecases">Use-Cases</h3>
+    <p>
+      These are potential use cases for Bluetooth in general,
+      but they may not all be supported in
+      the initial versions of the <a href="index.html">Web Bluetooth API</a>.
+
+    <section>
+      <h4 id="usecase_new_device_vendor_site">Designer of a new device writes a web page to control that device</h4>
+
+      <p>A group making a product like <a href="https://www.fitbit.com/">Fitbit</a>, a <a href="https://www.sportchalet.com/product/302090_3192991.do">heart rate monitor</a>, or a <a href="https://www.walmart.com/ip/37650811">singing lightbulb</a>
+        can write a web site that users can navigate to and control their device.
+
+      <p>Other devices include:
+      <ul>
+        <li>
+          <a href="http://amzn.com/B007HOGNLW">Bicycle cadence sensor</a>
+          (<a href="https://developer.bluetooth.org/gatt/profiles/Pages/ProfileViewer.aspx?u=org.bluetooth.profile.cycling_speed_and_cadence.xml">standard profile</a>)
+        <li><a href="http://www.barcodegiant.com/unitech/part-ms840-subbgc-sg.htm">Barcode scanner</a>
+        <li><a href="http://www.bhphotovideo.com/bnh/controller/home?sku=1024990&Q=&is=REG&A=details">BT security tags</a>
+        <li><a href="http://www.mobilefun.com/44028-parrot-flower-power-bluetooth-indooroutdoor-plant-sensor-green.htm">BT plant sensors</a>
+        <li>
+          <a href="http://www.bhphotovideo.com/bnh/controller/home?O=&sku=1014794&Q=&is=REG&A=details">Camera shutter remote</a>
+          (this may be a <a href="https://developer.bluetooth.org/gatt/profiles/Pages/ProfileViewer.aspx?u=org.bluetooth.profile.hid_over_gatt.xml">HID device</a>)
+        <li><a href="http://www.weatherconnection.com/product.asp?itmky=148800">BT weather station</a>
+        <li><a href="http://www.escali.com/smartconnect-kitchen-scale">BT kitchen scale</a>
+        <li><a href="http://www.houseofscuba.com/computers/com113.html">BT enabled dive logger</a>
+        <li><a href="http://www.thinkgeek.com/product/1898/">Robotic car</a>
+      </ul>
+    </section>
+
+    <section>
+      <h4 id="usecase_third_party_site">Third party  writes a web page to control a device</h4>
+
+      <p>
+        Not only original manufacturers should be able to interact with devices.
+        It should be possible to write a single page that can pull your heart rate data from
+        <a href="https://www.sportchalet.com/product/302090_3192991.do">lots</a>
+        <a href="http://www.heartratemonitorsusa.com/polar-h7-transmitter.html">of</a>
+        <a href="http://www.amazon.com/Jarv-Premium-Bluetooth%C2%AE-Monitor-Motorola/dp/B00GWSQFPS">different</a>
+        <a href="http://www.cellphoneshop.net/heartmonitor.html">heart</a>
+        <a href="http://www.wtek-usa.com/hs2bt_strapless_bluetooth_heart_rate_sensor.php">rate</a>
+        <a href="http://www.amazon.com/Wahoo-Heart-Monitor-iPhone-Android/dp/B006NZH0TU">monitors</a>.
+    </section>
+
+    <section>
+      <h4 id="usecase_lazy_scale">Bluetooth <abbr title="Low Energy">LE</abbr> scale begins advertising after the user has opened its web page.</h4>
+
+      <p>A user opens their <a href="https://www.amazon.com/WiTscale-S1-Bluetooth-Bathroom-Technology/dp/B009RGD6I6"><abbr title="Bluetooth Low Energy">BTLE</abbr> scale</a>'s website before they step onto their scale.
+        They may also be in range of several unrelated Bluetooth devices when they first open the website.
+        Stepping onto the scale turns on the Bluetooth transmitter, at which point the website begins pulling data from the scale.
+    </section>
+
+    <section>
+      <h4 id="usecase_device_url">Device advertised URL opened by user.</h4>
+
+      <p>As described in <a href="https://github.com/scottjenson/physical-web">Physical Web</a>, devices may advertise a URL for the convenience of users who wish to interact.
+        Launching an advertised URL loads a website with the device already paired and available for communication.</p>
+
+      <p>E.G. a user approaches a parking meter and wishes to make a payment.
+        They look at their mobile's user interface for nearby device discovery provided by the operating system, browser, or app.
+        Upon selecting the parking meter the web browser is launched with the URL provided by the parking meter.
+        The website is then able to communicate with the parking meter without requiring further pairing user interface.
+    </section>
+
+    <section>
+      <h4 id="usecase_nfc_handover">NFC Handover.</h4>
+
+      <p>
+        <em>Likely unsupported initially because of the immaturity of [[nfc]].</em>
+
+      <p>A website may already have established a <a href="https://en.wikipedia.org/wiki/Near_field_communication">Near Field Communication</a> (<abbr title="Near Field Communication">NFC</abbr>) channel with a device via [[nfc]] and then initiate a Bluetooth connection.
+          As security for communication with the device has already been established in the NFC channel the transition to Bluetooth communication may proceed without interrupting the user for pairing with the device.</p>
+
+      <p>E.G. a set of two users wish to play a game together.
+        They both load a given website which prompts to pair using NFC by tapping devices together.
+        Upon tapping the devices handover the connection from NFC to Bluetooth, enabling playing while sitting in the same room.
+    </section>
+
+    <section>
+      <h4 id="usecase_beacon">Beacons</h4>
+
+      <p>
+        <em>Likely unsupported initially because of
+          the <a href="#risk_class_pairing_data_leak">privacy risks</a>
+          of granting access to a class of devices.</em>
+
+      <p>
+        Bluetooth beacons can allow a web page to get precise indoor location or to detect distance to interesting physical objects.
+        <a href="http://en.wikipedia.org/wiki/IBeacon">iBeacon</a> and <a href="https://www.paypal.com/webapps/mpp/beacon">PayPal Beacons</a>
+        are particularly famous examples.
+    </section>
+
+    <section>
+      <h4 id="usecase_audio_control">Audio control</h4>
+
+      <p>
+        The process of playing audio to a Bluetooth speaker or
+        recording from a Bluetooth microphone should be handled by a combination of the
+        <code><a href="http://dev.w3.org/2011/webrtc/editor/getusermedia.html#enumerating-devices">navigator.mediaDevices</a></code> and
+        <a href="http://webaudio.github.io/web-audio-api/#AudioDestinationNode">WebAudio</a> APIs.
+        Websites shouldn't need to deal with the Bluetooth audio protocol
+        in order to simply play or record sound.
+        However, speakers and microphones can also expose a metadata channel,
+        for example to control hardware volume, balance,
+        or even report the position of the user's head.
+
+      <p>
+        A user should be able to pair a device to a site in a single interaction,
+        rather than needing separate actions for each API the site wants to use.
+        The site should be able to associate representations of the same device
+        across multiple APIs.
+    </section>
+  </section>
+
+  <section>
+    <h3 id="requirements_section">Requirements</h3>
+
+    <section>
+      <h4 id="req_request">The Bluetooth API must allow websites to request access to devices they know how to interact with.</h4>
+    </section>
+
+    <section>
+      <h4 id="req_watch">The Bluetooth API must allow websites to watch for new devices.</h4>
+    </section>
+
+    <section>
+      <h4 id="req_previous_action">The Bluetooth API should be able to pair a site with a device based on previous user action linking the two.</h4>
+
+      <p>
+        For example, an <abbr title="Operating System">OS</abbr> chooser in which the user selects a particular web site or a previously-consented NFC connection should be sufficient.
+        These may only be sufficient to pair for the duration of the session, rather than permanently.
+    </section>
+  </section>
+</section>
+
+<section>
+  <h2 id="security_privacy">Security and Privacy Considerations</h2>
+
+  <section>
+    <h3 id="risks">Risks</h3>
+
+    <section>
+      <h4 id="kernel_attack_surface">Exposes a larger kernel attack surface</h4>
+
+      <p>Bluetooth drivers are complex. Unless a very narrow, well-defined API is exposed to
+        websites through Web Bluetooth, this has the potential to expose a large kernel attack
+        surface to users. For sandboxed user agents, this attack surface would essentially be
+        exposed to the untrusted content, as arbitrary bytes would be controllable by the
+        renderer, unless a very narrow and well defined API is used and can be audited
+        carefully.</p>
+
+      <p>For example, compared to the
+        <a href="http://webaudio.github.io/web-audio-api/#AudioDestinationNode">WebAudio</a>
+        API, Bluetooth drivers are probably handle data in a much more complex way and with more
+        complicated abstractions. This leads to a much larger kernel surface area for
+        attackers.</p>
+    </section>
+
+    <section>
+      <h4 id="device_management_attacks">XSS and CSRF attacks on a device</h4>
+
+      <p>Even if a user only exposes a device to the correct origin, if that origin is not
+        correctly protected, they are exposing the device to XSS and CSRF attacks, where an
+        attacker could modify, delete, or read data from the device, not just the origin.
+        Expressing these risks to users will be a difficult task. This potentially could be
+        mitigated by requiring a user interaction for any explicit code to be executed, so in that
+        way it couldn't at least happen silently.</p>
+
+      <p>Currently, the Same Origin Policy basically makes it so even if a site is compromised,
+        the damage is limited to that origin (that is to say, your local browsing instance and the
+        server you're communicating with).  With the addition of Bluetooth or similar permissions,
+        all of a sudden, an XSS or CSRF potentially affects devices as well. In some ways, you can
+        think of this as an entirely new and privileged domain. Or, alternatively, you could view
+        the device as being added to the origin. In either case, communicating that to the user in
+        a meaningful way is going to be tough/impossible. This changes the promise user agents
+        have been making to users.</p>
+
+    </section>
+
+    <section>
+      <h4 id="risk_vulnerable_device">A malicious website could exploit a vulnerable device</h4>
+
+      <p>Like with [[WebGL]], we should expect that many Bluetooth devices were designed to be accessed only by trusted code.
+        Exposing them to the web will expose many more vulnerabilities which could result in anything from persistent misbehavior to complete reprogramming of the device's Bluetooth controller.
+        A reprogrammed Bluetooth controller could potentially turn around and attack the user's computer, for example by pretending to be a Bluetooth keyboard.
+    </section>
+
+    <section>
+      <h4 id="risk_unexpected_use">A website the user didn't expect gets access to personal data</h4>
+
+      <p>A user visits a news website and is shown articles based on data pulled from their diabetes monitor.
+    </section>
+
+    <section>
+      <h4 id="risk_unpaired_data_leak">A website learns the user's location by accessing devices that don't require pairing</h4>
+
+      <p>Some Bluetooth devices don't need to be paired in order for a computer to use them, often because they don't control any information that needs to be private from devices near them.
+        Without pairing between the website and the otherwise non-pairing device, casual surfing may leak private data about the user such as location identifying information from non-paired devices.
+
+        <p class="issue">Give a more detailed description here involving specific devices.
+    </section>
+
+    <section>
+      <h4 id="risk_class_pairing_data_leak">A website tracks the user's location by pairing to and accessing an entire class of devices</h4>
+
+      <p>
+        A store might offer details about an item using a Bluetooth device attached to a particular display.
+        If the site asks for access to this entire class of devices rather than the individual device,
+        and members of the device class are scattered around the environment,
+        the site is likely to be able to discover the user's location in most cases that the site is opened.
+      <p>
+        Giving access in the background (in a <a href="https://slightlyoff.github.io/ServiceWorker/spec/service_worker/index.html">Service Worker</a>)
+        would give the site the user's location even when it was closed.
+    </section>
+
+    <section>
+      <h4 id="risk_tracking">A website tracks a user across cookie reset using Bluetooth device IDs</h4>
+
+      <p>When a website with access to any Bluetooth device finds its cookies reset, it can connect the user back to their previous server data using the immutable, unique Bluetooth device ID.
+    </section>
+
+    <section>
+      <h4 id="risk_active_scan">Certain active scan requests allow tracking a device's location</h4>
+
+      <p>
+        When a BTLE Central or Observer device is scanning for advertising packets and receives one from a Peripheral or Broadcaster, it can send a "scan request" (<code>SCAN_REQ</code>) to the Peripheral in order to receive more data. ([[BLUETOOTH42]] 6.B.2.3.2.1)
+        The scan request may contain a persistent ID for the Central device, which would allow a malicious Peripheral to report the location of the Central device.
+        If a website causes enough active scanning and enough malicious Peripherals are scattered around the environment, this could allow tracking a device's location.
+        The "privacy feature" ([[BLUETOOTH42]] 3.C.10.7)) makes it more difficult to track devices by rotating their address every <code>T<sub>GAP</sub>(private_addr_int)</code> minutes (recommended to be 15 minutes: ([[BLUETOOTH42]] 3.C.17))).
+    </section>
+  </section>
+
+  <section>
+    <h3 id="secpriv_requirements">Security and Privacy Requirements</h3>
+
+    <section>
+      <h4 id="secprvreq_protocol_restriction">The Bluetooth API must only expose those parts of the general Bluetooth protocol that present an acceptable risk of exploit.</h4>
+
+      <p>The spec should provide guidance to implementers on ways to mitigate exploits further. For example, a mechanism similar to the <a href="https://www.khronos.org/webgl/wiki/BlacklistsAndWhitelists">GPU Blacklist</a> may be appropriate.
+    </section>
+
+    <section>
+      <h4 id="secprvreq_pairing">Users must explicitly grant particular websites access to particular devices, even if the device does not intrinsically require pairing.</h4>
+    </section>
+
+    <section>
+      <h4 id="secprvreq_tracking">The website-visible ID for any particular device must change when that website's cookies are reset.</h4>
+
+      <p class="issue">
+        This doesn't completely mitigate the risk,
+        since a malicious device can embed a unique ID in any other piece of the protocol it speaks.
+        Check with privacy folks if there's anything better we can do.
+    </section>
+
+    <section>
+      <h4 id="secprvreq_passive">Scans must either enable the Bluetooth privacy feature or must use passive scanning until the user has indicated interest in information from the active scan.</h4>
+    </section>
+  </section>
+</section>
