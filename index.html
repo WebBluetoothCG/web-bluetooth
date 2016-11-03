@@ -1577,7 +1577,7 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      <ol class="toc">
       <li><a href="#standardized-uuids"><span class="secno">6.1</span> <span class="content">Standardized UUIDs</span></a>
      </ol>
-    <li><a href="#the-gatt-blacklist"><span class="secno">7</span> <span class="content">The GATT Blacklist</span></a>
+    <li><a href="#the-gatt-blocklist"><span class="secno">7</span> <span class="content">The GATT Blocklist</span></a>
     <li><a href="#navigator-extensions"><span class="secno">8</span> <span class="content">Extensions to the Navigator Interface</span></a>
     <li><a href="#terminology"><span class="secno">9</span> <span class="content">Terminology and Conventions</span></a>
     <li><a href="#conformance"><span class="secno"></span> <span class="content"> Conformance</span></a>
@@ -1795,7 +1795,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
       the trusted operating system of a remote device.
       Human Interface Devices are a prominent example,
       where allowing a website to communicate would allow that site to log keystrokes.
-      This specification includes a <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-1">GATT blacklist</a> of
+      This specification includes a <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-1">GATT blocklist</a> of
       such vulnerable services, characteristics, and descriptors
       to prevent websites from taking advantage of them. </p>
      <p> We expect that many devices are vulnerable to unexpected data delivered to their radio.
@@ -2407,7 +2407,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
         <li> Let <var>optionalServiceUUIDs</var> be <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>optionalServices</var>, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-1">BluetoothUUID.getService</a></code>)</code>. 
         <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-2">BluetoothUUID.getService()</a></code> calls threw an exception,
             throw that exception and abort these steps. 
-        <li> Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-1">blacklisted</a>. 
+        <li> Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted-1">blocklisted</a>. 
        </ol>
       <li>
         Let <var>descriptor</var> be 
@@ -2478,7 +2478,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
         <li> If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-4">BluetoothUUID.getService()</a></code> calls
             threw an exception,
             throw that exception and abort these steps. 
-        <li> If any service in <var>services</var> is <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-2">blacklisted</a>,
+        <li> If any service in <var>services</var> is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted-2">blocklisted</a>,
             throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
         <li> Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>. 
        </ol>
@@ -2533,7 +2533,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
         <li> Let <var>service</var> be <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice-5">BluetoothUUID.getService</a></code>(<var>serviceName</var>)</code>. 
         <li> If the previous step threw an exception,
             throw that exception and abort these steps. 
-        <li> If <var>service</var> is <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-3">blacklisted</a>,
+        <li> If <var>service</var> is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted-3">blocklisted</a>,
             throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
         <li> Let <var>dataFilter</var> be <code><var>filter</var>.serviceData[<var>service</var>]</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-convert-ecmascript-to-idl-value">converted to an IDL value</a> of type <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothdatafilterinit" id="ref-for-dictdef-bluetoothdatafilterinit-4">BluetoothDataFilterInit</a></code>.
             If this conversion throws an exception, propagate it and abort these steps. 
@@ -3417,7 +3417,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
             set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
             If <var>uuidCanonicalizer</var> threw an exception,
             return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> that exception and abort these steps. 
-        <li> If <var>uuid</var> is present and is <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-4">blacklisted</a>,
+        <li> If <var>uuid</var> is present and is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted-4">blocklisted</a>,
             return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
         <li>
           Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>: 
@@ -3444,7 +3444,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
          <ul>
           <li>are within <a data-link-type="dfn" href="#represented" id="ref-for-represented-2">Represented</a>(<var>attribute</var>),
           <li>have a type described by <var>child type</var>,
-          <li>have a UUID that is not <a data-link-type="dfn" href="#blacklisted" id="ref-for-blacklisted-5">blacklisted</a>,
+          <li>have a UUID that is not <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted-5">blocklisted</a>,
           <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,
           <li> if <var>allowedUuids</var> is present and not <code>"all"</code>,
                 have a UUID in <var>allowedUuids</var>, and 
@@ -3829,7 +3829,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-readvalue">readValue()</dfn></code> method, when invoked,
         MUST run the following steps: </p>
       <ol>
-       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-reads" id="ref-for-blacklisted-for-reads-1">blacklisted for reads</a>,
+       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads-1">blocklisted for reads</a>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
        <li> If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-6">connected</a></code></code> is <code>false</code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
@@ -3869,7 +3869,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattcharacteristic-writevalue">writeValue(<var>value</var>)</dfn></code> method, when invoked,
         MUST run the following steps: </p>
       <ol>
-       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-writes" id="ref-for-blacklisted-for-writes-1">blacklisted for writes</a>,
+       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes-1">blocklisted for writes</a>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
        <li> Let <var>bytes</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a> by <code><var>value</var></code>. 
        <li> If <var>bytes</var> is more than 512 bytes long
@@ -3924,7 +3924,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         MUST return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>.
         See <a href="#notification-events">§5.6.4 Responding to Notifications and Indications</a> for details of receiving notifications. </p>
       <ol>
-       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-reads" id="ref-for-blacklisted-for-reads-2">blacklisted for reads</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
+       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads-2">blocklisted for reads</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
        <li> Let <var>characteristic</var> be <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot-5">[[representedCharacteristic]]</a></code></code>. 
        <li> If <var>characteristic</var> is <code>null</code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror">InvalidStateError</a></code> and
@@ -4105,7 +4105,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattdescriptor-readvalue">readValue()</dfn></code> method, when invoked,
         MUST run the following steps: </p>
       <ol>
-       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-reads" id="ref-for-blacklisted-for-reads-3">blacklisted for reads</a>,
+       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads-3">blocklisted for reads</a>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
        <li> If <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected-9">connected</a></code></code> is <code>false</code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
@@ -4142,7 +4142,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="method" data-export="" id="dom-bluetoothremotegattdescriptor-writevalue">writeValue(<var>value</var>)</dfn></code> method, when invoked,
         MUST  run the following steps: </p>
       <ol>
-       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blacklisted-for-writes" id="ref-for-blacklisted-for-writes-2">blacklisted for writes</a>,
+       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes-2">blocklisted for writes</a>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror">SecurityError</a></code> and abort these steps. 
        <li> Let <var>bytes</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a> by <code><var>value</var></code>. 
        <li> If <var>bytes</var> is more than 512 bytes long
@@ -4622,11 +4622,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     </section>
    </section>
    <section>
-    <h2 class="heading settled" data-level="7" id="the-gatt-blacklist"><span class="secno">7. </span><span class="content">The GATT Blacklist</span><a class="self-link" href="#the-gatt-blacklist"></a></h2>
-    <p> This specification relies on a blacklist file in the <a href="https://github.com/WebBluetoothCG/registries">https://github.com/WebBluetoothCG/registries</a> repository
+    <h2 class="heading settled" data-level="7" id="the-gatt-blocklist"><span class="secno">7. </span><span class="content">The GATT Blocklist</span><a class="self-link" href="#the-gatt-blocklist"></a></h2>
+    <p> This specification relies on a blocklist file in the <a href="https://github.com/WebBluetoothCG/registries">https://github.com/WebBluetoothCG/registries</a> repository
     to restrict the set of GATT attributes a website can access. </p>
-    <div class="algorithm" data-algorithm="parsing the blacklist">
-     <p> The result of <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="parsing-the-blacklist">parsing the blacklist</dfn> at a URL <var>url</var> is a map from <a data-link-type="dfn" href="#valid-uuid" id="ref-for-valid-uuid-8">valid UUID</a>s to tokens, or an error,
+    <div class="algorithm" data-algorithm="parsing the blocklist">
+     <p> The result of <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="parsing-the-blocklist">parsing the blocklist</dfn> at a URL <var>url</var> is a map from <a data-link-type="dfn" href="#valid-uuid" id="ref-for-valid-uuid-8">valid UUID</a>s to tokens, or an error,
       produced by the following algorithm: </p>
      <ol>
       <li>Fetch <var>url</var>, and let <var>contents</var> be its body, decoded as UTF-8.
@@ -4652,19 +4652,19 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <li>Return <var>result</var>.
      </ol>
     </div>
-    <p> The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="gatt-blacklist">GATT blacklist</dfn> is the result of <a data-link-type="dfn" href="#parsing-the-blacklist" id="ref-for-parsing-the-blacklist-1">parsing the blacklist</a> at <a href="https://github.com/WebBluetoothCG/registries/blob/master/gatt_blacklist.txt">https://github.com/WebBluetoothCG/registries/blob/master/gatt_blacklist.txt</a>.
-    The UA should re-fetch the blacklist periodically, but it’s unspecified how often. </p>
-    <p> A <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-8">UUID</a> is <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="blacklisted">blacklisted</dfn> if either
-    the <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-2">GATT blacklist</a>’s value is an error,
-    or the UUID maps to "<code>exclude</code>" in the <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-3">GATT blacklist</a>. </p>
-    <p> A <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-9">UUID</a> is <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="blacklisted-for-reads">blacklisted for reads</dfn> if either
-    the <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-4">GATT blacklist</a>’s value is an error,
+    <p> The <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="gatt-blocklist">GATT blocklist</dfn> is the result of <a data-link-type="dfn" href="#parsing-the-blocklist" id="ref-for-parsing-the-blocklist-1">parsing the blocklist</a> at <a href="https://github.com/WebBluetoothCG/registries/blob/master/gatt_blocklist.txt">https://github.com/WebBluetoothCG/registries/blob/master/gatt_blocklist.txt</a>.
+    The UA should re-fetch the blocklist periodically, but it’s unspecified how often. </p>
+    <p> A <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-8">UUID</a> is <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="blocklisted">blocklisted</dfn> if either
+    the <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-2">GATT blocklist</a>’s value is an error,
+    or the UUID maps to "<code>exclude</code>" in the <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-3">GATT blocklist</a>. </p>
+    <p> A <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-9">UUID</a> is <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="blocklisted-for-reads">blocklisted for reads</dfn> if either
+    the <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-4">GATT blocklist</a>’s value is an error,
     or the UUID maps to either "<code>exclude</code>" or "<code>exclude-reads</code>"
-    in the <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-5">GATT blacklist</a>. </p>
-    <p> A <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-10">UUID</a> is <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="blacklisted-for-writes">blacklisted for writes</dfn> if either
-    the <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-6">GATT blacklist</a>’s value is an error,
+    in the <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-5">GATT blocklist</a>. </p>
+    <p> A <a data-link-type="dfn" href="#uuid" id="ref-for-uuid-10">UUID</a> is <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="blocklisted-for-writes">blocklisted for writes</dfn> if either
+    the <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-6">GATT blocklist</a>’s value is an error,
     or the UUID maps to either "<code>exclude</code>" or "<code>exclude-writes</code>"
-    in the <a data-link-type="dfn" href="#gatt-blacklist" id="ref-for-gatt-blacklist-7">GATT blacklist</a>. </p>
+    in the <a data-link-type="dfn" href="#gatt-blocklist" id="ref-for-gatt-blocklist-7">GATT blocklist</a>. </p>
    </section>
    <section>
     <h2 class="heading settled" data-level="8" id="navigator-extensions"><span class="secno">8. </span><span class="content">Extensions to the Navigator Interface</span><a class="self-link" href="#navigator-extensions"></a></h2>
@@ -5231,9 +5231,9 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#dom-bluetoothcharacteristicproperties-authenticatedsignedwrites">authenticatedSignedWrites</a><span>, in §5.4.1</span>
    <li><a href="#eventdef-bluetooth-availabilitychanged">availabilitychanged</a><span>, in §5.6.2</span>
    <li><a href="#bd_addr">BD_ADDR</a><span>, in §9</span>
-   <li><a href="#blacklisted">blacklisted</a><span>, in §7</span>
-   <li><a href="#blacklisted-for-reads">blacklisted for reads</a><span>, in §7</span>
-   <li><a href="#blacklisted-for-writes">blacklisted for writes</a><span>, in §7</span>
+   <li><a href="#blocklisted">blocklisted</a><span>, in §7</span>
+   <li><a href="#blocklisted-for-reads">blocklisted for reads</a><span>, in §7</span>
+   <li><a href="#blocklisted-for-writes">blocklisted for writes</a><span>, in §7</span>
    <li><a href="#bluetooth">Bluetooth</a><span>, in §3</span>
    <li><a href="#dom-navigator-bluetooth">bluetooth</a><span>, in §8</span>
    <li><a href="#dom-permissionname-bluetooth">"bluetooth"</a><span>, in §3.1</span>
@@ -5348,7 +5348,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#generic-attribute-profile">GATT</a><span>, in §9</span>
    <li><a href="#dom-bluetoothdevice-gatt-slot">[[gatt]]</a><span>, in §4.2</span>
    <li><a href="#dom-bluetoothdevice-gatt">gatt</a><span>, in §4.2</span>
-   <li><a href="#gatt-blacklist">GATT blacklist</a><span>, in §7</span>
+   <li><a href="#gatt-blocklist">GATT blocklist</a><span>, in §7</span>
    <li><a href="#gatt-client">GATT Client</a><span>, in §9</span>
    <li><a href="#gatt-procedure">GATT procedure</a><span>, in §9</span>
    <li><a href="#gatt-procedure">GATT procedures</a><span>, in §9</span>
@@ -5419,7 +5419,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
      <li><a href="#dom-requestdeviceoptions-optionalservices">dict-member for RequestDeviceOptions</a><span>, in §3</span>
      <li><a href="#dom-bluetoothpermissiondescriptor-optionalservices">dict-member for BluetoothPermissionDescriptor</a><span>, in §3.1</span>
     </ul>
-   <li><a href="#parsing-the-blacklist">parsing the blacklist</a><span>, in §7</span>
+   <li><a href="#parsing-the-blocklist">parsing the blocklist</a><span>, in §7</span>
    <li><a href="#passive-scanning">Passive Scanning</a><span>, in §9</span>
    <li><a href="#peripheral">Peripheral</a><span>, in §9</span>
    <li><a href="#populate-the-bluetooth-cache">populate the Bluetooth cache</a><span>, in §5.1.2</span>
@@ -7056,7 +7056,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <ul>
     <li><a href="#ref-for-valid-uuid-1">6. UUIDs</a> <a href="#ref-for-valid-uuid-2">(2)</a> <a href="#ref-for-valid-uuid-3">(3)</a>
     <li><a href="#ref-for-valid-uuid-4">6.1. Standardized UUIDs</a> <a href="#ref-for-valid-uuid-5">(2)</a> <a href="#ref-for-valid-uuid-6">(3)</a> <a href="#ref-for-valid-uuid-7">(4)</a>
-    <li><a href="#ref-for-valid-uuid-8">7. The GATT Blacklist</a> <a href="#ref-for-valid-uuid-9">(2)</a> <a href="#ref-for-valid-uuid-10">(3)</a>
+    <li><a href="#ref-for-valid-uuid-8">7. The GATT Blocklist</a> <a href="#ref-for-valid-uuid-9">(2)</a> <a href="#ref-for-valid-uuid-10">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothuuid-canonicaluuid">
@@ -7121,38 +7121,38 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     <li><a href="#ref-for-dom-bluetoothuuid-getdescriptor-3">6.1. Standardized UUIDs</a> <a href="#ref-for-dom-bluetoothuuid-getdescriptor-4">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getdescriptor-5">(3)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="parsing-the-blacklist">
-   <b><a href="#parsing-the-blacklist">#parsing-the-blacklist</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="parsing-the-blocklist">
+   <b><a href="#parsing-the-blocklist">#parsing-the-blocklist</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-parsing-the-blacklist-1">7. The GATT Blacklist</a>
+    <li><a href="#ref-for-parsing-the-blocklist-1">7. The GATT Blocklist</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="gatt-blacklist">
-   <b><a href="#gatt-blacklist">#gatt-blacklist</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="gatt-blocklist">
+   <b><a href="#gatt-blocklist">#gatt-blocklist</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-gatt-blacklist-1">2.3. Attacks on devices</a>
-    <li><a href="#ref-for-gatt-blacklist-2">7. The GATT Blacklist</a> <a href="#ref-for-gatt-blacklist-3">(2)</a> <a href="#ref-for-gatt-blacklist-4">(3)</a> <a href="#ref-for-gatt-blacklist-5">(4)</a> <a href="#ref-for-gatt-blacklist-6">(5)</a> <a href="#ref-for-gatt-blacklist-7">(6)</a>
+    <li><a href="#ref-for-gatt-blocklist-1">2.3. Attacks on devices</a>
+    <li><a href="#ref-for-gatt-blocklist-2">7. The GATT Blocklist</a> <a href="#ref-for-gatt-blocklist-3">(2)</a> <a href="#ref-for-gatt-blocklist-4">(3)</a> <a href="#ref-for-gatt-blocklist-5">(4)</a> <a href="#ref-for-gatt-blocklist-6">(5)</a> <a href="#ref-for-gatt-blocklist-7">(6)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="blacklisted">
-   <b><a href="#blacklisted">#blacklisted</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="blocklisted">
+   <b><a href="#blocklisted">#blocklisted</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-blacklisted-1">3. Device Discovery</a> <a href="#ref-for-blacklisted-2">(2)</a> <a href="#ref-for-blacklisted-3">(3)</a>
-    <li><a href="#ref-for-blacklisted-4">5.1.3. Navigating the Bluetooth Hierarchy</a> <a href="#ref-for-blacklisted-5">(2)</a>
+    <li><a href="#ref-for-blocklisted-1">3. Device Discovery</a> <a href="#ref-for-blocklisted-2">(2)</a> <a href="#ref-for-blocklisted-3">(3)</a>
+    <li><a href="#ref-for-blocklisted-4">5.1.3. Navigating the Bluetooth Hierarchy</a> <a href="#ref-for-blocklisted-5">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="blacklisted-for-reads">
-   <b><a href="#blacklisted-for-reads">#blacklisted-for-reads</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="blocklisted-for-reads">
+   <b><a href="#blocklisted-for-reads">#blocklisted-for-reads</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-blacklisted-for-reads-1">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-blacklisted-for-reads-2">(2)</a>
-    <li><a href="#ref-for-blacklisted-for-reads-3">5.5. BluetoothRemoteGATTDescriptor</a>
+    <li><a href="#ref-for-blocklisted-for-reads-1">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-blocklisted-for-reads-2">(2)</a>
+    <li><a href="#ref-for-blocklisted-for-reads-3">5.5. BluetoothRemoteGATTDescriptor</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="blacklisted-for-writes">
-   <b><a href="#blacklisted-for-writes">#blacklisted-for-writes</a></b><b>Referenced in:</b>
+  <aside class="dfn-panel" data-for="blocklisted-for-writes">
+   <b><a href="#blocklisted-for-writes">#blocklisted-for-writes</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-blacklisted-for-writes-1">5.4. BluetoothRemoteGATTCharacteristic</a>
-    <li><a href="#ref-for-blacklisted-for-writes-2">5.5. BluetoothRemoteGATTDescriptor</a>
+    <li><a href="#ref-for-blocklisted-for-writes-1">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-blocklisted-for-writes-2">5.5. BluetoothRemoteGATTDescriptor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-navigator-bluetooth">
@@ -7206,7 +7206,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     <li><a href="#ref-for-uuid-2">4.2.1. Responding to Advertising Events</a>
     <li><a href="#ref-for-uuid-3">5.1. GATT Information Model</a>
     <li><a href="#ref-for-uuid-4">6. UUIDs</a> <a href="#ref-for-uuid-5">(2)</a> <a href="#ref-for-uuid-6">(3)</a> <a href="#ref-for-uuid-7">(4)</a>
-    <li><a href="#ref-for-uuid-8">7. The GATT Blacklist</a> <a href="#ref-for-uuid-9">(2)</a> <a href="#ref-for-uuid-10">(3)</a>
+    <li><a href="#ref-for-uuid-8">7. The GATT Blocklist</a> <a href="#ref-for-uuid-9">(2)</a> <a href="#ref-for-uuid-10">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="uuid-alias">
