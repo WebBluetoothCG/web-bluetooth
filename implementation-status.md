@@ -6,7 +6,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2016-11-14**.
+* Notes updated **2016-12-12**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-web-bluetooth` flag must be enabled, or the web page must have an [origin trial meta tag or header](https://github.com/jpchase/OriginTrials/blob/gh-pages/developer-guide.md) with a token requested from [http://bit.ly/WebBluetoothOriginTrial](http://bit.ly/WebBluetoothOriginTrial).
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
@@ -46,7 +46,7 @@ Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Service Changed Event     |           |         |     |       |         |
 BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
-TypeError for bad UUIDs   | 55        | 55      | 55  | 55    | 55      |
+TypeError for bad UUIDs   | ✓         | ✓       | ✓   | ✓     | ✓       |
 Invalidate GATT attributes upon disconnect | 56 | 56    | 56  | 56    | 56      |
 GATT Blocklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
 Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
