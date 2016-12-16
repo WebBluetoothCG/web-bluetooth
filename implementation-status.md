@@ -41,7 +41,7 @@ Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         
 Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Stop GATT Notifications   | ✓         | ✓      |     | ✓     |         |
 {start,stop}Notifications returns `this` | ✓ | ✓ | ✓  | ✓   |         |
-Descriptors               | 👷        | 👷      |     | 👷    |         |
+Descriptors               | 👷        | 👷      | 👷  | 👷    |         |
 Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Service Changed Event     |           |         |     |       |         |
