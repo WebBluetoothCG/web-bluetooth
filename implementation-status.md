@@ -22,7 +22,7 @@ Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓     
 └ Service list            | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Manufacturer/Service data |         |         |     |       |         |
-└ acceptAllDevices        | 56        | 56      | 56  | 56    | 56      |
+└ acceptAllDevices        | 56        | 56      | ✓   | ✓     | ✓      |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 permissions.request()     |           |         |     |       |         |
 permissions.query()       |           |         |     |       |         |
@@ -47,7 +47,7 @@ Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         
 Service Changed Event     |           |         |     |       |         |
 BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
 TypeError for bad UUIDs   | ✓         | ✓       | ✓   | ✓     | ✓       |
-Invalidate GATT attributes upon disconnect | 56 | 56    | 56  | 56    | 56      |
+Invalidate GATT attributes upon disconnect | 56 | 56    | ✓   | ✓     | ✓     |
 GATT Blocklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
 Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
 
