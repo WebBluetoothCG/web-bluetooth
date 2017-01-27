@@ -75,6 +75,8 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 * Android WebView: Will be supported in the future.
 * iOS: Uses the web exposed APIs as provided by the [WKWebView](https://developer.apple.com/library/ios/documentation/WebKit/Reference/WKWebView_Ref/), no implementation planned in the Chromium codebase.
 
+Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app for iOS that supports the GATT Communication API. It was created initially for the [Puck.js project](https://www.espruino.com/Puck.js+Quick+Start#ios-iphone-ipad-).
+
 # Opera
 Same as Chrome unless specified otherwise
 
