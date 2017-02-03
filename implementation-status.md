@@ -6,7 +6,7 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2017-01-27**.
+* Notes updated **2017-02-02**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled on Linux. In Chrome OS, Android, and Mac, the GATT Communication API is available without any flag.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
@@ -41,7 +41,7 @@ Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         
 Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Stop GATT Notifications   | ✓         | ✓      | 👷   | ✓     |         |
 {start,stop}Notifications returns `this` | ✓ | ✓ | ✓  | ✓   |         |
-Descriptors               | 👷        | 👷      | 👷  | 👷    |         |
+Descriptors               | 👷        | 58      | 👷  | 👷    |         |
 Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Service Changed Event     |           |         |     |       |         |
