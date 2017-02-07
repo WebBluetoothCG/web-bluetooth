@@ -418,7 +418,7 @@
 	[data-algorithm]:not(.heading) {
 	  padding: .5em;
 	  border: thin solid #ddd; border-radius: .5em;
-	  margin: .5em 0;
+	  margin: .5em calc(-0.5em - 1px);
 	}
 	[data-algorithm]:not(.heading) > :first-child {
 	  margin-top: 0;
@@ -1176,7 +1176,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 03d78578ed8eff62da4ee0feae56c86cce1dbd7e" name="generator">
+  <meta content="Bikeshed version 2de6f41e63a9bd84932e1a28745f8d452d3b0e46" name="generator">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
   /* Show self-links for various elements. This is incompatible with nearby floats. */
@@ -1456,7 +1456,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-02-06">6 February 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-02-07">7 February 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2766,13 +2766,18 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
           <li> If <code><var>desc</var>.deviceId</code> is set
                 and <code><var>allowedDevice</var>.deviceId != <var>desc</var>.deviceId</code>,
                 continue to the next <var>allowedDevice</var>. 
-          <li> If <code><var>desc</var>.filters</code> is set
-                and <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-2">[[device]]</a></code></code> does not <a data-link-type="dfn" href="#matches-a-filter" id="ref-for-matches-a-filter-4">match a filter</a> in <code><var>desc</var>.filters</code>,
-                continue to the next <var>allowedDevice</var>. 
-          <li class="note"> Note: The <code><var>desc</var>.optionalServices</code> field does not affect the result. 
+          <li>
+            If <code><var>desc</var>.filters</code> is set, do the following sub-steps: 
+           <ol>
+            <li> Replace each filter in <code><var>desc</var>.filters</code> with the result of <a data-link-type="dfn" href="#bluetoothlescanfilterinit-canonicalizing" id="ref-for-bluetoothlescanfilterinit-canonicalizing-2">canonicalizing</a> it.
+                    If any of these canonicalizations throws an error, return that error and abort these steps. 
+            <li> If <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-2">[[device]]</a></code></code> does not <a data-link-type="dfn" href="#matches-a-filter" id="ref-for-matches-a-filter-4">match a filter</a> in <code><var>desc</var>.filters</code>,
+                    continue to the next <var>allowedDevice</var>. 
+           </ol>
           <li> <a data-link-type="dfn" href="#get-the-bluetoothdevice-representing" id="ref-for-get-the-bluetoothdevice-representing-3">Get the <code>BluetoothDevice</code> representing</a> <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot-3">[[device]]</a></code></code> within <code><var>global</var>.navigator.bluetooth</code>,
                 and add the result to <var>matchingDevices</var>. 
          </ol>
+         <p class="note" role="note"> Note: The <code><var>desc</var>.optionalServices</code> field does not affect the result. </p>
         <li> Set <code><var>status</var>.devices</code> to
             a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a></code> whose contents are <var>matchingDevices</var>. 
        </ol>
@@ -6130,6 +6135,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#bluetoothlescanfilterinit-canonicalizing">#bluetoothlescanfilterinit-canonicalizing</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescanfilterinit-canonicalizing-1">3. Device Discovery</a>
+    <li><a href="#ref-for-bluetoothlescanfilterinit-canonicalizing-2">3.1. Permission API Integration</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothdatafilterinit-canonicalizing">
