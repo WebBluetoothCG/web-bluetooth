@@ -1945,13 +1945,19 @@ spec: html
                 continue to the next <var>allowedDevice</var>.
               </li>
               <li>
-                If <code><var>desc</var>.filters</code> is set
-                and <code><var>allowedDevice</var>.{{[[device]]}}</code> does not
-                <a>match a filter</a> in <code><var>desc</var>.filters</code>,
-                continue to the next <var>allowedDevice</var>.
-              </li>
-              <li class="note">
-                Note: The <code>|desc|.optionalServices</code> field does not affect the result.
+                If <code><var>desc</var>.filters</code> is set, do the following sub-steps:
+                <ol>
+                  <li>
+                    Replace each filter in <code>|desc|.filters</code>
+                    with the result of <a for="BluetoothLEScanFilterInit">canonicalizing</a> it.
+                    If any of these canonicalizations throws an error, return that error and abort these steps.
+                  </li>
+                  <li>
+                    If <code><var>allowedDevice</var>.{{[[device]]}}</code> does not
+                    <a>match a filter</a> in <code>|desc|.filters</code>,
+                    continue to the next <var>allowedDevice</var>.
+                  </li>
+                </ol>
               </li>
               <li>
                 <a>Get the `BluetoothDevice` representing</a>
@@ -1960,6 +1966,9 @@ spec: html
                 and add the result to <var>matchingDevices</var>.
               </li>
             </ol>
+            <p class="note">
+              Note: The <code>|desc|.optionalServices</code> field does not affect the result.
+            </p>
           </li>
           <li>
             Set <code><var>status</var>.devices</code> to
