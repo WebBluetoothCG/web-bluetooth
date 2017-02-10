@@ -1176,7 +1176,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 7d5b85d5220bc9cd2c3f6f91ad51efdd41a94cd6" name="generator">
+  <meta content="Bikeshed version 862f905dcd28738c926b57b7cfebee04d3d6e31e" name="generator">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
   /* Show self-links for various elements. This is incompatible with nearby floats. */
@@ -1456,7 +1456,7 @@ pre.idl.highlight { color: #708090; }
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-02-08">8 February 2017</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2017-02-10">10 February 2017</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -3544,6 +3544,19 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
            <li> If this attempt failed for another reason, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code> and abort these steps. 
            <li> Use the <a data-link-type="dfn" href="#exchange-mtu" id="ref-for-exchange-mtu-1">Exchange MTU</a> procedure to negotiate the largest supported MTU.
                   Ignore any errors from this step. 
+           <li>
+             The UA MAY attempt to bond with the remote device using
+                  the <a data-link-type="dfn" href="#br-edr-bonding-procedure" id="ref-for-br-edr-bonding-procedure-1">BR/EDR Bonding Procedure</a> or
+                  the <a data-link-type="dfn" href="#le-bonding-procedure" id="ref-for-le-bonding-procedure-1">LE Bonding Procedure</a>. 
+            <p class="note" role="note"><span>Note:</span> We would normally prefer to give the website control
+                  over whether and when bonding happens,
+                  but the <a href="https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html">Core Bluetooth</a> platform API doesn’t provide a way for UAs to implement such a knob.
+                  Having a bond is more secure than not having one,
+                  so this specification allows the UA to opportunistically create one
+                  on platforms where that’s possible.
+                  This may cause a user-visible pairing dialog to appear
+                  when a connection is created,
+                  instead of when a restricted characteristic is accessed.</p>
           </ol>
          <li>
            <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">Queue a task</a> to perform the following sub-steps: 
@@ -4783,6 +4796,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
             Idle Mode Procedures — BR/EDR Physical Transport 
             <ol>
              <li value="4"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="device-discovery-procedure">Device Discovery Procedure</dfn>
+             <li value="5"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="br-edr-bonding-procedure">BR/EDR Bonding Procedure</dfn>
             </ol>
            <li value="9">
             Operational Modes and Procedures — LE Physical Transport 
@@ -4799,6 +4813,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
                <li value="7"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="name-discovery-procedure">Name Discovery Procedure</dfn>
               </ol>
              <li value="3"><dfn data-dfn-type="dfn" data-noexport="" id="connection-modes-and-procedures">Connection Modes and Procedures<a class="self-link" href="#connection-modes-and-procedures"></a></dfn>
+             <li value="4">
+              Bonding Modes and Procedures 
+              <ol>
+               <li value="4"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="le-bonding-procedure">LE Bonding Procedure</dfn>
+              </ol>
             </ol>
            <li value="10">
             Security Aspects — LE Physical Transport 
@@ -5257,6 +5276,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#bluetooth-tree">Bluetooth Tree</a><span>, in §5.6</span>
    <li><a href="#bluetoothuuid">BluetoothUUID</a><span>, in §6.1</span>
    <li><a href="#bond">bond</a><span>, in §9</span>
+   <li><a href="#br-edr-bonding-procedure">BR/EDR Bonding Procedure</a><span>, in §9</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-broadcast">broadcast</a><span>, in §5.4.1</span>
    <li><a href="#broadcaster">Broadcaster</a><span>, in §9</span>
    <li>
@@ -5366,6 +5386,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#dom-bluetoothcharacteristicproperties-indicate">indicate</a><span>, in §5.4.1</span>
    <li><a href="#identity-resolving-key">IRK</a><span>, in §9</span>
    <li><a href="#dom-bluetoothremotegattservice-isprimary">isPrimary</a><span>, in §5.3</span>
+   <li><a href="#le-bonding-procedure">LE Bonding Procedure</a><span>, in §9</span>
    <li><a href="#local-name-data-type">Local Name Data Type</a><span>, in §9</span>
    <li><a href="#long-attribute-values">Long Attribute Values</a><span>, in §9</span>
    <li>
@@ -7257,6 +7278,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     <li><a href="#ref-for-device-discovery-procedure-1">3. Device Discovery</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="br-edr-bonding-procedure">
+   <b><a href="#br-edr-bonding-procedure">#br-edr-bonding-procedure</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-br-edr-bonding-procedure-1">5.2. BluetoothRemoteGATTServer</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="observation-procedure">
    <b><a href="#observation-procedure">#observation-procedure</a></b><b>Referenced in:</b>
    <ul>
@@ -7273,6 +7300,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#name-discovery-procedure">#name-discovery-procedure</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-name-discovery-procedure-1">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="le-bonding-procedure">
+   <b><a href="#le-bonding-procedure">#le-bonding-procedure</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-le-bonding-procedure-1">5.2. BluetoothRemoteGATTServer</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="privacy-feature">
