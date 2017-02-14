@@ -39,7 +39,7 @@ Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         
 Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
 Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
-Stop GATT Notifications   | ✓         | ✓      | 👷   | ✓     |         |
+Stop GATT Notifications   | ✓         | ✓      | 58   | ✓     |         |
 {start,stop}Notifications returns `this` | ✓ | ✓ | ✓  | ✓   |         |
 Descriptors               | 👷        | 58      | 👷  | 👷    |         |
 Event bubbling            |           |         |     |       |         |
