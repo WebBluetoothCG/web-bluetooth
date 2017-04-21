@@ -61,13 +61,12 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 
 ### Notes
 
-* [Android](https://crbug.com/471536): Requires Android 6, Marshmallow or later.
- * Tip of tree [Chromium builds](https://download-chromium.appspot.com/?platform=Android&type=snapshots) work on Android 5, Lollipop and later for ease of developers - but Chrome versions will only ever support Marshmallow or later. Read [how to play with Web Bluetooth on Lollipop](http://stackoverflow.com/q/34810194/422957).
+* [Android](https://crbug.com/471536): Requires Android 6.0 Marshmallow or later.
 * [Mac](https://crbug.com/364359): Requires OS X Yosemite or later.
   * Some MacBooks may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and [BlueZ](http://www.bluez.org/) 5.41+ installed. Read [How to get Chrome Web Bluetooth working on Linux](https://acassis.wordpress.com/2016/06/28/how-to-get-chrome-web-bluetooth-working-on-linux/).
   * Note that Bluetooth daemon needs to run with experimental interfaces if BlueZ version is lower than 5.43: `sudo /usr/sbin/bluetoothd -E`
-* [Windows](https://crbug.com/507419): Requires Windows 8.1.
+* [Windows](https://crbug.com/507419): Requires Windows 8.1 or later.
   * To discover devices the user hasn't yet manually paired, requires Windows 10.
 
 ### Unsupported platforms
