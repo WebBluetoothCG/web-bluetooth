@@ -38,10 +38,8 @@ getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     |         
 Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
 Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
-Start GATT Notifications  | ✓         | ✓       | ✓   | ✓     |         |
-Stop GATT Notifications   | ✓         | ✓      | 58   | ✓     |         |
-{start,stop}Notifications returns `this` | ✓ | ✓ | ✓  | ✓   |         |
-Descriptors               | 58        | 58      | 59  | 58    |         |
+Start/Stop Notifications  | ✓         | ✓       | ✓   | ✓     |         |
+Descriptors               | 58        | ✓       | 59  | ✓     |         |
 Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Service Changed Event     |           |         |     |       |         |
