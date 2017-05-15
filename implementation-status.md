@@ -66,7 +66,7 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
   * Note that Bluetooth daemon needs to run with experimental interfaces if BlueZ version is lower than 5.43: `sudo /usr/sbin/bluetoothd -E`
 * [Windows](https://crbug.com/507419): Requires Windows 8.1 or later.
   * To discover devices the user hasn't yet manually paired, requires Windows 10.
-
+  * A third-party [Windows 10 Polyfill](https://github.com/urish/web-bluetooth-polyfill) (Chrome Extension + Native Executable) has been created while Windows support is not implemented yet. 
 ### Unsupported platforms
 
 * Android WebView: Will be supported in the future.
