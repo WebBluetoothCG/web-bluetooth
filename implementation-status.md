@@ -39,7 +39,7 @@ Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         
 Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
 Start/Stop Notifications  | ✓         | ✓       | ✓   | ✓     |         |
-Descriptors               | ✓        | ✓       | 59  | ✓     |         |
+Descriptors               | ✓         | ✓       | ✓   | ✓     |         |
 Event bubbling            |           |         |     |       |         |
 Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
 Service Changed Event     |           |         |     |       |         |
