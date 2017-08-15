@@ -76,7 +76,9 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app for iOS that supports the GATT Communication API. It was created initially for the [Puck.js project](https://www.espruino.com/Puck.js+Quick+Start#ios-iphone-ipad-).
 
 # Opera
-Same as Chrome unless specified otherwise
+- Available in [Opera for Android](https://play.google.com/store/apps/details?id=com.opera.browser)
+  behind a flag `opera://flags/#enable-web-bluetooth`.
+  - See [An introduction to the Web Bluetooth API](https://dev.opera.com/articles/web-bluetooth-intro/).
 
 # Servo
 https://szeged.github.io/servo/
@@ -92,4 +94,7 @@ https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 https://bugs.webkit.org/show_bug.cgi?id=101034
 
 # Samsung Internet
-http://developer.samsung.com/forum/board/thread/view.do?boardName=SDK&messageId=296269
+- Available in 
+  [Internet Beta](https://play.google.com/store/apps/details?id=com.sec.android.app.sbrowser.beta&hl=en)
+  v6.2 behind a flag `internet://flags/#enable-web-bluetooth`.
+  - See [medium post for 6.2 beta](https://medium.com/samsung-internet-dev/big-news-for-our-new-samsung-internet-beta-v6-2-6199b6743cb9).
