@@ -78,6 +78,11 @@ Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app fo
 # Opera
 Same as Chrome unless specified otherwise
 
+# Samsung Internet
+Support has been introduced from Samsung Internet Beta v6.2, behind a flag.
+- https://samsunginter.net/docs/web-bluetooth
+- http://developer.samsung.com/forum/board/thread/view.do?boardName=SDK&messageId=296269
+
 # Servo
 https://szeged.github.io/servo/
 
@@ -90,6 +95,3 @@ https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
 # Safari
 https://bugs.webkit.org/show_bug.cgi?id=101034
-
-# Samsung Internet
-http://developer.samsung.com/forum/board/thread/view.do?boardName=SDK&messageId=296269
