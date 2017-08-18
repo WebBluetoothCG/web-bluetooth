@@ -76,7 +76,7 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app for iOS that supports the GATT Communication API. It was created initially for the [Puck.js project](https://www.espruino.com/Puck.js+Quick+Start#ios-iphone-ipad-).
 
 # Opera
-Available behnid a flag `opera://flags/#enable-web-bluetooth`.
+Available behind a flag `opera://flags/#enable-web-bluetooth`.
 
 # Samsung Internet
 Support has been introduced from Samsung Internet Beta v6.2, behind a flag `internet://flags/#enable-web-bluetooth`.
