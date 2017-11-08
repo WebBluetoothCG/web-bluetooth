@@ -6,9 +6,9 @@ different browsers.
 
 # Chrome
 Work is in progress:
-* Notes updated **2017-06-09**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
-* The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled on Linux and Windows. In Chrome OS, Android, and Mac, the GATT Communication API is available without any flag.
+* In **Chrome OS, Android, & Mac**, the GATT Communication API is shipped without any flag.
+* **Linux & Windows** are partially implemented, but not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
 
@@ -79,7 +79,7 @@ Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app fo
 Available behind a flag `opera://flags/#enable-web-bluetooth`.
 
 # Samsung Internet
-Support has been introduced from Samsung Internet Beta v6.2, behind a flag `internet://flags/#enable-web-bluetooth`.
+Support has been introduced from Samsung Internet v6.x, behind a flag. `internet://flags/#enable-web-bluetooth`.
 - https://samsunginter.net/docs/web-bluetooth
 - http://developer.samsung.com/forum/board/thread/view.do?boardName=SDK&messageId=296269
 
