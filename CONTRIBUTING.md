@@ -4,13 +4,14 @@ When sending a pull request that changes a `.bs` file,
 please include a preview URL of the form
 `https://api.csswg.org/bikeshed/?url=https://github.com/{org}/web-bluetooth/raw/{branch}/{spec}.bs`.
 
-You can iterate locally by
-[installing Bikeshed](https://github.com/tabatkins/bikeshed/blob/master/docs/install.md)
-and then running `bikeshed watch {spec}.bs`,
+Local edits can be testing using the [Bikeshed API](https://api.csswg.org/bikeshed/).
+
+Or, [install Bikeshed](https://tabatkins.github.io/bikeshed/#installing)
+and then run `bikeshed watch {spec}.bs`,
 where `{spec}` is either `index` or `scanning`.
 If you've installed Bikeshed locally,
 then each time you start editing the spec you should
-update it using the instructions at the bottom of that link.
+[update Bikeshed](https://tabatkins.github.io/bikeshed/#updating-bikeshed).
 
 # Legal requirements
 
