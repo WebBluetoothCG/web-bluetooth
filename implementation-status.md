@@ -29,7 +29,7 @@ permissions.query()       |           |         |     |       |         |
 permissions.revoke()      |           |         |     |       |         |
 watchAdvertisements()     |           |         |     |       |         |
 Persistent Device IDs     |           |         |     |       |         |
-GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
+GATT Server Connect       | ✓         | ✓       | ✓   | ✓     | [👷](https://crbug.com/663131) |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
 Hanging connect() abortable by disconnect() |  | |    |       |         |
 getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     |         |
