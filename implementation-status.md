@@ -30,7 +30,7 @@ permissions.revoke()      |           |         |     |       |         |
 watchAdvertisements()     |           |         |     |       |         |
 Persistent Device IDs     |           |         |     |       |         |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     | ✓       |
-GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
+GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     | ✓       |
 Hanging connect() abortable by disconnect() |  | |    |       |         |
 getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     | ✓       |
 getIncludedService*()     |           |         |     |       |         |
