@@ -95,3 +95,6 @@ https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
 # Safari
 https://bugs.webkit.org/show_bug.cgi?id=101034
+
+# Node.js
+A Node.js port is available at https://github.com/thegecko/webbluetooth
