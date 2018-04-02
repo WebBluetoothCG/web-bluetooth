@@ -593,9 +593,9 @@ spec: html
       [SecureContext]
       Promise&lt;BluetoothDevice> requestDevice(optional RequestDeviceOptions options);
     };
-    Bluetooth implements BluetoothDeviceEventHandlers;
-    Bluetooth implements CharacteristicEventHandlers;
-    Bluetooth implements ServiceEventHandlers;
+    Bluetooth includes BluetoothDeviceEventHandlers;
+    Bluetooth includes CharacteristicEventHandlers;
+    Bluetooth includes ServiceEventHandlers;
   </pre>
   <div class="note" heading="{{Bluetooth}} members">
     <p>
@@ -2227,7 +2227,7 @@ spec: html
     </p>
 
     <pre class="idl">
-      interface BluetoothDevice {
+      interface BluetoothDevice : EventTarget {
         readonly attribute DOMString id;
         readonly attribute DOMString? name;
         readonly attribute BluetoothRemoteGATTServer? gatt;
@@ -2236,10 +2236,9 @@ spec: html
         void unwatchAdvertisements();
         readonly attribute boolean watchingAdvertisements;
       };
-      BluetoothDevice implements EventTarget;
-      BluetoothDevice implements BluetoothDeviceEventHandlers;
-      BluetoothDevice implements CharacteristicEventHandlers;
-      BluetoothDevice implements ServiceEventHandlers;
+      BluetoothDevice includes BluetoothDeviceEventHandlers;
+      BluetoothDevice includes CharacteristicEventHandlers;
+      BluetoothDevice includes ServiceEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothDevice}} attributes"
@@ -3512,7 +3511,7 @@ spec: html
     </p>
 
     <pre class="idl">
-      interface BluetoothRemoteGATTService {
+      interface BluetoothRemoteGATTService : EventTarget {
         [SameObject]
         readonly attribute BluetoothDevice device;
         readonly attribute UUID uuid;
@@ -3526,9 +3525,8 @@ spec: html
         Promise&lt;sequence&lt;BluetoothRemoteGATTService>>
           getIncludedServices(optional BluetoothServiceUUID service);
       };
-      BluetoothRemoteGATTService implements EventTarget;
-      BluetoothRemoteGATTService implements CharacteristicEventHandlers;
-      BluetoothRemoteGATTService implements ServiceEventHandlers;
+      BluetoothRemoteGATTService includes CharacteristicEventHandlers;
+      BluetoothRemoteGATTService includes ServiceEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothRemoteGATTService}} attributes"
@@ -3676,7 +3674,7 @@ spec: html
     <p>{{BluetoothRemoteGATTCharacteristic}} represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
 
     <pre class="idl">
-      interface BluetoothRemoteGATTCharacteristic {
+      interface BluetoothRemoteGATTCharacteristic : EventTarget {
         [SameObject]
         readonly attribute BluetoothRemoteGATTService service;
         readonly attribute UUID uuid;
@@ -3690,8 +3688,7 @@ spec: html
         Promise&lt;BluetoothRemoteGATTCharacteristic> startNotifications();
         Promise&lt;BluetoothRemoteGATTCharacteristic> stopNotifications();
       };
-      BluetoothRemoteGATTCharacteristic implements EventTarget;
-      BluetoothRemoteGATTCharacteristic implements CharacteristicEventHandlers;
+      BluetoothRemoteGATTCharacteristic includes CharacteristicEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothRemoteGATTCharacteristic}} attributes"
@@ -4941,8 +4938,7 @@ spec: html
       <h4 id="idl-event-handlers">IDL event handlers</h4>
 
       <pre class="idl">
-        [NoInterfaceObject]
-        interface CharacteristicEventHandlers {
+        interface mixin CharacteristicEventHandlers {
           attribute EventHandler oncharacteristicvaluechanged;
         };
       </pre>
@@ -4953,8 +4949,7 @@ spec: html
       </p>
 
       <pre class="idl">
-        [NoInterfaceObject]
-        interface BluetoothDeviceEventHandlers {
+        interface mixin BluetoothDeviceEventHandlers {
           attribute EventHandler ongattserverdisconnected;
         };
       </pre>
@@ -4965,8 +4960,7 @@ spec: html
       </p>
 
       <pre class="idl">
-        [NoInterfaceObject]
-        interface ServiceEventHandlers {
+        interface mixin ServiceEventHandlers {
           attribute EventHandler onserviceadded;
           attribute EventHandler onservicechanged;
           attribute EventHandler onserviceremoved;
