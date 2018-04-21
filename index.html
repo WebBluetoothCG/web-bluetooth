@@ -3947,13 +3947,20 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         <p class="issue" id="issue-0fd47a9a"><a class="self-link" href="#issue-0fd47a9a"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①⑧">NetworkError</a></code>,
           but for now sites need to serialize their use of this API
           and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
-       <li> Use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors">Characteristic Descriptors</a> procedures
-          to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration">Client Characteristic Configuration</a> descriptor
+       <li>
+         If the characteristic has a <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration">Client Characteristic Configuration</a> descriptor, use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors">Characteristic Descriptors</a> procedures
+          to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration①">Client Characteristic Configuration</a> descriptor
           is set, matching the constraints
           in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties③">properties</a>.
           The UA SHOULD avoid setting both bits,
           and MUST deduplicate <a href="#notification-events">value-change events</a> if both bits are set.
           Handle errors as described in <a href="#error-handling">§5.7 Error handling</a>. 
+        <p class="note" role="note"><span>Note:</span> Some devices have characteristics whose properties include the
+          Notify or Indicate bit but that don’t have a <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration②">Client Characteristic
+          Configuration</a> descriptor. These non-standard-compliant characteristics
+          tend to send notifications or indications unconditionally, so this
+          specification allows applications to simply subscribe to their
+          messages.</p>
        <li> If the previous step returned an error, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise②④">reject</a> <var>promise</var> with that error and abort these steps. 
        <li> Add <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth②">navigator.bluetooth</a></code> to <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set①">active notification context set</a>. 
        <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise①②">Resolve</a> <var>promise</var> with <code>this</code>. 
@@ -3974,9 +3981,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           abort these steps. 
        <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set②">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth③">navigator.bluetooth</a></code>,
           remove it. 
-       <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set③">active notification context set</a> became empty,
+       <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set③">active notification context set</a> became empty
+          and the characteristic has a <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration③">Client Characteristic Configuration</a> descriptor,
           the UA SHOULD use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors①">Characteristic Descriptors</a> procedures
-          to clear the <code>Notification</code> and <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration①">Client Characteristic Configuration</a> descriptor. 
+          to clear the <code>Notification</code> and <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration④">Client Characteristic Configuration</a> descriptor. 
        <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①①">Queue a task</a> to <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise①③">resolve</a> <var>promise</var> with <code>this</code>. 
       </ol>
       <p class="note" role="note"> Queuing a task to resolve the promise ensures that
@@ -4128,7 +4136,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
          <li>
            If the UA is currently using the Bluetooth system,
               it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise②⑥">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②⓪">NetworkError</a></code> and abort these steps. 
-          <p class="issue" id="issue-2a2f134a"><a class="self-link" href="#issue-2a2f134a"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②①">NetworkError</a></code>,
+          <p class="issue" id="issue-3f78f0f8"><a class="self-link" href="#issue-3f78f0f8"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②①">NetworkError</a></code>,
               but for now sites need to serialize their use of this API
               and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
          <li> Use either the <a data-link-type="dfn" href="#read-characteristic-descriptors" id="ref-for-read-characteristic-descriptors①">Read Characteristic Descriptors</a> or
@@ -4169,7 +4177,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
          <li>
            If the UA is currently using the Bluetooth system,
               it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise②⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②④">NetworkError</a></code> and abort these steps. 
-          <p class="issue" id="issue-a612274c"><a class="self-link" href="#issue-a612274c"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②⑤">NetworkError</a></code>,
+          <p class="issue" id="issue-00d9769f"><a class="self-link" href="#issue-00d9769f"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②⑤">NetworkError</a></code>,
               but for now sites need to serialize their use of this API
               and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
          <li> Use either the <a data-link-type="dfn" href="#write-characteristic-descriptors" id="ref-for-write-characteristic-descriptors">Write Characteristic Descriptors</a> or
@@ -4275,9 +4283,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           <li> Let <var>notificationContexts</var> be <code><var>characteristic</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot⑥">[[representedCharacteristic]]</a></code></code>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set④">active notification context set</a>. 
           <li> Remove <var>context</var> from <var>notificationContexts</var>. 
           <li> If <var>notificationContexts</var> became empty
-                and there is still an <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer⑧">ATT Bearer</a> to <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot①⑤">[[representedDevice]]</a></code></code>,
+                and there is still an <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer⑧">ATT Bearer</a> to <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot①⑤">[[representedDevice]]</a></code></code> and <var>characteristic</var> has a <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration⑤">Client Characteristic
+                Configuration</a> descriptor,
                 the UA SHOULD use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors②">Characteristic Descriptors</a> procedures
-                to clear the <code>Notification</code> and <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration②">Client Characteristic Configuration</a> descriptor. 
+                to clear the <code>Notification</code> and <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration⑥">Client Characteristic Configuration</a> descriptor. 
           <li> Set <code><var>characteristic</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot⑦">[[representedCharacteristic]]</a></code></code> to <code>null</code>. 
          </ol>
         <li> For each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor" id="ref-for-bluetoothremotegattdescriptor①④">BluetoothRemoteGATTDescriptor</a></code> <var>descriptor</var> in <var>deviceObj</var>’s <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-code-realms" id="ref-for-sec-code-realms⑦">realm</a>,
@@ -6017,10 +6026,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
                   If they are, the UA should be allowed to cache them. <a href="#issue-02de619c"> ↵ </a></div>
    <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
               but for now sites need to serialize their use of this API
-              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-2a2f134a"> ↵ </a></div>
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-3f78f0f8"> ↵ </a></div>
    <div class="issue"> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror">NetworkError</a></code>,
               but for now sites need to serialize their use of this API
-              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-a612274c"> ↵ </a></div>
+              and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a><a href="#issue-00d9769f"> ↵ </a></div>
   </div>
   <aside class="dfn-panel" data-for="dictdef-bluetoothdatafilterinit">
    <b><a href="#dictdef-bluetoothdatafilterinit">#dictdef-bluetoothdatafilterinit</a></b><b>Referenced in:</b>
@@ -7532,8 +7541,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
   <aside class="dfn-panel" data-for="client-characteristic-configuration">
    <b><a href="#client-characteristic-configuration">#client-characteristic-configuration</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-client-characteristic-configuration">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-client-characteristic-configuration①">(2)</a>
-    <li><a href="#ref-for-client-characteristic-configuration②">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-client-characteristic-configuration">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-client-characteristic-configuration①">(2)</a> <a href="#ref-for-client-characteristic-configuration②">(3)</a> <a href="#ref-for-client-characteristic-configuration③">(4)</a> <a href="#ref-for-client-characteristic-configuration④">(5)</a>
+    <li><a href="#ref-for-client-characteristic-configuration⑤">5.6.3. Responding to Disconnection</a> <a href="#ref-for-client-characteristic-configuration⑥">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="gatt-procedure">
