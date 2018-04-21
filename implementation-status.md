@@ -2,11 +2,10 @@
 This document shows the implementation status of Web Bluetooth on the
 different browsers.
 
-<a href="#chrome"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_128x128.png" alt="Chrome browser logo"></a><a href="#opera"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_128x128.png" alt="Opera browser logo"></a><a href="#servo"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/browser.html/browser.html_128x128.png" alt="Servo browser logo"></a><a href="#firefox"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_128x128.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_128x128.png" alt="Microsoft Edge browser logo"></a><a href="#safari"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_128x128.png" alt="Safari browser logo"></a><a href="#samsung-internet"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/samsung-internet/samsung-internet_128x128.png" alt="Samsung Internet browser logo"></a>
+<a href="#chrome"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_128x128.png" alt="Chrome browser logo"></a><a href="#samsung-internet"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/samsung-internet/samsung-internet_128x128.png" alt="Samsung Internet browser logo"></a><a href="#opera"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_128x128.png" alt="Opera browser logo"></a><a href="#servo"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/browser.html/browser.html_128x128.png" alt="Servo browser logo"></a><a href="#firefox"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_128x128.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_128x128.png" alt="Microsoft Edge browser logo"></a><a href="#safari"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_128x128.png" alt="Safari browser logo"></a>
 
 # Chrome
 Work is in progress:
-* Notes updated **2017-06-09**.
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * In **Chrome OS, Android, & Mac**, the GATT Communication API is shipped without any flag.
 * **Linux & Windows** are partially implemented, but not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
@@ -30,15 +29,15 @@ permissions.query()       |           |         |     |       |         |
 permissions.revoke()      |           |         |     |       |         |
 watchAdvertisements()     |           |         |     |       |         |
 Persistent Device IDs     |           |         |     |       |         |
-GATT Server Connect       | ✓         | ✓       | ✓   | ✓     |         |
-GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     |         |
+GATT Server Connect       | ✓         | ✓       | ✓   | ✓     | ✓       |
+GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     | ✓       |
 Hanging connect() abortable by disconnect() |  | |    |       |         |
-getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     |         |
+getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     | ✓       |
 getIncludedService*()     |           |         |     |       |         |
-getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     |         |
+getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     | ✓       |
 Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
-Read Characteristic       | ✓         | ✓       | ✓   | ✓     |         |
-Write Characteristic      | ✓         | ✓       | ✓   | ✓     |         |
+Read Characteristic       | ✓         | ✓       | ✓   | ✓     | ✓       |
+Write Characteristic      | ✓         | ✓       | ✓   | ✓     | ✓       |
 Start/Stop Notifications  | ✓         | ✓       | ✓   | ✓     |         |
 Descriptors               | ✓         | ✓       | ✓   | ✓     |         |
 Event bubbling            |           |         |     |       |         |
@@ -76,13 +75,14 @@ Tip: Chrome channel releases are tracked at [https://googlechrome.github.io/curr
 
 Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app for iOS that supports the GATT Communication API. It was created initially for the [Puck.js project](https://www.espruino.com/Puck.js+Quick+Start#ios-iphone-ipad-).
 
+# Samsung Internet
+In Samsung Internet v6.4, the GATT Communication API is shipped without any flag.
+
+- https://medium.com/samsung-internet-dev/lets-connect-with-samsung-internet-v6-4-stable-1f197d43a812
+- https://samsunginter.net/docs/web-bluetooth
+
 # Opera
 Available behind a flag `opera://flags/#enable-web-bluetooth`.
-
-# Samsung Internet
-Support has been introduced from Samsung Internet Beta v6.2, behind a flag `internet://flags/#enable-web-bluetooth`.
-- https://samsunginter.net/docs/web-bluetooth
-- http://developer.samsung.com/forum/board/thread/view.do?boardName=SDK&messageId=296269
 
 # Servo
 https://szeged.github.io/servo/
@@ -96,3 +96,8 @@ https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
 # Safari
 https://bugs.webkit.org/show_bug.cgi?id=101034
+
+# Node.js
+Node.js ports are available:
+- https://github.com/thegecko/webbluetooth
+- https://github.com/IjzerenHein/node-web-bluetooth
