@@ -992,57 +992,92 @@ Possible extra rowspan handling
 	.toc > li li          { font-weight: normal; }
 	.toc > li li li       { font-size:   95%;    }
 	.toc > li li li li    { font-size:   90%;    }
+	.toc > li li li li .secno { font-size: 85%; }
 	.toc > li li li li li { font-size:   85%;    }
+	.toc > li li li li li .secno { font-size: 100%; }
 
-	.toc > li             { margin: 1.5rem 0;    }
-	.toc > li li          { margin: 0.3rem 0;    }
-	.toc > li li li       { margin-left: 2rem;   }
+	/* @supports not (display:grid) { */
+		.toc > li             { margin: 1.5rem 0;    }
+		.toc > li li          { margin: 0.3rem 0;    }
+		.toc > li li li       { margin-left: 2rem;   }
 
-	/* Section numbers in a column of their own */
-	.toc .secno {
-		float: left;
-		width: 4rem;
-		white-space: nowrap;
-	}
-	.toc > li li li li .secno {
-		font-size: 85%;
-	}
-	.toc > li li li li li .secno {
-		font-size: 100%;
-	}
+		/* Section numbers in a column of their own */
+		.toc .secno {
+			float: left;
+			width: 4rem;
+			white-space: nowrap;
+		}
 
-	:not(li) > .toc              { margin-left:  5rem; }
-	.toc .secno                  { margin-left: -5rem; }
-	.toc > li li li .secno       { margin-left: -7rem; }
-	.toc > li li li li .secno    { margin-left: -9rem; }
-	.toc > li li li li li .secno { margin-left: -11rem; }
+		.toc li {
+			clear: both;
+		}
 
-	/* Tighten up indentation in narrow ToCs */
-	@media (max-width: 30em) {
-		:not(li) > .toc              { margin-left:  4rem; }
-		.toc .secno                  { margin-left: -4rem; }
-		.toc > li li li              { margin-left:  1rem; }
-		.toc > li li li .secno       { margin-left: -5rem; }
-		.toc > li li li li .secno    { margin-left: -6rem; }
-		.toc > li li li li li .secno { margin-left: -7rem; }
-	}
-	@media screen and (min-width: 78em) {
-		body:not(.toc-inline) :not(li) > .toc              { margin-left:  4rem; }
-		body:not(.toc-inline) .toc .secno                  { margin-left: -4rem; }
-		body:not(.toc-inline) .toc > li li li              { margin-left:  1rem; }
-		body:not(.toc-inline) .toc > li li li .secno       { margin-left: -5rem; }
-		body:not(.toc-inline) .toc > li li li li .secno    { margin-left: -6rem; }
-		body:not(.toc-inline) .toc > li li li li li .secno { margin-left: -7rem; }
-	}
-	body.toc-sidebar #toc :not(li) > .toc              { margin-left:  4rem; }
-	body.toc-sidebar #toc .toc .secno                  { margin-left: -4rem; }
-	body.toc-sidebar #toc .toc > li li li              { margin-left:  1rem; }
-	body.toc-sidebar #toc .toc > li li li .secno       { margin-left: -5rem; }
-	body.toc-sidebar #toc .toc > li li li li .secno    { margin-left: -6rem; }
-	body.toc-sidebar #toc .toc > li li li li li .secno { margin-left: -7rem; }
+		:not(li) > .toc              { margin-left:  5rem; }
+		.toc .secno                  { margin-left: -5rem; }
+		.toc > li li li .secno       { margin-left: -7rem; }
+		.toc > li li li li .secno    { margin-left: -9rem; }
+		.toc > li li li li li .secno { margin-left: -11rem; }
 
-	.toc li {
-		clear: both;
+		/* Tighten up indentation in narrow ToCs */
+		@media (max-width: 30em) {
+			:not(li) > .toc              { margin-left:  4rem; }
+			.toc .secno                  { margin-left: -4rem; }
+			.toc > li li li              { margin-left:  1rem; }
+			.toc > li li li .secno       { margin-left: -5rem; }
+			.toc > li li li li .secno    { margin-left: -6rem; }
+			.toc > li li li li li .secno { margin-left: -7rem; }
+		}
+	/* } */
+
+	@supports (display:grid) {
+		/* Use #toc over .toc to override non-@supports rules. */
+		#toc {
+			display: grid;
+			align-content: start;
+			grid-template-columns: auto 1fr;
+			grid-column-gap: 1rem;
+			column-gap: 1rem;
+			grid-row-gap: .6rem;
+			row-gap: .6rem;
+		}
+		#toc h2 {
+			grid-column: 1 / -1;
+			margin-bottom: 0;
+		}
+		#toc ol,
+		#toc li,
+		#toc a {
+			display: contents;
+			/* Switch <a> to subgrid when supported */
+		}
+		#toc span {
+			margin: 0;
+		}
+		#toc > .toc > li > a > span {
+			/* The spans of the top-level list,
+			   comprising the first items of each top-level section. */
+			margin-top: 1.1rem;
+		}
+		#toc .secno {
+			grid-column: 1;
+			width: auto;
+		}
+		#toc .content {
+			grid-column: 2;
+			width: auto;
+			margin-right: 1rem;
+		}
+		#toc .content:hover {
+			background: rgba(75%, 75%, 75%, .25);
+			border-bottom: 3px solid #054572;
+			margin-bottom: -3px;
+		}
+		#toc li li li .content {
+			margin-left: 1rem;
+		}
+		#toc li li li li .content {
+			margin-left: 2rem;
+		}
 	}
 
 
@@ -1176,7 +1211,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 150b038a54cb926cf8e3d36fd8b108c226cb94b8" name="generator">
+  <meta content="Bikeshed version 6d3a750812441328ea98d66fac577c3ced988303" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
@@ -1299,13 +1334,13 @@ figcaption:not(.no-marker)::before {
 <style>/* style-var-click-highlighting */
 
     var { cursor: pointer; }
-    var.selected0 { background-color: hsl(60deg, 50%, 90%); }
-    var.selected1 { background-color: hsl(0deg, 50%, 90%); }
-    var.selected2 { background-color: hsl(120deg, 50%, 90%); }
-    var.selected3 { background-color: hsl(180deg, 50%, 90%); }
-    var.selected4 { background-color: hsl(30deg, 50%, 90%); }
-    var.selected5 { background-color: hsl(240deg, 50%, 90%); }
-    var.selected6 { background-color: hsl(330deg, 80%, 93%); }
+    var.selected0 { background-color: #F4D200; box-shadow: 0 0 0 2px #F4D200; }
+    var.selected1 { background-color: #FF87A2; box-shadow: 0 0 0 2px #FF87A2; }
+    var.selected2 { background-color: #96E885; box-shadow: 0 0 0 2px #96E885; }
+    var.selected3 { background-color: #3EEED2; box-shadow: 0 0 0 2px #3EEED2; }
+    var.selected4 { background-color: #EACFB6; box-shadow: 0 0 0 2px #EACFB6; }
+    var.selected5 { background-color: #82DDFF; box-shadow: 0 0 0 2px #82DDFF; }
+    var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
     </style>
 <style>/* style-autolinks */
 
@@ -1371,41 +1406,41 @@ pre .property::before, pre .property::after {
 }</style>
 <style>/* style-dfn-panel */
 
-        .dfn-panel {
-            position: absolute;
-            z-index: 35;
-            height: auto;
-            width: -webkit-fit-content;
-            width: fit-content;
-            max-width: 300px;
-            max-height: 500px;
-            overflow: auto;
-            padding: 0.5em 0.75em;
-            font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
-            background: #DDDDDD;
-            color: black;
-            border: outset 0.2em;
-        }
-        .dfn-panel:not(.on) { display: none; }
-        .dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
-        .dfn-panel > b { display: block; }
-        .dfn-panel a { color: black; }
-        .dfn-panel a:not(:hover) { text-decoration: none !important; border-bottom: none !important; }
-        .dfn-panel > b + b { margin-top: 0.25em; }
-        .dfn-panel ul { padding: 0; }
-        .dfn-panel li { list-style: inside; }
-        .dfn-panel.activated {
-            display: inline-block;
-            position: fixed;
-            left: .5em;
-            bottom: 2em;
-            margin: 0 auto;
-            max-width: calc(100vw - 1.5em - .4em - .5em);
-            max-height: 30vh;
-        }
+.dfn-panel {
+    position: absolute;
+    z-index: 35;
+    height: auto;
+    width: -webkit-fit-content;
+    width: fit-content;
+    max-width: 300px;
+    max-height: 500px;
+    overflow: auto;
+    padding: 0.5em 0.75em;
+    font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+    background: #DDDDDD;
+    color: black;
+    border: outset 0.2em;
+}
+.dfn-panel:not(.on) { display: none; }
+.dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
+.dfn-panel > b { display: block; }
+.dfn-panel a { color: black; }
+.dfn-panel a:not(:hover) { text-decoration: none !important; border-bottom: none !important; }
+.dfn-panel > b + b { margin-top: 0.25em; }
+.dfn-panel ul { padding: 0; }
+.dfn-panel li { list-style: inside; }
+.dfn-panel.activated {
+    display: inline-block;
+    position: fixed;
+    left: .5em;
+    bottom: 2em;
+    margin: 0 auto;
+    max-width: calc(100vw - 1.5em - .4em - .5em);
+    max-height: 30vh;
+}
 
-        .dfn-paneled { cursor: pointer; }
-        </style>
+.dfn-paneled { cursor: pointer; }
+</style>
 <style>/* style-syntax-highlighting */
 pre.idl.highlight { color: #708090; }
 .highlight:not(.idl) { background: hsl(24, 20%, 95%); }
@@ -1468,7 +1503,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2018-05-09">9 May 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2018-06-13">13 June 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1655,17 +1690,17 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
   <span class="p">}]</span>
 <span class="p">}).</span>then<span class="p">(</span>device <span class="p">=></span> device<span class="p">.</span>gatt<span class="p">.</span><a data-link-type="functionish" href="#dom-bluetoothremotegattserver-connect" id="ref-for-dom-bluetoothremotegattserver-connect">connect<span class="p">()</span></a><span class="p">)</span>
 <span class="p">.</span>then<span class="p">(</span>server <span class="p">=></span> server<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattserver-getprimaryservice" id="ref-for-dom-bluetoothremotegattserver-getprimaryservice">
-                      getPrimaryService</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">
+                      getPrimaryService</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#" id="termref-for-">
     <span class="s1">'heart_rate'</span></a><span class="p">))</span>
 <span class="p">.</span>then<span class="p">(</span>service <span class="p">=></span> <span class="p">{</span>
   chosenHeartRateService <span class="o">=</span> service<span class="p">;</span>
   <span class="k">return</span> Promise<span class="p">.</span>all<span class="p">([</span>
     service<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic">
-               getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">
+               getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#" id="termref-for-①">
     <span class="s1">'body_sensor_location'</span></a><span class="p">)</span>
       <span class="p">.</span>then<span class="p">(</span>handleBodySensorLocationCharacteristic<span class="p">),</span>
     service<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic①">
-               getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">
+               getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#" id="termref-for-②">
     <span class="s1">'heart_rate_measurement'</span></a><span class="p">)</span>
       <span class="p">.</span>then<span class="p">(</span>handleHeartRateMeasurementCharacteristic<span class="p">),</span>
   <span class="p">]);</span>
@@ -1705,7 +1740,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
   console<span class="p">.</span>log<span class="p">(</span>parseHeartRate<span class="p">(</span>characteristic<span class="p">.</span><a class="idl-code" data-link-type="attribute" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value">value</a><span class="p">));</span>
 <span class="p">}</span>
 </pre>
-      <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"> <code>heart_rate_measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor">DataView</a></code> stored
+      <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#" id="termref-for-③"> <code>heart_rate_measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor">DataView</a></code> stored
         in a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value①">value</a></code> field. </p>
 <pre class="highlight"><span class="kd">function</span> parseHeartRate<span class="p">(</span>data<span class="p">)</span> <span class="p">{</span>
   <span class="kd">let</span> flags <span class="o">=</span> data<span class="p">.</span>getUint8<span class="p">(</span><span class="mi">0</span><span class="p">);</span>
@@ -1749,13 +1784,13 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
 <span class="c1"></span><span class="p">}</span>
 </pre>
       <p> If the heart rate sensor reports the <code>energyExpended</code> field,
-        the web application can reset its value to <code>0</code> by writing to the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">heart_rate_control_point</a></code> characteristic: </p>
+        the web application can reset its value to <code>0</code> by writing to the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#" id="termref-for-④">heart_rate_control_point</a></code> characteristic: </p>
 <pre class="highlight"><span class="kd">function</span> resetEnergyExpended<span class="p">()</span> <span class="p">{</span>
   <span class="k">if</span> <span class="p">(</span><span class="o">!</span>chosenHeartRateService<span class="p">)</span> <span class="p">{</span>
     <span class="k">return</span> Promise<span class="p">.</span>reject<span class="p">(</span><span class="k">new</span> Error<span class="p">(</span><span class="s1">'No heart rate sensor selected yet.'</span><span class="p">));</span>
   <span class="p">}</span>
   <span class="k">return</span> chosenHeartRateService<span class="p">.</span><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic②">
-                                 getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">
+                                 getCharacteristic</a><span class="p">(</span><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#" id="termref-for-⑤">
     <span class="s1">'heart_rate_control_point'</span></a><span class="p">)</span>
   <span class="p">.</span>then<span class="p">(</span>controlPoint <span class="p">=></span> <span class="p">{</span>
     <span class="kd">let</span> resetEnergyExpended <span class="o">=</span> <span class="k">new</span> Uint8Array<span class="p">([</span><span class="mi">1</span><span class="p">]);</span>
@@ -2747,7 +2782,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
 </pre>
       <dt> <a data-link-type="dfn" href="https://wicg.github.io/permissions-request/#permission-request-algorithm" id="ref-for-permission-request-algorithm">permission request algorithm</a> 
       <dd class="algorithm" data-algorithm="permission request">
-       <p> To <dfn data-dfn-type="dfn" data-noexport="" id="request-the-bluetooth-permission">request the "bluetooth" permission<a class="self-link" href="#request-the-bluetooth-permission"></a></dfn> with
+       <p> To <dfn data-dfn-type="dfn" data-export="" id="request-the-bluetooth-permission">request the "bluetooth" permission<a class="self-link" href="#request-the-bluetooth-permission"></a></dfn> with
           a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondescriptor" id="ref-for-dictdef-bluetoothpermissiondescriptor">BluetoothPermissionDescriptor</a></code> <var>options</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothpermissionresult" id="ref-for-bluetoothpermissionresult">BluetoothPermissionResult</a></code> <var>status</var>,
           the UA MUST run the following steps: </p>
        <ol data-link-for-hint="BluetoothPermissionDescriptor">
@@ -2769,7 +2804,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
        </ol>
       <dt> <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-query-algorithm" id="ref-for-permission-query-algorithm">permission query algorithm</a> 
       <dd class="algorithm" data-algorithm="query the &quot;bluetooth&quot; permission">
-        To <dfn data-dfn-type="dfn" data-noexport="" id="query-the-bluetooth-permission">query the "bluetooth" permission<a class="self-link" href="#query-the-bluetooth-permission"></a></dfn> with
+        To <dfn data-dfn-type="dfn" data-export="" id="query-the-bluetooth-permission">query the "bluetooth" permission<a class="self-link" href="#query-the-bluetooth-permission"></a></dfn> with
         a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondescriptor" id="ref-for-dictdef-bluetoothpermissiondescriptor①">BluetoothPermissionDescriptor</a></code> <var>desc</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothpermissionresult" id="ref-for-bluetoothpermissionresult①">BluetoothPermissionResult</a></code> <var>status</var>, the UA must: 
        <ol>
         <li> Let <var>global</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a> for <var>status</var>. 
@@ -2917,7 +2952,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         and a resolvable or non-resolvable <a data-link-type="dfn" href="#private-address" id="ref-for-private-address①">Private Address</a>. 
       <li>An optional 128-bit <a data-link-type="dfn" href="#identity-resolving-key" id="ref-for-identity-resolving-key②">Identity Resolving Key</a>.
       <li> An optional partial or complete <a data-link-type="dfn" href="#bluetooth-device-name" id="ref-for-bluetooth-device-name⑥">Bluetooth Device Name</a>.
-        A device has a partial name when the <a data-link-type="dfn" href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#">Shortened Local Name</a> AD data was received,
+        A device has a partial name when the <a data-link-type="dfn" href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#" id="termref-for-⑥">Shortened Local Name</a> AD data was received,
         but the full name hasn’t been read yet.
         The <a data-link-type="dfn" href="#bluetooth-device-name" id="ref-for-bluetooth-device-name⑦">Bluetooth Device Name</a> is encoded as UTF-8 and
         converted to a DOMString using the <a data-link-type="dfn" href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom" id="ref-for-utf-8-decode-without-bom">utf-8 decode without BOM</a> algorithm. 
@@ -2926,7 +2961,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         "Connection Establishment" under <a data-link-type="dfn" href="#gap-interoperability-requirements" id="ref-for-gap-interoperability-requirements">GAP Interoperability Requirements</a>.
         It is disconnected in ways <a data-link-type="biblio" href="#biblio-bluetooth42">[BLUETOOTH42]</a> isn’t entirely clear about. 
       <li> A list of advertised <a data-link-type="dfn" href="#service-uuid-data-type" id="ref-for-service-uuid-data-type①">Service UUIDs</a> from the <a data-link-type="dfn" href="#advertising-data" id="ref-for-advertising-data①">Advertising Data</a> or <a data-link-type="dfn" href="#extended-inquiry-response" id="ref-for-extended-inquiry-response③">Extended Inquiry Response</a>. 
-      <li> A hierarchy of GATT attributes, described in <a href="#information-model">§5.1 GATT Information Model</a>. 
+      <li> A hierarchy of GATT <a data-link-type="dfn" href="#attribute" id="ref-for-attribute">Attributes</a>. 
      </ul>
      <p> The UA SHOULD determine that
       two <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device①⓪">Bluetooth device</a>s are
@@ -3119,7 +3154,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
           this advertisement says <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingevent-device" id="ref-for-dom-bluetoothadvertisingevent-device①">device</a></code>'s GATT server supports. </p>
        <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothAdvertisingEvent" data-dfn-type="attribute" data-export="" id="dom-bluetoothadvertisingevent-name"><code>name</code></dfn> is <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingevent-device" id="ref-for-dom-bluetoothadvertisingevent-device②">device</a></code>'s local name, or a prefix of it. </p>
        <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothAdvertisingEvent" data-dfn-type="attribute" data-export="" id="dom-bluetoothadvertisingevent-appearance"><code>appearance</code></dfn> is an <a data-link-type="dfn" href="#appearance" id="ref-for-appearance">Appearance</a>, one of the values defined by
-          the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#">org.bluetooth.characteristic.gap.appearance</a></code> characteristic. </p>
+          the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#" id="termref-for-⑦">org.bluetooth.characteristic.gap.appearance</a></code> characteristic. </p>
        <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothAdvertisingEvent" data-dfn-type="attribute" data-export="" id="dom-bluetoothadvertisingevent-txpower"><code>txPower</code></dfn> is
           the transmission power at which the device is broadcasting, measured in dBm.
           This is used to compute the path loss as <code>this.txPower - this.rssi</code>. </p>
@@ -3245,7 +3280,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <div class="algorithm" data-algorithm="BluetoothAdvertisingEvent(type, init)">
        <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothAdvertisingEvent" data-dfn-type="constructor" data-export="" id="dom-bluetoothadvertisingevent-bluetoothadvertisingevent"><code>BluetoothAdvertisingEvent(type, init)</code></dfn> constructor MUST perform the following steps: </p>
        <ol>
-        <li> Let <var>event</var> be the result of running the steps from <a href="https://dom.spec.whatwg.org/#constructing-events">DOM §2.4 Constructing events</a> except for the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-uuids" id="ref-for-dom-bluetoothadvertisingeventinit-uuids">uuids</a></code>, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-manufacturerdata" id="ref-for-dom-bluetoothadvertisingeventinit-manufacturerdata">manufacturerData</a></code>,
+        <li> Let <var>event</var> be the result of running the steps from <a href="https://dom.spec.whatwg.org/#constructing-events">DOM §2.5 Constructing events</a> except for the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-uuids" id="ref-for-dom-bluetoothadvertisingeventinit-uuids">uuids</a></code>, <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-manufacturerdata" id="ref-for-dom-bluetoothadvertisingeventinit-manufacturerdata">manufacturerData</a></code>,
             and <code class="idl"><a data-link-type="idl" href="#dom-bluetoothadvertisingeventinit-servicedata" id="ref-for-dom-bluetoothadvertisingeventinit-servicedata">serviceData</a></code> members. 
         <li> If <code><var>init</var>.uuids</code> is set,
             initialize <code><var>event</var>.uuids</code> to a new <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array" id="ref-for-idl-frozen-array③">FrozenArray</a></code> containing the elements of <code><var>init</var>.uuids.map(<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice⑤">BluetoothUUID.getService</a></code>)</code>.
@@ -3299,7 +3334,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
         the Services, Characteristics, and Descriptors on a device
         using a set of <a data-link-type="dfn" href="#gatt-procedure" id="ref-for-gatt-procedure">GATT procedures</a>.
         This spec refers to Services, Characteristics, and Descriptors
-        collectively as <dfn data-dfn-type="dfn" data-noexport="" id="attribute">Attribute<a class="self-link" href="#attribute"></a></dfn>s.
+        collectively as <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="attribute">Attribute</dfn>s.
         All Attributes have a type that’s identified by a <a data-link-type="dfn" href="#uuid" id="ref-for-uuid②">UUID</a>.
         Each Attribute also has a 16-bit <a data-link-type="dfn" href="#attribute-handle" id="ref-for-attribute-handle">Attribute Handle</a> that distinguishes it from other Attributes
         of the same type on the same <a data-link-type="dfn" href="#gatt-server" id="ref-for-gatt-server②">GATT Server</a>.
@@ -3706,7 +3741,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattservice-device"><code>device</code></dfn> is the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice③⑤">BluetoothDevice</a></code> representing
         the remote peripheral that the GATT service belongs to. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattservice-uuid"><code>uuid</code></dfn> is the UUID of the service,
-        e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">Heart Rate</a> service. </p>
+        e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#" id="termref-for-⑧">Heart Rate</a> service. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTService" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattservice-isprimary"><code>isPrimary</code></dfn> indicates whether the type of this service is primary or secondary. </p>
      </div>
      <p> Instances of <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice①⑥">BluetoothRemoteGATTService</a></code> are created with the <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-object-internal-methods-and-internal-slots" id="ref-for-sec-object-internal-methods-and-internal-slots⑦">internal slots</a> described in the following table: </p>
@@ -3788,7 +3823,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①⑤">BluetoothRemoteGATTCharacteristic</a></code> attributes</div>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-service"><code>service</code></dfn> is the GATT service this characteristic belongs to. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-uuid"><code>uuid</code></dfn> is the UUID of the characteristic,
-        e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#"> Heart Rate Measurement</a> characteristic. </p>
+        e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#" id="termref-for-⑨"> Heart Rate Measurement</a> characteristic. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-properties"><code>properties</code></dfn> holds the properties of this characteristic. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattcharacteristic-value"><code>value</code></dfn> is the currently cached characteristic value.
         This value gets updated when the value of the characteristic is read or updated via a notification or indication. </p>
@@ -4095,7 +4130,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor" id="ref-for-bluetoothremotegattdescriptor⑨">BluetoothRemoteGATTDescriptor</a></code> attributes</div>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattdescriptor-characteristic"><code>characteristic</code></dfn> is the GATT characteristic this descriptor belongs to. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattdescriptor-uuid"><code>uuid</code></dfn> is the UUID of the characteristic descriptor,
-        e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml#"> Client Characteristic Configuration</a> descriptor. </p>
+        e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml#" id="termref-for-①⓪"> Client Characteristic Configuration</a> descriptor. </p>
       <p> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="attribute" data-export="" id="dom-bluetoothremotegattdescriptor-value"><code>value</code></dfn> is the currently cached descriptor value.
         This value gets updated when the value of the descriptor is read. </p>
      </div>
@@ -4642,11 +4677,11 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
       MUST return <a data-link-type="dfn" href="#resolveuuidname" id="ref-for-resolveuuidname②">ResolveUUIDName</a>(<code><var>name</var></code>, <a data-link-type="biblio" href="#biblio-bluetooth-assigned-descriptors">[BLUETOOTH-ASSIGNED-DESCRIPTORS]</a>, "org.bluetooth.descriptor"). </p>
      <div class="example" id="example-650faeb7">
       <a class="self-link" href="#example-650faeb7"></a> 
-      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice①③">BluetoothUUID.getService</a></code>("<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#"> cycling_power</a>")</code> returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>. </p>
+      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice①③">BluetoothUUID.getService</a></code>("<a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#" id="termref-for-①①"> cycling_power</a>")</code> returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>. </p>
       <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice①④">BluetoothUUID.getService</a></code>("00001801-0000-1000-8000-00805f9b34fb")</code> returns <code>"00001801-0000-1000-8000-00805f9b34fb"</code>. </p>
       <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice①⑤">BluetoothUUID.getService</a></code>("unknown-service")</code> throws a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror①⑤">TypeError</a></code>. </p>
-      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getcharacteristic" id="ref-for-dom-bluetoothuuid-getcharacteristic④">BluetoothUUID.getCharacteristic</a></code>("<code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml#">ieee_11073-20601_regulatory_certification_data_list</a></code>")</code> returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>. </p>
-      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getdescriptor" id="ref-for-dom-bluetoothuuid-getdescriptor④">BluetoothUUID.getDescriptor</a></code>("<code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml#">gatt.characteristic_presentation_format</a></code>")</code> returns <code>"00002904-0000-1000-8000-00805f9b34fb"</code>. </p>
+      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getcharacteristic" id="ref-for-dom-bluetoothuuid-getcharacteristic④">BluetoothUUID.getCharacteristic</a></code>("<code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml#" id="termref-for-①②">ieee_11073-20601_regulatory_certification_data_list</a></code>")</code> returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>. </p>
+      <p> <code><code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getdescriptor" id="ref-for-dom-bluetoothuuid-getdescriptor④">BluetoothUUID.getDescriptor</a></code>("<code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml#" id="termref-for-①③">gatt.characteristic_presentation_format</a></code>")</code> returns <code>"00002904-0000-1000-8000-00805f9b34fb"</code>. </p>
      </div>
     </section>
    </section>
@@ -4841,7 +4876,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
                <li value="6"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="general-discovery-procedure">General Discovery Procedure</dfn>
                <li value="7"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="name-discovery-procedure">Name Discovery Procedure</dfn>
               </ol>
-             <li value="3"><dfn data-dfn-type="dfn" data-noexport="" id="connection-modes-and-procedures">Connection Modes and Procedures<a class="self-link" href="#connection-modes-and-procedures"></a></dfn>
+             <li value="3">Connection Modes and Procedures
              <li value="4">
               Bonding Modes and Procedures 
               <ol>
@@ -4959,18 +4994,18 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
              <li value="4">
               <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="primary-service-discovery">Primary Service Discovery</dfn> 
               <ol>
-               <li value="1"><dfn data-dfn-type="dfn" data-noexport="" id="discover-all-primary-services">Discover All Primary Services<a class="self-link" href="#discover-all-primary-services"></a></dfn>
+               <li value="1">Discover All Primary Services
                <li value="2"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="discover-primary-service-by-service-uuid">Discover Primary Service by Service UUID</dfn>
               </ol>
              <li value="5">
               <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="relationship-discovery">Relationship Discovery</dfn> 
               <ol>
-               <li value="1"><dfn data-dfn-type="dfn" data-noexport="" id="find-included-services">Find Included Services<a class="self-link" href="#find-included-services"></a></dfn>
+               <li value="1">Find Included Services
               </ol>
              <li value="6">
               <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="characteristic-discovery">Characteristic Discovery</dfn> 
               <ol>
-               <li value="1"><dfn data-dfn-type="dfn" data-noexport="" id="discover-all-characteristics-of-a-service">Discover All Characteristics of a Service<a class="self-link" href="#discover-all-characteristics-of-a-service"></a></dfn>
+               <li value="1">Discover All Characteristics of a Service
                <li value="2"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="discover-characteristics-by-uuid">Discover Characteristics by UUID</dfn>
               </ol>
              <li value="7">
@@ -5334,7 +5369,6 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#dom-bluetoothremotegattserver-connect">connect()</a><span>, in §5.2</span>
    <li><a href="#dom-bluetoothremotegattserver-connected">connected</a><span>, in §5.2</span>
    <li><a href="#connection-checking-wrapper">connection-checking wrapper</a><span>, in §5.2</span>
-   <li><a href="#connection-modes-and-procedures">Connection Modes and Procedures</a><span>, in §9</span>
    <li><a href="#dom-bluetoothdevice-context-slot">[[context]]</a><span>, in §4.2</span>
    <li><a href="#create-a-bluetoothcharacteristicproperties-instance-from-the-characteristic">create a BluetoothCharacteristicProperties instance from the Characteristic</a><span>, in §5.4.1</span>
    <li><a href="#create-a-bluetoothremotegattcharacteristic-representing">create a BluetoothRemoteGATTCharacteristic representing</a><span>, in §5.4</span>
@@ -5364,8 +5398,6 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <li><a href="#dom-bluetoothremotegattserver-disconnect">disconnect()</a><span>, in §5.2</span>
    <li><a href="#discoverable-mode">Discoverable Mode</a><span>, in §9</span>
    <li><a href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a><span>, in §9</span>
-   <li><a href="#discover-all-characteristics-of-a-service">Discover All Characteristics of a Service</a><span>, in §9</span>
-   <li><a href="#discover-all-primary-services">Discover All Primary Services</a><span>, in §9</span>
    <li><a href="#discover-characteristics-by-uuid">Discover Characteristics by UUID</a><span>, in §9</span>
    <li><a href="#discover-primary-service-by-service-uuid">Discover Primary Service by Service UUID</a><span>, in §9</span>
    <li><a href="#error-response">Error Response</a><span>, in §9</span>
@@ -5377,7 +5409,6 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
      <li><a href="#dom-bluetoothpermissiondescriptor-filters">dict-member for BluetoothPermissionDescriptor</a><span>, in §3.1</span>
      <li><a href="#dom-requestdeviceoptions-filters">dict-member for RequestDeviceOptions</a><span>, in §3</span>
     </ul>
-   <li><a href="#find-included-services">Find Included Services</a><span>, in §9</span>
    <li><a href="#fire-an-advertisementreceived-event">fire an advertisementreceived event</a><span>, in §4.2.1</span>
    <li><a href="#flags-data-type">Flags Data Type</a><span>, in §9</span>
    <li><a href="#gap-interoperability-requirements">GAP Interoperability Requirements</a><span>, in §9</span>
@@ -5593,158 +5624,944 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     </ul>
    <li><a href="#dom-bluetoothcharacteristicproperties-writewithoutresponse">writeWithoutResponse</a><span>, in §5.4.1</span>
   </ul>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">1.1. Examples</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">4.2.1. Responding to Advertising Events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">1.1. Examples</a> <a href="#termref-for-">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">1.1. Examples</a> <a href="#termref-for-">(2)</a>
+    <li><a href="#termref-for-">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">6.1. Standardized UUIDs</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml#">https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">6.1. Standardized UUIDs</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml#">https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">5.5. BluetoothRemoteGATTDescriptor</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">6.1. Standardized UUIDs</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">1.1. Examples</a>
+    <li><a href="#termref-for-">5.3. BluetoothRemoteGATTService</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-">
+   <a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#">https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#termref-for-">4.1. Global Bluetooth device properties</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-event">
+   <a href="https://dom.spec.whatwg.org/#event">https://dom.spec.whatwg.org/#event</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-event">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-event①">4.2.1. Responding to Advertising Events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dictdef-eventinit">
+   <a href="https://dom.spec.whatwg.org/#dictdef-eventinit">https://dom.spec.whatwg.org/#dictdef-eventinit</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-eventinit">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-dictdef-eventinit①">4.2.1. Responding to Advertising Events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-eventtarget">
+   <a href="https://dom.spec.whatwg.org/#eventtarget">https://dom.spec.whatwg.org/#eventtarget</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-eventtarget">3. Device Discovery</a>
+    <li><a href="#ref-for-eventtarget①">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-eventtarget②">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-eventtarget③">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-event-bubbles">
+   <a href="https://dom.spec.whatwg.org/#dom-event-bubbles">https://dom.spec.whatwg.org/#dom-event-bubbles</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-event-bubbles">5.6.3. Responding to Disconnection</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-tree-child">
+   <a href="https://dom.spec.whatwg.org/#concept-tree-child">https://dom.spec.whatwg.org/#concept-tree-child</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-tree-child">5.6.1. Bluetooth Tree</a> <a href="#ref-for-concept-tree-child①">(2)</a> <a href="#ref-for-concept-tree-child②">(3)</a> <a href="#ref-for-concept-tree-child③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-context-object">
+   <a href="https://dom.spec.whatwg.org/#context-object">https://dom.spec.whatwg.org/#context-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-context-object">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-event-fire">
+   <a href="https://dom.spec.whatwg.org/#concept-event-fire">https://dom.spec.whatwg.org/#concept-event-fire</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-event-fire">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-concept-event-fire①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-concept-event-fire②">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-concept-event-fire③">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-concept-event-fire④">5.6.4. Responding to Notifications and Indications</a>
+    <li><a href="#ref-for-concept-event-fire⑤">5.6.5. Responding to Service Changes</a> <a href="#ref-for-concept-event-fire⑥">(2)</a> <a href="#ref-for-concept-event-fire⑦">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-event-istrusted">
+   <a href="https://dom.spec.whatwg.org/#dom-event-istrusted">https://dom.spec.whatwg.org/#dom-event-istrusted</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-event-istrusted">4.2.1. Responding to Advertising Events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-tree-participate">
+   <a href="https://dom.spec.whatwg.org/#concept-tree-participate">https://dom.spec.whatwg.org/#concept-tree-participate</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-tree-participate">5.6.1. Bluetooth Tree</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-array-objects">
+   <a href="https://tc39.github.io/ecma262/#sec-array-objects">https://tc39.github.io/ecma262/#sec-array-objects</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-array-objects">3. Device Discovery</a>
+    <li><a href="#ref-for-sec-array-objects①">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-array.prototype.map">
+   <a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">https://tc39.github.io/ecma262/#sec-array.prototype.map</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-array.prototype.map">3. Device Discovery</a> <a href="#ref-for-sec-array.prototype.map①">(2)</a>
+    <li><a href="#ref-for-sec-array.prototype.map②">9. Terminology and Conventions</a> <a href="#ref-for-sec-array.prototype.map③">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-arraybuffer-constructor">
+   <a href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">https://tc39.github.io/ecma262/#sec-arraybuffer-constructor</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-arraybuffer-constructor">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-arraybuffer-constructor①">(2)</a>
+    <li><a href="#ref-for-sec-arraybuffer-constructor②">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-arraybuffer-constructor③">(2)</a> <a href="#ref-for-sec-arraybuffer-constructor④">(3)</a>
+    <li><a href="#ref-for-sec-arraybuffer-constructor⑤">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-arraybuffer-constructor⑥">(2)</a> <a href="#ref-for-sec-arraybuffer-constructor⑦">(3)</a>
+    <li><a href="#ref-for-sec-arraybuffer-constructor⑧">5.6.4. Responding to Notifications and Indications</a>
+    <li><a href="#ref-for-sec-arraybuffer-constructor⑨">9. Terminology and Conventions</a> <a href="#ref-for-sec-arraybuffer-constructor①⓪">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-canonicalnumericindexstring">
+   <a href="https://tc39.github.io/ecma262/#sec-canonicalnumericindexstring">https://tc39.github.io/ecma262/#sec-canonicalnumericindexstring</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-canonicalnumericindexstring">3. Device Discovery</a> <a href="#ref-for-sec-canonicalnumericindexstring①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-createdataproperty">
+   <a href="https://tc39.github.io/ecma262/#sec-createdataproperty">https://tc39.github.io/ecma262/#sec-createdataproperty</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-createdataproperty">3. Device Discovery</a> <a href="#ref-for-sec-createdataproperty①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-dataview-constructor">
+   <a href="https://tc39.github.io/ecma262/#sec-dataview-constructor">https://tc39.github.io/ecma262/#sec-dataview-constructor</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-dataview-constructor">1.1. Examples</a>
+    <li><a href="#ref-for-sec-dataview-constructor①">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-dataview-constructor②">(2)</a> <a href="#ref-for-sec-dataview-constructor③">(3)</a> <a href="#ref-for-sec-dataview-constructor④">(4)</a>
+    <li><a href="#ref-for-sec-dataview-constructor⑤">4.2.1.1. BluetoothManufacturerDataMap</a>
+    <li><a href="#ref-for-sec-dataview-constructor⑥">4.2.1.2. BluetoothServiceDataMap</a>
+    <li><a href="#ref-for-sec-dataview-constructor⑦">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-dataview-constructor⑧">(2)</a> <a href="#ref-for-sec-dataview-constructor⑨">(3)</a> <a href="#ref-for-sec-dataview-constructor①⓪">(4)</a>
+    <li><a href="#ref-for-sec-dataview-constructor①①">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-dataview-constructor①②">(2)</a> <a href="#ref-for-sec-dataview-constructor①③">(3)</a> <a href="#ref-for-sec-dataview-constructor①④">(4)</a>
+    <li><a href="#ref-for-sec-dataview-constructor①⑤">5.6.4. Responding to Notifications and Indications</a>
+    <li><a href="#ref-for-sec-dataview-constructor①⑥">9. Terminology and Conventions</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-isinteger">
+   <a href="https://tc39.github.io/ecma262/#sec-isinteger">https://tc39.github.io/ecma262/#sec-isinteger</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-isinteger">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-map-constructor">
+   <a href="https://tc39.github.io/ecma262/#sec-map-constructor">https://tc39.github.io/ecma262/#sec-map-constructor</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-map-constructor">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-map-constructor①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-promise-objects">
+   <a href="https://tc39.github.io/ecma262/#sec-promise-objects">https://tc39.github.io/ecma262/#sec-promise-objects</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-promise-objects">2.5. Exposing Bluetooth availability</a>
+    <li><a href="#ref-for-sec-promise-objects①">3. Device Discovery</a> <a href="#ref-for-sec-promise-objects②">(2)</a>
+    <li><a href="#ref-for-sec-promise-objects③">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-sec-promise-objects④">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-sec-promise-objects⑤">(2)</a> <a href="#ref-for-sec-promise-objects⑥">(3)</a> <a href="#ref-for-sec-promise-objects⑦">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-set-objects">
+   <a href="https://tc39.github.io/ecma262/#sec-set-objects">https://tc39.github.io/ecma262/#sec-set-objects</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-set-objects">3. Device Discovery</a>
+    <li><a href="#ref-for-sec-set-objects①">5.2. BluetoothRemoteGATTServer</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-native-error-types-used-in-this-standard-typeerror">
+   <a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror">3. Device Discovery</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①">(2)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror②">(3)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror③">(4)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror④">(5)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑤">(6)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑥">(7)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑦">(8)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑧">(9)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑨">(10)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①⓪">(11)</a>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①①">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①②">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①③">(2)</a>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①④">6.1. Standardized UUIDs</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①⑤">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-typedarray-constructors">
+   <a href="https://tc39.github.io/ecma262/#sec-typedarray-constructors">https://tc39.github.io/ecma262/#sec-typedarray-constructors</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-typedarray-constructors">9. Terminology and Conventions</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">
+   <a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">3. Device Discovery</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys①">(2)</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys②">(3)</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-current-realm">
+   <a href="https://tc39.github.io/ecma262/#current-realm">https://tc39.github.io/ecma262/#current-realm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-current-realm">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-object-internal-methods-and-internal-slots">
+   <a href="https://tc39.github.io/ecma262/#sec-object-internal-methods-and-internal-slots">https://tc39.github.io/ecma262/#sec-object-internal-methods-and-internal-slots</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots">3. Device Discovery</a> <a href="#ref-for-sec-object-internal-methods-and-internal-slots①">(2)</a>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots②">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots③">4.2. BluetoothDevice</a> <a href="#ref-for-sec-object-internal-methods-and-internal-slots④">(2)</a>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots⑤">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-sec-object-internal-methods-and-internal-slots⑥">(2)</a>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots⑦">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-sec-object-internal-methods-and-internal-slots⑧">(2)</a>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots⑨">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-object-internal-methods-and-internal-slots①⓪">(2)</a>
+    <li><a href="#ref-for-sec-object-internal-methods-and-internal-slots①①">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-object-internal-methods-and-internal-slots①②">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-code-realms">
+   <a href="https://tc39.github.io/ecma262/#sec-code-realms">https://tc39.github.io/ecma262/#sec-code-realms</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-code-realms">3. Device Discovery</a>
+    <li><a href="#ref-for-sec-code-realms①">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-sec-code-realms②">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-sec-code-realms③">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-sec-code-realms④">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-sec-code-realms⑤">5.6.3. Responding to Disconnection</a> <a href="#ref-for-sec-code-realms⑥">(2)</a> <a href="#ref-for-sec-code-realms⑦">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-utf-8-decode-without-bom">
+   <a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">https://encoding.spec.whatwg.org/#utf-8-decode-without-bom</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-utf-8-decode-without-bom">4.1. Global Bluetooth device properties</a>
+    <li><a href="#ref-for-utf-8-decode-without-bom①">4.2.1. Responding to Advertising Events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-utf-8-encode">
+   <a href="https://encoding.spec.whatwg.org/#utf-8-encode">https://encoding.spec.whatwg.org/#utf-8-encode</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-utf-8-encode">3. Device Discovery</a> <a href="#ref-for-utf-8-encode①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-fingerprinting-surface">
+   <a href="https://w3c.github.io/fingerprinting-guidance/#dfn-fingerprinting-surface">https://w3c.github.io/fingerprinting-guidance/#dfn-fingerprinting-surface</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-fingerprinting-surface">2.5. Exposing Bluetooth availability</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-eventhandler">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-eventhandler">3. Device Discovery</a>
+    <li><a href="#ref-for-eventhandler①">5.6.6. IDL event handlers</a> <a href="#ref-for-eventhandler②">(2)</a> <a href="#ref-for-eventhandler③">(3)</a> <a href="#ref-for-eventhandler④">(4)</a> <a href="#ref-for-eventhandler⑤">(5)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-navigator">
+   <a href="https://html.spec.whatwg.org/multipage/system-state.html#navigator">https://html.spec.whatwg.org/multipage/system-state.html#navigator</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-navigator">8. Extensions to the Navigator Interface</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-browsing-context">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">https://html.spec.whatwg.org/multipage/browsers.html#browsing-context</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-browsing-context">3. Device Discovery</a>
+    <li><a href="#ref-for-browsing-context①">5.2. BluetoothRemoteGATTServer</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-current-settings-object">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-current-settings-object">3. Device Discovery</a>
+    <li><a href="#ref-for-current-settings-object①">3.1. Permission API Integration</a> <a href="#ref-for-current-settings-object②">(2)</a>
+    <li><a href="#ref-for-current-settings-object③">4.2. BluetoothDevice</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-environment-settings-object">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-environment-settings-object">5.6.5. Responding to Service Changes</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-event-handler-idl-attributes">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-event-handler-idl-attributes">5.6.6. IDL event handlers</a> <a href="#ref-for-event-handler-idl-attributes①">(2)</a> <a href="#ref-for-event-handler-idl-attributes②">(3)</a> <a href="#ref-for-event-handler-idl-attributes③">(4)</a> <a href="#ref-for-event-handler-idl-attributes④">(5)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-settings-object-global">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-global</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-settings-object-global">5.6.5. Responding to Service Changes</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-in-parallel">
+   <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-in-parallel">3. Device Discovery</a> <a href="#ref-for-in-parallel①">(2)</a>
+    <li><a href="#ref-for-in-parallel②">3.2. Overall Bluetooth availability</a> <a href="#ref-for-in-parallel③">(2)</a>
+    <li><a href="#ref-for-in-parallel④">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-in-parallel⑤">5.1.2. The Bluetooth cache</a> <a href="#ref-for-in-parallel⑥">(2)</a>
+    <li><a href="#ref-for-in-parallel⑦">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-in-parallel⑧">(2)</a>
+    <li><a href="#ref-for-in-parallel⑨">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-in-parallel①⓪">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-in-parallel①①">(2)</a> <a href="#ref-for-in-parallel①②">(3)</a> <a href="#ref-for-in-parallel①③">(4)</a>
+    <li><a href="#ref-for-in-parallel①④">5.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-in-parallel①⑤">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-in-parallel①⑥">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-initialise-the-document-object">
+   <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#initialise-the-document-object">https://html.spec.whatwg.org/multipage/browsing-the-web.html#initialise-the-document-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-initialise-the-document-object">3. Device Discovery</a> <a href="#ref-for-initialise-the-document-object①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-navigate">
+   <a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate">https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-navigate">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-perform-a-microtask-checkpoint">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint">https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-perform-a-microtask-checkpoint">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-queue-a-task">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-queue-a-task">3.2. Overall Bluetooth availability</a> <a href="#ref-for-queue-a-task①">(2)</a> <a href="#ref-for-queue-a-task②">(3)</a> <a href="#ref-for-queue-a-task③">(4)</a>
+    <li><a href="#ref-for-queue-a-task④">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-queue-a-task⑤">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-queue-a-task⑥">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-queue-a-task⑦">(2)</a> <a href="#ref-for-queue-a-task⑧">(3)</a>
+    <li><a href="#ref-for-queue-a-task⑨">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-queue-a-task①⓪">(2)</a> <a href="#ref-for-queue-a-task①①">(3)</a>
+    <li><a href="#ref-for-queue-a-task①②">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-queue-a-task①③">(2)</a>
+    <li><a href="#ref-for-queue-a-task①④">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-queue-a-task①⑤">5.6.4. Responding to Notifications and Indications</a>
+    <li><a href="#ref-for-queue-a-task①⑥">5.6.5. Responding to Service Changes</a> <a href="#ref-for-queue-a-task①⑦">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-relevant-global">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-relevant-global">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-concept-relevant-global①">5.6.5. Responding to Service Changes</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-relevant-settings-object">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-relevant-settings-object①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-relevant-settings-object②">5.6.1. Bluetooth Tree</a>
+    <li><a href="#ref-for-relevant-settings-object③">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-relevant-settings-object④">5.6.5. Responding to Service Changes</a> <a href="#ref-for-relevant-settings-object⑤">(2)</a> <a href="#ref-for-relevant-settings-object⑥">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-responsible-event-loop">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-responsible-event-loop">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-responsible-event-loop①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-responsible-event-loop②">5.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-responsible-event-loop③">5.6.5. Responding to Service Changes</a> <a href="#ref-for-responsible-event-loop④">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-triggered-by-user-activation">
+   <a href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-triggered-by-user-activation">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissionstate-denied">
+   <a href="https://w3c.github.io/permissions/#dom-permissionstate-denied">https://w3c.github.io/permissions/#dom-permissionstate-denied</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissionstate-denied">3. Device Discovery</a> <a href="#ref-for-dom-permissionstate-denied①">(2)</a> <a href="#ref-for-dom-permissionstate-denied②">(3)</a>
+    <li><a href="#ref-for-dom-permissionstate-denied③">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dictdef-permissiondescriptor">
+   <a href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">https://w3c.github.io/permissions/#dictdef-permissiondescriptor</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-permissiondescriptor">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permissionstatus">
+   <a href="https://w3c.github.io/permissions/#permissionstatus">https://w3c.github.io/permissions/#permissionstatus</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permissionstatus">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-allowed-in-non-secure-contexts">
+   <a href="https://w3c.github.io/permissions/#allowed-in-non-secure-contexts">https://w3c.github.io/permissions/#allowed-in-non-secure-contexts</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-allowed-in-non-secure-contexts">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-extra-permission-data">
+   <a href="https://w3c.github.io/permissions/#extra-permission-data">https://w3c.github.io/permissions/#extra-permission-data</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-extra-permission-data">3. Device Discovery</a>
+    <li><a href="#ref-for-extra-permission-data①">3.1. Permission API Integration</a> <a href="#ref-for-extra-permission-data②">(2)</a> <a href="#ref-for-extra-permission-data③">(3)</a>
+    <li><a href="#ref-for-extra-permission-data④">4.2. BluetoothDevice</a> <a href="#ref-for-extra-permission-data⑤">(2)</a>
+    <li><a href="#ref-for-extra-permission-data⑥">5.6.1. Bluetooth Tree</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-extra-permission-data-constraints">
+   <a href="https://w3c.github.io/permissions/#extra-permission-data-constraints">https://w3c.github.io/permissions/#extra-permission-data-constraints</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-extra-permission-data-constraints">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-extra-permission-data-type">
+   <a href="https://w3c.github.io/permissions/#extra-permission-data-type">https://w3c.github.io/permissions/#extra-permission-data-type</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-extra-permission-data-type">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissiondescriptor-name">
+   <a href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">https://w3c.github.io/permissions/#dom-permissiondescriptor-name</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissiondescriptor-name">3.1. Permission API Integration</a> <a href="#ref-for-dom-permissiondescriptor-name①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-descriptor-type">
+   <a href="https://w3c.github.io/permissions/#permission-descriptor-type">https://w3c.github.io/permissions/#permission-descriptor-type</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-descriptor-type">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-query-algorithm">
+   <a href="https://w3c.github.io/permissions/#permission-query-algorithm">https://w3c.github.io/permissions/#permission-query-algorithm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-query-algorithm">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-result-type">
+   <a href="https://w3c.github.io/permissions/#permission-result-type">https://w3c.github.io/permissions/#permission-result-type</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-result-type">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-revocation-algorithm">
+   <a href="https://w3c.github.io/permissions/#permission-revocation-algorithm">https://w3c.github.io/permissions/#permission-revocation-algorithm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-revocation-algorithm">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-state">
+   <a href="https://w3c.github.io/permissions/#permission-state">https://w3c.github.io/permissions/#permission-state</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-state">3. Device Discovery</a>
+    <li><a href="#ref-for-permission-state①">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-powerful-feature">
+   <a href="https://w3c.github.io/permissions/#powerful-feature">https://w3c.github.io/permissions/#powerful-feature</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-powerful-feature">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-prompt-the-user-to-choose">
+   <a href="https://w3c.github.io/permissions/#prompt-the-user-to-choose">https://w3c.github.io/permissions/#prompt-the-user-to-choose</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-prompt-the-user-to-choose">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissions-query">
+   <a href="https://w3c.github.io/permissions/#dom-permissions-query">https://w3c.github.io/permissions/#dom-permissions-query</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissions-query">3.1. Permission API Integration</a> <a href="#ref-for-dom-permissions-query①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissionstatus-state">
+   <a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">https://w3c.github.io/permissions/#dom-permissionstatus-state</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissionstatus-state">3.1. Permission API Integration</a> <a href="#ref-for-dom-permissionstatus-state①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-request-algorithm">
+   <a href="https://wicg.github.io/permissions-request/#permission-request-algorithm">https://wicg.github.io/permissions-request/#permission-request-algorithm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-request-algorithm">3.1. Permission API Integration</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissions-request">
+   <a href="https://wicg.github.io/permissions-request/#dom-permissions-request">https://wicg.github.io/permissions-request/#dom-permissions-request</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissions-request">3.1. Permission API Integration</a> <a href="#ref-for-dom-permissions-request①">(2)</a> <a href="#ref-for-dom-permissions-request②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-a-new-promise">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-a-new-promise">3. Device Discovery</a>
+    <li><a href="#ref-for-a-new-promise①">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-a-new-promise②">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-a-new-promise③">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-a-new-promise④">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-a-new-promise⑤">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-a-new-promise⑥">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-a-new-promise⑦">(2)</a> <a href="#ref-for-a-new-promise⑧">(3)</a> <a href="#ref-for-a-new-promise⑨">(4)</a> <a href="#ref-for-a-new-promise①⓪">(5)</a>
+    <li><a href="#ref-for-a-new-promise①①">5.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-a-new-promise①②">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-a-new-promise①③">(2)</a> <a href="#ref-for-a-new-promise①④">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-a-promise-rejected-with">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-a-promise-rejected-with">5.1.3. Navigating the Bluetooth Hierarchy</a> <a href="#ref-for-a-promise-rejected-with①">(2)</a> <a href="#ref-for-a-promise-rejected-with②">(3)</a> <a href="#ref-for-a-promise-rejected-with③">(4)</a>
+    <li><a href="#ref-for-a-promise-rejected-with④">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-a-promise-rejected-with⑤">(2)</a>
+    <li><a href="#ref-for-a-promise-rejected-with⑥">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-a-promise-rejected-with⑦">(2)</a> <a href="#ref-for-a-promise-rejected-with⑧">(3)</a> <a href="#ref-for-a-promise-rejected-with⑨">(4)</a> <a href="#ref-for-a-promise-rejected-with①⓪">(5)</a> <a href="#ref-for-a-promise-rejected-with①①">(6)</a> <a href="#ref-for-a-promise-rejected-with①②">(7)</a> <a href="#ref-for-a-promise-rejected-with①③">(8)</a> <a href="#ref-for-a-promise-rejected-with①④">(9)</a>
+    <li><a href="#ref-for-a-promise-rejected-with①⑤">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-a-promise-rejected-with①⑥">(2)</a> <a href="#ref-for-a-promise-rejected-with①⑦">(3)</a> <a href="#ref-for-a-promise-rejected-with①⑧">(4)</a> <a href="#ref-for-a-promise-rejected-with①⑨">(5)</a> <a href="#ref-for-a-promise-rejected-with②⓪">(6)</a> <a href="#ref-for-a-promise-rejected-with②①">(7)</a>
+    <li><a href="#ref-for-a-promise-rejected-with②②">6. UUIDs</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-reject-promise">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-reject-promise">3. Device Discovery</a> <a href="#ref-for-reject-promise①">(2)</a> <a href="#ref-for-reject-promise②">(3)</a>
+    <li><a href="#ref-for-reject-promise③">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-reject-promise④">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-reject-promise⑤">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-reject-promise⑥">(2)</a> <a href="#ref-for-reject-promise⑦">(3)</a> <a href="#ref-for-reject-promise⑧">(4)</a> <a href="#ref-for-reject-promise⑨">(5)</a> <a href="#ref-for-reject-promise①⓪">(6)</a>
+    <li><a href="#ref-for-reject-promise①①">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-reject-promise①②">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-reject-promise①③">(2)</a> <a href="#ref-for-reject-promise①④">(3)</a> <a href="#ref-for-reject-promise①⑤">(4)</a> <a href="#ref-for-reject-promise①⑥">(5)</a> <a href="#ref-for-reject-promise①⑦">(6)</a> <a href="#ref-for-reject-promise①⑧">(7)</a> <a href="#ref-for-reject-promise①⑨">(8)</a> <a href="#ref-for-reject-promise②⓪">(9)</a> <a href="#ref-for-reject-promise②①">(10)</a> <a href="#ref-for-reject-promise②②">(11)</a> <a href="#ref-for-reject-promise②③">(12)</a> <a href="#ref-for-reject-promise②④">(13)</a>
+    <li><a href="#ref-for-reject-promise②⑤">5.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-reject-promise②⑥">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-reject-promise②⑦">(2)</a> <a href="#ref-for-reject-promise②⑧">(3)</a> <a href="#ref-for-reject-promise②⑨">(4)</a> <a href="#ref-for-reject-promise③⓪">(5)</a> <a href="#ref-for-reject-promise③①">(6)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-resolve-promise">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-resolve-promise">3. Device Discovery</a>
+    <li><a href="#ref-for-resolve-promise①">3.2. Overall Bluetooth availability</a> <a href="#ref-for-resolve-promise②">(2)</a> <a href="#ref-for-resolve-promise③">(3)</a>
+    <li><a href="#ref-for-resolve-promise④">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-resolve-promise⑤">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-resolve-promise⑥">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-resolve-promise⑦">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-resolve-promise⑧">(2)</a> <a href="#ref-for-resolve-promise⑨">(3)</a> <a href="#ref-for-resolve-promise①⓪">(4)</a> <a href="#ref-for-resolve-promise①①">(5)</a> <a href="#ref-for-resolve-promise①②">(6)</a> <a href="#ref-for-resolve-promise①③">(7)</a>
+    <li><a href="#ref-for-resolve-promise①④">5.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-resolve-promise①⑤">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-resolve-promise①⑥">(2)</a> <a href="#ref-for-resolve-promise①⑦">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-transforming-by">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#transforming-by">https://www.w3.org/2001/tag/doc/promises-guide/#transforming-by</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-transforming-by">5.1.3. Navigating the Bluetooth Hierarchy</a>
+    <li><a href="#ref-for-transforming-by①">5.2. BluetoothRemoteGATTServer</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-waiting-for-all">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#waiting-for-all">https://www.w3.org/2001/tag/doc/promises-guide/#waiting-for-all</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-waiting-for-all">5.1.2. The Bluetooth cache</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-non-secure-contexts">
+   <a href="https://w3c.github.io/webappsec-secure-contexts/#non-secure-contexts">https://w3c.github.io/webappsec-secure-contexts/#non-secure-contexts</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-non-secure-contexts">3. Device Discovery</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-secure-contexts">
+   <a href="https://w3c.github.io/webappsec-secure-contexts/#secure-contexts">https://w3c.github.io/webappsec-secure-contexts/#secure-contexts</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-secure-contexts">2.1. Device access is powerful</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-aborterror">
+   <a href="https://heycam.github.io/webidl/#aborterror">https://heycam.github.io/webidl/#aborterror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-aborterror">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-aborterror①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-BufferSource">
+   <a href="https://heycam.github.io/webidl/#BufferSource">https://heycam.github.io/webidl/#BufferSource</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-BufferSource">3. Device Discovery</a> <a href="#ref-for-BufferSource①">(2)</a>
+    <li><a href="#ref-for-BufferSource②">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-BufferSource③">(2)</a>
+    <li><a href="#ref-for-BufferSource④">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-BufferSource⑤">5.5. BluetoothRemoteGATTDescriptor</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-DOMException">
+   <a href="https://heycam.github.io/webidl/#idl-DOMException">https://heycam.github.io/webidl/#idl-DOMException</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-DOMException">3.1. Permission API Integration</a> <a href="#ref-for-idl-DOMException①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-DOMString">
+   <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-DOMString">3. Device Discovery</a> <a href="#ref-for-idl-DOMString①">(2)</a>
+    <li><a href="#ref-for-idl-DOMString②">3.1. Permission API Integration</a> <a href="#ref-for-idl-DOMString③">(2)</a> <a href="#ref-for-idl-DOMString④">(3)</a>
+    <li><a href="#ref-for-idl-DOMString⑤">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-idl-DOMString⑥">4.2. BluetoothDevice</a> <a href="#ref-for-idl-DOMString⑦">(2)</a>
+    <li><a href="#ref-for-idl-DOMString⑧">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-DOMString⑨">(2)</a> <a href="#ref-for-idl-DOMString①⓪">(3)</a> <a href="#ref-for-idl-DOMString①①">(4)</a>
+    <li><a href="#ref-for-idl-DOMString①②">6. UUIDs</a>
+    <li><a href="#ref-for-idl-DOMString①③">6.1. Standardized UUIDs</a> <a href="#ref-for-idl-DOMString①④">(2)</a> <a href="#ref-for-idl-DOMString①⑤">(3)</a> <a href="#ref-for-idl-DOMString①⑥">(4)</a> <a href="#ref-for-idl-DOMString①⑦">(5)</a> <a href="#ref-for-idl-DOMString①⑧">(6)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-EnforceRange">
+   <a href="https://heycam.github.io/webidl/#EnforceRange">https://heycam.github.io/webidl/#EnforceRange</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-EnforceRange">6.1. Standardized UUIDs</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-frozen-array">
+   <a href="https://heycam.github.io/webidl/#idl-frozen-array">https://heycam.github.io/webidl/#idl-frozen-array</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-frozen-array">3.1. Permission API Integration</a> <a href="#ref-for-idl-frozen-array①">(2)</a> <a href="#ref-for-idl-frozen-array②">(3)</a>
+    <li><a href="#ref-for-idl-frozen-array③">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-frozen-array④">(2)</a>
+    <li><a href="#ref-for-idl-frozen-array⑤">9. Terminology and Conventions</a> <a href="#ref-for-idl-frozen-array⑥">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-invalidmodificationerror">
+   <a href="https://heycam.github.io/webidl/#invalidmodificationerror">https://heycam.github.io/webidl/#invalidmodificationerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-invalidmodificationerror">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-invalidmodificationerror①">5.5. BluetoothRemoteGATTDescriptor</a>
+    <li><a href="#ref-for-invalidmodificationerror②">5.7. Error handling</a> <a href="#ref-for-invalidmodificationerror③">(2)</a> <a href="#ref-for-invalidmodificationerror④">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-invalidstateerror">
+   <a href="https://heycam.github.io/webidl/#invalidstateerror">https://heycam.github.io/webidl/#invalidstateerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-invalidstateerror">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-invalidstateerror①">5.1.3. Navigating the Bluetooth Hierarchy</a>
+    <li><a href="#ref-for-invalidstateerror②">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-invalidstateerror③">(2)</a> <a href="#ref-for-invalidstateerror④">(3)</a> <a href="#ref-for-invalidstateerror⑤">(4)</a>
+    <li><a href="#ref-for-invalidstateerror⑥">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-invalidstateerror⑦">(2)</a>
+    <li><a href="#ref-for-invalidstateerror⑧">5.7. Error handling</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-networkerror">
+   <a href="https://heycam.github.io/webidl/#networkerror">https://heycam.github.io/webidl/#networkerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-networkerror">5.1.3. Navigating the Bluetooth Hierarchy</a>
+    <li><a href="#ref-for-networkerror①">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-networkerror②">(2)</a> <a href="#ref-for-networkerror③">(3)</a> <a href="#ref-for-networkerror④">(4)</a> <a href="#ref-for-networkerror⑤">(5)</a> <a href="#ref-for-networkerror⑥">(6)</a> <a href="#ref-for-networkerror⑦">(7)</a>
+    <li><a href="#ref-for-networkerror⑧">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-networkerror⑨">(2)</a> <a href="#ref-for-networkerror①⓪">(3)</a> <a href="#ref-for-networkerror①①">(4)</a> <a href="#ref-for-networkerror①②">(5)</a> <a href="#ref-for-networkerror①③">(6)</a> <a href="#ref-for-networkerror①④">(7)</a> <a href="#ref-for-networkerror①⑤">(8)</a> <a href="#ref-for-networkerror①⑥">(9)</a> <a href="#ref-for-networkerror①⑦">(10)</a> <a href="#ref-for-networkerror①⑧">(11)</a>
+    <li><a href="#ref-for-networkerror①⑨">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-networkerror②⓪">(2)</a> <a href="#ref-for-networkerror②①">(3)</a> <a href="#ref-for-networkerror②②">(4)</a> <a href="#ref-for-networkerror②③">(5)</a> <a href="#ref-for-networkerror②④">(6)</a> <a href="#ref-for-networkerror②⑤">(7)</a> <a href="#ref-for-networkerror②⑥">(8)</a>
+    <li><a href="#ref-for-networkerror②⑦">5.7. Error handling</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-NoInterfaceObject">
+   <a href="https://heycam.github.io/webidl/#NoInterfaceObject">https://heycam.github.io/webidl/#NoInterfaceObject</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-NoInterfaceObject">5.6.6. IDL event handlers</a> <a href="#ref-for-NoInterfaceObject①">(2)</a> <a href="#ref-for-NoInterfaceObject②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-notfounderror">
+   <a href="https://heycam.github.io/webidl/#notfounderror">https://heycam.github.io/webidl/#notfounderror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-notfounderror">3. Device Discovery</a>
+    <li><a href="#ref-for-notfounderror①">3.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-notfounderror②">5.1.3. Navigating the Bluetooth Hierarchy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-notsupportederror">
+   <a href="https://heycam.github.io/webidl/#notsupportederror">https://heycam.github.io/webidl/#notsupportederror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-notsupportederror">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-notsupportederror①">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-notsupportederror②">(2)</a> <a href="#ref-for-notsupportederror③">(3)</a>
+    <li><a href="#ref-for-notsupportederror④">5.7. Error handling</a> <a href="#ref-for-notsupportederror⑤">(2)</a> <a href="#ref-for-notsupportederror⑥">(3)</a> <a href="#ref-for-notsupportederror⑦">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-SameObject">
+   <a href="https://heycam.github.io/webidl/#SameObject">https://heycam.github.io/webidl/#SameObject</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-SameObject">3. Device Discovery</a>
+    <li><a href="#ref-for-SameObject①">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-SameObject②">(2)</a> <a href="#ref-for-SameObject③">(3)</a>
+    <li><a href="#ref-for-SameObject④">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-SameObject⑤">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-SameObject⑥">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-SameObject⑦">5.5. BluetoothRemoteGATTDescriptor</a>
+    <li><a href="#ref-for-SameObject⑧">8. Extensions to the Navigator Interface</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-SecureContext">
+   <a href="https://heycam.github.io/webidl/#SecureContext">https://heycam.github.io/webidl/#SecureContext</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-SecureContext">3. Device Discovery</a> <a href="#ref-for-SecureContext①">(2)</a> <a href="#ref-for-SecureContext②">(3)</a> <a href="#ref-for-SecureContext③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-securityerror">
+   <a href="https://heycam.github.io/webidl/#securityerror">https://heycam.github.io/webidl/#securityerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-securityerror">3. Device Discovery</a> <a href="#ref-for-securityerror①">(2)</a> <a href="#ref-for-securityerror②">(3)</a>
+    <li><a href="#ref-for-securityerror③">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-securityerror④">5.1.3. Navigating the Bluetooth Hierarchy</a>
+    <li><a href="#ref-for-securityerror⑤">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-securityerror⑥">(2)</a>
+    <li><a href="#ref-for-securityerror⑦">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-securityerror⑧">(2)</a> <a href="#ref-for-securityerror⑨">(3)</a>
+    <li><a href="#ref-for-securityerror①⓪">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-securityerror①①">(2)</a>
+    <li><a href="#ref-for-securityerror①②">5.7. Error handling</a> <a href="#ref-for-securityerror①③">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-unknownerror">
+   <a href="https://heycam.github.io/webidl/#unknownerror">https://heycam.github.io/webidl/#unknownerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-unknownerror">4.2. BluetoothDevice</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-get-buffer-source-copy">
+   <a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">https://heycam.github.io/webidl/#dfn-get-buffer-source-copy</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-get-buffer-source-copy">3. Device Discovery</a> <a href="#ref-for-dfn-get-buffer-source-copy①">(2)</a> <a href="#ref-for-dfn-get-buffer-source-copy②">(3)</a> <a href="#ref-for-dfn-get-buffer-source-copy③">(4)</a>
+    <li><a href="#ref-for-dfn-get-buffer-source-copy④">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dfn-get-buffer-source-copy⑤">(2)</a>
+    <li><a href="#ref-for-dfn-get-buffer-source-copy⑥">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-dfn-get-buffer-source-copy⑦">5.5. BluetoothRemoteGATTDescriptor</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-boolean">
+   <a href="https://heycam.github.io/webidl/#idl-boolean">https://heycam.github.io/webidl/#idl-boolean</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-boolean">3. Device Discovery</a> <a href="#ref-for-idl-boolean①">(2)</a>
+    <li><a href="#ref-for-idl-boolean②">3.1. Permission API Integration</a> <a href="#ref-for-idl-boolean③">(2)</a>
+    <li><a href="#ref-for-idl-boolean④">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-idl-boolean⑤">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-idl-boolean⑥">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-idl-boolean⑦">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-idl-boolean⑧">(2)</a> <a href="#ref-for-idl-boolean⑨">(3)</a> <a href="#ref-for-idl-boolean①⓪">(4)</a> <a href="#ref-for-idl-boolean①①">(5)</a> <a href="#ref-for-idl-boolean①②">(6)</a> <a href="#ref-for-idl-boolean①③">(7)</a> <a href="#ref-for-idl-boolean①④">(8)</a> <a href="#ref-for-idl-boolean①⑤">(9)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-byte">
+   <a href="https://heycam.github.io/webidl/#idl-byte">https://heycam.github.io/webidl/#idl-byte</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-byte">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-byte①">(2)</a> <a href="#ref-for-idl-byte②">(3)</a> <a href="#ref-for-idl-byte③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-convert-idl-to-ecmascript-value">
+   <a href="https://heycam.github.io/webidl/#dfn-convert-idl-to-ecmascript-value">https://heycam.github.io/webidl/#dfn-convert-idl-to-ecmascript-value</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-convert-idl-to-ecmascript-value">3. Device Discovery</a> <a href="#ref-for-dfn-convert-idl-to-ecmascript-value①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-convert-ecmascript-to-idl-value">
+   <a href="https://heycam.github.io/webidl/#dfn-convert-ecmascript-to-idl-value">https://heycam.github.io/webidl/#dfn-convert-ecmascript-to-idl-value</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-convert-ecmascript-to-idl-value">3. Device Discovery</a> <a href="#ref-for-dfn-convert-ecmascript-to-idl-value①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-maplike">
+   <a href="https://heycam.github.io/webidl/#dfn-maplike">https://heycam.github.io/webidl/#dfn-maplike</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-maplike">4.2.1.1. BluetoothManufacturerDataMap</a>
+    <li><a href="#ref-for-dfn-maplike①">4.2.1.2. BluetoothServiceDataMap</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-object">
+   <a href="https://heycam.github.io/webidl/#idl-object">https://heycam.github.io/webidl/#idl-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-object">3. Device Discovery</a> <a href="#ref-for-idl-object①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-unsigned-long">
+   <a href="https://heycam.github.io/webidl/#idl-unsigned-long">https://heycam.github.io/webidl/#idl-unsigned-long</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-unsigned-long">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-idl-unsigned-long①">6.1. Standardized UUIDs</a> <a href="#ref-for-idl-unsigned-long②">(2)</a> <a href="#ref-for-idl-unsigned-long③">(3)</a> <a href="#ref-for-idl-unsigned-long④">(4)</a> <a href="#ref-for-idl-unsigned-long⑤">(5)</a> <a href="#ref-for-idl-unsigned-long⑥">(6)</a> <a href="#ref-for-idl-unsigned-long⑦">(7)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-unsigned-short">
+   <a href="https://heycam.github.io/webidl/#idl-unsigned-short">https://heycam.github.io/webidl/#idl-unsigned-short</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-unsigned-short">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-unsigned-short①">(2)</a> <a href="#ref-for-idl-unsigned-short②">(3)</a> <a href="#ref-for-idl-unsigned-short③">(4)</a>
+   </ul>
+  </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
    <li>
     <a data-link-type="biblio">[BLUETOOTH-ASSIGNED]</a> defines the following terms:
     <ul>
-     <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.body_sensor_location.xml#">org.bluetooth.characteristic.body_sensor_location</a>
-     <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#">org.bluetooth.characteristic.gap.appearance</a>
-     <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#">org.bluetooth.characteristic.heart_rate_control_point</a>
-     <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#">org.bluetooth.characteristic.heart_rate_measurement</a>
-     <li><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list.xml#">org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list</a>
-     <li><a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_presentation_format.xml#">org.bluetooth.descriptor.gatt.characteristic_presentation_format</a>
-     <li><a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.client_characteristic_configuration.xml#">org.bluetooth.descriptor.gatt.client_characteristic_configuration</a>
-     <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.cycling_power.xml#">org.bluetooth.service.cycling_power</a>
-     <li><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">org.bluetooth.service.heart_rate</a>
-     <li><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#">shortened local name</a>
+     <li><span class="dfn-paneled" id="term-for-" style="color:initial">org.bluetooth.characteristic.body_sensor_location</span>
+     <li><span class="dfn-paneled" id="term-for-①" style="color:initial">org.bluetooth.characteristic.gap.appearance</span>
+     <li><span class="dfn-paneled" id="term-for-②" style="color:initial">org.bluetooth.characteristic.heart_rate_control_point</span>
+     <li><span class="dfn-paneled" id="term-for-③" style="color:initial">org.bluetooth.characteristic.heart_rate_measurement</span>
+     <li><span class="dfn-paneled" id="term-for-④" style="color:initial">org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list</span>
+     <li><span class="dfn-paneled" id="term-for-⑤" style="color:initial">org.bluetooth.descriptor.gatt.characteristic_presentation_format</span>
+     <li><span class="dfn-paneled" id="term-for-⑥" style="color:initial">org.bluetooth.descriptor.gatt.client_characteristic_configuration</span>
+     <li><span class="dfn-paneled" id="term-for-⑦" style="color:initial">org.bluetooth.service.cycling_power</span>
+     <li><span class="dfn-paneled" id="term-for-⑧" style="color:initial">org.bluetooth.service.heart_rate</span>
+     <li><span class="dfn-paneled" id="term-for-⑨" style="color:initial">shortened local name</span>
     </ul>
    <li>
     <a data-link-type="biblio">[DOM]</a> defines the following terms:
     <ul>
-     <li><a href="https://dom.spec.whatwg.org/#event">Event</a>
-     <li><a href="https://dom.spec.whatwg.org/#dictdef-eventinit">EventInit</a>
-     <li><a href="https://dom.spec.whatwg.org/#eventtarget">EventTarget</a>
-     <li><a href="https://dom.spec.whatwg.org/#dom-event-bubbles">bubbles</a>
-     <li><a href="https://dom.spec.whatwg.org/#concept-tree-child">children</a>
-     <li><a href="https://dom.spec.whatwg.org/#context-object">context object</a>
-     <li><a href="https://dom.spec.whatwg.org/#concept-event-fire">fire an event</a>
-     <li><a href="https://dom.spec.whatwg.org/#dom-event-istrusted">isTrusted</a>
-     <li><a href="https://dom.spec.whatwg.org/#concept-tree-participate">participate in a tree</a>
+     <li><span class="dfn-paneled" id="term-for-event" style="color:initial">Event</span>
+     <li><span class="dfn-paneled" id="term-for-dictdef-eventinit" style="color:initial">EventInit</span>
+     <li><span class="dfn-paneled" id="term-for-eventtarget" style="color:initial">EventTarget</span>
+     <li><span class="dfn-paneled" id="term-for-dom-event-bubbles" style="color:initial">bubbles</span>
+     <li><span class="dfn-paneled" id="term-for-concept-tree-child" style="color:initial">children</span>
+     <li><span class="dfn-paneled" id="term-for-context-object" style="color:initial">context object</span>
+     <li><span class="dfn-paneled" id="term-for-concept-event-fire" style="color:initial">fire an event</span>
+     <li><span class="dfn-paneled" id="term-for-dom-event-istrusted" style="color:initial">isTrusted</span>
+     <li><span class="dfn-paneled" id="term-for-concept-tree-participate" style="color:initial">participate in a tree</span>
     </ul>
    <li>
     <a data-link-type="biblio">[ECMAScript]</a> defines the following terms:
     <ul>
-     <li><a href="https://tc39.github.io/ecma262/#sec-array-objects">Array</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">ArrayBuffer</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-canonicalnumericindexstring">CanonicalNumericIndexString</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-createdataproperty">CreateDataProperty</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-dataview-constructor">DataView</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-isinteger">IsInteger</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-map-constructor">Map</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-promise-objects">Promise</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-set-objects">Set</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-typedarray-constructors">TypedArray</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a>
-     <li><a href="https://tc39.github.io/ecma262/#current-realm">current realm</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-object-internal-methods-and-internal-slots">internal slot</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-code-realms">realm</a>
+     <li><span class="dfn-paneled" id="term-for-sec-array-objects" style="color:initial">Array</span>
+     <li><span class="dfn-paneled" id="term-for-sec-array.prototype.map" style="color:initial">Array.prototype.map</span>
+     <li><span class="dfn-paneled" id="term-for-sec-arraybuffer-constructor" style="color:initial">ArrayBuffer</span>
+     <li><span class="dfn-paneled" id="term-for-sec-canonicalnumericindexstring" style="color:initial">CanonicalNumericIndexString</span>
+     <li><span class="dfn-paneled" id="term-for-sec-createdataproperty" style="color:initial">CreateDataProperty</span>
+     <li><span class="dfn-paneled" id="term-for-sec-dataview-constructor" style="color:initial">DataView</span>
+     <li><span class="dfn-paneled" id="term-for-sec-isinteger" style="color:initial">IsInteger</span>
+     <li><span class="dfn-paneled" id="term-for-sec-map-constructor" style="color:initial">Map</span>
+     <li><span class="dfn-paneled" id="term-for-sec-promise-objects" style="color:initial">Promise</span>
+     <li><span class="dfn-paneled" id="term-for-sec-set-objects" style="color:initial">Set</span>
+     <li><span class="dfn-paneled" id="term-for-sec-native-error-types-used-in-this-standard-typeerror" style="color:initial">TypeError</span>
+     <li><span class="dfn-paneled" id="term-for-sec-typedarray-constructors" style="color:initial">TypedArray</span>
+     <li><span class="dfn-paneled" id="term-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys" style="color:initial">[[OwnPropertyKeys]]</span>
+     <li><span class="dfn-paneled" id="term-for-current-realm" style="color:initial">current realm</span>
+     <li><span class="dfn-paneled" id="term-for-sec-object-internal-methods-and-internal-slots" style="color:initial">internal slot</span>
+     <li><span class="dfn-paneled" id="term-for-sec-code-realms" style="color:initial">realm</span>
     </ul>
    <li>
     <a data-link-type="biblio">[ENCODING]</a> defines the following terms:
     <ul>
-     <li><a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">utf-8 decode without bom</a>
-     <li><a href="https://encoding.spec.whatwg.org/#utf-8-encode">utf-8 encode</a>
+     <li><span class="dfn-paneled" id="term-for-utf-8-decode-without-bom" style="color:initial">utf-8 decode without bom</span>
+     <li><span class="dfn-paneled" id="term-for-utf-8-encode" style="color:initial">utf-8 encode</span>
     </ul>
    <li>
     <a data-link-type="biblio">[fingerprinting-guidance]</a> defines the following terms:
     <ul>
-     <li><a href="https://w3c.github.io/fingerprinting-guidance/#dfn-fingerprinting-surface">fingerprinting surface</a>
+     <li><span class="dfn-paneled" id="term-for-dfn-fingerprinting-surface" style="color:initial">fingerprinting surface</span>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#eventhandler">EventHandler</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/system-state.html#navigator">Navigator</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context">browsing context</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object">current settings object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object">environment settings object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">event handler idl attribute</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object">global object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-settings-object-global">global object <small>(for environment settings object)</small></a>
-     <li><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#initialise-the-document-object">initializing a new document object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/browsing-the-web.html#navigate">navigate</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint">perform a microtask checkpoint</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">relevant global object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">triggered by user activation</a>
+     <li><span class="dfn-paneled" id="term-for-eventhandler" style="color:initial">EventHandler</span>
+     <li><span class="dfn-paneled" id="term-for-navigator" style="color:initial">Navigator</span>
+     <li><span class="dfn-paneled" id="term-for-browsing-context" style="color:initial">browsing context</span>
+     <li><span class="dfn-paneled" id="term-for-current-settings-object" style="color:initial">current settings object</span>
+     <li><span class="dfn-paneled" id="term-for-environment-settings-object" style="color:initial">environment settings object</span>
+     <li><span class="dfn-paneled" id="term-for-event-handler-idl-attributes" style="color:initial">event handler idl attribute</span>
+     <li><span class="dfn-paneled" id="term-for-concept-settings-object-global" style="color:initial">global object <small>(for environment settings object)</small></span>
+     <li><span class="dfn-paneled" id="term-for-in-parallel" style="color:initial">in parallel</span>
+     <li><span class="dfn-paneled" id="term-for-initialise-the-document-object" style="color:initial">initializing a new document object</span>
+     <li><span class="dfn-paneled" id="term-for-navigate" style="color:initial">navigate</span>
+     <li><span class="dfn-paneled" id="term-for-perform-a-microtask-checkpoint" style="color:initial">perform a microtask checkpoint</span>
+     <li><span class="dfn-paneled" id="term-for-queue-a-task" style="color:initial">queue a task</span>
+     <li><span class="dfn-paneled" id="term-for-concept-relevant-global" style="color:initial">relevant global object</span>
+     <li><span class="dfn-paneled" id="term-for-relevant-settings-object" style="color:initial">relevant settings object</span>
+     <li><span class="dfn-paneled" id="term-for-responsible-event-loop" style="color:initial">responsible event loop</span>
+     <li><span class="dfn-paneled" id="term-for-triggered-by-user-activation" style="color:initial">triggered by user activation</span>
     </ul>
    <li>
     <a data-link-type="biblio">[permissions]</a> defines the following terms:
     <ul>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a>
-     <li><a href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a>
-     <li><a href="https://w3c.github.io/permissions/#permissionstatus">PermissionStatus</a>
-     <li><a href="https://w3c.github.io/permissions/#allowed-in-non-secure-contexts">allowed in non-secure contexts</a>
-     <li><a href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a>
-     <li><a href="https://w3c.github.io/permissions/#extra-permission-data-constraints">extra permission data constraints</a>
-     <li><a href="https://w3c.github.io/permissions/#extra-permission-data-type">extra permission data type</a>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissiondescriptor-name">name</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-descriptor-type">permission descriptor type</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-query-algorithm">permission query algorithm</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-result-type">permission result type</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-revocation-algorithm">permission revocation algorithm</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-state">permission state</a>
-     <li><a href="https://w3c.github.io/permissions/#powerful-feature">powerful feature</a>
-     <li><a href="https://w3c.github.io/permissions/#prompt-the-user-to-choose">prompt the user to choose</a>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissions-query">query(permissionDesc)</a>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">state</a>
+     <li><span class="dfn-paneled" id="term-for-dom-permissionstate-denied" style="color:initial">"denied"</span>
+     <li><span class="dfn-paneled" id="term-for-dictdef-permissiondescriptor" style="color:initial">PermissionDescriptor</span>
+     <li><span class="dfn-paneled" id="term-for-permissionstatus" style="color:initial">PermissionStatus</span>
+     <li><span class="dfn-paneled" id="term-for-allowed-in-non-secure-contexts" style="color:initial">allowed in non-secure contexts</span>
+     <li><span class="dfn-paneled" id="term-for-extra-permission-data" style="color:initial">extra permission data</span>
+     <li><span class="dfn-paneled" id="term-for-extra-permission-data-constraints" style="color:initial">extra permission data constraints</span>
+     <li><span class="dfn-paneled" id="term-for-extra-permission-data-type" style="color:initial">extra permission data type</span>
+     <li><span class="dfn-paneled" id="term-for-dom-permissiondescriptor-name" style="color:initial">name</span>
+     <li><span class="dfn-paneled" id="term-for-permission-descriptor-type" style="color:initial">permission descriptor type</span>
+     <li><span class="dfn-paneled" id="term-for-permission-query-algorithm" style="color:initial">permission query algorithm</span>
+     <li><span class="dfn-paneled" id="term-for-permission-result-type" style="color:initial">permission result type</span>
+     <li><span class="dfn-paneled" id="term-for-permission-revocation-algorithm" style="color:initial">permission revocation algorithm</span>
+     <li><span class="dfn-paneled" id="term-for-permission-state" style="color:initial">permission state</span>
+     <li><span class="dfn-paneled" id="term-for-powerful-feature" style="color:initial">powerful feature</span>
+     <li><span class="dfn-paneled" id="term-for-prompt-the-user-to-choose" style="color:initial">prompt the user to choose</span>
+     <li><span class="dfn-paneled" id="term-for-dom-permissions-query" style="color:initial">query(permissionDesc)</span>
+     <li><span class="dfn-paneled" id="term-for-dom-permissionstatus-state" style="color:initial">state</span>
     </ul>
    <li>
     <a data-link-type="biblio">[permissions-request-1]</a> defines the following terms:
     <ul>
-     <li><a href="https://wicg.github.io/permissions-request/#permission-request-algorithm">permission request algorithm</a>
-     <li><a href="https://wicg.github.io/permissions-request/#dom-permissions-request">request(permissionDesc)</a>
+     <li><span class="dfn-paneled" id="term-for-permission-request-algorithm" style="color:initial">permission request algorithm</span>
+     <li><span class="dfn-paneled" id="term-for-dom-permissions-request" style="color:initial">request(permissionDesc)</span>
     </ul>
    <li>
     <a data-link-type="biblio">[promises-guide]</a> defines the following terms:
     <ul>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with">a promise rejected with</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#transforming-by">transforming</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#waiting-for-all">waiting for all</a>
+     <li><span class="dfn-paneled" id="term-for-a-new-promise" style="color:initial">a new promise</span>
+     <li><span class="dfn-paneled" id="term-for-a-promise-rejected-with" style="color:initial">a promise rejected with</span>
+     <li><span class="dfn-paneled" id="term-for-reject-promise" style="color:initial">reject</span>
+     <li><span class="dfn-paneled" id="term-for-resolve-promise" style="color:initial">resolve</span>
+     <li><span class="dfn-paneled" id="term-for-transforming-by" style="color:initial">transforming</span>
+     <li><span class="dfn-paneled" id="term-for-waiting-for-all" style="color:initial">waiting for all</span>
     </ul>
    <li>
     <a data-link-type="biblio">[secure-contexts]</a> defines the following terms:
     <ul>
-     <li><a href="https://w3c.github.io/webappsec-secure-contexts/#non-secure-contexts">non-secure contexts</a>
-     <li><a href="https://w3c.github.io/webappsec-secure-contexts/#secure-contexts">secure contexts</a>
+     <li><span class="dfn-paneled" id="term-for-non-secure-contexts" style="color:initial">non-secure contexts</span>
+     <li><span class="dfn-paneled" id="term-for-secure-contexts" style="color:initial">secure contexts</span>
     </ul>
    <li>
     <a data-link-type="biblio">[WebIDL]</a> defines the following terms:
     <ul>
-     <li><a href="https://heycam.github.io/webidl/#aborterror">AbortError</a>
-     <li><a href="https://heycam.github.io/webidl/#BufferSource">BufferSource</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-DOMException">DOMException</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-DOMString">DOMString</a>
-     <li><a href="https://heycam.github.io/webidl/#EnforceRange">EnforceRange</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a>
-     <li><a href="https://heycam.github.io/webidl/#invalidmodificationerror">InvalidModificationError</a>
-     <li><a href="https://heycam.github.io/webidl/#invalidstateerror">InvalidStateError</a>
-     <li><a href="https://heycam.github.io/webidl/#networkerror">NetworkError</a>
-     <li><a href="https://heycam.github.io/webidl/#NoInterfaceObject">NoInterfaceObject</a>
-     <li><a href="https://heycam.github.io/webidl/#notfounderror">NotFoundError</a>
-     <li><a href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a>
-     <li><a href="https://heycam.github.io/webidl/#SameObject">SameObject</a>
-     <li><a href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>
-     <li><a href="https://heycam.github.io/webidl/#securityerror">SecurityError</a>
-     <li><a href="https://heycam.github.io/webidl/#unknownerror">UnknownError</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-boolean">boolean</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-byte">byte</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-convert-idl-to-ecmascript-value">converted to an ecmascript value</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-convert-ecmascript-to-idl-value">converted to an idl value</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-maplike">maplike</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-object">object</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-unsigned-long">unsigned long</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-unsigned-short">unsigned short</a>
+     <li><span class="dfn-paneled" id="term-for-aborterror" style="color:initial">AbortError</span>
+     <li><span class="dfn-paneled" id="term-for-BufferSource" style="color:initial">BufferSource</span>
+     <li><span class="dfn-paneled" id="term-for-idl-DOMException" style="color:initial">DOMException</span>
+     <li><span class="dfn-paneled" id="term-for-idl-DOMString" style="color:initial">DOMString</span>
+     <li><span class="dfn-paneled" id="term-for-EnforceRange" style="color:initial">EnforceRange</span>
+     <li><span class="dfn-paneled" id="term-for-idl-frozen-array" style="color:initial">FrozenArray</span>
+     <li><span class="dfn-paneled" id="term-for-invalidmodificationerror" style="color:initial">InvalidModificationError</span>
+     <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
+     <li><span class="dfn-paneled" id="term-for-networkerror" style="color:initial">NetworkError</span>
+     <li><span class="dfn-paneled" id="term-for-NoInterfaceObject" style="color:initial">NoInterfaceObject</span>
+     <li><span class="dfn-paneled" id="term-for-notfounderror" style="color:initial">NotFoundError</span>
+     <li><span class="dfn-paneled" id="term-for-notsupportederror" style="color:initial">NotSupportedError</span>
+     <li><span class="dfn-paneled" id="term-for-SameObject" style="color:initial">SameObject</span>
+     <li><span class="dfn-paneled" id="term-for-SecureContext" style="color:initial">SecureContext</span>
+     <li><span class="dfn-paneled" id="term-for-securityerror" style="color:initial">SecurityError</span>
+     <li><span class="dfn-paneled" id="term-for-unknownerror" style="color:initial">UnknownError</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-get-buffer-source-copy" style="color:initial">a copy of the bytes held</span>
+     <li><span class="dfn-paneled" id="term-for-idl-boolean" style="color:initial">boolean</span>
+     <li><span class="dfn-paneled" id="term-for-idl-byte" style="color:initial">byte</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-convert-idl-to-ecmascript-value" style="color:initial">converted to an ecmascript value</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-convert-ecmascript-to-idl-value" style="color:initial">converted to an idl value</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-maplike" style="color:initial">maplike</span>
+     <li><span class="dfn-paneled" id="term-for-idl-object" style="color:initial">object</span>
+     <li><span class="dfn-paneled" id="term-for-idl-unsigned-long" style="color:initial">unsigned long</span>
+     <li><span class="dfn-paneled" id="term-for-idl-unsigned-short" style="color:initial">unsigned short</span>
     </ul>
   </ul>
   <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
@@ -6589,6 +7406,12 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
    <b><a href="#dom-bluetoothservicedatamap-backingmap-slot">#dom-bluetoothservicedatamap-backingmap-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothservicedatamap-backingmap-slot">4.2.1. Responding to Advertising Events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="attribute">
+   <b><a href="#attribute">#attribute</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-attribute">4.1. Global Bluetooth device properties</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetooth-cache">
@@ -7799,7 +8622,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
             if(algoContainer == null) return;
 
             const algoName = algoContainer.getAttribute("data-algorithm");
-            const varName = v.innerHTML;
+            const varName = getVarName(v);
             const addClass = !v.classList.contains("selected");
             let highlightClass = null;
             if(addClass) {
@@ -7815,11 +8638,14 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
 
             // Find all same-name vars, and toggle their class appropriately.
             for(const el of algoContainer.querySelectorAll("var")) {
-                if(el.innerHTML == varName) {
+                if(getVarName(el) == varName) {
                     el.classList.toggle("selected", addClass);
                     el.classList.toggle(highlightClass, addClass);
                 }
             }
+        }
+        function getVarName(el) {
+            return el.textContent.replace(/(\s| )+/, " ").trim();
         }
         function chooseHighlightIndex(algoName, varName) {
             let indexes = null;
@@ -7856,57 +8682,57 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span>addEventListen
     </script>
 <script>/* script-dfn-panel */
 
-        document.body.addEventListener("click", function(e) {
-            var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
-            // Find the dfn element or panel, if any, that was clicked on.
-            var el = e.target;
-            var target;
-            var hitALink = false;
-            while(el.parentElement) {
-                if(el.tagName == "A") {
-                    // Clicking on a link in a <dfn> shouldn't summon the panel
-                    hitALink = true;
-                }
-                if(el.classList.contains("dfn-paneled")) {
-                    target = "dfn";
-                    break;
-                }
-                if(el.classList.contains("dfn-panel")) {
-                    target = "dfn-panel";
-                    break;
-                }
-                el = el.parentElement;
-            }
-            if(target != "dfn-panel") {
-                // Turn off any currently "on" or "activated" panels.
-                queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
-                    el.classList.remove("on");
-                    el.classList.remove("activated");
-                });
-            }
-            if(target == "dfn" && !hitALink) {
-                // open the panel
-                var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
-                if(dfnPanel) {
-                    dfnPanel.classList.add("on");
-                    var rect = el.getBoundingClientRect();
-                    dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
-                    dfnPanel.style.top = window.scrollY + rect.top + "px";
-                    var panelRect = dfnPanel.getBoundingClientRect();
-                    var panelWidth = panelRect.right - panelRect.left;
-                    if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
-                        // Reposition, because the panel is overflowing
-                        dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
-                    }
-                } else {
-                    console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
-                }
-            } else if(target == "dfn-panel") {
-                // Switch it to "activated" state, which pins it.
-                el.classList.add("activated");
-                el.style.left = null;
-                el.style.top = null;
-            }
-
+document.body.addEventListener("click", function(e) {
+    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
+    // Find the dfn element or panel, if any, that was clicked on.
+    var el = e.target;
+    var target;
+    var hitALink = false;
+    while(el.parentElement) {
+        if(el.tagName == "A") {
+            // Clicking on a link in a <dfn> shouldn't summon the panel
+            hitALink = true;
+        }
+        if(el.classList.contains("dfn-paneled")) {
+            target = "dfn";
+            break;
+        }
+        if(el.classList.contains("dfn-panel")) {
+            target = "dfn-panel";
+            break;
+        }
+        el = el.parentElement;
+    }
+    if(target != "dfn-panel") {
+        // Turn off any currently "on" or "activated" panels.
+        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
+            el.classList.remove("on");
+            el.classList.remove("activated");
         });
-        </script>
+    }
+    if(target == "dfn" && !hitALink) {
+        // open the panel
+        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+        if(dfnPanel) {
+            dfnPanel.classList.add("on");
+            var rect = el.getBoundingClientRect();
+            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+            dfnPanel.style.top = window.scrollY + rect.top + "px";
+            var panelRect = dfnPanel.getBoundingClientRect();
+            var panelWidth = panelRect.right - panelRect.left;
+            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                // Reposition, because the panel is overflowing
+                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+            }
+        } else {
+            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+        }
+    } else if(target == "dfn-panel") {
+        // Switch it to "activated" state, which pins it.
+        el.classList.add("activated");
+        el.style.left = null;
+        el.style.top = null;
+    }
+
+});
+</script>

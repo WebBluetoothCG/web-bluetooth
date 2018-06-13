@@ -992,57 +992,92 @@ Possible extra rowspan handling
 	.toc > li li          { font-weight: normal; }
 	.toc > li li li       { font-size:   95%;    }
 	.toc > li li li li    { font-size:   90%;    }
+	.toc > li li li li .secno { font-size: 85%; }
 	.toc > li li li li li { font-size:   85%;    }
+	.toc > li li li li li .secno { font-size: 100%; }
 
-	.toc > li             { margin: 1.5rem 0;    }
-	.toc > li li          { margin: 0.3rem 0;    }
-	.toc > li li li       { margin-left: 2rem;   }
+	/* @supports not (display:grid) { */
+		.toc > li             { margin: 1.5rem 0;    }
+		.toc > li li          { margin: 0.3rem 0;    }
+		.toc > li li li       { margin-left: 2rem;   }
 
-	/* Section numbers in a column of their own */
-	.toc .secno {
-		float: left;
-		width: 4rem;
-		white-space: nowrap;
-	}
-	.toc > li li li li .secno {
-		font-size: 85%;
-	}
-	.toc > li li li li li .secno {
-		font-size: 100%;
-	}
+		/* Section numbers in a column of their own */
+		.toc .secno {
+			float: left;
+			width: 4rem;
+			white-space: nowrap;
+		}
 
-	:not(li) > .toc              { margin-left:  5rem; }
-	.toc .secno                  { margin-left: -5rem; }
-	.toc > li li li .secno       { margin-left: -7rem; }
-	.toc > li li li li .secno    { margin-left: -9rem; }
-	.toc > li li li li li .secno { margin-left: -11rem; }
+		.toc li {
+			clear: both;
+		}
 
-	/* Tighten up indentation in narrow ToCs */
-	@media (max-width: 30em) {
-		:not(li) > .toc              { margin-left:  4rem; }
-		.toc .secno                  { margin-left: -4rem; }
-		.toc > li li li              { margin-left:  1rem; }
-		.toc > li li li .secno       { margin-left: -5rem; }
-		.toc > li li li li .secno    { margin-left: -6rem; }
-		.toc > li li li li li .secno { margin-left: -7rem; }
-	}
-	@media screen and (min-width: 78em) {
-		body:not(.toc-inline) :not(li) > .toc              { margin-left:  4rem; }
-		body:not(.toc-inline) .toc .secno                  { margin-left: -4rem; }
-		body:not(.toc-inline) .toc > li li li              { margin-left:  1rem; }
-		body:not(.toc-inline) .toc > li li li .secno       { margin-left: -5rem; }
-		body:not(.toc-inline) .toc > li li li li .secno    { margin-left: -6rem; }
-		body:not(.toc-inline) .toc > li li li li li .secno { margin-left: -7rem; }
-	}
-	body.toc-sidebar #toc :not(li) > .toc              { margin-left:  4rem; }
-	body.toc-sidebar #toc .toc .secno                  { margin-left: -4rem; }
-	body.toc-sidebar #toc .toc > li li li              { margin-left:  1rem; }
-	body.toc-sidebar #toc .toc > li li li .secno       { margin-left: -5rem; }
-	body.toc-sidebar #toc .toc > li li li li .secno    { margin-left: -6rem; }
-	body.toc-sidebar #toc .toc > li li li li li .secno { margin-left: -7rem; }
+		:not(li) > .toc              { margin-left:  5rem; }
+		.toc .secno                  { margin-left: -5rem; }
+		.toc > li li li .secno       { margin-left: -7rem; }
+		.toc > li li li li .secno    { margin-left: -9rem; }
+		.toc > li li li li li .secno { margin-left: -11rem; }
 
-	.toc li {
-		clear: both;
+		/* Tighten up indentation in narrow ToCs */
+		@media (max-width: 30em) {
+			:not(li) > .toc              { margin-left:  4rem; }
+			.toc .secno                  { margin-left: -4rem; }
+			.toc > li li li              { margin-left:  1rem; }
+			.toc > li li li .secno       { margin-left: -5rem; }
+			.toc > li li li li .secno    { margin-left: -6rem; }
+			.toc > li li li li li .secno { margin-left: -7rem; }
+		}
+	/* } */
+
+	@supports (display:grid) {
+		/* Use #toc over .toc to override non-@supports rules. */
+		#toc {
+			display: grid;
+			align-content: start;
+			grid-template-columns: auto 1fr;
+			grid-column-gap: 1rem;
+			column-gap: 1rem;
+			grid-row-gap: .6rem;
+			row-gap: .6rem;
+		}
+		#toc h2 {
+			grid-column: 1 / -1;
+			margin-bottom: 0;
+		}
+		#toc ol,
+		#toc li,
+		#toc a {
+			display: contents;
+			/* Switch <a> to subgrid when supported */
+		}
+		#toc span {
+			margin: 0;
+		}
+		#toc > .toc > li > a > span {
+			/* The spans of the top-level list,
+			   comprising the first items of each top-level section. */
+			margin-top: 1.1rem;
+		}
+		#toc .secno {
+			grid-column: 1;
+			width: auto;
+		}
+		#toc .content {
+			grid-column: 2;
+			width: auto;
+			margin-right: 1rem;
+		}
+		#toc .content:hover {
+			background: rgba(75%, 75%, 75%, .25);
+			border-bottom: 3px solid #054572;
+			margin-bottom: -3px;
+		}
+		#toc li li li .content {
+			margin-left: 1rem;
+		}
+		#toc li li li li .content {
+			margin-left: 2rem;
+		}
 	}
 
 
@@ -1176,7 +1211,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 150b038a54cb926cf8e3d36fd8b108c226cb94b8" name="generator">
+  <meta content="Bikeshed version 6d3a750812441328ea98d66fac577c3ced988303" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/scanning.html" rel="canonical">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
@@ -1271,13 +1306,13 @@ figcaption:not(.no-marker)::before {
 <style>/* style-var-click-highlighting */
 
     var { cursor: pointer; }
-    var.selected0 { background-color: hsl(60deg, 50%, 90%); }
-    var.selected1 { background-color: hsl(0deg, 50%, 90%); }
-    var.selected2 { background-color: hsl(120deg, 50%, 90%); }
-    var.selected3 { background-color: hsl(180deg, 50%, 90%); }
-    var.selected4 { background-color: hsl(30deg, 50%, 90%); }
-    var.selected5 { background-color: hsl(240deg, 50%, 90%); }
-    var.selected6 { background-color: hsl(330deg, 80%, 93%); }
+    var.selected0 { background-color: #F4D200; box-shadow: 0 0 0 2px #F4D200; }
+    var.selected1 { background-color: #FF87A2; box-shadow: 0 0 0 2px #FF87A2; }
+    var.selected2 { background-color: #96E885; box-shadow: 0 0 0 2px #96E885; }
+    var.selected3 { background-color: #3EEED2; box-shadow: 0 0 0 2px #3EEED2; }
+    var.selected4 { background-color: #EACFB6; box-shadow: 0 0 0 2px #EACFB6; }
+    var.selected5 { background-color: #82DDFF; box-shadow: 0 0 0 2px #82DDFF; }
+    var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
     </style>
 <style>/* style-autolinks */
 
@@ -1343,41 +1378,41 @@ pre .property::before, pre .property::after {
 }</style>
 <style>/* style-dfn-panel */
 
-        .dfn-panel {
-            position: absolute;
-            z-index: 35;
-            height: auto;
-            width: -webkit-fit-content;
-            width: fit-content;
-            max-width: 300px;
-            max-height: 500px;
-            overflow: auto;
-            padding: 0.5em 0.75em;
-            font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
-            background: #DDDDDD;
-            color: black;
-            border: outset 0.2em;
-        }
-        .dfn-panel:not(.on) { display: none; }
-        .dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
-        .dfn-panel > b { display: block; }
-        .dfn-panel a { color: black; }
-        .dfn-panel a:not(:hover) { text-decoration: none !important; border-bottom: none !important; }
-        .dfn-panel > b + b { margin-top: 0.25em; }
-        .dfn-panel ul { padding: 0; }
-        .dfn-panel li { list-style: inside; }
-        .dfn-panel.activated {
-            display: inline-block;
-            position: fixed;
-            left: .5em;
-            bottom: 2em;
-            margin: 0 auto;
-            max-width: calc(100vw - 1.5em - .4em - .5em);
-            max-height: 30vh;
-        }
+.dfn-panel {
+    position: absolute;
+    z-index: 35;
+    height: auto;
+    width: -webkit-fit-content;
+    width: fit-content;
+    max-width: 300px;
+    max-height: 500px;
+    overflow: auto;
+    padding: 0.5em 0.75em;
+    font: small Helvetica Neue, sans-serif, Droid Sans Fallback;
+    background: #DDDDDD;
+    color: black;
+    border: outset 0.2em;
+}
+.dfn-panel:not(.on) { display: none; }
+.dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
+.dfn-panel > b { display: block; }
+.dfn-panel a { color: black; }
+.dfn-panel a:not(:hover) { text-decoration: none !important; border-bottom: none !important; }
+.dfn-panel > b + b { margin-top: 0.25em; }
+.dfn-panel ul { padding: 0; }
+.dfn-panel li { list-style: inside; }
+.dfn-panel.activated {
+    display: inline-block;
+    position: fixed;
+    left: .5em;
+    bottom: 2em;
+    margin: 0 auto;
+    max-width: calc(100vw - 1.5em - .4em - .5em);
+    max-height: 30vh;
+}
 
-        .dfn-paneled { cursor: pointer; }
-        </style>
+.dfn-paneled { cursor: pointer; }
+</style>
 <style>/* style-syntax-highlighting */
 pre.idl.highlight { color: #708090; }
 .highlight:not(.idl) { background: hsl(24, 20%, 95%); }
@@ -1440,7 +1475,7 @@ pre.highlight, pre > code.highlight { display: block; padding: 1em; margin: .5em
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth Scanning</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2018-05-09">9 May 2018</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2018-06-13">13 June 2018</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -2055,10 +2090,10 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
                <li value="1">
                 Advertising PDUs 
                 <ol>
-                 <li value="1"><dfn data-dfn-type="dfn" data-noexport="" id="adv_ind">ADV_IND<a class="self-link" href="#adv_ind"></a></dfn>
-                 <li value="2"><dfn data-dfn-type="dfn" data-noexport="" id="adv_direct_ind">ADV_DIRECT_IND<a class="self-link" href="#adv_direct_ind"></a></dfn>
-                 <li value="3"><dfn data-dfn-type="dfn" data-noexport="" id="adv_nonconn_ind">ADV_NONCONN_IND<a class="self-link" href="#adv_nonconn_ind"></a></dfn>
-                 <li value="4"><dfn data-dfn-type="dfn" data-noexport="" id="adv_scan_ind">ADV_SCAN_IND<a class="self-link" href="#adv_scan_ind"></a></dfn>
+                 <li value="1">ADV_IND
+                 <li value="2">ADV_DIRECT_IND
+                 <li value="3">ADV_NONCONN_IND
+                 <li value="4">ADV_SCAN_IND
                 </ol>
               </ol>
             </ol>
@@ -2089,7 +2124,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
           Data Types Definitions and Formats 
           <ol>
            <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="service-uuid">Service UUID</dfn>
-           <li value="1"> <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="local-name">Local Name</dfn> also defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="shortened-local-name">Shortened Local Name</dfn> and <dfn data-dfn-type="dfn" data-noexport="" id="complete-local-name">Complete Local Name<a class="self-link" href="#complete-local-name"></a></dfn> 
+           <li value="1"> <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="local-name">Local Name</dfn> also defines <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="shortened-local-name">Shortened Local Name</dfn> and Complete Local Name 
            <li value="4"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="manufacturer-specific-data">Manufacturer Specific Data</dfn>
            <li value="11"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport="" id="service-data">Service Data</dfn>
           </ol>
@@ -2257,12 +2292,8 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <li><a href="#dom-bluetoothlescan-active">active</a><span>, in §4.1</span>
    <li><a href="#active-scanning">Active Scanning</a><span>, in §7</span>
    <li><a href="#dom-bluetooth-activescans-slot">[[activeScans]]</a><span>, in §6</span>
-   <li><a href="#adv_direct_ind">ADV_DIRECT_IND</a><span>, in §7</span>
    <li><a href="#advertising-event">advertising event</a><span>, in §7</span>
    <li><a href="#advertising-event">advertising events</a><span>, in §7</span>
-   <li><a href="#adv_ind">ADV_IND</a><span>, in §7</span>
-   <li><a href="#adv_nonconn_ind">ADV_NONCONN_IND</a><span>, in §7</span>
-   <li><a href="#adv_scan_ind">ADV_SCAN_IND</a><span>, in §7</span>
    <li><a href="#bluetoothdatafilter">BluetoothDataFilter</a><span>, in §4.1</span>
    <li><a href="#dom-bluetoothdatafilter-bluetoothdatafilter">BluetoothDataFilter(init)</a><span>, in §4.1</span>
    <li><a href="#bluetoothlescan">BluetoothLEScan</a><span>, in §4.1</span>
@@ -2276,7 +2307,6 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <li><a href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">BluetoothManufacturerDataFilter(init)</a><span>, in §4.1</span>
    <li><a href="#bluetoothservicedatafilter">BluetoothServiceDataFilter</a><span>, in §4.1</span>
    <li><a href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter">BluetoothServiceDataFilter(init)</a><span>, in §4.1</span>
-   <li><a href="#complete-local-name">Complete Local Name</a><span>, in §7</span>
    <li><a href="#dom-bluetoothdatafilter-dataprefix">dataPrefix</a><span>, in §4.1</span>
    <li><a href="#device-address">Device Address</a><span>, in §7</span>
    <li>
@@ -2320,101 +2350,479 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
    <li><a href="#shortened-local-name">Shortened Local Name</a><span>, in §7</span>
    <li><a href="#dom-bluetoothlescan-stop">stop()</a><span>, in §4.1</span>
   </ul>
+  <aside class="dfn-panel" data-for="term-for-sec-array.prototype.map">
+   <a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">https://tc39.github.io/ecma262/#sec-array.prototype.map</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-array.prototype.map">7. Terminology and conventions</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-native-error-types-used-in-this-standard-typeerror">
+   <a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror">4. Scanning for BLE advertisements</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①">(2)</a>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror②">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">
+   <a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">4.1. Controlling a BLE scan</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys①">(2)</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys②">(3)</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-in-parallel">
+   <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-in-parallel">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-queue-a-task">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-queue-a-task">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-relevant-settings-object">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-responsible-event-loop">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-responsible-event-loop">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-triggered-by-user-activation">
+   <a href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-triggered-by-user-activation">4. Scanning for BLE advertisements</a> <a href="#ref-for-triggered-by-user-activation①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissionstate-denied">
+   <a href="https://w3c.github.io/permissions/#dom-permissionstate-denied">https://w3c.github.io/permissions/#dom-permissionstate-denied</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissionstate-denied">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-dom-permissionstate-denied①">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissionstate-granted">
+   <a href="https://w3c.github.io/permissions/#dom-permissionstate-granted">https://w3c.github.io/permissions/#dom-permissionstate-granted</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissionstate-granted">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dictdef-permissiondescriptor">
+   <a href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">https://w3c.github.io/permissions/#dictdef-permissiondescriptor</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-permissiondescriptor">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permissionstatus">
+   <a href="https://w3c.github.io/permissions/#permissionstatus">https://w3c.github.io/permissions/#permissionstatus</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permissionstatus">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-extra-permission-data">
+   <a href="https://w3c.github.io/permissions/#extra-permission-data">https://w3c.github.io/permissions/#extra-permission-data</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-extra-permission-data">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-descriptor-type">
+   <a href="https://w3c.github.io/permissions/#permission-descriptor-type">https://w3c.github.io/permissions/#permission-descriptor-type</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-descriptor-type">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-query-algorithm">
+   <a href="https://w3c.github.io/permissions/#permission-query-algorithm">https://w3c.github.io/permissions/#permission-query-algorithm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-query-algorithm">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-result-type">
+   <a href="https://w3c.github.io/permissions/#permission-result-type">https://w3c.github.io/permissions/#permission-result-type</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-result-type">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-revocation-algorithm">
+   <a href="https://w3c.github.io/permissions/#permission-revocation-algorithm">https://w3c.github.io/permissions/#permission-revocation-algorithm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-revocation-algorithm">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-state">
+   <a href="https://w3c.github.io/permissions/#permission-state">https://w3c.github.io/permissions/#permission-state</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-state">4.2. Permission to scan</a> <a href="#ref-for-permission-state①">(2)</a> <a href="#ref-for-permission-state②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-powerful-feature">
+   <a href="https://w3c.github.io/permissions/#powerful-feature">https://w3c.github.io/permissions/#powerful-feature</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-powerful-feature">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-request-permission-to-use">
+   <a href="https://w3c.github.io/permissions/#request-permission-to-use">https://w3c.github.io/permissions/#request-permission-to-use</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-request-permission-to-use">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissionstatus-state">
+   <a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">https://w3c.github.io/permissions/#dom-permissionstatus-state</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissionstatus-state">4.2. Permission to scan</a> <a href="#ref-for-dom-permissionstatus-state①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-permission-request-algorithm">
+   <a href="https://wicg.github.io/permissions-request/#permission-request-algorithm">https://wicg.github.io/permissions-request/#permission-request-algorithm</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-permission-request-algorithm">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-a-new-promise">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-a-new-promise">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-reject-promise">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-reject-promise">4. Scanning for BLE advertisements</a> <a href="#ref-for-reject-promise①">(2)</a> <a href="#ref-for-reject-promise②">(3)</a> <a href="#ref-for-reject-promise③">(4)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-resolve-promise">
+   <a href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-resolve-promise">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-secure-contexts">
+   <a href="https://w3c.github.io/webappsec-secure-contexts/#secure-contexts">https://w3c.github.io/webappsec-secure-contexts/#secure-contexts</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-secure-contexts">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-permissionname-bluetooth">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-permissionname-bluetooth">https://webbluetoothcg.github.io/web-bluetooth/#dom-permissionname-bluetooth</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-permissionname-bluetooth">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-bluetooth">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">https://webbluetoothcg.github.io/web-bluetooth/#bluetooth</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetooth">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-bluetooth①">5.1. Responding to advertising events</a>
+    <li><a href="#ref-for-bluetooth②">6. Changes to existing interfaces</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dictdef-bluetoothdatafilterinit">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit">https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-bluetoothdatafilterinit">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-bluetoothdevice">
+   <a href="index.html#bluetoothdevice">index.html#bluetoothdevice</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothdevice">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-bluetoothdevice①">5.1. Responding to advertising events</a>
+    <li><a href="#ref-for-bluetoothdevice②">6. Changes to existing interfaces</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dictdef-bluetoothlescanfilterinit">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit">https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit①">4.1. Controlling a BLE scan</a>
+    <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit②">4.2. Permission to scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-typedefdef-uuid">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-typedefdef-uuid">4.1. Controlling a BLE scan</a> <a href="#ref-for-typedefdef-uuid①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-eventdef-bluetoothdevice-advertisementreceived">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived">https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived">1.1. Examples</a>
+    <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived①">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-bluetooth-device">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device">https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetooth-device">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-bluetoothlescanfilterinit-canonicalizing">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothlescanfilterinit-canonicalizing">4.1. Controlling a BLE scan</a> <a href="#ref-for-bluetoothlescanfilterinit-canonicalizing①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-bluetoothdatafilterinit-dataprefix">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothdatafilterinit-dataprefix">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-fire-an-advertisementreceived-event">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event">https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-fire-an-advertisementreceived-event">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-get-the-bluetoothdevice-representing">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing">https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-get-the-bluetoothdevice-representing">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-bluetoothuuid-getservice">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-bluetoothlescanfilterinit-manufacturerdata">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanfilterinit-manufacturerdata">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-bluetoothdatafilterinit-mask">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothdatafilterinit-mask">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-bluetoothdatafilterinit-matches">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothdatafilterinit-matches">5.1. Responding to advertising events</a> <a href="#ref-for-bluetoothdatafilterinit-matches①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-allowedbluetoothdevice-mayusegatt">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt">https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-allowedbluetoothdevice-mayusegatt">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-read-only-arraybuffer">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-read-only-arraybuffer">4.1. Controlling a BLE scan</a> <a href="#ref-for-read-only-arraybuffer①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-same-bluetooth-device">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device">https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-same-bluetooth-device">5.1. Responding to advertising events</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-bluetoothlescanfilterinit-servicedata">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanfilterinit-servicedata">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dom-bluetoothlescanfilterinit-services">
+   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothlescanfilterinit-services">4.1. Controlling a BLE scan</a> <a href="#ref-for-dom-bluetoothlescanfilterinit-services①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-ArrayBuffer">
+   <a href="https://heycam.github.io/webidl/#idl-ArrayBuffer">https://heycam.github.io/webidl/#idl-ArrayBuffer</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-ArrayBuffer">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-ArrayBuffer①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-DOMString">
+   <a href="https://heycam.github.io/webidl/#idl-DOMString">https://heycam.github.io/webidl/#idl-DOMString</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-DOMString">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-DOMString①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-frozen-array">
+   <a href="https://heycam.github.io/webidl/#idl-frozen-array">https://heycam.github.io/webidl/#idl-frozen-array</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-frozen-array">4.2. Permission to scan</a> <a href="#ref-for-idl-frozen-array①">(2)</a> <a href="#ref-for-idl-frozen-array②">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-invalidstateerror">
+   <a href="https://heycam.github.io/webidl/#invalidstateerror">https://heycam.github.io/webidl/#invalidstateerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-invalidstateerror">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-notallowederror">
+   <a href="https://heycam.github.io/webidl/#notallowederror">https://heycam.github.io/webidl/#notallowederror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-notallowederror">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-notsupportederror">
+   <a href="https://heycam.github.io/webidl/#notsupportederror">https://heycam.github.io/webidl/#notsupportederror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-notsupportederror">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-SecureContext">
+   <a href="https://heycam.github.io/webidl/#SecureContext">https://heycam.github.io/webidl/#SecureContext</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-SecureContext">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-unknownerror">
+   <a href="https://heycam.github.io/webidl/#unknownerror">https://heycam.github.io/webidl/#unknownerror</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-unknownerror">4. Scanning for BLE advertisements</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-get-buffer-source-copy">
+   <a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">https://heycam.github.io/webidl/#dfn-get-buffer-source-copy</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-get-buffer-source-copy">4.1. Controlling a BLE scan</a> <a href="#ref-for-dfn-get-buffer-source-copy①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-boolean">
+   <a href="https://heycam.github.io/webidl/#idl-boolean">https://heycam.github.io/webidl/#idl-boolean</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-boolean">4. Scanning for BLE advertisements</a> <a href="#ref-for-idl-boolean①">(2)</a>
+    <li><a href="#ref-for-idl-boolean②">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-boolean③">(2)</a> <a href="#ref-for-idl-boolean④">(3)</a>
+    <li><a href="#ref-for-idl-boolean⑤">4.2. Permission to scan</a> <a href="#ref-for-idl-boolean⑥">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-map-entries">
+   <a href="https://heycam.github.io/webidl/#dfn-map-entries">https://heycam.github.io/webidl/#dfn-map-entries</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-map-entries">4.1. Controlling a BLE scan</a> <a href="#ref-for-dfn-map-entries①">(2)</a> <a href="#ref-for-dfn-map-entries②">(3)</a> <a href="#ref-for-dfn-map-entries③">(4)</a>
+    <li><a href="#ref-for-dfn-map-entries④">5.1. Responding to advertising events</a> <a href="#ref-for-dfn-map-entries⑤">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-object">
+   <a href="https://heycam.github.io/webidl/#idl-object">https://heycam.github.io/webidl/#idl-object</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-object">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-object①">(2)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-dfn-present">
+   <a href="https://heycam.github.io/webidl/#dfn-present">https://heycam.github.io/webidl/#dfn-present</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dfn-present">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-dfn-present①">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-idl-unsigned-short">
+   <a href="https://heycam.github.io/webidl/#idl-unsigned-short">https://heycam.github.io/webidl/#idl-unsigned-short</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-idl-unsigned-short">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
   <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
    <li>
     <a data-link-type="biblio">[ECMAScript]</a> defines the following terms:
     <ul>
-     <li><a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">Array.prototype.map</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">TypeError</a>
-     <li><a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</a>
+     <li><span class="dfn-paneled" id="term-for-sec-array.prototype.map" style="color:initial">Array.prototype.map</span>
+     <li><span class="dfn-paneled" id="term-for-sec-native-error-types-used-in-this-standard-typeerror" style="color:initial">TypeError</span>
+     <li><span class="dfn-paneled" id="term-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys" style="color:initial">[[OwnPropertyKeys]]</span>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
-     <li><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">in parallel</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">queue a task</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">relevant settings object</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">responsible event loop</a>
-     <li><a href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">triggered by user activation</a>
+     <li><span class="dfn-paneled" id="term-for-in-parallel" style="color:initial">in parallel</span>
+     <li><span class="dfn-paneled" id="term-for-queue-a-task" style="color:initial">queue a task</span>
+     <li><span class="dfn-paneled" id="term-for-relevant-settings-object" style="color:initial">relevant settings object</span>
+     <li><span class="dfn-paneled" id="term-for-responsible-event-loop" style="color:initial">responsible event loop</span>
+     <li><span class="dfn-paneled" id="term-for-triggered-by-user-activation" style="color:initial">triggered by user activation</span>
     </ul>
    <li>
     <a data-link-type="biblio">[permissions]</a> defines the following terms:
     <ul>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissionstate-denied">"denied"</a>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissionstate-granted">"granted"</a>
-     <li><a href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor">PermissionDescriptor</a>
-     <li><a href="https://w3c.github.io/permissions/#permissionstatus">PermissionStatus</a>
-     <li><a href="https://w3c.github.io/permissions/#extra-permission-data">extra permission data</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-descriptor-type">permission descriptor type</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-query-algorithm">permission query algorithm</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-result-type">permission result type</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-revocation-algorithm">permission revocation algorithm</a>
-     <li><a href="https://w3c.github.io/permissions/#permission-state">permission state</a>
-     <li><a href="https://w3c.github.io/permissions/#powerful-feature">powerful feature</a>
-     <li><a href="https://w3c.github.io/permissions/#request-permission-to-use">request permission to use</a>
-     <li><a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">state</a>
+     <li><span class="dfn-paneled" id="term-for-dom-permissionstate-denied" style="color:initial">"denied"</span>
+     <li><span class="dfn-paneled" id="term-for-dom-permissionstate-granted" style="color:initial">"granted"</span>
+     <li><span class="dfn-paneled" id="term-for-dictdef-permissiondescriptor" style="color:initial">PermissionDescriptor</span>
+     <li><span class="dfn-paneled" id="term-for-permissionstatus" style="color:initial">PermissionStatus</span>
+     <li><span class="dfn-paneled" id="term-for-extra-permission-data" style="color:initial">extra permission data</span>
+     <li><span class="dfn-paneled" id="term-for-permission-descriptor-type" style="color:initial">permission descriptor type</span>
+     <li><span class="dfn-paneled" id="term-for-permission-query-algorithm" style="color:initial">permission query algorithm</span>
+     <li><span class="dfn-paneled" id="term-for-permission-result-type" style="color:initial">permission result type</span>
+     <li><span class="dfn-paneled" id="term-for-permission-revocation-algorithm" style="color:initial">permission revocation algorithm</span>
+     <li><span class="dfn-paneled" id="term-for-permission-state" style="color:initial">permission state</span>
+     <li><span class="dfn-paneled" id="term-for-powerful-feature" style="color:initial">powerful feature</span>
+     <li><span class="dfn-paneled" id="term-for-request-permission-to-use" style="color:initial">request permission to use</span>
+     <li><span class="dfn-paneled" id="term-for-dom-permissionstatus-state" style="color:initial">state</span>
     </ul>
    <li>
     <a data-link-type="biblio">[permissions-request-1]</a> defines the following terms:
     <ul>
-     <li><a href="https://wicg.github.io/permissions-request/#permission-request-algorithm">permission request algorithm</a>
+     <li><span class="dfn-paneled" id="term-for-permission-request-algorithm" style="color:initial">permission request algorithm</span>
     </ul>
    <li>
     <a data-link-type="biblio">[promises-guide]</a> defines the following terms:
     <ul>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise">a new promise</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise">reject</a>
-     <li><a href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise">resolve</a>
+     <li><span class="dfn-paneled" id="term-for-a-new-promise" style="color:initial">a new promise</span>
+     <li><span class="dfn-paneled" id="term-for-reject-promise" style="color:initial">reject</span>
+     <li><span class="dfn-paneled" id="term-for-resolve-promise" style="color:initial">resolve</span>
     </ul>
    <li>
     <a data-link-type="biblio">[secure-contexts]</a> defines the following terms:
     <ul>
-     <li><a href="https://w3c.github.io/webappsec-secure-contexts/#secure-contexts">secure contexts</a>
+     <li><span class="dfn-paneled" id="term-for-secure-contexts" style="color:initial">secure contexts</span>
     </ul>
    <li>
     <a data-link-type="biblio">[web-bluetooth]</a> defines the following terms:
     <ul>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-permissionname-bluetooth">"bluetooth"</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">Bluetooth</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit">BluetoothDataFilterInit</a>
-     <li><a href="index.html#bluetoothdevice">BluetoothDevice</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">UUID</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived">advertisementreceived</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device">bluetooth device</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-canonicalizing">canonicalizing <small>(for BluetoothDataFilterInit)</small></a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing">canonicalizing <small>(for BluetoothLEScanFilterInit)</small></a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix">dataPrefix</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event">fire an advertisementreceived event</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing">get the bluetoothdevice representing</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">getService(name)</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata">manufacturerData</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask">mask</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches">matches</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt">mayUseGATT</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">read only arraybuffer</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device">same bluetooth device</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata">serviceData</a>
-     <li><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services">services</a>
+     <li><span class="dfn-paneled" id="term-for-dom-permissionname-bluetooth" style="color:initial">"bluetooth"</span>
+     <li><span class="dfn-paneled" id="term-for-bluetooth" style="color:initial">Bluetooth</span>
+     <li><span class="dfn-paneled" id="term-for-dictdef-bluetoothdatafilterinit" style="color:initial">BluetoothDataFilterInit</span>
+     <li><span class="dfn-paneled" id="term-for-bluetoothdevice" style="color:initial">BluetoothDevice</span>
+     <li><span class="dfn-paneled" id="term-for-dictdef-bluetoothlescanfilterinit" style="color:initial">BluetoothLEScanFilterInit</span>
+     <li><span class="dfn-paneled" id="term-for-typedefdef-uuid" style="color:initial">UUID</span>
+     <li><span class="dfn-paneled" id="term-for-eventdef-bluetoothdevice-advertisementreceived" style="color:initial">advertisementreceived</span>
+     <li><span class="dfn-paneled" id="term-for-bluetooth-device" style="color:initial">bluetooth device</span>
+     <li><span class="dfn-paneled" id="term-for-bluetoothlescanfilterinit-canonicalizing" style="color:initial">canonicalizing <small>(for BluetoothLEScanFilterInit)</small></span>
+     <li><span class="dfn-paneled" id="term-for-dom-bluetoothdatafilterinit-dataprefix" style="color:initial">dataPrefix</span>
+     <li><span class="dfn-paneled" id="term-for-fire-an-advertisementreceived-event" style="color:initial">fire an advertisementreceived event</span>
+     <li><span class="dfn-paneled" id="term-for-get-the-bluetoothdevice-representing" style="color:initial">get the bluetoothdevice representing</span>
+     <li><span class="dfn-paneled" id="term-for-dom-bluetoothuuid-getservice" style="color:initial">getService(name)</span>
+     <li><span class="dfn-paneled" id="term-for-dom-bluetoothlescanfilterinit-manufacturerdata" style="color:initial">manufacturerData</span>
+     <li><span class="dfn-paneled" id="term-for-dom-bluetoothdatafilterinit-mask" style="color:initial">mask</span>
+     <li><span class="dfn-paneled" id="term-for-bluetoothdatafilterinit-matches" style="color:initial">matches</span>
+     <li><span class="dfn-paneled" id="term-for-dom-allowedbluetoothdevice-mayusegatt" style="color:initial">mayUseGATT</span>
+     <li><span class="dfn-paneled" id="term-for-read-only-arraybuffer" style="color:initial">read only arraybuffer</span>
+     <li><span class="dfn-paneled" id="term-for-same-bluetooth-device" style="color:initial">same bluetooth device</span>
+     <li><span class="dfn-paneled" id="term-for-dom-bluetoothlescanfilterinit-servicedata" style="color:initial">serviceData</span>
+     <li><span class="dfn-paneled" id="term-for-dom-bluetoothlescanfilterinit-services" style="color:initial">services</span>
     </ul>
    <li>
     <a data-link-type="biblio">[WebIDL]</a> defines the following terms:
     <ul>
-     <li><a href="https://heycam.github.io/webidl/#idl-ArrayBuffer">ArrayBuffer</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-DOMString">DOMString</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-frozen-array">FrozenArray</a>
-     <li><a href="https://heycam.github.io/webidl/#invalidstateerror">InvalidStateError</a>
-     <li><a href="https://heycam.github.io/webidl/#notallowederror">NotAllowedError</a>
-     <li><a href="https://heycam.github.io/webidl/#notsupportederror">NotSupportedError</a>
-     <li><a href="https://heycam.github.io/webidl/#SecureContext">SecureContext</a>
-     <li><a href="https://heycam.github.io/webidl/#unknownerror">UnknownError</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">a copy of the bytes held</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-boolean">boolean</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-map-entries">map entries</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-object">object</a>
-     <li><a href="https://heycam.github.io/webidl/#dfn-present">present</a>
-     <li><a href="https://heycam.github.io/webidl/#idl-unsigned-short">unsigned short</a>
+     <li><span class="dfn-paneled" id="term-for-idl-ArrayBuffer" style="color:initial">ArrayBuffer</span>
+     <li><span class="dfn-paneled" id="term-for-idl-DOMString" style="color:initial">DOMString</span>
+     <li><span class="dfn-paneled" id="term-for-idl-frozen-array" style="color:initial">FrozenArray</span>
+     <li><span class="dfn-paneled" id="term-for-invalidstateerror" style="color:initial">InvalidStateError</span>
+     <li><span class="dfn-paneled" id="term-for-notallowederror" style="color:initial">NotAllowedError</span>
+     <li><span class="dfn-paneled" id="term-for-notsupportederror" style="color:initial">NotSupportedError</span>
+     <li><span class="dfn-paneled" id="term-for-SecureContext" style="color:initial">SecureContext</span>
+     <li><span class="dfn-paneled" id="term-for-unknownerror" style="color:initial">UnknownError</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-get-buffer-source-copy" style="color:initial">a copy of the bytes held</span>
+     <li><span class="dfn-paneled" id="term-for-idl-boolean" style="color:initial">boolean</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-map-entries" style="color:initial">map entries</span>
+     <li><span class="dfn-paneled" id="term-for-idl-object" style="color:initial">object</span>
+     <li><span class="dfn-paneled" id="term-for-dfn-present" style="color:initial">present</span>
+     <li><span class="dfn-paneled" id="term-for-idl-unsigned-short" style="color:initial">unsigned short</span>
     </ul>
   </ul>
   <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
@@ -2828,7 +3236,7 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
             if(algoContainer == null) return;
 
             const algoName = algoContainer.getAttribute("data-algorithm");
-            const varName = v.innerHTML;
+            const varName = getVarName(v);
             const addClass = !v.classList.contains("selected");
             let highlightClass = null;
             if(addClass) {
@@ -2844,11 +3252,14 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
 
             // Find all same-name vars, and toggle their class appropriately.
             for(const el of algoContainer.querySelectorAll("var")) {
-                if(el.innerHTML == varName) {
+                if(getVarName(el) == varName) {
                     el.classList.toggle("selected", addClass);
                     el.classList.toggle(highlightClass, addClass);
                 }
             }
+        }
+        function getVarName(el) {
+            return el.textContent.replace(/(\s| )+/, " ").trim();
         }
         function chooseHighlightIndex(algoName, varName) {
             let indexes = null;
@@ -2885,57 +3296,57 @@ navigator<span class="p">.</span>bluetooth<span class="p">.</span><a data-link-t
     </script>
 <script>/* script-dfn-panel */
 
-        document.body.addEventListener("click", function(e) {
-            var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
-            // Find the dfn element or panel, if any, that was clicked on.
-            var el = e.target;
-            var target;
-            var hitALink = false;
-            while(el.parentElement) {
-                if(el.tagName == "A") {
-                    // Clicking on a link in a <dfn> shouldn't summon the panel
-                    hitALink = true;
-                }
-                if(el.classList.contains("dfn-paneled")) {
-                    target = "dfn";
-                    break;
-                }
-                if(el.classList.contains("dfn-panel")) {
-                    target = "dfn-panel";
-                    break;
-                }
-                el = el.parentElement;
-            }
-            if(target != "dfn-panel") {
-                // Turn off any currently "on" or "activated" panels.
-                queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
-                    el.classList.remove("on");
-                    el.classList.remove("activated");
-                });
-            }
-            if(target == "dfn" && !hitALink) {
-                // open the panel
-                var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
-                if(dfnPanel) {
-                    dfnPanel.classList.add("on");
-                    var rect = el.getBoundingClientRect();
-                    dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
-                    dfnPanel.style.top = window.scrollY + rect.top + "px";
-                    var panelRect = dfnPanel.getBoundingClientRect();
-                    var panelWidth = panelRect.right - panelRect.left;
-                    if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
-                        // Reposition, because the panel is overflowing
-                        dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
-                    }
-                } else {
-                    console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
-                }
-            } else if(target == "dfn-panel") {
-                // Switch it to "activated" state, which pins it.
-                el.classList.add("activated");
-                el.style.left = null;
-                el.style.top = null;
-            }
-
+document.body.addEventListener("click", function(e) {
+    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
+    // Find the dfn element or panel, if any, that was clicked on.
+    var el = e.target;
+    var target;
+    var hitALink = false;
+    while(el.parentElement) {
+        if(el.tagName == "A") {
+            // Clicking on a link in a <dfn> shouldn't summon the panel
+            hitALink = true;
+        }
+        if(el.classList.contains("dfn-paneled")) {
+            target = "dfn";
+            break;
+        }
+        if(el.classList.contains("dfn-panel")) {
+            target = "dfn-panel";
+            break;
+        }
+        el = el.parentElement;
+    }
+    if(target != "dfn-panel") {
+        // Turn off any currently "on" or "activated" panels.
+        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
+            el.classList.remove("on");
+            el.classList.remove("activated");
         });
-        </script>
+    }
+    if(target == "dfn" && !hitALink) {
+        // open the panel
+        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
+        if(dfnPanel) {
+            dfnPanel.classList.add("on");
+            var rect = el.getBoundingClientRect();
+            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
+            dfnPanel.style.top = window.scrollY + rect.top + "px";
+            var panelRect = dfnPanel.getBoundingClientRect();
+            var panelWidth = panelRect.right - panelRect.left;
+            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
+                // Reposition, because the panel is overflowing
+                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
+            }
+        } else {
+            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
+        }
+    } else if(target == "dfn-panel") {
+        // Switch it to "activated" state, which pins it.
+        el.classList.add("activated");
+        el.style.left = null;
+        el.style.top = null;
+    }
+
+});
+</script>
