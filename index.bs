@@ -376,10 +376,9 @@ spec: promises-guide-1
       and MAY let a user pair this pseudo-device with a website.
 
     <p>
-      To help ensure that only the entity the user approved for access actually has access,
-      this specification requires that only <a>secure context</a>s
-      can access Bluetooth devices
-      (<a idl lt="Bluetooth">requestDevice</a>).
+      To help ensure that only the entity the user approved for access actually
+      has access, this specification requires that only <a>secure contexts</a>
+      can access Bluetooth devices.
     </p>
   </section>
 
@@ -586,6 +585,7 @@ spec: promises-guide-1
       boolean acceptAllDevices = false;
     };
 
+    [SecureContext]
     interface Bluetooth : EventTarget {
       Promise&lt;boolean> getAvailability();
       attribute EventHandler onavailabilitychanged;
@@ -2113,7 +2113,10 @@ spec: promises-guide-1
     </div>
 
     <pre class="idl">
-      [Constructor(DOMString type, optional ValueEventInit initDict)]
+      [
+        Constructor(DOMString type, optional ValueEventInit initDict),
+        SecureContext
+      ]
       interface ValueEvent : Event {
         readonly attribute any value;
       };
@@ -2227,6 +2230,7 @@ spec: promises-guide-1
     </p>
 
     <pre class="idl">
+      [SecureContext]
       interface BluetoothDevice {
         readonly attribute DOMString id;
         readonly attribute DOMString? name;
@@ -2474,13 +2478,18 @@ spec: promises-guide-1
       </p>
 
       <pre class="idl">
+        [SecureContext]
         interface BluetoothManufacturerDataMap {
           readonly maplike&lt;unsigned short, DataView>;
         };
+        [SecureContext]
         interface BluetoothServiceDataMap {
           readonly maplike&lt;UUID, DataView>;
         };
-        [Constructor(DOMString type, BluetoothAdvertisingEventInit init)]
+        [
+          Constructor(DOMString type, BluetoothAdvertisingEventInit init),
+          SecureContext
+        ]
         interface BluetoothAdvertisingEvent : Event {
           [SameObject]
           readonly attribute BluetoothDevice device;
@@ -3159,6 +3168,7 @@ spec: promises-guide-1
     </p>
 
     <pre class="idl">
+      [SecureContext]
       interface BluetoothRemoteGATTServer {
         [SameObject]
         readonly attribute BluetoothDevice device;
@@ -3512,6 +3522,7 @@ spec: promises-guide-1
     </p>
 
     <pre class="idl">
+      [SecureContext]
       interface BluetoothRemoteGATTService {
         [SameObject]
         readonly attribute BluetoothDevice device;
@@ -3676,6 +3687,7 @@ spec: promises-guide-1
     <p>{{BluetoothRemoteGATTCharacteristic}} represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
 
     <pre class="idl">
+      [SecureContext]
       interface BluetoothRemoteGATTCharacteristic {
         [SameObject]
         readonly attribute BluetoothRemoteGATTService service;
@@ -4135,6 +4147,7 @@ spec: promises-guide-1
       </p>
 
       <pre class="idl">
+        [SecureContext]
         interface BluetoothCharacteristicProperties {
           readonly attribute boolean broadcast;
           readonly attribute boolean read;
@@ -4227,6 +4240,7 @@ spec: promises-guide-1
     <p>{{BluetoothRemoteGATTDescriptor}} represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
 
     <pre class="idl">
+      [SecureContext]
       interface BluetoothRemoteGATTDescriptor {
         [SameObject]
         readonly attribute BluetoothRemoteGATTCharacteristic characteristic;
@@ -4952,7 +4966,7 @@ spec: promises-guide-1
       <h4 id="idl-event-handlers">IDL event handlers</h4>
 
       <pre class="idl">
-        [NoInterfaceObject]
+        [NoInterfaceObject, SecureContext]
         interface CharacteristicEventHandlers {
           attribute EventHandler oncharacteristicvaluechanged;
         };
@@ -4964,7 +4978,7 @@ spec: promises-guide-1
       </p>
 
       <pre class="idl">
-        [NoInterfaceObject]
+        [NoInterfaceObject, SecureContext]
         interface BluetoothDeviceEventHandlers {
           attribute EventHandler ongattserverdisconnected;
         };
@@ -4976,7 +4990,7 @@ spec: promises-guide-1
       </p>
 
       <pre class="idl">
-        [NoInterfaceObject]
+        [NoInterfaceObject, SecureContext]
         interface ServiceEventHandlers {
           attribute EventHandler onserviceadded;
           attribute EventHandler onservicechanged;
