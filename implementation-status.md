@@ -9,6 +9,7 @@ Work is in progress:
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * In **Chrome OS, Android, & Mac**, the GATT Communication API is shipped without any flag.
 * **Linux & Windows** are partially implemented, but not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
+* New Windows implementation is available by running Chrome with `--enable-features=NewBLEWinImplementation`.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
 
