@@ -2,14 +2,14 @@
 This document shows the implementation status of Web Bluetooth on the
 different browsers.
 
-<a href="#chrome"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_128x128.png" alt="Chrome browser logo"></a><a href="#samsung-internet"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/samsung-internet/samsung-internet_128x128.png" alt="Samsung Internet browser logo"></a><a href="#opera"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_128x128.png" alt="Opera browser logo"></a><a href="#servo"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/browser.html/browser.html_128x128.png" alt="Servo browser logo"></a><a href="#firefox"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_128x128.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_128x128.png" alt="Microsoft Edge browser logo"></a><a href="#safari"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_128x128.png" alt="Safari browser logo"></a>
+<a href="#chrome"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/chrome/chrome_128x128.png" alt="Chrome browser logo"></a><a href="#samsung-internet"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/samsung-internet/samsung-internet_128x128.png" alt="Samsung Internet browser logo"></a><a href="#opera"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/opera/opera_128x128.png" alt="Opera browser logo"></a><a href="#servo"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/servo/servo_128x128.png" alt="Servo browser logo"></a><a href="#firefox"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/firefox/firefox_128x128.png" alt="Firefox browser logo"></a><a href="#microsoft-edge"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/edge/edge_128x128.png" alt="Microsoft Edge browser logo"></a><a href="#safari"><img width=64 src="https://raw.githubusercontent.com/alrra/browser-logos/master/src/safari/safari_128x128.png" alt="Safari browser logo"></a>
 
 # Chrome
 Work is in progress:
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
 * In **Chrome OS, Android, & Mac**, the GATT Communication API is shipped without any flag.
 * **Linux & Windows** are partially implemented, but not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
-* New Windows implementation is available by running Chrome with `--enable-features=NewBLEWinImplementation`.
+* New Windows implementation is available in Chrome 70.0.3526.0.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
 
@@ -36,13 +36,13 @@ Hanging connect() abortable by disconnect() |  | |    |       |         |
 getPrimaryService*()      | ✓         | ✓       | ✓   | ✓     | ✓       |
 getIncludedService*()     |           |         |     |       |         |
 getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     | ✓       |
-Characteristic Properties | ✓         | ✓       | ✓   | ✓     |         |
+Characteristic Properties | ✓         | ✓       | ✓   | ✓     | 70       |
 Read Characteristic       | ✓         | ✓       | ✓   | ✓     | ✓       |
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     | ✓       |
-Start/Stop Notifications  | ✓         | ✓       | ✓   | ✓     |         |
-Descriptors               | ✓         | ✓       | ✓   | ✓     |         |
+Start/Stop Notifications  | ✓         | ✓       | ✓   | ✓     | 70      |
+Descriptors               | ✓         | ✓       | ✓   | ✓     | 70      |
 Event bubbling            |           |         |     |       |         |
-Device Disconnected Event | ✓         | ✓       | ✓   | ✓     |         |
+Device Disconnected Event | ✓         | ✓       | ✓   | ✓     | 70      |
 Service Changed Event     |           |         |     |       |         |
 BluetoothUUID             | ✓         | ✓       | ✓   | ✓     | ✓       |
 TypeError for bad UUIDs   | ✓         | ✓       | ✓   | ✓     | ✓       |
