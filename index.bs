@@ -593,9 +593,9 @@ spec: promises-guide-1
       readonly attribute BluetoothDevice? referringDevice;
       Promise&lt;BluetoothDevice> requestDevice(optional RequestDeviceOptions options);
     };
-    Bluetooth implements BluetoothDeviceEventHandlers;
-    Bluetooth implements CharacteristicEventHandlers;
-    Bluetooth implements ServiceEventHandlers;
+    Bluetooth includes BluetoothDeviceEventHandlers;
+    Bluetooth includes CharacteristicEventHandlers;
+    Bluetooth includes ServiceEventHandlers;
   </pre>
   <div class="note" heading="{{Bluetooth}} members">
     <p>
@@ -2242,9 +2242,9 @@ spec: promises-guide-1
         void unwatchAdvertisements();
         readonly attribute boolean watchingAdvertisements;
       };
-      BluetoothDevice implements BluetoothDeviceEventHandlers;
-      BluetoothDevice implements CharacteristicEventHandlers;
-      BluetoothDevice implements ServiceEventHandlers;
+      BluetoothDevice includes BluetoothDeviceEventHandlers;
+      BluetoothDevice includes CharacteristicEventHandlers;
+      BluetoothDevice includes ServiceEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothDevice}} attributes"
@@ -3539,8 +3539,8 @@ spec: promises-guide-1
         Promise&lt;sequence&lt;BluetoothRemoteGATTService>>
           getIncludedServices(optional BluetoothServiceUUID service);
       };
-      BluetoothRemoteGATTService implements CharacteristicEventHandlers;
-      BluetoothRemoteGATTService implements ServiceEventHandlers;
+      BluetoothRemoteGATTService includes CharacteristicEventHandlers;
+      BluetoothRemoteGATTService includes ServiceEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothRemoteGATTService}} attributes"
@@ -3703,7 +3703,7 @@ spec: promises-guide-1
         Promise&lt;BluetoothRemoteGATTCharacteristic> startNotifications();
         Promise&lt;BluetoothRemoteGATTCharacteristic> stopNotifications();
       };
-      BluetoothRemoteGATTCharacteristic implements CharacteristicEventHandlers;
+      BluetoothRemoteGATTCharacteristic includes CharacteristicEventHandlers;
     </pre>
 
     <div class="note" heading="{{BluetoothRemoteGATTCharacteristic}} attributes"
@@ -4966,8 +4966,8 @@ spec: promises-guide-1
       <h4 id="idl-event-handlers">IDL event handlers</h4>
 
       <pre class="idl">
-        [NoInterfaceObject, SecureContext]
-        interface CharacteristicEventHandlers {
+        [SecureContext]
+        interface mixin CharacteristicEventHandlers {
           attribute EventHandler oncharacteristicvaluechanged;
         };
       </pre>
@@ -4978,8 +4978,8 @@ spec: promises-guide-1
       </p>
 
       <pre class="idl">
-        [NoInterfaceObject, SecureContext]
-        interface BluetoothDeviceEventHandlers {
+        [SecureContext]
+        interface mixin BluetoothDeviceEventHandlers {
           attribute EventHandler ongattserverdisconnected;
         };
       </pre>
@@ -4990,8 +4990,8 @@ spec: promises-guide-1
       </p>
 
       <pre class="idl">
-        [NoInterfaceObject, SecureContext]
-        interface ServiceEventHandlers {
+        [SecureContext]
+        interface mixin ServiceEventHandlers {
           attribute EventHandler onserviceadded;
           attribute EventHandler onservicechanged;
           attribute EventHandler onserviceremoved;
