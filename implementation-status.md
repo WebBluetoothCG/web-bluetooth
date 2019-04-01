@@ -7,9 +7,9 @@ different browsers.
 # Chrome
 Work is in progress:
 * Know [How to file Web Bluetooth Bugs](https://www.chromium.org/developers/how-tos/file-web-bluetooth-bugs).
-* In **Chrome OS, Android, & Mac**, the GATT Communication API is shipped without any flag.
-* **Linux & Windows** are partially implemented, but not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
-* New Windows implementation is available in Chrome 70.0.3526.0.
+* In **Android, Chrome OS, Mac and Windows**, the GATT Communication API is shipped without any flag.
+* **Linux** is partially implemented and not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
+* The Windows implementation is available in Chrome 70.0.3526.0 and requires **Windows 10 version 1703 (Creators Update)**.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
 
@@ -65,9 +65,7 @@ Tip: Chrome channel releases are tracked at [https://googlechromelabs.github.io/
   * Some MacBooks may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and [BlueZ](http://www.bluez.org/) 5.41+ installed. Read [How to get Chrome Web Bluetooth working on Linux](https://acassis.wordpress.com/2016/06/28/how-to-get-chrome-web-bluetooth-working-on-linux/).
   * Note that Bluetooth daemon needs to run with experimental interfaces if BlueZ version is lower than 5.43: `sudo /usr/sbin/bluetoothd -E`
-* [Windows](https://crbug.com/507419): Requires Windows 8.1 or later.
-  * To discover devices the user hasn't yet manually paired, requires Windows 10.
-  * A third-party [Windows 10 Polyfill](https://github.com/urish/web-bluetooth-polyfill) (Chrome Extension + Native Executable) has been created while Windows support is not implemented yet.
+* [Windows](https://crbug.com/507419): Requires Windows 10 version 1706 (Creators Update) or later.
 
 ### Unsupported platforms
 
