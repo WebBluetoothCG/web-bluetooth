@@ -3704,6 +3704,8 @@ spec: promises-guide-1
           getDescriptors(optional BluetoothDescriptorUUID descriptor);
         Promise&lt;DataView> readValue();
         Promise&lt;void> writeValue(BufferSource value);
+        Promise&lt;void> writeValueWithResponse(BufferSource value);
+        Promise&lt;void> writeValueWithoutResponse(BufferSource value);
         Promise&lt;BluetoothRemoteGATTCharacteristic> startNotifications();
         Promise&lt;BluetoothRemoteGATTCharacteristic> stopNotifications();
       };
@@ -3911,14 +3913,17 @@ spec: promises-guide-1
       </ol>
     </div>
 
-    <div algorithm="Characteristic.writeValue()">
+    <div algorithm>
       <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, when invoked,
-        MUST run the following steps:
+        To <dfn>WriteCharacteristicValue</dfn>(<span class="argument-list"><var>this</var>: BluetoothRemoteGATTCharacteristic,<br>
+        <var>value</var>: BufferSource,<br>
+        <var>withResponse</var>: boolean,<br>
+        <var>withoutResponse</var>: boolean),</span><br>
+        the UA MUST perform the following steps:
       </p>
       <ol>
         <li>
-          If <code>this.uuid</code> is <a>blocklisted for writes</a>,
+          If <code>|this|.uuid</code> is <a>blocklisted for writes</a>,
           return <a>a promise rejected with</a> a {{SecurityError}}
           and abort these steps.
         </li>
@@ -3933,13 +3938,13 @@ spec: promises-guide-1
           and abort these steps.
         </li>
         <li>
-          If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
+          If <code>|this|.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
           return <a>a promise rejected with</a> a {{NetworkError}}
           and abort these steps.
         </li>
         <li>
           Let |characteristic| be
-          <code>this.{{[[representedCharacteristic]]}}</code>.
+          <code>|this|.{{[[representedCharacteristic]]}}</code>.
         </li>
         <li>
           If |characteristic| is `null`,
@@ -3947,14 +3952,25 @@ spec: promises-guide-1
           abort these steps.
         </li>
         <li>
-          Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
+          Return a <code>|this|.service.device.gatt</code>-<a>connection-checking wrapper</a> around
           <a>a new promise</a> <var>promise</var>
           and run the following steps in parallel.
           <ol>
             <li>
-              If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
-              in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
-              <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
+              <a>Reject</a> <var>promise</var> with a {{NotSupportedError}} and
+              abort these steps if any of the following is true:
+              <ol>
+                <li>
+                 |withResponse| is `true` and <code>Write</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
+                </li>
+                <li>
+                 |withoutResponse| is `true` and <code>Write Without Response</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
+                </li>
+                <li>
+                 |withResponse| and |withoutResponse| are `false` and none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
+              in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
+                </li>
+              </ol>
             </li>
             <li>
               If the UA is currently using the Bluetooth system,
@@ -3966,9 +3982,20 @@ spec: promises-guide-1
               and/or give the user a way to retry failed operations.
             </li>
             <li>
-              Use any combination of the sub-procedures in
-              the <a>Characteristic Value Write</a> procedure
-              to write <var>bytes</var> to <var>characteristic</var>.
+              Write <var>bytes</var> to <var>characteristic</var> by performing
+              the following steps:
+              <ol>
+                <li>
+                  If |withResponse| is `true`, use the <a>Write Characteristic Value</a> procedure.
+                </li>
+                <li>
+                  Otherwise, if |withoutResponse| is `true`, use the <a>Write Without Response</a> procedure.
+                </li>
+                <li>
+                  Otherwise, use any combination of the sub-procedures in
+                  the <a>Characteristic Value Write</a> procedure.
+                </li>
+              </ol>
               Handle errors as described in <a href="#error-handling"></a>.
             </li>
             <li>
@@ -3980,11 +4007,11 @@ spec: promises-guide-1
               <ol>
                 <li>
                   If <var>promise</var> is not in
-                  <code>this.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
+                  <code>|this|.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
                   <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
                 </li>
                 <li>
-                  Set <code>this.value</code> to
+                  Set <code>|this|.value</code> to
                   a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
                 </li>
                 <li>
@@ -3995,6 +4022,45 @@ spec: promises-guide-1
           </ol>
         </li>
       </ol>
+    </div>
+
+    <div algorithm="Characteristic.writeValue()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, 
+        when invoked, MUST return
+      </p>
+      <blockquote>
+        <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
+          <i>value</i>=<code><var>value</var></code>,<br>
+          <i>withResponse</i>=false,<br>
+          <i>withoutResponse</i>=false)</span>
+      </blockquote>
+    </div>
+
+    <div algorithm="Characteristic.writeValueWithResponse()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValueWithResponse(<var>value</var>)</dfn></code> method, 
+        when invoked, MUST return
+      </p>
+      <blockquote>
+        <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
+          <i>value</i>=<code><var>value</var></code>,<br>
+          <i>withResponse</i>=true,<br>
+          <i>withoutResponse</i>=false)</span>
+      </blockquote>
+    </div>
+
+    <div algorithm="Characteristic.writeValueWithoutResponse()">
+      <p>
+        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValueWithoutResponse(<var>value</var>)</dfn></code> method, 
+        when invoked, MUST return
+      </p>
+      <blockquote>
+        <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
+          <i>value</i>=<code><var>value</var></code>,<br>
+          <i>withResponse</i>=false,<br>
+          <i>withoutResponse</i>=true)</span>
+      </blockquote>
     </div>
 
     <p>
@@ -5699,7 +5765,12 @@ spec: promises-guide-1
                       </ol>
                     </li>
                     <li value="8"><dfn>Characteristic Value Read</dfn></li>
-                    <li value="9"><dfn>Characteristic Value Write</dfn></li>
+                    <li value="9"><dfn>Characteristic Value Write</dfn>
+                      <ol>
+                        <li value="1"><dfn>Write Without Response</dfn></li>
+                        <li value="2"><dfn>Write Characteristic Value</dfn></li>
+                      </ol>
+                    </li>
                     <li value="10"><dfn>Characteristic Value Notification</dfn></li>
                     <li value="11"><dfn>Characteristic Value Indications</dfn></li>
                     <li value="12"><dfn>Characteristic Descriptors</dfn>
