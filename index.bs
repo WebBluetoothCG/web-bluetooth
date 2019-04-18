@@ -3917,8 +3917,7 @@ spec: promises-guide-1
       <p>
         To <dfn>WriteCharacteristicValue</dfn>(<span class="argument-list"><var>this</var>: BluetoothRemoteGATTCharacteristic,<br>
         <var>value</var>: BufferSource,<br>
-        <var>withResponse</var>: boolean,<br>
-        <var>withoutResponse</var>: boolean),</span><br>
+        <var>response</var>: string),</span><br>
         the UA MUST perform the following steps:
       </p>
       <ol>
@@ -3957,17 +3956,20 @@ spec: promises-guide-1
           and run the following steps in parallel.
           <ol>
             <li>
+              Assert: |response| is one of "required", "never", or "optional".
+            </li>
+            <li>
               <a>Reject</a> <var>promise</var> with a {{NotSupportedError}} and
               abort these steps if any of the following is true:
               <ol>
                 <li>
-                 |withResponse| is `true` and <code>Write</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
+                 |response| is "required" and <code>Write</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
                 </li>
                 <li>
-                 |withoutResponse| is `true` and <code>Write Without Response</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
+                 |response| is "never" and <code>Write Without Response</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
                 </li>
                 <li>
-                 |withResponse| and |withoutResponse| are `false` and none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
+                 |response| is "optional" and none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
               in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
                 </li>
               </ol>
@@ -3986,10 +3988,10 @@ spec: promises-guide-1
               the following steps:
               <ol>
                 <li>
-                  If |withResponse| is `true`, use the <a>Write Characteristic Value</a> procedure.
+                  If |response| is "required", use the <a>Write Characteristic Value</a> procedure.
                 </li>
                 <li>
-                  Otherwise, if |withoutResponse| is `true`, use the <a>Write Without Response</a> procedure.
+                  Otherwise, if |response| is "never", use the <a>Write Without Response</a> procedure.
                 </li>
                 <li>
                   Otherwise, use any combination of the sub-procedures in
@@ -4032,12 +4034,11 @@ spec: promises-guide-1
       <blockquote>
         <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
           <i>value</i>=<code><var>value</var></code>,<br>
-          <i>withResponse</i>=false,<br>
-          <i>withoutResponse</i>=false)</span>
+          <i>response</i>="optional")</span>
       </blockquote>
     </div>
 
-    <div algorithm="Characteristic.writeValueWithResponse()">
+    <div algorithm="Characteristic.writeValueWithResponse()" class="unstable">
       <p>
         The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValueWithResponse(<var>value</var>)</dfn></code> method, 
         when invoked, MUST return
@@ -4045,12 +4046,11 @@ spec: promises-guide-1
       <blockquote>
         <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
           <i>value</i>=<code><var>value</var></code>,<br>
-          <i>withResponse</i>=true,<br>
-          <i>withoutResponse</i>=false)</span>
+          <i>response</i>="required")</span>
       </blockquote>
     </div>
 
-    <div algorithm="Characteristic.writeValueWithoutResponse()">
+    <div algorithm="Characteristic.writeValueWithoutResponse()" class="unstable">
       <p>
         The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValueWithoutResponse(<var>value</var>)</dfn></code> method, 
         when invoked, MUST return
@@ -4058,8 +4058,7 @@ spec: promises-guide-1
       <blockquote>
         <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
           <i>value</i>=<code><var>value</var></code>,<br>
-          <i>withResponse</i>=false,<br>
-          <i>withoutResponse</i>=true)</span>
+          <i>response</i>="never")</span>
       </blockquote>
     </div>
 
