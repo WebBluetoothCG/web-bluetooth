@@ -3823,6 +3823,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
     <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-getdescriptors" id="ref-for-dom-bluetoothremotegattcharacteristic-getdescriptors"><c- g>getDescriptors</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid" id="ref-for-typedefdef-bluetoothdescriptoruuid①"><c- n>BluetoothDescriptorUUID</c-></a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/getDescriptors(descriptor), BluetoothRemoteGATTCharacteristic/getDescriptors()" data-dfn-type="argument" data-export id="dom-bluetoothremotegattcharacteristic-getdescriptors-descriptor-descriptor"><code><c- g>descriptor</c-></code><a class="self-link" href="#dom-bluetoothremotegattcharacteristic-getdescriptors-descriptor-descriptor"></a></dfn>);
   <c- b>Promise</c->&lt;<a class="idl-code" data-link-type="interface" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor⑧"><c- b>DataView</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-readvalue" id="ref-for-dom-bluetoothremotegattcharacteristic-readvalue①"><c- g>readValue</c-></a>();
   <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevalue" id="ref-for-dom-bluetoothremotegattcharacteristic-writevalue①"><c- g>writeValue</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource④"><c- n>BufferSource</c-></a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/writeValue(value)" data-dfn-type="argument" data-export id="dom-bluetoothremotegattcharacteristic-writevalue-value-value"><code><c- g>value</c-></code><a class="self-link" href="#dom-bluetoothremotegattcharacteristic-writevalue-value-value"></a></dfn>);
+  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse" id="ref-for-dom-bluetoothremotegattcharacteristic-writevaluewithresponse"><c- g>writeValueWithResponse</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑤"><c- n>BufferSource</c-></a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/writeValueWithResponse(value)" data-dfn-type="argument" data-export id="dom-bluetoothremotegattcharacteristic-writevaluewithresponse-value-value"><code><c- g>value</c-></code><a class="self-link" href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse-value-value"></a></dfn>);
+  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse" id="ref-for-dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse"><c- g>writeValueWithoutResponse</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑥"><c- n>BufferSource</c-></a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic/writeValueWithoutResponse(value)" data-dfn-type="argument" data-export id="dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse-value-value"><code><c- g>value</c-></code><a class="self-link" href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse-value-value"></a></dfn>);
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①①"><c- n>BluetoothRemoteGATTCharacteristic</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-startnotifications" id="ref-for-dom-bluetoothremotegattcharacteristic-startnotifications①"><c- g>startNotifications</c-></a>();
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①②"><c- n>BluetoothRemoteGATTCharacteristic</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-stopnotifications" id="ref-for-dom-bluetoothremotegattcharacteristic-stopnotifications"><c- g>stopNotifications</c-></a>();
 };
@@ -3928,48 +3930,80 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
         </ol>
       </ol>
      </div>
-     <div class="algorithm" data-algorithm="Characteristic.writeValue()">
-      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export id="dom-bluetoothremotegattcharacteristic-writevalue"><code>writeValue(<var>value</var>)</code></dfn></code> method, when invoked,
-        MUST run the following steps: </p>
+     <div class="algorithm" data-algorithm="WriteCharacteristicValue">
+      <p> To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="writecharacteristicvalue">WriteCharacteristicValue</dfn>(<span class="argument-list"><var>this</var>: BluetoothRemoteGATTCharacteristic,<br> <var>value</var>: BufferSource,<br> <var>response</var>: string),</span><br> the UA MUST perform the following steps: </p>
       <ol>
-       <li> If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes">blocklisted for writes</a>,
+       <li> If <code><var>this</var>.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes">blocklisted for writes</a>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑨">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror" id="ref-for-securityerror⑧">SecurityError</a></code> and abort these steps. 
        <li> Let <var>bytes</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy" id="ref-for-dfn-get-buffer-source-copy⑥">a copy of the bytes held</a> by <code><var>value</var></code>. 
        <li> If <var>bytes</var> is more than 512 bytes long
           (the maximum length of an attribute value, per <a data-link-type="dfn" href="#long-attribute-values" id="ref-for-long-attribute-values">Long Attribute Values</a>)
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①⓪">a promise rejected with</a> an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidmodificationerror" id="ref-for-invalidmodificationerror">InvalidModificationError</a></code> and abort these steps. 
-       <li> If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected⑥">connected</a></code></code> is <code>false</code>,
+       <li> If <code><var>this</var>.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected⑥">connected</a></code></code> is <code>false</code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①①">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①②">NetworkError</a></code> and abort these steps. 
-       <li> Let <var>characteristic</var> be <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot③">[[representedCharacteristic]]</a></code></code>. 
+       <li> Let <var>characteristic</var> be <code><var>this</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot③">[[representedCharacteristic]]</a></code></code>. 
        <li> If <var>characteristic</var> is <code>null</code>,
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①②">a promise rejected with</a> an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror③">InvalidStateError</a></code> and
           abort these steps. 
        <li>
-         Return a <code>this.service.device.gatt</code>-<a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper②">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑧">a new promise</a> <var>promise</var> and run the following steps in parallel. 
+         Return a <code><var>this</var>.service.device.gatt</code>-<a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper②">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-new-promise" id="ref-for-a-new-promise⑧">a new promise</a> <var>promise</var> and run the following steps in parallel. 
         <ol>
-         <li> If none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
-              in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties①">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise①⑥">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror②">NotSupportedError</a></code> and abort these steps. 
+         <li> Assert: <var>response</var> is one of "required", "never", or "optional". 
+         <li>
+           <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise①⑥">Reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror②">NotSupportedError</a></code> and
+              abort these steps if any of the following is true: 
+          <ol>
+           <li> <var>response</var> is "required" and <code>Write</code> bit is not set in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties①">properties</a> 
+           <li> <var>response</var> is "never" and none of <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
+                 in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties②">properties</a> 
+           <li> <var>response</var> is "optional" and none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
+                 in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties③">properties</a> 
+          </ol>
          <li>
            If the UA is currently using the Bluetooth system,
               it MAY <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise①⑦">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①③">NetworkError</a></code> and abort these steps. 
           <p class="issue" id="issue-f363405f②"><a class="self-link" href="#issue-f363405f②"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①④">NetworkError</a></code>,
               but for now sites need to serialize their use of this API
               and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">&lt;https://github.com/WebBluetoothCG/web-bluetooth/issues/188></a></p>
-         <li> Use any combination of the sub-procedures in
-              the <a data-link-type="dfn" href="#characteristic-value-write" id="ref-for-characteristic-value-write">Characteristic Value Write</a> procedure
-              to write <var>bytes</var> to <var>characteristic</var>.
-              Handle errors as described in <a href="#error-handling">§5.7 Error handling</a>. 
+         <li>
+           Write <var>bytes</var> to <var>characteristic</var> by performing
+              the following steps: 
+          <dl class="switch">
+           <dt>If <var>response</var> is "required"
+           <dd> Use the <a data-link-type="dfn" href="#write-characteristic-value" id="ref-for-write-characteristic-value">Write Characteristic Value</a> procedure. 
+           <dt>If <var>response</var> is "never"
+           <dd> Use the <a data-link-type="dfn" href="#write-without-response" id="ref-for-write-without-response">Write Without Response</a> procedure. 
+           <dt>Otherwise
+           <dd> Use any combination of the sub-procedures in
+                  the <a data-link-type="dfn" href="#characteristic-value-write" id="ref-for-characteristic-value-write">Characteristic Value Write</a> procedure. 
+          </dl>
+           Handle errors as described in <a href="#error-handling">§5.7 Error handling</a>. 
          <li> If the previous step returned an error, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise①⑧">reject</a> <var>promise</var> with that error and abort these steps. 
          <li>
            <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⓪">Queue a task</a> to perform the following steps: 
           <ol>
-           <li> If <var>promise</var> is not in <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①①">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise①⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①⑤">NetworkError</a></code> and abort these steps. 
-           <li> Set <code>this.value</code> to
+           <li> If <var>promise</var> is not in <code><var>this</var>.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①①">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise①⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①⑤">NetworkError</a></code> and abort these steps. 
+           <li> Set <code><var>this</var>.value</code> to
                   a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①⓪">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor④">ArrayBuffer</a></code> containing <var>bytes</var>. 
            <li> <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise①⓪">Resolve</a> <var>promise</var> with <code>undefined</code>. 
           </ol>
         </ol>
       </ol>
+     </div>
+     <div class="algorithm" data-algorithm="Characteristic.writeValue()">
+      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export id="dom-bluetoothremotegattcharacteristic-writevalue"><code>writeValue(<var>value</var>)</code></dfn></code> method, 
+        when invoked, MUST return </p>
+      <blockquote> <a data-link-type="dfn" href="#writecharacteristicvalue" id="ref-for-writecharacteristicvalue">WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br> <i>value</i>=<code><var>value</var></code>,<br> <i>response</i>="optional")</span> </blockquote>
+     </div>
+     <div class="unstable algorithm" data-algorithm="Characteristic.writeValueWithResponse()">
+      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export id="dom-bluetoothremotegattcharacteristic-writevaluewithresponse"><code>writeValueWithResponse(<var>value</var>)</code></dfn></code> method, 
+        when invoked, MUST return </p>
+      <blockquote> <a data-link-type="dfn" href="#writecharacteristicvalue" id="ref-for-writecharacteristicvalue①">WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br> <i>value</i>=<code><var>value</var></code>,<br> <i>response</i>="required")</span> </blockquote>
+     </div>
+     <div class="unstable algorithm" data-algorithm="Characteristic.writeValueWithoutResponse()">
+      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="method" data-export id="dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse"><code>writeValueWithoutResponse(<var>value</var>)</code></dfn></code> method, 
+        when invoked, MUST return </p>
+      <blockquote> <a data-link-type="dfn" href="#writecharacteristicvalue" id="ref-for-writecharacteristicvalue②">WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br> <i>value</i>=<code><var>value</var></code>,<br> <i>response</i>="never")</span> </blockquote>
      </div>
      <p> The UA MUST maintain a map from each known GATT <a data-link-type="dfn" href="#characteristic" id="ref-for-characteristic⑧">Characteristic</a> to
       a set of <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth⑨">Bluetooth</a></code> objects known as
@@ -3994,7 +4028,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           return <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①③">a promise rejected with</a> an <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#invalidstateerror" id="ref-for-invalidstateerror④">InvalidStateError</a></code> and
           abort these steps. 
        <li> If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-          in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties②">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise②②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror③">NotSupportedError</a></code> and abort these steps. 
+          in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties④">properties</a>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#reject-promise" id="ref-for-reject-promise②②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror③">NotSupportedError</a></code> and abort these steps. 
        <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth①">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://www.w3.org/2001/tag/doc/promises-guide/#resolve-promise" id="ref-for-resolve-promise①①">resolve</a> <var>promise</var> with <code>this</code> and abort these steps. 
        <li>
          If the UA is currently using the Bluetooth system,
@@ -4006,7 +4040,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
          If the characteristic has a <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration">Client Characteristic Configuration</a> descriptor, use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors">Characteristic Descriptors</a> procedures
           to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration①">Client Characteristic Configuration</a> descriptor
           is set, matching the constraints
-          in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties③">properties</a>.
+          in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties⑤">properties</a>.
           The UA SHOULD avoid setting both bits,
           and MUST deduplicate <a href="#notification-events">value-change events</a> if both bits are set.
           Handle errors as described in <a href="#error-handling">§5.7 Error handling</a>. 
@@ -4048,7 +4082,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
      </div>
      <section>
       <h4 class="heading settled" data-level="5.4.1" id="characteristicproperties"><span class="secno">5.4.1. </span><span class="content"><dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bluetoothcharacteristicproperties"><code>BluetoothCharacteristicProperties</code></dfn></span><a class="self-link" href="#characteristicproperties"></a></h4>
-      <p> Each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①⑦">BluetoothRemoteGATTCharacteristic</a></code> exposes its <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties④">characteristic properties</a> through a <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties②">BluetoothCharacteristicProperties</a></code> object.
+      <p> Each <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①⑦">BluetoothRemoteGATTCharacteristic</a></code> exposes its <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties⑥">characteristic properties</a> through a <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties②">BluetoothCharacteristicProperties</a></code> object.
         These properties express what operations are valid on the characteristic. </p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed①⓪"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext⑨"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties③"><c- g>BluetoothCharacteristicProperties</c-></a> {
@@ -4070,7 +4104,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
        <ol>
         <li> Let <var>propertiesObj</var> be a new instance of <code class="idl"><a data-link-type="idl" href="#bluetoothcharacteristicproperties" id="ref-for-bluetoothcharacteristicproperties④">BluetoothCharacteristicProperties</a></code>. 
         <li> Let <var>properties</var> be
-            the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties⑤">characteristic properties</a> of <var>characteristic</var>. 
+            the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties⑦">characteristic properties</a> of <var>characteristic</var>. 
         <li>
           Initialize the attributes of <var>propertiesObj</var> from
             the corresponding bits in <var>properties</var>: 
@@ -4103,7 +4137,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
             <td>Authenticated Signed Writes
          </table>
         <li>
-          If the Extended Properties bit of the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties⑥">characteristic properties</a> is not set,
+          If the Extended Properties bit of the <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties⑧">characteristic properties</a> is not set,
             initialize <code><var>propertiesObj</var>.reliableWrite</code> and <code><var>propertiesObj</var>.writableAuxiliaries</code> to <code>false</code>.
             Otherwise, run the following steps: 
          <ol>
@@ -4134,7 +4168,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid⑥"><c- n>UUID</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="UUID" href="#dom-bluetoothremotegattdescriptor-uuid" id="ref-for-dom-bluetoothremotegattdescriptor-uuid"><c- g>uuid</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①①"><c- b>DataView</c-></a>? <a class="idl-code" data-link-type="attribute" data-readonly data-type="DataView?" href="#dom-bluetoothremotegattdescriptor-value" id="ref-for-dom-bluetoothremotegattdescriptor-value"><c- g>value</c-></a>;
   <c- b>Promise</c->&lt;<a class="idl-code" data-link-type="interface" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①②"><c- b>DataView</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-readvalue" id="ref-for-dom-bluetoothremotegattdescriptor-readvalue"><c- g>readValue</c-></a>();
-  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-writevalue" id="ref-for-dom-bluetoothremotegattdescriptor-writevalue"><c- g>writeValue</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑤"><c- n>BufferSource</c-></a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor/writeValue(value)" data-dfn-type="argument" data-export id="dom-bluetoothremotegattdescriptor-writevalue-value-value"><code><c- g>value</c-></code><a class="self-link" href="#dom-bluetoothremotegattdescriptor-writevalue-value-value"></a></dfn>);
+  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-writevalue" id="ref-for-dom-bluetoothremotegattdescriptor-writevalue"><c- g>writeValue</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑦"><c- n>BufferSource</c-></a> <dfn class="idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor/writeValue(value)" data-dfn-type="argument" data-export id="dom-bluetoothremotegattdescriptor-writevalue-value-value"><code><c- g>value</c-></code><a class="self-link" href="#dom-bluetoothremotegattdescriptor-writevalue-value-value"></a></dfn>);
 };
 </pre>
      <div class="note no-marker" role="note">
@@ -5029,7 +5063,12 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
                <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</dfn>
               </ol>
              <li value="8"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="characteristic-value-read">Characteristic Value Read</dfn>
-             <li value="9"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="characteristic-value-write">Characteristic Value Write</dfn>
+             <li value="9">
+              <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="characteristic-value-write">Characteristic Value Write</dfn> 
+              <ol>
+               <li value="1"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="write-without-response">Write Without Response</dfn>
+               <li value="2"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="write-characteristic-value">Write Characteristic Value</dfn>
+              </ol>
              <li value="10"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="characteristic-value-notification">Characteristic Value Notification</dfn>
              <li value="11"><dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="characteristic-value-indications">Characteristic Value Indications</dfn>
              <li value="12">
@@ -5631,6 +5670,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
    <li><a href="#dom-bluetoothcharacteristicproperties-writableauxiliaries">writableAuxiliaries</a><span>, in §5.4.1</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-write">write</a><span>, in §5.4.1</span>
    <li><a href="#write-characteristic-descriptors">Write Characteristic Descriptors</a><span>, in §9</span>
+   <li><a href="#write-characteristic-value">Write Characteristic Value</a><span>, in §9</span>
+   <li><a href="#writecharacteristicvalue">WriteCharacteristicValue</a><span>, in §5.4</span>
    <li><a href="#write-long-characteristic-descriptors">Write Long Characteristic Descriptors</a><span>, in §9</span>
    <li>
     writeValue(value)
@@ -5638,6 +5679,9 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
      <li><a href="#dom-bluetoothremotegattcharacteristic-writevalue">method for BluetoothRemoteGATTCharacteristic</a><span>, in §5.4</span>
      <li><a href="#dom-bluetoothremotegattdescriptor-writevalue">method for BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
     </ul>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse">writeValueWithoutResponse(value)</a><span>, in §5.4</span>
+   <li><a href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse">writeValueWithResponse(value)</a><span>, in §5.4</span>
+   <li><a href="#write-without-response">Write Without Response</a><span>, in §9</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-writewithoutresponse">writeWithoutResponse</a><span>, in §5.4.1</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-">
@@ -6235,8 +6279,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
    <ul>
     <li><a href="#ref-for-BufferSource">3. Device Discovery</a> <a href="#ref-for-BufferSource①">(2)</a>
     <li><a href="#ref-for-BufferSource②">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-BufferSource③">(2)</a>
-    <li><a href="#ref-for-BufferSource④">5.4. BluetoothRemoteGATTCharacteristic</a>
-    <li><a href="#ref-for-BufferSource⑤">5.5. BluetoothRemoteGATTDescriptor</a>
+    <li><a href="#ref-for-BufferSource④">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-BufferSource⑤">(2)</a> <a href="#ref-for-BufferSource⑥">(3)</a>
+    <li><a href="#ref-for-BufferSource⑦">5.5. BluetoothRemoteGATTDescriptor</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-DOMException">
@@ -6640,7 +6684,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a href="#dictdef-bluetoothdatafilterinit"><code><c- g>BluetoothDataFilterInit</c-></code></a> {
-  <a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑥"><c- n>BufferSource</c-></a> <a data-type="BufferSource " href="#dom-bluetoothdatafilterinit-dataprefix"><code><c- g>dataPrefix</c-></code></a>;
+  <a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑧"><c- n>BufferSource</c-></a> <a data-type="BufferSource " href="#dom-bluetoothdatafilterinit-dataprefix"><code><c- g>dataPrefix</c-></code></a>;
   <a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource①①"><c- n>BufferSource</c-></a> <a data-type="BufferSource " href="#dom-bluetoothdatafilterinit-mask"><code><c- g>mask</c-></code></a>;
 };
 <c- b>dictionary</c-> <a href="#dictdef-bluetoothlescanfilterinit"><code><c- g>BluetoothLEScanFilterInit</c-></code></a> {
@@ -6800,6 +6844,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
     <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-getdescriptors" id="ref-for-dom-bluetoothremotegattcharacteristic-getdescriptors①"><c- g>getDescriptors</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothdescriptoruuid" id="ref-for-typedefdef-bluetoothdescriptoruuid①①"><c- n>BluetoothDescriptorUUID</c-></a> <a href="#dom-bluetoothremotegattcharacteristic-getdescriptors-descriptor-descriptor"><code><c- g>descriptor</c-></code></a>);
   <c- b>Promise</c->&lt;<a class="idl-code" data-link-type="interface" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor⑧①"><c- b>DataView</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-readvalue" id="ref-for-dom-bluetoothremotegattcharacteristic-readvalue①①"><c- g>readValue</c-></a>();
   <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevalue" id="ref-for-dom-bluetoothremotegattcharacteristic-writevalue①①"><c- g>writeValue</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource④①"><c- n>BufferSource</c-></a> <a href="#dom-bluetoothremotegattcharacteristic-writevalue-value-value"><code><c- g>value</c-></code></a>);
+  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse" id="ref-for-dom-bluetoothremotegattcharacteristic-writevaluewithresponse①"><c- g>writeValueWithResponse</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑤①"><c- n>BufferSource</c-></a> <a href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse-value-value"><code><c- g>value</c-></code></a>);
+  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse" id="ref-for-dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse①"><c- g>writeValueWithoutResponse</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑥①"><c- n>BufferSource</c-></a> <a href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse-value-value"><code><c- g>value</c-></code></a>);
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①①①"><c- n>BluetoothRemoteGATTCharacteristic</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-startnotifications" id="ref-for-dom-bluetoothremotegattcharacteristic-startnotifications①①"><c- g>startNotifications</c-></a>();
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic①②①"><c- n>BluetoothRemoteGATTCharacteristic</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattcharacteristic-stopnotifications" id="ref-for-dom-bluetoothremotegattcharacteristic-stopnotifications①"><c- g>stopNotifications</c-></a>();
 };
@@ -6825,7 +6871,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#typedefdef-uuid" id="ref-for-typedefdef-uuid⑥①"><c- n>UUID</c-></a> <a class="idl-code" data-link-type="attribute" data-readonly data-type="UUID" href="#dom-bluetoothremotegattdescriptor-uuid" id="ref-for-dom-bluetoothremotegattdescriptor-uuid①"><c- g>uuid</c-></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①①①"><c- b>DataView</c-></a>? <a class="idl-code" data-link-type="attribute" data-readonly data-type="DataView?" href="#dom-bluetoothremotegattdescriptor-value" id="ref-for-dom-bluetoothremotegattdescriptor-value①"><c- g>value</c-></a>;
   <c- b>Promise</c->&lt;<a class="idl-code" data-link-type="interface" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①②①"><c- b>DataView</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-readvalue" id="ref-for-dom-bluetoothremotegattdescriptor-readvalue①"><c- g>readValue</c-></a>();
-  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-writevalue" id="ref-for-dom-bluetoothremotegattdescriptor-writevalue①"><c- g>writeValue</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑤①"><c- n>BufferSource</c-></a> <a href="#dom-bluetoothremotegattdescriptor-writevalue-value-value"><code><c- g>value</c-></code></a>);
+  <c- b>Promise</c->&lt;<c- b>void</c->> <a class="idl-code" data-link-type="method" href="#dom-bluetoothremotegattdescriptor-writevalue" id="ref-for-dom-bluetoothremotegattdescriptor-writevalue①"><c- g>writeValue</c-></a>(<a class="n" data-link-type="idl-name" href="https://heycam.github.io/webidl/#BufferSource" id="ref-for-BufferSource⑦①"><c- n>BufferSource</c-></a> <a href="#dom-bluetoothremotegattdescriptor-writevalue-value-value"><code><c- g>value</c-></code></a>);
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①①①"><c- g>SecureContext</c-></a>]
@@ -7740,11 +7786,29 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
     <li><a href="#ref-for-dom-bluetoothremotegattcharacteristic-readvalue②">5.6.2. Event types</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="writecharacteristicvalue">
+   <b><a href="#writecharacteristicvalue">#writecharacteristicvalue</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-writecharacteristicvalue">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-writecharacteristicvalue①">(2)</a> <a href="#ref-for-writecharacteristicvalue②">(3)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothremotegattcharacteristic-writevalue">
    <b><a href="#dom-bluetoothremotegattcharacteristic-writevalue">#dom-bluetoothremotegattcharacteristic-writevalue</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothremotegattcharacteristic-writevalue">1.1. Examples</a>
     <li><a href="#ref-for-dom-bluetoothremotegattcharacteristic-writevalue①">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothremotegattcharacteristic-writevaluewithresponse">
+   <b><a href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse">#dom-bluetoothremotegattcharacteristic-writevaluewithresponse</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothremotegattcharacteristic-writevaluewithresponse">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse">
+   <b><a href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse">#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse">5.4. BluetoothRemoteGATTCharacteristic</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="active-notification-context-set">
@@ -8401,8 +8465,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
   <aside class="dfn-panel" data-for="characteristic-properties">
    <b><a href="#characteristic-properties">#characteristic-properties</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-characteristic-properties">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-properties①">(2)</a> <a href="#ref-for-characteristic-properties②">(3)</a> <a href="#ref-for-characteristic-properties③">(4)</a>
-    <li><a href="#ref-for-characteristic-properties④">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-characteristic-properties⑤">(2)</a> <a href="#ref-for-characteristic-properties⑥">(3)</a>
+    <li><a href="#ref-for-characteristic-properties">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-characteristic-properties①">(2)</a> <a href="#ref-for-characteristic-properties②">(3)</a> <a href="#ref-for-characteristic-properties③">(4)</a> <a href="#ref-for-characteristic-properties④">(5)</a> <a href="#ref-for-characteristic-properties⑤">(6)</a>
+    <li><a href="#ref-for-characteristic-properties⑥">5.4.1. BluetoothCharacteristicProperties</a> <a href="#ref-for-characteristic-properties⑦">(2)</a> <a href="#ref-for-characteristic-properties⑧">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="descriptor">
@@ -8497,6 +8561,18 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
    <b><a href="#characteristic-value-write">#characteristic-value-write</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-characteristic-value-write">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="write-without-response">
+   <b><a href="#write-without-response">#write-without-response</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-write-without-response">5.4. BluetoothRemoteGATTCharacteristic</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="write-characteristic-value">
+   <b><a href="#write-characteristic-value">#write-characteristic-value</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-write-characteristic-value">5.4. BluetoothRemoteGATTCharacteristic</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="characteristic-value-notification">
