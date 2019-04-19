@@ -39,6 +39,8 @@ getCharacteristic*()      | ✓         | ✓       | ✓   | ✓     | ✓     
 Characteristic Properties | ✓         | ✓       | ✓   | ✓     | 70       |
 Read Characteristic       | ✓         | ✓       | ✓   | ✓     | ✓       |
 Write Characteristic      | ✓         | ✓       | ✓   | ✓     | ✓       |
+└ With Response           |           |         | 👷  |       |         |
+└ Without Response        |           |         | 👷  |       |         |
 Start/Stop Notifications  | ✓         | ✓       | ✓   | ✓     | 70      |
 Descriptors               | ✓         | ✓       | ✓   | ✓     | 70      |
 Event bubbling            |           |         |     |       |         |
