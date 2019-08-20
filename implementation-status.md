@@ -67,7 +67,7 @@ Tip: Chrome channel releases are tracked at [https://googlechromelabs.github.io/
   * Some MacBooks may not work: Check "About this Mac" / "System Report" / "Bluetooth" and verify that Low Energy is supported.
 * [Linux](https://crbug.com/570344): Requires Kernel 3.19+ and [BlueZ](http://www.bluez.org/) 5.41+ installed. Read [How to get Chrome Web Bluetooth working on Linux](https://acassis.wordpress.com/2016/06/28/how-to-get-chrome-web-bluetooth-working-on-linux/).
   * Note that Bluetooth daemon needs to run with experimental interfaces if BlueZ version is lower than 5.43: `sudo /usr/sbin/bluetoothd -E`
-* [Windows](https://crbug.com/507419): Requires Windows 10 version 1703 (Creators Update) or later.
+* [Windows](https://crbug.com/507419): Requires Windows 10 version 1706 (Creators Update) or later.
 
 ### Unsupported platforms
 
