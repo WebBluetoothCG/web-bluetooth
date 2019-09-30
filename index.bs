@@ -105,6 +105,10 @@ spec: fingerprinting-guidance; urlPrefix: https://w3c.github.io/fingerprinting-g
     type: dfn
         text: fingerprinting surface; url: dfn-fingerprinting-surface
 
+spec: html; urlPrefix: https://html.spec.whatwg.org/#
+    type: dfn
+        text: initializing the Document object; url: initialise-the-document-object
+
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
@@ -117,7 +121,7 @@ spec: html
     type: dfn
         text: browsing context; for: /
         text: global object; for: /
-spec: promises-guide-1
+spec: webidl
     type: dfn
         text: resolve
 </pre>
@@ -1068,7 +1072,7 @@ spec: promises-guide-1
         `null`
       </td>
       <td>
-        Set to a {{BluetoothDevice}} while <a>initializing a new `Document` object</a>
+        Set to a {{BluetoothDevice}} while <a>initializing the `Document` object</a>
         if the `Document` was opened from the device.
       </td>
     </tr>
@@ -1091,7 +1095,7 @@ spec: promises-guide-1
         advertises a URL,
         the UA may allow the user to navigate to this URL.
       </span>
-      If this happens, then as part of <a>initializing a new `Document` object</a>,
+      If this happens, then as part of <a>initializing the `Document` object</a>,
       the UA MUST run the following steps:
     </p>
     <ol>
@@ -3108,15 +3112,15 @@ spec: promises-guide-1
             Let <var>promise</var> be the result.
           </li>
           <li>
-            Return the result of
-            <a>transforming</a> <var>promise</var> with a fulfillment handler that:
+            <a>Upon fulfillment</a> of <var>promise</var> with |result|, run the
+            following steps:
             <ul>
-              <li>If its argument is empty, throws a {{NotFoundError}},</li>
+              <li>If |result| is empty, throw a {{NotFoundError}},</li>
               <li>
                 Otherwise, if the <var>single</var> flag is set,
-                returns the first (only) element of its argument.
+                returns the first (only) element of |result|.
               </li>
-              <li>Otherwise, returns its argument.</li>
+              <li>Otherwise, return |result|.</li>
             </ul>
           </li>
         </ol>
@@ -3424,16 +3428,14 @@ spec: promises-guide-1
           <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
         </li>
         <li>
-          Return the result of <a>transforming</a> <var>promise</var>
-          with fulfillment and rejection handlers that perform the following steps:
-          <dl>
-            <dt>fulfillment handler</dt>
-            <dd>
+          <a>React</a> to <var>promise</var>:
+          <ul>
+            <li>If |promise| was fulfilled with value |result|, then:
               <ol>
                 <li>
                   If <var>promise</var> is in
                   <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
-                  remove it and return the first argument.
+                  remove it and return |result|.
                 </li>
                 <li>
                   Otherwise, throw a {{NetworkError}}.
@@ -3443,14 +3445,13 @@ spec: promises-guide-1
                   </span>
                 </li>
               </ol>
-            </dd>
-            <dt>rejection handler</dt>
-            <dd>
+            </li>
+            <li>If |promise| was rejected with reason |error|, then:
               <ol>
                 <li>
                   If <var>promise</var> is in
                   <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
-                  remove it and throw the first argument.
+                  remove it and throw |error|.
                 </li>
                 <li>
                   Otherwise, throw a {{NetworkError}}.
@@ -3460,8 +3461,8 @@ spec: promises-guide-1
                   </span>
                 </li>
               </ol>
-            </dd>
-          </dl>
+            </li>
+          </ul>
         </li>
       </ol>
     </div>
