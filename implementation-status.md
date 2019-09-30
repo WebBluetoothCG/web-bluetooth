@@ -54,6 +54,8 @@ Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓     
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 
+In development.  `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
+
 Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
 Advertisements Scanning   |           |         |     |       |         |
