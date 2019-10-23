@@ -225,19 +225,14 @@ spec: webidl
             services: ['heart_rate'],
           }]
         }).then(device => device.gatt.<a for="BluetoothRemoteGATTServer">connect()</a>)
-        .then(server => server.<a idl for="BluetoothRemoteGATTServer" lt="getPrimaryService()">
-                              getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate">
-            'heart_rate'</a>))
+        .then(server => server.<a idl for="BluetoothRemoteGATTServer" lt="getPrimaryService()"
+          >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate">'heart_rate'</a>))
         .then(service => {
           chosenHeartRateService = service;
           return Promise.all([
-            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">
-                       getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location">
-            'body_sensor_location'</a>)
+            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location">'body_sensor_location'</a>)
               .then(handleBodySensorLocationCharacteristic),
-            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">
-                       getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
-            'heart_rate_measurement'</a>)
+            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">'heart_rate_measurement'</a>)
               .then(handleHeartRateMeasurementCharacteristic),
           ]);
         });
@@ -345,9 +340,7 @@ spec: webidl
           if (!chosenHeartRateService) {
             return Promise.reject(new Error('No heart rate sensor selected yet.'));
           }
-          return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">
-                                         getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point">
-            'heart_rate_control_point'</a>)
+          return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point">'heart_rate_control_point'</a>)
           .then(controlPoint => {
             let resetEnergyExpended = new Uint8Array([1]);
             return controlPoint.<a idl for="BluetoothRemoteGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
