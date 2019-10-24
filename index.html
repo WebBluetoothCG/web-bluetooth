@@ -1504,7 +1504,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-10-23">23 October 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-10-24">24 October 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1708,7 +1708,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   <c- p>}</c->
   <c- k>return</c-> characteristic<c- p>.</c-><a data-link-type="functionish" href="#dom-bluetoothremotegattcharacteristic-readvalue" id="ref-for-dom-bluetoothremotegattcharacteristic-readvalue">readValue<c- p>()</c-></a>
   <c- p>.</c->then<c- p>(</c->sensorLocationData <c- p>=></c-> <c- p>{</c->
-    <c- a>let</c-> sensorLocation <c- o>=</c-> sensorLocationData<c- p>.</c->getUint8<c- p>(</c-><c- mi>0</c-><c- p>);</c->
+    <c- kr>const</c-> sensorLocation <c- o>=</c-> sensorLocationData<c- p>.</c->getUint8<c- p>(</c-><c- mi>0</c-><c- p>);</c->
     <c- k>switch</c-> <c- p>(</c->sensorLocation<c- p>)</c-> <c- p>{</c->
       <c- k>case</c-> <c- mi>0</c-><c- o>:</c-> <c- k>return</c-> <c- t>'Other'</c-><c- p>;</c->
       <c- k>case</c-> <c- mi>1</c-><c- o>:</c-> <c- k>return</c-> <c- t>'Chest'</c-><c- p>;</c->
@@ -1731,16 +1731,16 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
 <c- p>}</c->
 
 <c- a>function</c-> onHeartRateChanged<c- p>(</c->event<c- p>)</c-> <c- p>{</c->
-  <c- a>let</c-> characteristic <c- o>=</c-> event<c- p>.</c->target<c- p>;</c->
+  <c- kr>const</c-> characteristic <c- o>=</c-> event<c- p>.</c->target<c- p>;</c->
   console<c- p>.</c->log<c- p>(</c->parseHeartRate<c- p>(</c->characteristic<c- p>.</c-><a class="idl-code" data-link-type="attribute" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value">value</a><c- p>));</c->
 <c- p>}</c->
 </pre>
       <p> <code>parseHeartRate()</code> would be defined using the <a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_measurement.xml#" id="termref-for-③"> <code>heart_rate_measurement</code> documentation</a> to read the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor">DataView</a></code> stored
         in a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic">BluetoothRemoteGATTCharacteristic</a></code>'s <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-value" id="ref-for-dom-bluetoothremotegattcharacteristic-value①">value</a></code> field. </p>
 <pre class="highlight"><c- a>function</c-> parseHeartRate<c- p>(</c->data<c- p>)</c-> <c- p>{</c->
-  <c- a>let</c-> flags <c- o>=</c-> data<c- p>.</c->getUint8<c- p>(</c-><c- mi>0</c-><c- p>);</c->
-  <c- a>let</c-> rate16Bits <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x1</c-><c- p>;</c->
-  <c- a>let</c-> result <c- o>=</c-> <c- p>{};</c->
+  <c- kr>const</c-> flags <c- o>=</c-> data<c- p>.</c->getUint8<c- p>(</c-><c- mi>0</c-><c- p>);</c->
+  <c- kr>const</c-> rate16Bits <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x1</c-><c- p>;</c->
+  <c- kr>const</c-> result <c- o>=</c-> <c- p>{};</c->
   <c- a>let</c-> index <c- o>=</c-> <c- mi>1</c-><c- p>;</c->
   <c- k>if</c-> <c- p>(</c->rate16Bits<c- p>)</c-> <c- p>{</c->
     result<c- p>.</c->heartRate <c- o>=</c-> data<c- p>.</c->getUint16<c- p>(</c->index<c- p>,</c-> <c- d>/*littleEndian=*/</c-><c- kc>true</c-><c- p>);</c->
@@ -1749,19 +1749,19 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
     result<c- p>.</c->heartRate <c- o>=</c-> data<c- p>.</c->getUint8<c- p>(</c->index<c- p>);</c->
     index <c- o>+=</c-> <c- mi>1</c-><c- p>;</c->
   <c- p>}</c->
-  <c- a>let</c-> contactDetected <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x2</c-><c- p>;</c->
-  <c- a>let</c-> contactSensorPresent <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x4</c-><c- p>;</c->
+  <c- kr>const</c-> contactDetected <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x2</c-><c- p>;</c->
+  <c- kr>const</c-> contactSensorPresent <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x4</c-><c- p>;</c->
   <c- k>if</c-> <c- p>(</c->contactSensorPresent<c- p>)</c-> <c- p>{</c->
     result<c- p>.</c->contactDetected <c- o>=</c-> <c- o>!!</c->contactDetected<c- p>;</c->
   <c- p>}</c->
-  <c- a>let</c-> energyPresent <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x8</c-><c- p>;</c->
+  <c- kr>const</c-> energyPresent <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x8</c-><c- p>;</c->
   <c- k>if</c-> <c- p>(</c->energyPresent<c- p>)</c-> <c- p>{</c->
     result<c- p>.</c->energyExpended <c- o>=</c-> data<c- p>.</c->getUint16<c- p>(</c->index<c- p>,</c-> <c- d>/*littleEndian=*/</c-><c- kc>true</c-><c- p>);</c->
     index <c- o>+=</c-> <c- mi>2</c-><c- p>;</c->
   <c- p>}</c->
-  <c- a>let</c-> rrIntervalPresent <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x10</c-><c- p>;</c->
+  <c- kr>const</c-> rrIntervalPresent <c- o>=</c-> flags <c- o>&amp;</c-> <c- mh>0x10</c-><c- p>;</c->
   <c- k>if</c-> <c- p>(</c->rrIntervalPresent<c- p>)</c-> <c- p>{</c->
-    <c- a>let</c-> rrIntervals <c- o>=</c-> <c- p>[];</c->
+    <c- kr>const</c-> rrIntervals <c- o>=</c-> <c- p>[];</c->
     <c- k>for</c-> <c- p>(;</c-> index <c- o>+</c-> <c- mi>1</c-> <c- o>&lt;</c-> data<c- p>.</c->byteLength<c- p>;</c-> index <c- o>+=</c-> <c- mi>2</c-><c- p>)</c-> <c- p>{</c->
       rrIntervals<c- p>.</c->push<c- p>(</c->data<c- p>.</c->getUint16<c- p>(</c->index<c- p>,</c-> <c- d>/*littleEndian=*/</c-><c- kc>true</c-><c- p>));</c->
     <c- p>}</c->
@@ -1786,7 +1786,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   <c- p>}</c->
   <c- k>return</c-> chosenHeartRateService<c- p>.</c-><a data-link-type="idl" href="#dom-bluetoothremotegattservice-getcharacteristic" id="ref-for-dom-bluetoothremotegattservice-getcharacteristic②">getCharacteristic</a><c- p>(</c-><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.heart_rate_control_point.xml#" id="termref-for-⑤"><c- t>'heart_rate_control_point'</c-></a><c- p>)</c->
   <c- p>.</c->then<c- p>(</c->controlPoint <c- p>=></c-> <c- p>{</c->
-    <c- a>let</c-> resetEnergyExpended <c- o>=</c-> <c- k>new</c-> Uint8Array<c- p>([</c-><c- mi>1</c-><c- p>]);</c->
+    <c- kr>const</c-> resetEnergyExpended <c- o>=</c-> <c- k>new</c-> Uint8Array<c- p>([</c-><c- mi>1</c-><c- p>]);</c->
     <c- k>return</c-> controlPoint<c- p>.</c-><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-writevalue" id="ref-for-dom-bluetoothremotegattcharacteristic-writevalue">writeValue</a><c- p>(</c->resetEnergyExpended<c- p>);</c->
   <c- p>});</c->
 <c- p>}</c->
@@ -2864,7 +2864,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      <div class="example" id="example-getavailability">
       <a class="self-link" href="#example-getavailability"></a> 
       <p> To show Bluetooth UI only to users who have a Bluetooth adapter: </p>
-<pre class="highlight"><c- a>let</c-> bluetoothUI <c- o>=</c-> document<c- p>.</c->querySelector<c- p>(</c-><c- t>'#bluetoothUI'</c-><c- p>);</c->
+<pre class="highlight"><c- kr>const</c-> bluetoothUI <c- o>=</c-> document<c- p>.</c->querySelector<c- p>(</c-><c- t>'#bluetoothUI'</c-><c- p>);</c->
 navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability③">getAvailability<c- p>()</c-></a><c- p>.</c->then<c- p>(</c->isAvailable <c- p>=></c-> <c- p>{</c->
   bluetoothUI<c- p>.</c->hidden <c- o>=</c-> <c- o>!</c->isAvailable<c- p>;</c->
 <c- p>});</c->
