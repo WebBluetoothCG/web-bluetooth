@@ -244,7 +244,7 @@ spec: webidl
           }
           return characteristic.<a for="BluetoothRemoteGATTCharacteristic">readValue()</a>
           .then(sensorLocationData => {
-            let sensorLocation = sensorLocationData.getUint8(0);
+            const sensorLocation = sensorLocationData.getUint8(0);
             switch (sensorLocation) {
               case 0: return 'Other';
               case 1: return 'Chest';
@@ -267,7 +267,7 @@ spec: webidl
         }
 
         function onHeartRateChanged(event) {
-          let characteristic = event.target;
+          const characteristic = event.target;
           console.log(parseHeartRate(characteristic.<a attribute for="BluetoothRemoteGATTCharacteristic">value</a>));
         }
       </pre>
@@ -283,9 +283,9 @@ spec: webidl
 
       <pre highlight="js">
         function parseHeartRate(data) {
-          let flags = data.getUint8(0);
-          let rate16Bits = flags & 0x1;
-          let result = {};
+          const flags = data.getUint8(0);
+          const rate16Bits = flags & 0x1;
+          const result = {};
           let index = 1;
           if (rate16Bits) {
             result.heartRate = data.getUint16(index, /*littleEndian=*/true);
@@ -294,19 +294,19 @@ spec: webidl
             result.heartRate = data.getUint8(index);
             index += 1;
           }
-          let contactDetected = flags & 0x2;
-          let contactSensorPresent = flags & 0x4;
+          const contactDetected = flags & 0x2;
+          const contactSensorPresent = flags & 0x4;
           if (contactSensorPresent) {
             result.contactDetected = !!contactDetected;
           }
-          let energyPresent = flags & 0x8;
+          const energyPresent = flags & 0x8;
           if (energyPresent) {
             result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
             index += 2;
           }
-          let rrIntervalPresent = flags & 0x10;
+          const rrIntervalPresent = flags & 0x10;
           if (rrIntervalPresent) {
-            let rrIntervals = [];
+            const rrIntervals = [];
             for (; index + 1 < data.byteLength; index += 2) {
               rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
             }
@@ -342,7 +342,7 @@ spec: webidl
           }
           return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point">'heart_rate_control_point'</a>)
           .then(controlPoint => {
-            let resetEnergyExpended = new Uint8Array([1]);
+            const resetEnergyExpended = new Uint8Array([1]);
             return controlPoint.<a idl for="BluetoothRemoteGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
           });
         }
@@ -2048,7 +2048,7 @@ spec: webidl
         To show Bluetooth UI only to users who have a Bluetooth adapter:
       </p>
       <pre highlight="js">
-      let bluetoothUI = document.querySelector('#bluetoothUI');
+      const bluetoothUI = document.querySelector('#bluetoothUI');
       navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
         bluetoothUI.hidden = !isAvailable;
       });
