@@ -551,7 +551,8 @@ spec: webidl
     <p>
       <code>navigator.bluetooth.{{getAvailability()}}</code>
       exposes whether a Bluetooth radio is available on the user's system,
-      regardless of whether it is powered on or not.
+      regardless of whether it is powered on or not. The availability is also
+      affected if the user has configured the UA to block Web Bluetooth.
       Some users might consider this private,
       although it's hard to imagine the damage that would result from revealing it.
       This information also increases the UA's <a>fingerprinting surface</a> by a bit.
@@ -2033,7 +2034,7 @@ spec: webidl
     </dl>
   </section>
 
-  <section class="unstable">
+  <section>
     <h3 id="availability">Overall Bluetooth availability</h3>
 
     <p>
@@ -2070,6 +2071,9 @@ spec: webidl
           return a particular answer from this function for the current origin,
           <a>queue a task</a> to <a>resolve</a> |promise| with the configured answer,
           and abort these steps.
+
+          Note: If the Web Bluetooth permission has been blocked by the user,
+          the UA may <a>resolve</a> |promise| with  `false`.
         </li>
         <li>
           If the UA is running on a system that has a Bluetooth radio
@@ -2081,12 +2085,36 @@ spec: webidl
         </li>
       </ol>
 
-      Note: the promise is resolved <a>in parallel</a>
+      Note: The promise is resolved <a>in parallel</a>
       to let the UA call out to other systems
       to determine whether Bluetooth is available.
     </div>
 
-    <div algorithm="availabilitychanged" id="availability-changed-algorithm">
+    <div class="example" id="example-getAvailability-PermissionStatus-onchange">
+      <p>If the user has blocked the permission and the UA resolves the
+      <code><a idl>getAvailability</a></code> promise with false, the following can be used to detect
+      when Bluetooth is available again to show Bluetooth UI:</p>
+      <pre highlight="js">
+      function checkAvailability() {
+        const bluetoothUI = document.querySelector('#bluetoothUI');
+        navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
+          bluetoothUI.hidden = !isAvailable;
+        });
+      }
+
+      navigator.permission.query({name: "bluetooth"}).then(status => {
+        if (status.state !== 'denied') checkAvailability();
+
+        // Bluetooth is blocked, listen for change in PermissionStatus.
+        status.onchange = () => {
+          if (this.state !== 'denied') checkAvailability();
+        };
+      });
+      </pre>
+    </div>
+
+    <div algorithm="availabilitychanged" id="availability-changed-algorithm"
+        class="unstable">
       <p>
         If the UA becomes able or unable to use Bluetooth,
         for example because a radio was physically attached or detached,
