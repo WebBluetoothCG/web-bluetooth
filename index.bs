@@ -2096,17 +2096,14 @@ spec: webidl
       when Bluetooth is available again to show Bluetooth UI:</p>
       <pre highlight="js">
       function checkAvailability() {
-        const BluetoothUI = document.querySelector('#bluetoothUI');
+        const bluetoothUI = document.querySelector('#bluetoothUI');
         navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
           bluetoothUI.hidden = !isAvailable;
         });
       }
 
       navigator.permission.query({name: "bluetooth"}).then(status => {
-        if (status.state !== 'denied') {
-          checkAvailability();
-          return;
-        }
+        if (status.state !== 'denied') checkAvailability();
 
         // Bluetooth is blocked, listen for change in PermissionStatus.
         status.onchange = () => {
