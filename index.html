@@ -1212,7 +1212,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version 98212c11613b78977e54b28cc53499f2ee83d388" name="generator">
+  <meta content="Bikeshed version f5a6d58a6b9207b620f985d7239601eb3a483162" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
@@ -1504,7 +1504,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-10-24">24 October 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-11-04">4 November 2019</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1929,7 +1929,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      <h3 class="heading settled" data-level="2.5" id="availability-fingerprint"><span class="secno">2.5. </span><span class="content">Exposing Bluetooth availability</span><a class="self-link" href="#availability-fingerprint"></a></h3>
      <p><em>This section is non-normative.</em></p>
      <p> <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability">getAvailability()</a></code></code> exposes whether a Bluetooth radio is available on the user’s system,
-      regardless of whether it is powered on or not.
+      regardless of whether it is powered on or not. The availability is also
+      affected if the user has configured the UA to block Web Bluetooth.
       Some users might consider this private,
       although it’s hard to imagine the damage that would result from revealing it.
       This information also increases the UA’s <a data-link-type="dfn" href="https://w3c.github.io/fingerprinting-guidance/#dfn-fingerprinting-surface" id="ref-for-dfn-fingerprinting-surface">fingerprinting surface</a> by a bit.
@@ -2856,7 +2857,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
        </ol>
      </dl>
     </section>
-    <section class="unstable">
+    <section>
      <h3 class="heading settled" data-level="3.2" id="availability"><span class="secno">3.2. </span><span class="content">Overall Bluetooth availability</span><a class="self-link" href="#availability"></a></h3>
      <p> The UA may be running on a computer that has no Bluetooth radio. <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice⑤">requestDevice()</a></code> handles this by failing to discover any devices,
       which results in a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notfounderror" id="ref-for-notfounderror①">NotFoundError</a></code>,
@@ -2877,29 +2878,53 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
       <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export id="dom-bluetooth-getavailability"><code>getAvailability()</code></dfn></code> method,
         when invoked, MUST return <a data-link-type="dfn" href="https://heycam.github.io/webidl/#a-new-promise" id="ref-for-a-new-promise①">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel②">in parallel</a>: </p>
       <ol>
-       <li id="override-availability"><a class="self-link" href="#override-availability"></a> If the user has configured the UA to
+       <li id="override-availability">
+        <a class="self-link" href="#override-availability"></a> If the user has configured the UA to
           return a particular answer from this function for the current origin, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①">resolve</a> <var>promise</var> with the configured answer,
           and abort these steps. 
-       <li> If the UA is running on a system that has a Bluetooth radio <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①">queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve②">resolve</a> <var>promise</var> with <code>true</code> regardless
+        <p class="note" role="note"><span>Note:</span> If the Web Bluetooth permission has been blocked by the user,
+          the UA may <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve②">resolve</a> <var>promise</var> with <code>false</code>.</p>
+       <li> If the UA is running on a system that has a Bluetooth radio <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①">queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve③">resolve</a> <var>promise</var> with <code>true</code> regardless
           of the powered state of the Bluetooth radio. 
-       <li> Otherwise, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task②">queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve③">resolve</a> <var>promise</var> with <code>false</code>. 
+       <li> Otherwise, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task②">queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve④">resolve</a> <var>promise</var> with <code>false</code>. 
       </ol>
-      <p class="note" role="note"><span>Note:</span> the promise is resolved <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel③">in parallel</a> to let the UA call out to other systems
+      <p class="note" role="note"><span>Note:</span> The promise is resolved <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel③">in parallel</a> to let the UA call out to other systems
       to determine whether Bluetooth is available.</p>
      </div>
-     <div class="algorithm" data-algorithm="availabilitychanged" id="availability-changed-algorithm">
+     <div class="example" id="example-getAvailability-PermissionStatus-onchange">
+      <a class="self-link" href="#example-getAvailability-PermissionStatus-onchange"></a> 
+      <p>If the user has blocked the permission and the UA resolves the <code><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability④">getAvailability</a></code> promise with false, the following can be used to detect
+      when Bluetooth is available again to show Bluetooth UI:</p>
+<pre class="highlight"><c- a>function</c-> checkAvailability<c- p>()</c-> <c- p>{</c->
+  <c- kr>const</c-> bluetoothUI <c- o>=</c-> document<c- p>.</c->querySelector<c- p>(</c-><c- t>'#bluetoothUI'</c-><c- p>);</c->
+  navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑤">getAvailability<c- p>()</c-></a><c- p>.</c->then<c- p>(</c->isAvailable <c- p>=></c-> <c- p>{</c->
+    bluetoothUI<c- p>.</c->hidden <c- o>=</c-> <c- o>!</c->isAvailable<c- p>;</c->
+  <c- p>});</c->
+<c- p>}</c->
+
+navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c- u>"bluetooth"</c-><c- p>}).</c->then<c- p>(</c->status <c- p>=></c-> <c- p>{</c->
+  <c- k>if</c-> <c- p>(</c->status<c- p>.</c->state <c- o>!==</c-> <c- t>'denied'</c-><c- p>)</c-> checkAvailability<c- p>();</c->
+
+  <c- c1>// Bluetooth is blocked, listen for change in PermissionStatus.</c->
+  status<c- p>.</c->onchange <c- o>=</c-> <c- p>()</c-> <c- p>=></c-> <c- p>{</c->
+    <c- k>if</c-> <c- p>(</c-><c- k>this</c-><c- p>.</c->state <c- o>!==</c-> <c- t>'denied'</c-><c- p>)</c-> checkAvailability<c- p>();</c->
+  <c- p>};</c->
+<c- p>});</c->
+</pre>
+     </div>
+     <div class="unstable algorithm" data-algorithm="availabilitychanged" id="availability-changed-algorithm">
       <p> If the UA becomes able or unable to use Bluetooth,
         for example because a radio was physically attached or detached,
         or the user has changed
         their <a href="#override-availability">configuration</a> for
-        the answer returned from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability④">getAvailability()</a></code>,
+        the answer returned from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑥">getAvailability()</a></code>,
         the UA must <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task③">queue a task</a> on
         each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object">global object</a> <var>global</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop">responsible event loop</a> to run the following steps: </p>
       <ol>
        <li> Let <var>oldAvailability</var> be
-          the value <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑤">getAvailability()</a></code> would have returned before the change. 
+          the value <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑦">getAvailability()</a></code> would have returned before the change. 
        <li> Let <var>newAvailability</var> be
-          the value <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑥">getAvailability()</a></code> would return after the change. 
+          the value <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑧">getAvailability()</a></code> would return after the change. 
        <li> If <var>oldAvailability</var> is not the same as <var>newAvailability</var>, <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire" id="ref-for-concept-event-fire">fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetooth-availabilitychanged" id="ref-for-eventdef-bluetooth-availabilitychanged②">availabilitychanged</a></code> using the <code class="idl"><a data-link-type="idl" href="#valueevent" id="ref-for-valueevent">ValueEvent</a></code> interface
           at <code><var>global</var>.navigator.bluetooth</code> with its <code class="idl"><a data-link-type="idl" href="#dom-valueevent-value" id="ref-for-dom-valueevent-value">value</a></code> attribute initialized to <var>newAvailability</var>. 
       </ol>
@@ -3430,7 +3455,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           <li> Append to <var>result</var> the <code>Promise&lt;BluetoothGATT*></code> instance
                 associated with <var>entry</var> in <var>context</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot" id="ref-for-dom-bluetooth-attributeinstancemap-slot②">[[attributeInstanceMap]]</a></code>. 
          </ol>
-        <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve④">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://heycam.github.io/webidl/#wait-for-all" id="ref-for-wait-for-all">waiting for all</a> elements of <var>result</var>. 
+        <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑤">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://heycam.github.io/webidl/#wait-for-all" id="ref-for-wait-for-all">waiting for all</a> elements of <var>result</var>. 
        </ol>
       </div>
       <div class="algorithm" data-algorithm="Represented">
@@ -3626,7 +3651,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
            <li> If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑨">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①⓪">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror⑤">NetworkError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection①">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot①⓪">[[representedDevice]]</a></code></code>,
                   and abort these steps. 
            <li> Set <code>this.connected</code> to <code>true</code>. 
-           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑤">Resolve</a> <var>promise</var> with <code>this</code>. 
+           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑥">Resolve</a> <var>promise</var> with <code>this</code>. 
           </ol>
         </ol>
       </ol>
@@ -3775,7 +3800,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
        <li> If <var>service</var> is a Primary Service,
           initialize <code><var>result</var>.isPrimary</code> to true.
           Otherwise initialize <code><var>result</var>.isPrimary</code> to false. 
-       <li><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑥">Resolve</a> <var>promise</var> with <var>result</var>.
+       <li><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑦">Resolve</a> <var>promise</var> with <var>result</var>.
       </ol>
      </div>
      <div class="algorithm" data-algorithm="getCharacteristic(characteristic)">
@@ -3862,7 +3887,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           from the Characteristic</a> <var>characteristic</var>,
           and let <var>propertiesPromise</var> be the result. 
        <li>Wait for <var>propertiesPromise</var> to settle.
-       <li> If <var>propertiesPromise</var> was rejected, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑦">resolve</a> <var>promise</var> with <var>propertiesPromise</var> and
+       <li> If <var>propertiesPromise</var> was rejected, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑧">resolve</a> <var>promise</var> with <var>propertiesPromise</var> and
           abort these steps. 
        <li> Initialize <code><var>result</var>.properties</code> from
           the value <var>propertiesPromise</var> was fulfilled with. 
@@ -3870,7 +3895,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           The UA MAY initialize <code><var>result</var>.value</code> to
           a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor⑨">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor②">ArrayBuffer</a></code> containing
           the most recently read value from <var>characteristic</var> if this value is available. 
-       <li><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑧">Resolve</a> <var>promise</var> with <var>result</var>.
+       <li><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑨">Resolve</a> <var>promise</var> with <var>result</var>.
       </ol>
      </div>
      <div class="unstable algorithm" data-algorithm="getDescriptor(descriptor)">
@@ -3920,7 +3945,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
            <li> Let <var>buffer</var> be an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor③">ArrayBuffer</a></code> holding the retrieved value,
                   and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>. 
            <li> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire" id="ref-for-concept-event-fire②">Fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged" id="ref-for-eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged①">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <code>this</code>. 
-           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve⑨">Resolve</a> <var>promise</var> with <code>this.value</code>. 
+           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⓪">Resolve</a> <var>promise</var> with <code>this.value</code>. 
           </ol>
         </ol>
       </ol>
@@ -3980,7 +4005,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
            <li> If <var>promise</var> is not in <code><var>this</var>.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①①">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject①⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①⑤">NetworkError</a></code> and abort these steps. 
            <li> Set <code><var>this</var>.value</code> to
                   a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①⓪">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor④">ArrayBuffer</a></code> containing <var>bytes</var>. 
-           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⓪">Resolve</a> <var>promise</var> with <code>undefined</code>. 
+           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①①">Resolve</a> <var>promise</var> with <code>undefined</code>. 
           </ol>
         </ol>
       </ol>
@@ -4024,7 +4049,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           abort these steps. 
        <li> If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
           in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties④">properties</a>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject②②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notsupportederror" id="ref-for-notsupportederror③">NotSupportedError</a></code> and abort these steps. 
-       <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth①">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①①">resolve</a> <var>promise</var> with <code>this</code> and abort these steps. 
+       <li> If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth①">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①②">resolve</a> <var>promise</var> with <code>this</code> and abort these steps. 
        <li>
          If the UA is currently using the Bluetooth system,
           it MAY <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject②③">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror①⑦">NetworkError</a></code> and abort these steps. 
@@ -4047,7 +4072,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           messages.</p>
        <li> If the previous step returned an error, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject②④">reject</a> <var>promise</var> with that error and abort these steps. 
        <li> Add <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth②">navigator.bluetooth</a></code> to <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set①">active notification context set</a>. 
-       <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①②">Resolve</a> <var>promise</var> with <code>this</code>. 
+       <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①③">Resolve</a> <var>promise</var> with <code>this</code>. 
       </ol>
       <p class="note" role="note"> After notifications are enabled,
         the resulting <a href="#notification-events">value-change events</a> won’t be delivered
@@ -4069,7 +4094,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           and the characteristic has a <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration③">Client Characteristic Configuration</a> descriptor,
           the UA SHOULD use any of the <a data-link-type="dfn" href="#characteristic-descriptors" id="ref-for-characteristic-descriptors①">Characteristic Descriptors</a> procedures
           to clear the <code>Notification</code> and <code>Indication</code> bits in <var>characteristic</var>’s <a data-link-type="dfn" href="#client-characteristic-configuration" id="ref-for-client-characteristic-configuration④">Client Characteristic Configuration</a> descriptor. 
-       <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①①">Queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①③">resolve</a> <var>promise</var> with <code>this</code>. 
+       <li> <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①①">Queue a task</a> to <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①④">resolve</a> <var>promise</var> with <code>this</code>. 
       </ol>
       <p class="note" role="note"> Queuing a task to resolve the promise ensures that
         no <a href="#notification-events">value change events</a> due to notifications
@@ -4148,7 +4173,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           <li> Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
                 the Writable Auxiliaries bit of <var>extendedProperties</var>. 
          </ol>
-        <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①④">Resolve</a> <var>promise</var> with <var>propertiesObj</var>. 
+        <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑤">Resolve</a> <var>promise</var> with <var>propertiesObj</var>. 
        </ol>
       </div>
      </section>
@@ -4201,7 +4226,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
           The UA MAY initialize <code><var>result</var>.value</code> to
           a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①③">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor⑤">ArrayBuffer</a></code> containing
           the most recently read value from <var>descriptor</var> if this value is available. 
-       <li><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑤">Resolve</a> <var>promise</var> with <var>result</var>.
+       <li><a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑥">Resolve</a> <var>promise</var> with <var>result</var>.
       </ol>
      </div>
      <div class="algorithm" data-algorithm="Descriptor.readValue()">
@@ -4236,7 +4261,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
            <li> If <var>promise</var> is not in <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①②">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject②⑧">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②②">NetworkError</a></code> and abort these steps. 
            <li> Let <var>buffer</var> be an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor⑥">ArrayBuffer</a></code> holding the retrieved value,
                   and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>. 
-           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑥">Resolve</a> <var>promise</var> with <code>this.value</code>. 
+           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑦">Resolve</a> <var>promise</var> with <code>this.value</code>. 
           </ol>
         </ol>
       </ol>
@@ -4277,7 +4302,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
            <li> If <var>promise</var> is not in <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①③">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://heycam.github.io/webidl/#reject" id="ref-for-reject③①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#networkerror" id="ref-for-networkerror②⑥">NetworkError</a></code> and abort these steps. 
            <li> Set <code>this.value</code> to
                   a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①④">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor⑦">ArrayBuffer</a></code> containing <var>bytes</var>. 
-           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑦">Resolve</a> <var>promise</var> with <code>undefined</code>. 
+           <li> <a data-link-type="dfn" href="https://heycam.github.io/webidl/#resolve" id="ref-for-resolve①⑧">Resolve</a> <var>promise</var> with <code>undefined</code>. 
           </ol>
         </ol>
       </ol>
@@ -6458,13 +6483,13 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
    <a href="https://heycam.github.io/webidl/#resolve">https://heycam.github.io/webidl/#resolve</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-resolve">3. Device Discovery</a>
-    <li><a href="#ref-for-resolve①">3.2. Overall Bluetooth availability</a> <a href="#ref-for-resolve②">(2)</a> <a href="#ref-for-resolve③">(3)</a>
-    <li><a href="#ref-for-resolve④">5.1.2. The Bluetooth cache</a>
-    <li><a href="#ref-for-resolve⑤">5.2. BluetoothRemoteGATTServer</a>
-    <li><a href="#ref-for-resolve⑥">5.3. BluetoothRemoteGATTService</a>
-    <li><a href="#ref-for-resolve⑦">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-resolve⑧">(2)</a> <a href="#ref-for-resolve⑨">(3)</a> <a href="#ref-for-resolve①⓪">(4)</a> <a href="#ref-for-resolve①①">(5)</a> <a href="#ref-for-resolve①②">(6)</a> <a href="#ref-for-resolve①③">(7)</a>
-    <li><a href="#ref-for-resolve①④">5.4.1. BluetoothCharacteristicProperties</a>
-    <li><a href="#ref-for-resolve①⑤">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-resolve①⑥">(2)</a> <a href="#ref-for-resolve①⑦">(3)</a>
+    <li><a href="#ref-for-resolve①">3.2. Overall Bluetooth availability</a> <a href="#ref-for-resolve②">(2)</a> <a href="#ref-for-resolve③">(3)</a> <a href="#ref-for-resolve④">(4)</a>
+    <li><a href="#ref-for-resolve⑤">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-resolve⑥">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-resolve⑦">5.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-resolve⑧">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-resolve⑨">(2)</a> <a href="#ref-for-resolve①⓪">(3)</a> <a href="#ref-for-resolve①①">(4)</a> <a href="#ref-for-resolve①②">(5)</a> <a href="#ref-for-resolve①③">(6)</a> <a href="#ref-for-resolve①④">(7)</a>
+    <li><a href="#ref-for-resolve①⑤">5.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-resolve①⑥">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-resolve①⑦">(2)</a> <a href="#ref-for-resolve①⑧">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-unsigned-long">
@@ -7236,7 +7261,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c
    <ul>
     <li><a href="#ref-for-dom-bluetooth-getavailability">2.5. Exposing Bluetooth availability</a>
     <li><a href="#ref-for-dom-bluetooth-getavailability①">3. Device Discovery</a> <a href="#ref-for-dom-bluetooth-getavailability②">(2)</a>
-    <li><a href="#ref-for-dom-bluetooth-getavailability③">3.2. Overall Bluetooth availability</a> <a href="#ref-for-dom-bluetooth-getavailability④">(2)</a> <a href="#ref-for-dom-bluetooth-getavailability⑤">(3)</a> <a href="#ref-for-dom-bluetooth-getavailability⑥">(4)</a>
+    <li><a href="#ref-for-dom-bluetooth-getavailability③">3.2. Overall Bluetooth availability</a> <a href="#ref-for-dom-bluetooth-getavailability④">(2)</a> <a href="#ref-for-dom-bluetooth-getavailability⑤">(3)</a> <a href="#ref-for-dom-bluetooth-getavailability⑥">(4)</a> <a href="#ref-for-dom-bluetooth-getavailability⑦">(5)</a> <a href="#ref-for-dom-bluetooth-getavailability⑧">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="valueevent">
