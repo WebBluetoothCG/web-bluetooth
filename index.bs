@@ -2093,24 +2093,27 @@ spec: webidl
     <div class="example" id="example-getAvailability-PermissionStatus-onchange">
       <p>If the user has blocked the permission and the UA resolves the
       <code><a idl>getAvailability</a></code> promise with false, the following can be used to detect
-      when Bluetooth is available again:</p>
+      when Bluetooth is available again to show Bluetooth UI:</p>
       <pre highlight="js">
-      // Check if Bluetooth is available first.
-      navigator.bluetooth.getAvailability().then(isAvailable => {
-        if (!isAvailable) {
-          // Check if the permission has been blocked
-          navigator.permission.query({name: "bluetooth"}).then(status => {
-            if (status.state === 'denied') {
-              // Bluetooth is blocked, listen for change in PermissionStatus.
-              status.onchange = () => {
-                if (this.state == 'prompt') {
-                  // Bluetooth is available now.
-                }
-              };
-            }
-          });
+      function checkAvailability() {
+        const BluetoothUI = document.querySelector('#bluetoothUI');
+        navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
+          bluetoothUI.hidden = !isAvailable;
+        });
+      }
+
+      navigator.permission.query({name: "bluetooth"}).then(status => {
+        if (status.state !== 'denied') {
+          checkAvailability();
+          return;
         }
+
+        // Bluetooth is blocked, listen for change in PermissionStatus.
+        status.onchange = () => {
+          if (this.state !== 'denied') checkAvailability();
+        };
       });
+      </pre>
     </div>
 
     <div algorithm="availabilitychanged" id="availability-changed-algorithm"
