@@ -54,11 +54,13 @@ Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓     
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 
-In development.  `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
+Partial development.  `chrome://flags/#enable-experimental-web-platform-features` 🚩 flag required.
 
 Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
-Advertisements Scanning   |           |         |     |       |         |
+Advertisements Scanning   |           | 🚩      | 🚩  |       |         |
+
+[Implementaiton issue](https://crbug.com/897312)
 
 Tip: Chrome channel releases are tracked at [https://googlechromelabs.github.io/current-versions/](https://googlechromelabs.github.io/current-versions/).
 
