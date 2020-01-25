@@ -60,7 +60,7 @@ Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
 Advertisements Scanning   |           | 🚩      | 🚩  |       |         |
 
-[Implementaiton issue](https://crbug.com/897312)
+[Implementation issue](https://crbug.com/897312)
 
 Tip: Chrome channel releases are tracked at [https://googlechromelabs.github.io/current-versions/](https://googlechromelabs.github.io/current-versions/).
 
