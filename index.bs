@@ -145,2038 +145,1685 @@ spec: webidl
     background-repeat: repeat
   }
 
- .unstable.example:not(.no-marker)::before {
-     content: "Example " counter(example) " (Unstable)";
-     float: none;
- }
+  .unstable.example:not(.no-marker)::before {
+      content: "Example " counter(example) " (Unstable)";
+      float: none;
+  }
 
- .note {
-     background-color: rgba(145, 235, 145, .2);
- }
- .example {
-     background-color: rgba(240, 230, 170, .2);
- }
- .def {
-     background-color: rgba(85, 170, 255, .2);
- }
- .issue {
-     background-color: rgba(235, 145, 145, .2);
- }
+  .note {
+      background-color: rgba(145, 235, 145, .2);
+  }
+  .example {
+      background-color: rgba(240, 230, 170, .2);
+  }
+  .def {
+      background-color: rgba(85, 170, 255, .2);
+  }
+  .issue {
+      background-color: rgba(235, 145, 145, .2);
+  }
+  table {
+    border-collapse: collapse;
+    border-left-style: hidden;
+    border-right-style: hidden;
+    text-align: left;
+  }
+  table caption {
+    font-weight: bold;
+    padding: 3px;
+    text-align: left;
+  }
+  table td, table th {
+    border: 1px solid black;
+    padding: 3px;
+  }
 </style>
 
-<section>
-  <h2 id="introduction">Introduction</h2>
+# Introduction # {#introduction}
 
-  <em>This section is non-normative.</em>
+*This section is non-normative.*
 
-  <p>
-    <a href="https://developer.bluetooth.org/">Bluetooth</a> is
-    a standard for short-range wireless communication between devices.
-    Bluetooth "Classic" (<abbr title="Basic Rate">BR</abbr>/<abbr title="Enhanced Data Rate">EDR</abbr>)
-    defines a set of binary protocols and supports speeds up to about 24Mbps.
-    Bluetooth 4.0 introduced a new "Low Energy" mode known as "Bluetooth Smart",
-    <abbr title="Bluetooth Low Energy">BLE</abbr>, or just <abbr title="Low Energy">LE</abbr>
-    which is limited to about 1Mbps but
-    allows devices to leave their transmitters off most of the time.
-    BLE provides most of its functionality through key/value pairs provided by
-    the <a lt="Generic Attribute Profile">Generic Attribute Profile
-    (<abbr title="Generic Attribute Profile">GATT</abbr>)</a>.
-  </p>
+<a href="https://developer.bluetooth.org/">Bluetooth</a> is a standard for
+short-range wireless communication between devices. Bluetooth "Classic" (<abbr
+title="Basic Rate">BR</abbr>/<abbr title="Enhanced Data Rate">EDR</abbr>)
+defines a set of binary protocols and supports speeds up to about 24Mbps.
+Bluetooth 4.0 introduced a new "Low Energy" mode known as "Bluetooth Smart",
+<abbr title="Bluetooth Low Energy">BLE</abbr>, or just <abbr title="Low
+Energy">LE</abbr>
+which is limited to about 1Mbps but allows devices to leave their transmitters
+off most of the time. BLE provides most of its functionality through key/value
+pairs provided by the <a lt="Generic Attribute Profile">Generic Attribute
+Profile (<abbr title="Generic Attribute Profile">GATT</abbr>)</a>.
 
-  <p>
-    BLE defines multiple roles that devices can play.
-    The <a>Broadcaster</a> and <a>Observer</a> roles are
-    for transmitter- and receiver-only applications, respectively.
-    Devices acting in the <a>Peripheral</a> role can receive connections,
-    and devices acting in the <a>Central</a> role can connect to <a>Peripheral</a> devices.
-  </p>
+BLE defines multiple roles that devices can play. The <a>Broadcaster</a> and
+<a>Observer</a> roles are for transmitter- and receiver-only applications,
+respectively. Devices acting in the <a>Peripheral</a> role can receive
+connections, and devices acting in the <a>Central</a> role can connect to
+<a>Peripheral</a> devices.
 
-  <p>
-    A device acting in either the <a>Peripheral</a> or <a>Central</a> role
-    can host a <a>GATT Server</a>,
-    which exposes a hierarchy of <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
-    See [[#information-model]] for more details about this hierarchy.
-    Despite being designed to support BLE transport,
-    the GATT protocol can also run over BR/EDR transport.
-  </p>
+A device acting in either the <a>Peripheral</a> or <a>Central</a> role can host
+a <a>GATT Server</a>, which exposes a hierarchy of <a>Service</a>s,
+<a>Characteristic</a>s, and <a>Descriptor</a>s. See [[#information-model]] for
+more details about this hierarchy. Despite being designed to support BLE
+transport, the GATT protocol can also run over BR/EDR transport.
 
-  <p>
-    The first version of this specification allows web pages,
-    running on a UA in the <a>Central</a> role, to connect to <a>GATT Server</a>s
-    over either a BR/EDR or LE connection.
-    While this specification cites the [[BLUETOOTH42]] specification,
-    it intends to also support communication
-    among devices that only implement Bluetooth 4.0 or 4.1.
-  </p>
+The first version of this specification allows web pages, running on a UA in the
+<a>Central</a> role, to connect to <a>GATT Server</a>s over either a BR/EDR or
+LE connection. While this specification cites the [[BLUETOOTH42]] specification,
+it intends to also support communication among devices that only implement
+Bluetooth 4.0 or 4.1.
 
-  <section>
-    <h3 id="introduction-examples">Examples</h3>
+## Examples ## {#introduction-examples}
 
-    <div class="example" id="example-heart-rate-monitor">
-      <p>
-        To discover and retrieve data from a standard heart rate monitor,
-        a website would use code like the following:
-      </p>
+<div class="example" id="example-heart-rate-monitor">
+To discover and retrieve data from a standard heart rate monitor,
+a website would use code like the following:
+
+<pre highlight="js">
+  let chosenHeartRateService = null;
+
+  navigator.bluetooth.<a idl for="Bluetooth" lt="requestDevice()">requestDevice</a>({
+    filters: [{
+      services: ['heart_rate'],
+    }]
+  }).then(device => device.gatt.<a for="BluetoothRemoteGATTServer">connect()</a>)
+  .then(server => server.<a idl for="BluetoothRemoteGATTServer" lt="getPrimaryService()"
+    >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate">'heart_rate'</a>))
+  .then(service => {
+    chosenHeartRateService = service;
+    return Promise.all([
+      service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location">'body_sensor_location'</a>)
+        .then(handleBodySensorLocationCharacteristic),
+      service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">'heart_rate_measurement'</a>)
+        .then(handleHeartRateMeasurementCharacteristic),
+    ]);
+  });
+
+  function handleBodySensorLocationCharacteristic(characteristic) {
+    if (characteristic === null) {
+      console.log("Unknown sensor location.");
+      return Promise.resolve();
+    }
+    return characteristic.<a for="BluetoothRemoteGATTCharacteristic">readValue()</a>
+    .then(sensorLocationData => {
+      const sensorLocation = sensorLocationData.getUint8(0);
+      switch (sensorLocation) {
+        case 0: return 'Other';
+        case 1: return 'Chest';
+        case 2: return 'Wrist';
+        case 3: return 'Finger';
+        case 4: return 'Hand';
+        case 5: return 'Ear Lobe';
+        case 6: return 'Foot';
+        default: return 'Unknown';
+      }
+    }).then(location => console.log(location));
+  }
+
+  function handleHeartRateMeasurementCharacteristic(characteristic) {
+    return characteristic.<a for="BluetoothRemoteGATTCharacteristic">startNotifications()</a>
+    .then(char => {
+      characteristic.addEventListener('<a event>characteristicvaluechanged</a>',
+                                      onHeartRateChanged);
+    });
+  }
+
+  function onHeartRateChanged(event) {
+    const characteristic = event.target;
+    console.log(parseHeartRate(characteristic.<a attribute for="BluetoothRemoteGATTCharacteristic">value</a>));
+  }
+</pre>
+
+<code>parseHeartRate()</code> would be defined using the
+<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
+<code>heart_rate_measurement</code> documentation</a>
+to read the {{DataView}} stored in a {{BluetoothRemoteGATTCharacteristic}}'s
+{{BluetoothRemoteGATTCharacteristic/value}} field.
+
+<pre highlight="js">
+  function parseHeartRate(data) {
+    const flags = data.getUint8(0);
+    const rate16Bits = flags & 0x1;
+    const result = {};
+    let index = 1;
+    if (rate16Bits) {
+      result.heartRate = data.getUint16(index, /*littleEndian=*/true);
+      index += 2;
+    } else {
+      result.heartRate = data.getUint8(index);
+      index += 1;
+    }
+    const contactDetected = flags & 0x2;
+    const contactSensorPresent = flags & 0x4;
+    if (contactSensorPresent) {
+      result.contactDetected = !!contactDetected;
+    }
+    const energyPresent = flags & 0x8;
+    if (energyPresent) {
+      result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
+      index += 2;
+    }
+    const rrIntervalPresent = flags & 0x10;
+    if (rrIntervalPresent) {
+      const rrIntervals = [];
+      for (; index + 1 < data.byteLength; index += 2) {
+        rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
+      }
+      result.rrIntervals = rrIntervals;
+    }
+    return result;
+  }
+</pre>
+
+<code>onHeartRateChanged()</code> might log an object like
+<pre highlight="js">
+  {
+    heartRate: 70,
+    contactDetected: true,
+    energyExpended: 750,     // Meaning 750kJ.
+    rrIntervals: [890, 870]  // Meaning .87s and .85s.
+  }
+</pre>
+
+If the heart rate sensor reports the <code>energyExpended</code> field, the web
+application can reset its value to <code>0</code> by writing to the
+{{org.bluetooth.characteristic.heart_rate_control_point|heart_rate_control_point}}
+characteristic:
+
+<pre highlight="js">
+  function resetEnergyExpended() {
+    if (!chosenHeartRateService) {
+      return Promise.reject(new Error('No heart rate sensor selected yet.'));
+    }
+    return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point">'heart_rate_control_point'</a>)
+    .then(controlPoint => {
+      const resetEnergyExpended = new Uint8Array([1]);
+      return controlPoint.<a idl for="BluetoothRemoteGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
+    });
+  }
+</pre>
+</div>
+
+# Security and privacy considerations # {#security-and-privacy}
+
+## Device access is powerful ## {#device-access-is-powerful}
+
+When a website requests access to devices using {{Bluetooth/requestDevice()}},
+it gets the ability to access all GATT services mentioned in the call. The UA
+MUST inform the user what capabilities these services give the website before
+asking which devices to entrust to it. If any services in the list aren't known
+to the UA, the UA MUST assume they give the site complete control over the
+device and inform the user of this risk. The UA MUST also allow the user to
+inspect what sites have access to what devices and <a lt="revoke Bluetooth
+access">revoke</a> these pairings.
+
+The UA MUST NOT allow the user to pair entire classes of devices with a website.
+It is possible to construct a class of devices for which each individual device
+sends the same Bluetooth-level identifying information. UAs are not required to
+attempt to detect this sort of forgery and MAY let a user pair this
+pseudo-device with a website.
+
+To help ensure that only the entity the user approved for access actually has
+access, this specification requires that only <a>secure contexts</a> can access
+Bluetooth devices.
+
+## Trusted servers can serve malicious code ## {#server-takeovers}
+
+*This section is non-normative.*
+
+Even if the user trusts an origin, that origin's servers or developers could be
+compromised, or the origin's site could be vulnerable to XSS attacks. Either
+could lead to users granting malicious code access to valuable devices. Origins
+should define a Content Security Policy ([[CSP3]]) to reduce the risk of XSS
+attacks, but this doesn't help with compromised servers or developers.
+
+The ability to retrieve granted devices after a page reload, provided by <a
+href="#permission-api-integration"></a>, makes this risk worse. Instead of
+having to get the user to grant access while the site is compromised, the
+attacker can take advantage of previously-granted devices if the user simply
+visits while the site is compromised. On the other hand, when sites can keep
+access to devices across page reloads, they don't have to show as many
+permission prompts overall, making it more likely that users will pay attention
+to the prompts they do see.
+
+## Attacks on devices ## {#attacks-on-devices}
+
+*This section is non-normative.*
+
+Communication from websites can break the security model of some devices, which
+assume they only receive messages from the trusted operating system of a remote
+device. Human Interface Devices are a prominent example, where allowing a
+website to communicate would allow that site to log keystrokes. This
+specification includes a <a>GATT blocklist</a> of such vulnerable services,
+characteristics, and descriptors to prevent websites from taking advantage of
+them.
+
+We expect that many devices are vulnerable to unexpected data delivered to their
+radio. In the past, these devices had to be exploited one-by-one, but this API
+makes it plausible to conduct large-scale attacks. This specification takes
+several approaches to make such attacks more difficult:
+
+* Pairing individual devices instead of device classes requires at least a user  
+    action before a device can be exploited.
+
+* Constraining access to <a>GATT</a>, as opposed to generic byte-stream access,
+    denies malicious websites access to most parsers on the device.
+
+    On the other hand, GATT's <a>Characteristic</a> and <a>Descriptor</a> values
+    are still byte arrays, which may be set to lengths and formats the device
+    doesn't expect. UAs are encouraged to validate these values when they can.
+
+* This API never exposes Bluetooth addressing, data signing or encryption keys
+    (<a>Definition of Keys and Values</a>) to websites. This makes it more
+    difficult for a website to predict the bits that will be sent over the
+    radio, which blocks <a
+    href="https://www.usenix.org/legacy/events/woot11/tech/final_files/Goodspeed.pdf">packet-in-packet
+    injection attacks</a>. Unfortunately, this only works over encrypted links,
+    which not all BLE devices are required to support.
+
+UAs can also take further steps to protect their users:
+
+* A web service may collect lists of malicious websites and vulnerable devices.
+    UAs can deny malicious websites access to any device and any website access to
+    vulnerable devices.
+
+## Bluetooth device identifiers ## {#bluetooth-device-identifiers}
+
+*This section is non-normative.*
+
+Each Bluetooth BR/EDR device has a unique 48-bit MAC address known as the
+<a>BD_ADDR</a>. Each Bluetooth LE device has at least one of a <a>Public Device
+Address</a> and a <a>Static Device Address</a>. The <a>Public Device Address</a>
+is a MAC address. The <a>Static Device Address</a> may be regenerated on each
+restart. A BR/EDR/LE device will use the same value for the <a>BD_ADDR</a> and
+the <a>Public Device Address</a> (specified in the <a>Read BD_ADDR Command</a>).
+
+An LE device may also have a unique, 128-bit <a>Identity Resolving Key</a>,
+which is sent to trusted devices during the bonding process. To avoid leaking a
+persistent identifier, an LE device may scan and advertise using a random
+Resolvable or Non-Resolvable <a>Private Address</a> instead of its Static or
+Public Address. These are regenerated periodically (approximately every 15
+minutes), but a bonded device can check whether one of its stored <a>IRK</a>s
+matches any given Resolvable Private Address using the <a>Resolvable Private
+Address Resolution Procedure</a>.
+
+Each Bluetooth device also has a human-readable <a>Bluetooth Device Name</a>.
+These aren't guaranteed to be unique, but may well be, depending on the device
+type.
+
+### Identifiers for remote Bluetooth devices ### {#remote-device-identifiers}
+
+*This section is non-normative.*
+
+If a website can retrieve any of the persistent device IDs, these can be used,
+in combination with a large effort to catalog ambient devices, to discover a
+user's location. A device ID can also be used to identify that a user who pairs
+two different websites with the same Bluetooth device is a single user. On the
+other hand, many GATT services are available that could be used to fingerprint a
+device, and a device can easily expose a custom GATT service to make this
+easier.
+
+This specification <a href="#note-device-id-tracking">suggests</a> that the UA
+use different device IDs for a single device when its user doesn't intend
+scripts to learn that it's a single device, which makes it difficult for
+websites to abuse the device address like this. Device makers can still design
+their devices to help track users, but it takes work.
+
+### The UA's Bluetooth address ### {#ua-bluetooth-address}
+
+*This section is non-normative.*
+
+In BR/EDR mode, or in LE mode during active scanning without the <a>Privacy
+Feature</a>, the UA broadcasts its persistent ID to any nearby Bluetooth radio.
+This makes it easy to scatter hostile devices in an area and track the UA. As of
+2014-08, few or no platforms document that they implement the <a>Privacy
+Feature</a>, so despite this spec recommending it, few UAs are likely to use it.
+This spec does <a href="#requestDevice-user-gesture">require a user gesture</a>
+for a website to trigger a scan, which reduces the frequency of scans some, but
+it would still be better for more platforms to expose the <a>Privacy
+Feature</a>.
+
+## Exposing Bluetooth availability ## {#availability-fingerprint}
+
+*This section is non-normative.*
+
+<code>navigator.bluetooth.{{getAvailability()}}</code> exposes whether a
+Bluetooth radio is available on the user's system, regardless of whether it is
+powered on or not. The availability is also affected if the user has configured
+the UA to block Web Bluetooth. Some users might consider this private, although
+it's hard to imagine the damage that would result from revealing it. This
+information also increases the UA's <a>fingerprinting surface</a> by a bit. This
+function returns a {{Promise}}, so UAs have the option of asking the user what
+value they want to return, but we expect the increased risk to be small enough
+that UAs will choose not to prompt.
+
+# Device Discovery # {#device-discovery}
+
+<xmp class="idl">
+  dictionary BluetoothDataFilterInit {
+    BufferSource dataPrefix;
+    BufferSource mask;
+  };
+
+  dictionary BluetoothLEScanFilterInit {
+    sequence<BluetoothServiceUUID> services;
+    DOMString name;
+    DOMString namePrefix;
+    // Maps unsigned shorts to BluetoothDataFilters.
+    object manufacturerData;
+    // Maps BluetoothServiceUUIDs to BluetoothDataFilters.
+    object serviceData;
+  };
+
+  dictionary RequestDeviceOptions {
+    sequence<BluetoothLEScanFilterInit> filters;
+    sequence<BluetoothServiceUUID> optionalServices = [];
+    boolean acceptAllDevices = false;
+  };
+
+  [Exposed=Window, SecureContext]
+  interface Bluetooth : EventTarget {
+    Promise<boolean> getAvailability();
+    attribute EventHandler onavailabilitychanged;
+    [SameObject]
+    readonly attribute BluetoothDevice? referringDevice;
+    Promise<BluetoothDevice> requestDevice(optional RequestDeviceOptions options = {});
+  };
+
+  Bluetooth includes BluetoothDeviceEventHandlers;
+  Bluetooth includes CharacteristicEventHandlers;
+  Bluetooth includes ServiceEventHandlers;
+</xmp>
+
+<div class="note" heading="{{Bluetooth}} members">
+Note: {{Bluetooth/getAvailability()}} informs the page whether Bluetooth is available
+at all. An adapter that's disabled through software should count as available.
+Changes in availability, for example when the user physically attaches or
+detaches an adapter, are reported through the {{availabilitychanged}} event.
+
+<p class="unstable">
+  {{Bluetooth/referringDevice}} gives access to the device from which the user
+  opened this page, if any. For example, an <a
+  href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
+  might advertise a URL, which the UA allows the user to open. A
+  {{BluetoothDevice}} representing the beacon would be available through
+  <code>navigator.bluetooth.{{referringDevice}}</code>.
+</p>
+
+{{Bluetooth/requestDevice(options)}} asks the user to grant this origin access
+to a device that <a>matches any filter</a> in <code>options.<dfn dict-member
+for="RequestDeviceOptions">filters</dfn></code>. To <a>match a filter</a>, the
+device has to:
+
+* support <em>all</em> the GATT service UUIDs in the <dfn dict-member
+    for="BluetoothLEScanFilterInit">services</dfn> list if that member is
+    present,
+* have a name equal to <dfn dict-member
+    for="BluetoothLEScanFilterInit">name</dfn> if that member is present,
+* have a name starting with <dfn dict-member
+    for="BluetoothLEScanFilterInit">namePrefix</dfn> if that member is present,
+* <div class="unstable"> advertise <a>manufacturer specific data</a> matching
+    all of the key/value pairs in <dfn dict-member
+    for="BluetoothLEScanFilterInit">manufacturerData</dfn> if that member is
+    present, and</div>
+* <div class="unstable"> advertise <a>service data</a> matching all of the
+    key/value pairs in <dfn dict-member
+    for="BluetoothLEScanFilterInit">serviceData</dfn> if that member is
+    present.</div>
+
+<p link-for-hint="BluetoothDataFilterInit" class="unstable">
+  Both <a>Manufacturer Specific Data</a> and <a>Service Data</a> map a key to an
+  array of bytes. {{BluetoothDataFilterInit}} filters these arrays. An array
+  matches if it has a |prefix| such that <code>|prefix| & {{mask}}</code> is
+  equal to <code>{{dataPrefix}} & {{mask}}</code>.
+</p>
+
+Note that if a device changes its behavior significantly when it connects, for
+example by not advertising its identifying manufacturer data anymore and instead
+having the client discover some identifying GATT services, the website may need
+to include filters for both behaviors.
+
+In rare cases, a device may not advertise enough distinguishing information to
+let a site filter out uninteresting devices. In those cases, a site can set <dfn
+dict-member for="RequestDeviceOptions">acceptAllDevices</dfn> to `true` and omit
+all {{RequestDeviceOptions/filters}}. This puts the burden of selecting the
+right device entirely on the site's users. If a site uses
+{{RequestDeviceOptions/acceptAllDevices}}, it will only be able to use services
+listed in {{RequestDeviceOptions/optionalServices}}.
+
+After the user selects a device to pair with this origin, the origin is allowed
+to access any service whose UUID was listed in the
+{{BluetoothLEScanFilterInit/services}} list in any element of
+<code>options.filters</code> or in <code>options.<dfn dict-member
+for="RequestDeviceOptions">optionalServices</dfn></code>.
+
+This implies that if developers filter just by name, they must use
+{{RequestDeviceOptions/optionalServices}} to get access to any services.
+</div>
+
+<div class="example" id="example-filter-by-services">
+Say the UA is close to the following devices:  
+
+<table>
+  <tr>
+    <th>Device</th>
+    <th>Advertised Services</th>
+  </tr>
+  <tr>
+    <td>D1</td>
+    <td>A, B, C, D</td>
+  </tr>
+  <tr>
+    <td>D2</td>
+    <td>A, B, E</td>
+  </tr>
+  <tr>
+    <td>D3</td>
+    <td>C, D</td>
+  </tr>
+  <tr>
+    <td>D4</td>
+    <td>E</td>
+  </tr>
+  <tr>
+    <td>D5</td>
+    <td><i>&lt;none></i></td>
+  </tr>
+</table>
+
+If the website calls
+
+<pre highlight="js">
+  navigator.bluetooth.requestDevice({
+    filters: [ {services: [A, B]} ]
+  });
+</pre>
+
+the user will be shown a dialog containing devices D1 and D2. If the user
+selects D1, the website will not be able to access services C or D. If the user
+selects D2, the website will not be able to access service E.
+
+On the other hand, if the website calls
+
+<pre highlight="js">
+  navigator.bluetooth.requestDevice({
+    filters: [
+      {services: [A, B]},
+      {services: [C, D]}
+    ]
+  });
+</pre>
+
+the dialog will contain devices D1, D2, and D3, and if the user selects D1, the
+website will be able to access services A, B, C, and D.
+
+The <code>optionalServices</code> list doesn't add any devices to the dialog the
+user sees, but it does affect which services the website can use from the device
+the user picks.
+
+<pre highlight="js">
+  navigator.bluetooth.requestDevice({
+    filters: [ {services: [A, B]} ],
+    optionalServices: \[E]
+  });
+</pre>
+
+Shows a dialog containing D1 and D2, but not D4, since D4 doesn't contain the
+required services. If the user selects D2, unlike in the first example, the
+website will be able to access services A, B, and E.
+
+The allowed services also apply if the device changes after the user grants
+access. For example, if the user selects D1 in the previous
+<code>requestDevice()</code> call, and D1 later adds a new E service, that will
+fire the {{serviceadded}} event, and the web page will be able to access service
+E.
+</div>
+
+<div class="example" id="example-filter-by-name">
+Say the devices in the <a href="#example-filter-by-services">previous
+example</a> also advertise names as follows:
+
+<table>
+  <tr>
+    <th>Device</th>
+    <th>Advertised Device Name</th>
+  </tr>
+  <tr>
+    <td>D1</td>
+    <td>First De…</td>
+  </tr>
+  <tr>
+    <td>D2</td>
+    <td><i>&lt;none></i></td>
+  </tr>
+  <tr>
+    <td>D3</td>
+    <td>Device Third</td>
+  </tr>
+  <tr>
+    <td>D4</td>
+    <td>Device Fourth</td>
+  </tr>
+  <tr>
+    <td>D5</td>
+    <td>Unique Name</td>
+  </tr>
+</table>
+
+The following table shows which devices the user can select between
+for several values of <var>filters</var> passed to
+<code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
+
+<table>
+  <tr>
+    <th><var>filters</var></th>
+    <th>Devices</th><th>Notes</th>
+  </tr>
+  <tr>
+    <td>
       <pre highlight="js">
-        let chosenHeartRateService = null;
-
-        navigator.bluetooth.<a idl for="Bluetooth" lt="requestDevice()">requestDevice</a>({
-          filters: [{
-            services: ['heart_rate'],
-          }]
-        }).then(device => device.gatt.<a for="BluetoothRemoteGATTServer">connect()</a>)
-        .then(server => server.<a idl for="BluetoothRemoteGATTServer" lt="getPrimaryService()"
-          >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate">'heart_rate'</a>))
-        .then(service => {
-          chosenHeartRateService = service;
-          return Promise.all([
-            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location">'body_sensor_location'</a>)
-              .then(handleBodySensorLocationCharacteristic),
-            service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">'heart_rate_measurement'</a>)
-              .then(handleHeartRateMeasurementCharacteristic),
-          ]);
-        });
-
-        function handleBodySensorLocationCharacteristic(characteristic) {
-          if (characteristic === null) {
-            console.log("Unknown sensor location.");
-            return Promise.resolve();
-          }
-          return characteristic.<a for="BluetoothRemoteGATTCharacteristic">readValue()</a>
-          .then(sensorLocationData => {
-            const sensorLocation = sensorLocationData.getUint8(0);
-            switch (sensorLocation) {
-              case 0: return 'Other';
-              case 1: return 'Chest';
-              case 2: return 'Wrist';
-              case 3: return 'Finger';
-              case 4: return 'Hand';
-              case 5: return 'Ear Lobe';
-              case 6: return 'Foot';
-              default: return 'Unknown';
-            }
-          }).then(location => console.log(location));
-        }
-
-        function handleHeartRateMeasurementCharacteristic(characteristic) {
-          return characteristic.<a for="BluetoothRemoteGATTCharacteristic">startNotifications()</a>
-          .then(char => {
-            characteristic.addEventListener('<a event>characteristicvaluechanged</a>',
-                                            onHeartRateChanged);
-          });
-        }
-
-        function onHeartRateChanged(event) {
-          const characteristic = event.target;
-          console.log(parseHeartRate(characteristic.<a attribute for="BluetoothRemoteGATTCharacteristic">value</a>));
-        }
+        [{name: "Unique Name"}]
       </pre>
-
-      <p>
-        <code>parseHeartRate()</code> would be defined using the
-        <a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
-           <code>heart_rate_measurement</code> documentation</a>
-        to read the {{DataView}} stored
-        in a {{BluetoothRemoteGATTCharacteristic}}'s
-        {{BluetoothRemoteGATTCharacteristic/value}} field.
-      </p>
-
+    </td>
+    <td>D5</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
       <pre highlight="js">
-        function parseHeartRate(data) {
-          const flags = data.getUint8(0);
-          const rate16Bits = flags & 0x1;
-          const result = {};
-          let index = 1;
-          if (rate16Bits) {
-            result.heartRate = data.getUint16(index, /*littleEndian=*/true);
-            index += 2;
-          } else {
-            result.heartRate = data.getUint8(index);
-            index += 1;
-          }
-          const contactDetected = flags & 0x2;
-          const contactSensorPresent = flags & 0x4;
-          if (contactSensorPresent) {
-            result.contactDetected = !!contactDetected;
-          }
-          const energyPresent = flags & 0x8;
-          if (energyPresent) {
-            result.energyExpended = data.getUint16(index, /*littleEndian=*/true);
-            index += 2;
-          }
-          const rrIntervalPresent = flags & 0x10;
-          if (rrIntervalPresent) {
-            const rrIntervals = [];
-            for (; index + 1 < data.byteLength; index += 2) {
-              rrIntervals.push(data.getUint16(index, /*littleEndian=*/true));
-            }
-            result.rrIntervals = rrIntervals;
-          }
-          return result;
-        }
+        [{namePrefix: "Device"}]
       </pre>
-
-      <p>
-        <code>onHeartRateChanged()</code> might log an object like
-      </p>
+    </td>
+    <td>D3, D4</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
       <pre highlight="js">
-         {
-           heartRate: 70,
-           contactDetected: true,
-           energyExpended: 750,     // Meaning 750kJ.
-           rrIntervals: [890, 870]  // Meaning .87s and .85s.
-         }
+        [{name: "First De"},
+          {name: "First Device"}]
       </pre>
-
-      <p>
-        If the heart rate sensor reports the <code>energyExpended</code> field,
-        the web application can reset its value to <code>0</code> by writing to the
-        {{org.bluetooth.characteristic.heart_rate_control_point|heart_rate_control_point}}
-        characteristic:
-      </p>
-
+    </td>
+    <td><i>&lt;none></i></td>
+    <td>
+      D1 only advertises a prefix of its name, so trying to match its whole name
+      fails.
+    </td>
+  </tr>
+  <tr>
+    <td>
       <pre highlight="js">
-        function resetEnergyExpended() {
-          if (!chosenHeartRateService) {
-            return Promise.reject(new Error('No heart rate sensor selected yet.'));
-          }
-          return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point">'heart_rate_control_point'</a>)
-          .then(controlPoint => {
-            const resetEnergyExpended = new Uint8Array([1]);
-            return controlPoint.<a idl for="BluetoothRemoteGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
-          });
-        }
+        [{namePrefix: "First"},
+          {name: "Unique Name"}]
       </pre>
-    </div>
-  </section>
-</section>
+    </td>
+    <td>D1, D5</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{services: \[C],
+          namePrefix: "Device"},
+          {name: "Unique Name"}]
+      </pre>
+    </td>
+    <td>D3, D5</td>
+    <td></td>
+  </tr>
+</table>
+</div>
 
-<section>
-  <h2 id="security-and-privacy">Security and privacy considerations</h2>
+<div class="example unstable" id="example-filter-by-manufacturer-service-data">
+Say the devices in the <a href="#example-filter-by-services">previous
+example</a> also advertise manufacturer or service data as follows:
 
-  <section>
-    <h3 id="device-access-is-powerful">Device access is powerful</h3>
+<table>
+  <tr>
+    <th>Device</th>
+    <th>Manufacturer Data</th>
+    <th>Service Data</th>
+  </tr>
+  <tr>
+    <td>D1</td>
+    <td>17: 01 02 03</td>
+    <td></td>
+  </tr>
+  <tr>
+    <td>D2</td>
+    <td></td>
+    <td>A: 01 02 03</td>
+  </tr>
+</table>
 
-    <p>
-      When a website requests access to devices using
-      {{Bluetooth/requestDevice()}},
-      it gets the ability to access all GATT services mentioned in the call.
-      The UA MUST inform the user what capabilities these services give the website
-      before asking which devices to entrust to it.
-      If any services in the list aren't known to the UA,
-      the UA MUST assume they give the site complete control over the device
-      and inform the user of this risk.
-      The UA MUST also allow the user to inspect what sites have access to what devices
-      and <a lt="revoke Bluetooth access">revoke</a> these pairings.
+The following table shows which devices the user can select between for several
+values of <var>filters</var> passed to
+<code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
 
-    <p>
-      The UA MUST NOT allow the user to pair entire classes of devices with a website.
-      It is possible to construct a class of devices
-      for which each individual device sends the same Bluetooth-level identifying information.
-      UAs are not required to attempt to detect this sort of forgery
-      and MAY let a user pair this pseudo-device with a website.
+<table>
+  <tr>
+    <th><var>filters</var></th>
+    <th>Devices</th>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {17: {}}}]
+      </pre>
+    </td>
+    <td>D1</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{serviceData: {"A": {}}}]
+      </pre>
+    </td>
+    <td>D2</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {17: {}}},
+          {serviceData: {"A": {}}}]
+      </pre>
+    </td>
+    <td>D1, D2</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {17: {}},
+          serviceData: {"A": {}}}]
+      </pre>
+    </td>
+    <td><i>&lt;none></i></td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {
+            17: {dataPrefix: new Uint8Array([1, 2, 3])},
+        }}]
+      </pre>
+    </td>
+    <td>D1</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {
+            17: {dataPrefix: new Uint8Array([1, 2, 3, 4])},
+        }}]
+      </pre>
+    </td>
+    <td><i>&lt;none></i></td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {
+            17: {dataPrefix: new Uint8Array([1])},
+        }}]
+      </pre>
+    </td>
+    <td>D1</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {
+            17: {dataPrefix: new Uint8Array([0x91, 0xAA]),
+                mask: new Uint8Array([0x0F, 0x57])},
+        }}]
+      </pre>
+    </td>
+    <td>D1</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{manufacturerData: {
+            17: {},
+            18: {},
+        }}]
+      </pre>
+    </td>
+    <td><i>&lt;none></i></td>
+  </tr>
+</table>
+</div>
 
-    <p>
-      To help ensure that only the entity the user approved for access actually
-      has access, this specification requires that only <a>secure contexts</a>
-      can access Bluetooth devices.
-    </p>
-  </section>
+<div class="example" id="example-disallowed-filters"
+    link-for-hint="RequestDeviceOptions">
+Filters that either accept or reject all possible devices cause {{TypeError}}s.
+To accept all devices, use {{acceptAllDevices}} instead.
 
-  <section class="non-normative">
-    <h3 id="server-takeovers">Trusted servers can serve malicious code</h3>
+<table>
+  <tr>
+    <th>Call</th>
+    <th>Notes</th>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({})
+      </pre>
+    </td>
+    <td>Invalid: An absent list of filters doesn't accept any devices.</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({filters:[]})
+      </pre>
+    </td>
+    <td>Invalid: An empty list of filters doesn't accept any devices.</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({filters:[{}]})
+      </pre>
+    </td>
+    <td>
+      Invalid: An empty filter accepts all devices, and so isn't allowed either.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          acceptAllDevices:true
+        })
+      </pre>
+    </td>
+    <td>
+      Valid: Explicitly accept all devices with {{acceptAllDevices}}.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          filters: [...],
+          acceptAllDevices:true
+        })
+      </pre>
+    </td>
+    <td>Invalid: {{acceptAllDevices}} would override any {{filters}}.</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          filters:[{namePrefix: ""}]
+        })
+      </pre>
+    </td>
+    <td>
+      Invalid: `namePrefix`, if present, must be non-empty to filter devices.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          filters:[{manufacturerData: {}}]
+        })
+      </pre>
+    </td>
+    <td>
+      Invalid: {{BluetoothLEScanFilterInit/manufacturerData}}, if present,
+      must be non-empty to filter devices.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          filters:[{serviceData: {}}]
+        })
+      </pre>
+    </td>
+    <td>
+      Invalid: {{BluetoothLEScanFilterInit/serviceData}}, if present,
+      must be non-empty to filter devices.
+    </td>
+  </tr>
+</table>
+</div>
 
-    <em>This section is non-normative.</em>
+Instances of {{Bluetooth}} are created with the <a>internal slots</a>
+described in the following table:
 
-    <p>
-      Even if the user trusts an origin,
-      that origin's servers or developers could be compromised,
-      or the origin's site could be vulnerable to XSS attacks.
-      Either could lead to users granting malicious code access to valuable devices.
-      Origins should define a Content Security Policy ([[CSP3]])
-      to reduce the risk of XSS attacks,
-      but this doesn't help with compromised servers or developers.
-    </p>
+<table dfn-for="Bluetooth" dfn-type="attribute">
+  <tr>
+    <th><a>Internal Slot</a></th>
+    <th>Initial Value</th>
+    <th>Description (non-normative)</th>
+  </tr>
+  <tr>
+    <td><dfn>\[[deviceInstanceMap]]</dfn></td>
+    <td>
+      An empty map from <a>Bluetooth device</a>s
+      to <code>{{BluetoothDevice}}</code> instances.
+    </td>
+    <td>
+      Ensures only one {{BluetoothDevice}} instance represents each <a>Bluetooth
+      device</a> inside a single global object.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[attributeInstanceMap]]</dfn></td>
+    <td>
+      An empty map from <a>Bluetooth cache</a> entries to {{Promise}}s.
+    </td>
+    <td>
+      The {{Promise}}s resolve to either {{BluetoothRemoteGATTService}},
+      {{BluetoothRemoteGATTCharacteristic}}, or
+      {{BluetoothRemoteGATTDescriptor}} instances.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[referringDevice]]</dfn></td>
+    <td>
+      `null`
+    </td>
+    <td>
+      Set to a {{BluetoothDevice}} while <a>initializing the `Document`
+      object</a> if the `Document` was opened from the device.
+    </td>
+  </tr>
+</table>
 
-    <p>
-      The ability to retrieve granted devices after a page reload,
-      provided by <a href="#permission-api-integration"></a>,
-      makes this risk worse.
-      Instead of having to get the user to grant access while the site is compromised,
-      the attacker can take advantage of previously-granted devices
-      if the user simply visits while the site is compromised.
-      On the other hand, when sites can keep access to devices across page reloads,
-      they don't have to show as many permission prompts overall,
-      making it more likely that users will pay attention to the prompts they do see.
-    </p>
-  </section>
-
-  <section>
-    <h3 id="attacks-on-devices">Attacks on devices</h3>
-
-    <em>This section is non-normative.</em>
-
-    <p>
-      Communication from websites can break the security model of some devices,
-      which assume they only receive messages from
-      the trusted operating system of a remote device.
-      Human Interface Devices are a prominent example,
-      where allowing a website to communicate would allow that site to log keystrokes.
-      This specification includes a <a>GATT blocklist</a> of
-      such vulnerable services, characteristics, and descriptors
-      to prevent websites from taking advantage of them.
-    </p>
-
-    <p>
-      We expect that many devices are vulnerable to unexpected data delivered to their radio.
-      In the past, these devices had to be exploited one-by-one,
-      but this API makes it plausible to conduct large-scale attacks.
-      This specification takes several approaches to make such attacks more difficult:
-
-    <ul>
-      <li>
-        Pairing individual devices instead of device classes
-        requires at least a user action before a device can be exploited.
-
-      <li>
-        Constraining access to <a>GATT</a>, as opposed to generic byte-stream access,
-        denies malicious websites access to most parsers on the device.
-
-        <p>
-          On the other hand,
-          GATT's <a>Characteristic</a> and <a>Descriptor</a> values are still byte arrays,
-          which may be set to lengths and formats the device doesn't expect.
-          UAs are encouraged to validate these values when they can.
-
-      <li>
-        This API never exposes Bluetooth addressing, data signing or encryption keys
-        (<a>Definition of Keys and Values</a>) to websites.
-        This makes it more difficult for a website to predict the bits that will be sent over the radio,
-        which blocks <a href="https://www.usenix.org/legacy/events/woot11/tech/final_files/Goodspeed.pdf">packet-in-packet injection attacks</a>.
-        Unfortunately, this only works over encrypted links,
-        which not all BLE devices are required to support.
-      </li>
-    </ul>
-
-    <p>
-      UAs can also take further steps to protect their users:
-
-    <ul>
-      <li>
-        A web service may collect lists of malicious websites and vulnerable devices.
-        UAs can deny malicious websites access to any device
-        and any website access to vulnerable devices.
-    </ul>
-  </section>
-
-  <section>
-    <h3 id="bluetooth-device-identifiers">Bluetooth device identifiers</h3>
-
-    <em>This section is non-normative.</em>
-
-    <p>
-      Each Bluetooth BR/EDR device has a unique 48-bit MAC address
-      known as the <a>BD_ADDR</a>.
-      Each Bluetooth LE device has at least one of a <a>Public Device Address</a>
-      and a <a>Static Device Address</a>.
-      The <a>Public Device Address</a> is a MAC address.
-      The <a>Static Device Address</a> may be regenerated on each restart.
-      A BR/EDR/LE device will use the same value
-      for the <a>BD_ADDR</a> and the <a>Public Device Address</a>
-      (specified in the <a>Read BD_ADDR Command</a>).
-    </p>
-    <p>
-      An LE device may also have a unique, 128-bit <a>Identity Resolving Key</a>,
-      which is sent to trusted devices during the bonding process.
-      To avoid leaking a persistent identifier, an LE device may scan and advertise using
-      a random Resolvable or Non-Resolvable <a>Private Address</a>
-      instead of its Static or Public Address.
-      These are regenerated periodically (approximately every 15 minutes),
-      but a bonded device can check whether one of its stored <a>IRK</a>s matches
-      any given Resolvable Private Address
-      using the <a>Resolvable Private Address Resolution Procedure</a>.
-    </p>
-    <p>
-      Each Bluetooth device also has a human-readable <a>Bluetooth Device Name</a>.
-      These aren't guaranteed to be unique, but may well be, depending on the device type.
-
-    <section>
-      <h4 id="remote-device-identifiers">Identifiers for remote Bluetooth devices</h4>
-
-      <em>This section is non-normative.</em>
-
-      <p>
-        If a website can retrieve any of the persistent device IDs,
-        these can be used, in combination with a large effort to catalog ambient devices,
-        to discover a user's location.
-        A device ID can also be used to identify that a user who
-        pairs two different websites with the same Bluetooth device
-        is a single user.
-        On the other hand, many GATT services are available
-        that could be used to fingerprint a device,
-        and a device can easily expose a custom GATT service to make this easier.
-      </p>
-      <p>
-        This specification <a href="#note-device-id-tracking">suggests</a> that
-        the UA use different device IDs for a single device
-        when its user doesn't intend scripts to learn that it's a single device,
-        which makes it difficult for websites to abuse the device address like this.
-        Device makers can still design their devices to help track users,
-        but it takes work.
-      </p>
-    </section>
-
-    <section>
-      <h4 id="ua-bluetooth-address">The UA's Bluetooth address</h4>
-
-      <em>This section is non-normative.</em>
-
-      <p>
-        In BR/EDR mode, or in LE mode during active scanning without the <a>Privacy Feature</a>,
-        the UA broadcasts its persistent ID to any nearby Bluetooth radio.
-        This makes it easy to scatter hostile devices in an area and track the UA.
-        As of 2014-08, few or no platforms document that they implement the <a>Privacy Feature</a>,
-        so despite this spec recommending it, few UAs are likely to use it.
-        This spec does <a href="#requestDevice-user-gesture">require a user gesture</a>
-        for a website to trigger a scan, which reduces the frequency of scans some,
-        but it would still be better for more platforms to expose the <a>Privacy Feature</a>.
-    </section>
-  </section>
-
-  <section class="non-normative">
-    <h3 id="availability-fingerprint">Exposing Bluetooth availability</h3>
-
-    <em>This section is non-normative.</em>
-
-    <p>
-      <code>navigator.bluetooth.{{getAvailability()}}</code>
-      exposes whether a Bluetooth radio is available on the user's system,
-      regardless of whether it is powered on or not. The availability is also
-      affected if the user has configured the UA to block Web Bluetooth.
-      Some users might consider this private,
-      although it's hard to imagine the damage that would result from revealing it.
-      This information also increases the UA's <a>fingerprinting surface</a> by a bit.
-      This function returns a {{Promise}},
-      so UAs have the option of asking the user what value they want to return,
-      but we expect the increased risk to be small enough that
-      UAs will choose not to prompt.
-    </p>
-  </section>
-</section>
-
-<section>
-  <h2 id="device-discovery" oldids="requestDevice-secure-context">Device Discovery</h2>
-
-  <pre class="idl">
-    dictionary BluetoothDataFilterInit {
-      BufferSource dataPrefix;
-      BufferSource mask;
-    };
-    dictionary BluetoothLEScanFilterInit {
-      sequence&lt;BluetoothServiceUUID> services;
-      DOMString name;
-      DOMString namePrefix;
-      // Maps unsigned shorts to BluetoothDataFilters.
-      object manufacturerData;
-      // Maps BluetoothServiceUUIDs to BluetoothDataFilters.
-      object serviceData;
-    };
-
-    dictionary RequestDeviceOptions {
-      sequence&lt;BluetoothLEScanFilterInit> filters;
-      sequence&lt;BluetoothServiceUUID> optionalServices = [];
-      boolean acceptAllDevices = false;
-    };
-
-    [Exposed=Window, SecureContext]
-    interface Bluetooth : EventTarget {
-      Promise&lt;boolean> getAvailability();
-      attribute EventHandler onavailabilitychanged;
-      [SameObject]
-      readonly attribute BluetoothDevice? referringDevice;
-      Promise&lt;BluetoothDevice> requestDevice(optional RequestDeviceOptions options = {});
-    };
-    Bluetooth includes BluetoothDeviceEventHandlers;
-    Bluetooth includes CharacteristicEventHandlers;
-    Bluetooth includes ServiceEventHandlers;
-  </pre>
-  <div class="note" heading="{{Bluetooth}} members">
-    <p>
-      {{Bluetooth/getAvailability()}} informs the page
-      whether Bluetooth is available at all.
-      An adapter that's disabled through software should count as available.
-      Changes in availability,
-      for example when the user physically attaches or detaches an adapter,
-      are reported through the {{availabilitychanged}} event.
-    </p>
-    <p class="unstable">
-      {{Bluetooth/referringDevice}} gives access to
-      the device from which the user opened this page, if any.
-      For example, an <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
-      might advertise a URL, which the UA allows the user to open.
-      A {{BluetoothDevice}} representing the beacon would be available
-      through <code>navigator.bluetooth.{{referringDevice}}</code>.
-    </p>
-    <p>
-      {{Bluetooth/requestDevice(options)}} asks the user
-      to grant this origin access to a device
-      that <a>matches any filter</a> in <code>options.<dfn dict-member for="RequestDeviceOptions">filters</dfn></code>.
-      To <a>match a filter</a>, the device has to:
-    </p>
-    <ul>
-      <li>
-        support <em>all</em> the GATT service UUIDs
-        in the <dfn dict-member for="BluetoothLEScanFilterInit">services</dfn> list
-        if that member is present,
-      </li>
-      <li>
-        have a name equal to <dfn dict-member for="BluetoothLEScanFilterInit">name</dfn>
-        if that member is present,
-      </li>
-      <li>
-        have a name starting with <dfn dict-member for="BluetoothLEScanFilterInit">namePrefix</dfn>
-        if that member is present,
-      </li>
-      <li class="unstable">
-        advertise <a>manufacturer specific data</a> matching all of the key/value pairs in
-        <dfn dict-member for="BluetoothLEScanFilterInit">manufacturerData</dfn>
-        if that member is present, and
-      </li>
-      <li class="unstable">
-        advertise <a>service data</a> matching all of the key/value pairs in
-        <dfn dict-member for="BluetoothLEScanFilterInit">serviceData</dfn>
-        if that member is present.
-      </li>
-    </ul>
-    <p link-for-hint="BluetoothDataFilterInit" class="unstable">
-      Both <a>Manufacturer Specific Data</a> and <a>Service Data</a>
-      map a key to an array of bytes.
-      {{BluetoothDataFilterInit}} filters these arrays.
-      An array matches if it has a |prefix| such that
-      <code>|prefix| & {{mask}}</code> is equal to <code>{{dataPrefix}} & {{mask}}</code>.
-    </p>
-    <p>
-      Note that
-      if a device changes its behavior significantly when it connects,
-      for example by not advertising its identifying manufacturer data anymore
-      and instead having the client discover some identifying GATT services,
-      the website may need to include filters for both behaviors.
-    </p>
-    <p>
-      In rare cases,
-      a device may not advertise enough distinguishing information
-      to let a site filter out uninteresting devices.
-      In those cases, a site can set
-      <dfn dict-member for="RequestDeviceOptions">acceptAllDevices</dfn> to `true`
-      and omit all {{RequestDeviceOptions/filters}}.
-      This puts the burden of selecting the right device entirely on the site's users.
-      If a site uses {{RequestDeviceOptions/acceptAllDevices}},
-      it will only be able to use services listed in {{RequestDeviceOptions/optionalServices}}.
-    </p>
-    <p>
-      After the user selects a device to pair with this origin,
-      the origin is allowed to access any service whose UUID was listed
-      in the {{BluetoothLEScanFilterInit/services}} list
-      in any element of <code>options.filters</code>
-      or in <code>options.<dfn dict-member for="RequestDeviceOptions">optionalServices</dfn></code>.
-    </p>
-
-    <p>
-      This implies that if developers filter just by name,
-      they must use {{RequestDeviceOptions/optionalServices}} to get access to any services.
-    </p>
-  </div>
-
-  <div class="example" id="example-filter-by-services">
-    <p>
-      Say the UA is close to the following devices:
-    </p>
-    <table class="data">
-      <thead><th>Device</th><th>Advertised Services</th></thead>
-      <tr><td>D1</td><td>A, B, C, D</td></tr>
-      <tr><td>D2</td><td>A, B, E</td></tr>
-      <tr><td>D3</td><td>C, D</td></tr>
-      <tr><td>D4</td><td>E</td></tr>
-      <tr><td>D5</td><td><i>&lt;none></i></td></tr>
-    </table>
-    <p>
-      If the website calls
-    </p>
-    <pre highlight="js">
-      navigator.bluetooth.requestDevice({
-        filters: [ {services: [A, B]} ]
-      });
-    </pre>
-    <p>
-      the user will be shown a dialog containing devices D1 and D2.
-      If the user selects D1, the website will not be able to access services C or D.
-      If the user selects D2, the website will not be able to access service E.
-    </p>
-    <p>
-      On the other hand, if the website calls
-    </p>
-    <pre highlight="js">
-      navigator.bluetooth.requestDevice({
-        filters: [
-          {services: [A, B]},
-          {services: [C, D]}
-        ]
-      });
-    </pre>
-    <p>
-      the dialog will contain devices D1, D2, and D3,
-      and if the user selects D1,
-      the website will be able to access services A, B, C, and D.
-    </p>
-    <p>
-      The <code>optionalServices</code> list doesn't add any devices
-      to the dialog the user sees,
-      but it does affect which services the website can use from the device the user picks.
-    </p>
-    <pre highlight="js">
-      navigator.bluetooth.requestDevice({
-        filters: [ {services: [A, B]} ],
-        optionalServices: \[E]
-      });
-    </pre>
-    <p>
-      Shows a dialog containing D1 and D2,
-      but not D4, since D4 doesn't contain the required services.
-      If the user selects D2, unlike in the first example,
-      the website will be able to access services A, B, and E.
-    </p>
-    <p>
-      The allowed services also apply if the device changes after the user grants access.
-      For example, if the user selects D1 in the previous <code>requestDevice()</code> call,
-      and D1 later adds a new E service,
-      that will fire the {{serviceadded}} event,
-      and the web page will be able to access service E.
-    </p>
-  </div>
-  <div class="example" id="example-filter-by-name">
-    <p>
-      Say the devices in the <a href="#example-filter-by-services">previous example</a>
-      also advertise names as follows:
-    </p>
-    <table class="data">
-      <thead><th>Device</th><th>Advertised Device Name</th></thead>
-      <tr><td>D1</td><td>First De…</td></tr>
-      <tr><td>D2</td><td><i>&lt;none></i></td></tr>
-      <tr><td>D3</td><td>Device Third</td></tr>
-      <tr><td>D4</td><td>Device Fourth</td></tr>
-      <tr><td>D5</td><td>Unique Name</td></tr>
-    </table>
-
-    <p>
-      The following table shows which devices the user can select between
-      for several values of <var>filters</var> passed to
-      <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
-    </p>
-
-    <table class="data">
-      <thead><th><var>filters</var></th><th>Devices</th><th>Notes</th></thead>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{name: "Unique Name"}]
-          </pre>
-        </td>
-        <td>D5</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{namePrefix: "Device"}]
-          </pre>
-        </td>
-        <td>D3, D4</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{name: "First De"},
-             {name: "First Device"}]
-          </pre>
-        </td>
-        <td><i>&lt;none></i></td>
-        <td>
-          D1 only advertises a prefix of its name,
-          so trying to match its whole name fails.
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{namePrefix: "First"},
-             {name: "Unique Name"}]
-          </pre>
-        </td>
-        <td>D1, D5</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{services: \[C],
-              namePrefix: "Device"},
-             {name: "Unique Name"}]
-          </pre>
-        </td>
-        <td>D3, D5</td>
-        <td></td>
-      </tr>
-    </table>
-  </div>
-
-  <div class="example unstable" id="example-filter-by-manufacturer-service-data">
-    <p>
-      Say the devices in the <a href="#example-filter-by-services">previous example</a>
-      also advertise manufacturer or service data as follows:
-    </p>
-    <table class="data">
-      <thead><th>Device</th><th>Manufacturer Data</th><th>Service Data</th></thead>
-      <tr><td>D1</td><td>17: 01 02 03</td><td></td></tr>
-      <tr><td>D2</td><td></td><td>A: 01 02 03</td></tr>
-    </table>
-
-    <p>
-      The following table shows which devices the user can select between
-      for several values of <var>filters</var> passed to
-      <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>})</code>.
-    </p>
-
-    <table class="data">
-      <thead><th><var>filters</var></th><th>Devices</th></thead>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {17: {}}}]
-          </pre>
-        </td>
-        <td>D1</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{serviceData: {"A": {}}}]
-          </pre>
-        </td>
-        <td>D2</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {17: {}}},
-             {serviceData: {"A": {}}}]
-          </pre>
-        </td>
-        <td>D1, D2</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {17: {}},
-              serviceData: {"A": {}}}]
-          </pre>
-        </td>
-        <td><i>&lt;none></i></td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {
-               17: {dataPrefix: new Uint8Array([1, 2, 3])},
-            }}]
-          </pre>
-        </td>
-        <td>D1</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {
-               17: {dataPrefix: new Uint8Array([1, 2, 3, 4])},
-            }}]
-          </pre>
-        </td>
-        <td><i>&lt;none></i></td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {
-               17: {dataPrefix: new Uint8Array([1])},
-            }}]
-          </pre>
-        </td>
-        <td>D1</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {
-               17: {dataPrefix: new Uint8Array([0x91, 0xAA]),
-                    mask: new Uint8Array([0x0F, 0x57])},
-            }}]
-          </pre>
-        </td>
-        <td>D1</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            [{manufacturerData: {
-               17: {},
-               18: {},
-            }}]
-          </pre>
-        </td>
-        <td><i>&lt;none></i></td>
-      </tr>
-    </table>
-  </div>
-
-  <div class="example" id="example-disallowed-filters"
-       link-for-hint="RequestDeviceOptions">
-    <p>
-      Filters that either accept or reject all possible devices cause {{TypeError}}s.
-      To accept all devices, use {{acceptAllDevices}} instead.
-    </p>
-
-    <table class="data">
-      <thead><th>Call</th><th>Notes</th></thead>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({})
-          </pre>
-        </td>
-        <td>Invalid: An absent list of filters doesn't accept any devices.</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({filters:[]})
-          </pre>
-        </td>
-        <td>Invalid: An empty list of filters doesn't accept any devices.</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({filters:[{}]})
-          </pre>
-        </td>
-        <td>Invalid: An empty filter accepts all devices, and so isn't allowed either.</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({
-              acceptAllDevices:true
-            })
-          </pre>
-        </td>
-        <td>
-          Valid: Explicitly accept all devices with {{acceptAllDevices}}.
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({
-              filters: [...],
-              acceptAllDevices:true
-            })
-          </pre>
-        </td>
-        <td>Invalid: {{acceptAllDevices}} would override any {{filters}}.</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({
-              filters:[{namePrefix: ""}]
-            })
-          </pre>
-        </td>
-        <td>Invalid: `namePrefix`, if present, must be non-empty to filter devices.</td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({
-              filters:[{manufacturerData: {}}]
-            })
-          </pre>
-        </td>
-        <td>
-          Invalid: {{BluetoothLEScanFilterInit/manufacturerData}}, if present,
-          must be non-empty to filter devices.
-        </td>
-      </tr>
-      <tr>
-        <td>
-          <pre highlight="js">
-            requestDevice({
-              filters:[{serviceData: {}}]
-            })
-          </pre>
-        </td>
-        <td>
-          Invalid: {{BluetoothLEScanFilterInit/serviceData}}, if present,
-          must be non-empty to filter devices.
-        </td>
-      </tr>
-    </table>
-  </div>
-
-  <p>
-    Instances of {{Bluetooth}} are created with the <a>internal slots</a>
-    described in the following table:
-  </p>
-  <table class="data" dfn-for="Bluetooth" dfn-type="attribute">
-    <thead>
-      <th><a>Internal Slot</a></th>
-      <th>Initial Value</th>
-      <th>Description (non-normative)</th>
-    </thead>
-    <tr>
-      <td><dfn>\[[deviceInstanceMap]]</dfn></td>
-      <td>
-        An empty map from <a>Bluetooth device</a>s
-        to <code>{{BluetoothDevice}}</code> instances.
-      </td>
-      <td>
-        Ensures only one {{BluetoothDevice}} instance represents each <a>Bluetooth device</a>
-        inside a single global object.
-      </td>
-    </tr>
-    <tr>
-      <td><dfn>\[[attributeInstanceMap]]</dfn></td>
-      <td>
-        An empty map from <a>Bluetooth cache</a> entries to {{Promise}}s.
-      </td>
-      <td>
-        The {{Promise}}s resolve to either {{BluetoothRemoteGATTService}},
-        {{BluetoothRemoteGATTCharacteristic}}, or {{BluetoothRemoteGATTDescriptor}}
-        instances.
-      </td>
-    </tr>
-    <tr>
-      <td><dfn>\[[referringDevice]]</dfn></td>
-      <td>
-        `null`
-      </td>
-      <td>
-        Set to a {{BluetoothDevice}} while <a>initializing the `Document` object</a>
-        if the `Document` was opened from the device.
-      </td>
-    </tr>
-  </table>
-
-  <div class="unstable">
-  <p>
-    Getting <code>navigator.bluetooth.<dfn attribute for="Bluetooth">referringDevice</dfn></code>
-    must return {{[[referringDevice]]}}.
-  </p>
+<div class="unstable">
+  Getting <code>navigator.bluetooth.<dfn attribute
+  for="Bluetooth">referringDevice</dfn></code> must return
+  {{[[referringDevice]]}}.
 
   <div algorithm="initializing referringDevice">
-    <p>
-      Some UAs may allow the user
-      to cause a <a>browsing context</a> to <a lt="navigated">navigate</a>
-      in response to a <a>Bluetooth device</a>.
-      <span class="note">
-        For example, if an
-        <a href="https://developers.google.com/beacons/eddystone">Eddystone</a> beacon
-        advertises a URL,
-        the UA may allow the user to navigate to this URL.
-      </span>
-      If this happens, then as part of <a>initializing the `Document` object</a>,
-      the UA MUST run the following steps:
-    </p>
-    <ol>
-      <li>
-        Let <var>referringDevice</var> be the device that caused the navigation.
-      </li>
-      <li>
-        <a>Get the <code>BluetoothDevice</code> representing</a> <var>referringDevice</var>
-        inside `navigator.bluetooth`,
-        and let |referringDeviceObj| be the result.
-      </li>
-      <li>
-        If the previous step threw an exception, abort these steps.
+    Some UAs may allow the user to cause a <a>browsing context</a> to <a
+    lt="navigated">navigate</a> in response to a <a>Bluetooth device</a>.
 
-        Note: This means the UA didn't infer that the user intended to
-        grant the current <a>realm</a> access to |referringDevice|.
-        For example, the user might have denied GATT access globally.
-      </li>
-      <li>
-        Set <code>navigator.bluetooth.{{[[referringDevice]]}}</code>
-        to |referringDeviceObj|.
-      </li>
-    </ol>
-  </div>
-  </div>
-
-  <div algorithm>
-    <p>
-      A <a>Bluetooth device</a> <var>device</var>
-      <dfn local-lt="match a filter|matches any filter">matches a filter</dfn> <var>filter</var>
-      if the following steps return `match`:
-    </p>
-    <ol link-for-hint="BluetoothLEScanFilterInit">
-      <li>
-        If <code><var>filter</var>.{{name}}</code> is present then,
-        if <var>device</var>'s <a>Bluetooth Device Name</a> isn't complete
-        and equal to <code><var>filter</var>.name</code>,
-        return `mismatch`.
-      </li>
-      <li>
-        If <code><var>filter</var>.{{namePrefix}}</code> is present then
-        if <var>device</var>'s <a>Bluetooth Device Name</a> isn't present
-        or doesn't start with <code><var>filter</var>.namePrefix</code>,
-        return `mismatch`.
-      </li>
-      <li>
-        For each <var>uuid</var> in <code><var>filter</var>.{{services}}</code>,
-        if the UA has not received advertising data, an <a>extended inquiry response</a>,
-        or a service discovery response indicating that
-        the device supports a primary (vs included) service with UUID <var>uuid</var>,
-        return `mismatch`.
-      </li>
-      <li>
-        If <code><var>filter</var>.{{manufacturerData}}</code> is present then
-        for each |manufacturerId| in
-        <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>,
-        if <var>device</var> hasn't advertised <a>manufacturer specific data</a>
-        with a company identifier code that stringifies in base 10 to |manufacturerId|
-        and with data that <a for="BluetoothDataFilterInit">matches</a>
-        <code>|filter|.{{manufacturerData}}[|manufacturerId|]</code>
-        return `mismatch`.
-      </li>
-      <li>
-        If <code><var>filter</var>.{{serviceData}}</code> is present then
-        for each |uuid| in
-        <code>|filter|.{{serviceData}}.{{Object/[[OwnPropertyKeys]]}}()</code>,
-        if <var>device</var> hasn't advertised <a>service data</a>
-        with a UUID whose 128-bit form is |uuid|
-        and with data that <a for="BluetoothDataFilterInit">matches</a>
-        <code>|filter|.{{serviceData}}[|manufacturerId|]</code>,
-        return `mismatch`.
-      </li>
-      <li>Return `match`.</li>
-    </ol>
-  </div>
-
-  <div algorithm>
-    <p>
-      An array of bytes |data|
-      <dfn for="BluetoothDataFilterInit" export>matches</dfn> a {{BluetoothDataFilterInit}} |filter|
-      if the following steps return `match`.
-    </p>
-    <p class="note">
-      Note: This algorithm assumes that |filter| has already been
-      <a for="BluetoothDataFilterInit" lt="canonicalizing">canonicalized</a>.
-    </p>
-    <ol link-for-hint="BluetoothDataFilterInit">
-      <li>
-        Let |expectedPrefix| be <a>a copy of the bytes held</a> by <code>|filter|.{{dataPrefix}}</code>.
-      </li>
-      <li>
-        Let |mask| be <a>a copy of the bytes held</a> by <code>|filter|.{{mask}}</code>.
-      </li>
-      <li>
-        If |data| has fewer bytes than |expectedPrefix|, return `mismatch`.
-      </li>
-      <li>
-        For each `1` bit in |mask|,
-        if the corresponding bit in |data| is not equal to
-        the corresponding bit in |expectedPrefix|,
-        return `mismatch`.
-      </li>
-      <li>
-        Return `match`.
-      </li>
-    </ol>
-  </div>
-
-  <p class="note">
-    The list of Service UUIDs that a device advertises
-    might not include all the UUIDs the device supports.
-    The advertising data does specify whether this list is complete.
-    If a website filters for a UUID that a nearby device supports but doesn't advertise,
-    that device might not be included in the list of devices presented to the user.
-    The UA would need to connect to the device to discover the full list of supported services,
-    which can impair radio performance and cause delays, so this spec doesn't require it.
-  </p>
-
-  <div algorithm>
-    <p>
-      The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)</dfn></code> method,
-      when invoked, MUST return <a>a new promise</a> |promise|
-      and run the following steps <a>in parallel</a>:
-    </p>
-    <ol link-for-hint="RequestDeviceOptions">
-      <li>
-        If <code>|options|.{{filters}}</code> is present
-        and <code>|options|.{{acceptAllDevices}}</code> is `true`,
-        or if <code>|options|.{{filters}}</code> is not present
-        and <code>|options|.{{acceptAllDevices}}</code> is `false`,
-        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
-
-        Note: This enforces that
-        exactly one of {{filters}} or <code>{{acceptAllDevices}}:true</code> is present.
-      </li>
-      <li>
-        <a>Request Bluetooth devices</a>,
-        passing <code>|options|.{{filters}}</code>
-        if <code>|options|.{{acceptAllDevices}}</code> is `false`
-        or `null` otherwise,
-        and passing <code>|options|.{{optionalServices}}</code>,
-        and let |devices| be the result.
-      </li>
-      <li>
-        If the previous step threw an exception,
-        <a>reject</a> |promise| with that exception and abort these steps.
-      </li>
-      <li>
-        If |devices| is an empty sequence,
-        <a>reject</a> |promise| with a {{NotFoundError}} and abort these steps.
-      </li>
-      <li>
-        <a>Resolve</a> |promise| with <code>|devices|[0]</code>.
-      </li>
-    </ol>
-  </div>
-
-  <div algorithm>
-    <p>
-      To <dfn>request Bluetooth devices</dfn>,
-      given a sequence of {{BluetoothLEScanFilterInit}}s, |filters|,
-      which can be `null` to represent that all devices can match,
-      and a sequence of {{BluetoothServiceUUID}}s, |optionalServices|,
-      the UA MUST run the following steps:
-    </p>
-    <p class="note">
-      Note: These steps can block,
-      so uses of this algorithm must be <a>in parallel</a>.
-    </p>
-    <p class="note">
-      Calls to this algorithm will eventually be able to request multiple devices,
-      but for now it only ever returns a single one.
-    </p>
-    <ol>
-      <li id="requestDevice-user-gesture">
-        Check that the algorithm is triggered while its [=relevant global
-        object=] has a <a
-        href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
-        activation</a>, otherwise throw a {{SecurityError}} and abort these
-        steps.
-      </li>
-      <li>
-        In order to convert the arguments from service names and aliases to just <a>UUID</a>s,
-        do the following sub-steps:
-        <ol>
-          <li>
-            If <code>|filters| !== null && |filters|.length === 0</code>,
-            throw a {{TypeError}}
-            and abort these steps.
-          </li>
-          <li>
-            Let <var>uuidFilters</var> be a new {{Array}} and
-            <var>requiredServiceUUIDs</var> be a new {{Set}}.
-          </li>
-          <li>
-            If |filters| is `null`,
-            then set |requiredServiceUUIDs| to the set of all UUIDs.
-          </li>
-          <li>
-            If |filters| isn't `null`,
-            then for each |filter| in |filters|,
-            do the following steps:
-            <ol>
-              <li>
-                Let |canonicalFilter| be
-                the result of <a for="BluetoothLEScanFilterInit">canonicalizing</a> |filter|.
-              </li>
-              <li>
-                Append |canonicalFilter| to |uuidFilters|.
-              </li>
-              <li>
-                Add the contents of <code>|canonicalFilter|.services</code>
-                to |requiredServiceUUIDs|.
-              </li>
-            </ol>
-          </li>
-          <li>
-            Let <var>optionalServiceUUIDs</var> be
-            <code>{{Array.prototype.map}}.call(|optionalServices|,
-              {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
-          </li>
-          <li>
-            If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls threw an exception,
-            throw that exception and abort these steps.
-          </li>
-          <li>
-            Remove from <var>optionalServiceUUIDs</var> any UUIDs that are <a>blocklisted</a>.
-          </li>
-        </ol>
-      </li>
-      <li>
-        Let |descriptor| be
-        <pre highlight="js">
-        {
-          name: "bluetooth",
-          filters: <var>uuidFilters</var>,
-          optionalServices: <var>optionalServiceUUIDs</var>,
-          acceptAllDevices: <var>filters</var> !== null,
-        }
-        </pre>
-      </li>
-      <li>
-        Let |state| be |descriptor|'s <a>permission state</a>.
-
-        Note: |state| will be {{"denied"}} in <a>non-secure contexts</a> because
-        {{"bluetooth"}} doesn't set the <a>allowed in non-secure contexts</a> flag.
-      </li>
-      <li>
-        If |state| is {{"denied"}}, return `[]` and abort these steps.
-      </li>
-      <li>
-        If the UA can prove that no devices could possibly be found in the next step,
-        for example because there is no Bluetooth adapter with which to scan,
-        or because the filters can't be matched by any possible advertising packet,
-        the UA MAY return `[]` and abort these steps.
-      </li>
-      <li>
-        <a>Scan for devices</a> with
-        <var>requiredServiceUUIDs</var>
-        as the <i>set of <a>Service</a> UUIDs</i>,
-        and let <var>scanResult</var> be the result.
-      </li>
-      <li>
-        If |filters| isn't null,
-        remove devices from <var>scanResult</var> if
-        they do not <a>match a filter</a>
-        in <var>uuidFilters</var>.
-      </li>
-      <li id="requestDevice-prompt">
-        Even if <var>scanResult</var> is empty,
-        <a>prompt the user to choose</a> one of the devices in |scanResult|,
-        associated with |descriptor|,
-        and let |device| be the result.
-
-        <p>
-          The UA MAY allow the user to select a nearby device
-          that does not match <var>uuidFilters</var>.
-        </p>
-
-        <p class="note">
-          The UA should show the user the human-readable name of each device.
-          If this name is not available because, for example,
-          the UA's Bluetooth system doesn't support privacy-enabled scans,
-          the UA should allow the user to indicate interest and
-          then perform a privacy-disabled scan to retrieve the name.
-        </p>
-      </li>
-      <li>
-        If |device| is {{"denied"}}, return `[]` and abort these steps.
-      </li>
-      <li class="note">
-        Choosing a |device| probably indicates that
-        the user intends that device to appear in
-        the {{BluetoothPermissionData/allowedDevices}} list
-        of {{"bluetooth"}}'s <a>extra permission data</a> for
-        at least the <a>current settings object</a>,
-        for its {{AllowedBluetoothDevice/mayUseGATT}} field to be `true`,
-        and for all the services in the union of <var>requiredServiceUUIDs</var>
-        and <var>optionalServiceUUIDs</var>
-        to appear in its {{AllowedBluetoothDevice/allowedServices}} list,
-        in addition to any services that were already there.
-      </li>
-      <li>
-        The UA MAY <a>populate the Bluetooth cache</a> with
-        all Services inside <var>device</var>.
-        Ignore any errors from this step.
-      </li>
-      <li>
-        <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
-        inside the <a>context object</a>,
-        propagating any exception,
-        and let |deviceObj| be the result.
-      </li>
-      <li>
-        Return <code>[|deviceObj|]</code>.
-      </li>
-    </ol>
-  </div>
-
-  <div algorithm="canonicalizing an LE scan filter">
-    <p>
-      The result of <dfn for="BluetoothLEScanFilterInit" export>canonicalizing</dfn>
-      the {{BluetoothLEScanFilterInit}} |filter|,
-      is the {{BluetoothLEScanFilterInit}} returned from the following steps:
-    </p>
-    <ol>
-      <li>
-        If none of <var>filter</var>'s
-        members is present,
-        throw a {{TypeError}}
-        and abort these steps.
-      </li>
-      <li>Let <var>canonicalizedFilter</var> be `{}`.</li>
-      <li>
-        If <code><var>filter</var>.{{BluetoothLEScanFilterInit/services}}</code> is present,
-        do the following sub-steps:
-        <ol>
-          <li>
-            If <code><var>filter</var>.services.length === 0</code>,
-            throw a {{TypeError}}
-            and abort these steps.
-          </li>
-          <li>
-            Let <var>services</var> be
-            <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
-                    {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
-          </li>
-          <li>
-            If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}} calls
-            threw an exception,
-            throw that exception and abort these steps.
-          </li>
-          <li>
-            If any service in <var>services</var> is <a>blocklisted</a>,
-            throw a {{SecurityError}}
-            and abort these steps.
-          </li>
-          <li>
-            Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.
-          </li>
-        </ol>
-      </li>
-      <li>
-        If <code><var>filter</var>.{{BluetoothLEScanFilterInit/name}}</code> is present,
-        do the following sub-steps.
-        <ol>
-          <li>
-            If the <a lt="utf-8 encode">UTF-8 encoding</a>
-            of <code><var>filter</var>.name</code>
-            is more than 248 bytes long,
-            throw a {{TypeError}}
-            and abort these steps.
-
-            <p class="note">
-              248 is the maximum number of UTF-8 code units in
-              a <a>Bluetooth Device Name</a>.
-            </p>
-          </li>
-          <li>
-            Set <code><var>canonicalizedFilter</var>.name</code>
-            to <code><var>filter</var>.name</code>.
-          </li>
-        </ol>
-      </li>
-      <li>
-        If <code><var>filter</var>.{{BluetoothLEScanFilterInit/namePrefix}}</code> is present,
-        do the following sub-steps.
-        <ol>
-          <li>
-            If <code><var>filter</var>.namePrefix.length === 0</code>
-            or if the <a lt="utf-8 encode">UTF-8 encoding</a>
-            of <code><var>filter</var>.namePrefix</code>
-            is more than 248 bytes long,
-            throw a {{TypeError}}
-            and abort these steps.
-
-            <p class="note">
-              248 is the maximum number of UTF-8 code units in
-              a <a>Bluetooth Device Name</a>.
-            </p>
-          </li>
-          <li>
-            Set <code><var>canonicalizedFilter</var>.namePrefix</code>
-            to <code><var>filter</var>.namePrefix</code>.
-          </li>
-        </ol>
-      </li>
-
-      <li>
-        Set <code>|canonicalizedFilter|.manufacturerData</code> to `{}`.
-      </li>
-      <li>
-        If <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}</code> is present,
-        do the following sub-steps for each |key| in
-        <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>.
-        If there are no such keys, throw a {{TypeError}} and abort these steps.
-        <ol>
-          <li>
-            Let |manufacturerId| be <a abstract-op>CanonicalNumericIndexString</a>(|key|).
-          </li>
-          <li>
-            If |manufacturerId| is `undefined` or `-0`,
-            or <a abstract-op>IsInteger</a>(|manufacturerId|) is `false`,
-            or |manufacturerId| is outside the range from 0–65535 inclusive,
-            throw a {{TypeError}} and abort these steps.
-          </li>
-          <li>
-            Let |dataFilter| be
-            <code>|filter|.manufacturerData[|manufacturerId|]</code>,
-            <a>converted to an IDL value</a> of type {{BluetoothDataFilterInit}}.
-            If this conversion throws an exception, propagate it and abort these steps.
-          </li>
-          <li>
-            Let |canonicalizedDataFilter| be
-            the result of <a for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
-            <a>converted to an ECMAScript value</a>.
-            If this throws an exception, propagate that exception and abort these steps.
-          </li>
-          <li>
-            Call <a abstract-op>CreateDataProperty</a>(|canonicalizedFilter|.manufacturerData,
-            |key|, |canonicalizedDataFilter|).
-          </li>
-        </ol>
-      </li>
-
-      <li>
-        Set <code>|canonicalizedFilter|.serviceData</code> to `{}`.
-      </li>
-      <li>
-        If <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}</code> is present,
-        do the following sub-steps for each |key| in
-        <code>|filter|.serviceData.{{Object/[[OwnPropertyKeys]]}}()</code>.
-        If there are no such keys, throw a {{TypeError}} and abort these steps.
-        <ol>
-          <li>
-            Let |serviceName| be <a abstract-op>CanonicalNumericIndexString</a>(|key|).
-          </li>
-          <li>
-            If |serviceName| is `undefined`, set |serviceName| to |key|.
-          </li>
-          <li>
-            Let |service| be
-            <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|serviceName|)</code>.
-          </li>
-          <li>
-            If the previous step threw an exception,
-            throw that exception and abort these steps.
-          </li>
-          <li>
-            If |service| is <a>blocklisted</a>,
-            throw a {{SecurityError}}
-            and abort these steps.
-          </li>
-          <li>
-            Let |dataFilter| be
-            <code>|filter|.serviceData[|service|]</code>,
-            <a>converted to an IDL value</a> of type {{BluetoothDataFilterInit}}.
-            If this conversion throws an exception, propagate it and abort these steps.
-          </li>
-          <li>
-            Let |canonicalizedDataFilter| be
-            the result of <a for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
-            <a>converted to an ECMAScript value</a>.
-            If this throws an exception, propagate that exception and abort these steps.
-          </li>
-          <li>
-            Call <a abstract-op>CreateDataProperty</a>(|canonicalizedFilter|.serviceData,
-            |service|, |canonicalizedDataFilter|).
-          </li>
-        </ol>
-      </li>
-
-      <li>Return |canonicalizedFilter|.</li>
-    </ol>
-  </div>
-
-  <div algorithm="canonicalizing a data filter">
-    <p>
-      The result of <dfn for="BluetoothDataFilterInit" export>canonicalizing</dfn>
-      the {{BluetoothDataFilterInit}} |filter|,
-      is the {{BluetoothDataFilterInit}} returned from the following steps:
-    </p>
-    <ol>
-      <li>
-        If <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code> is present,
-        let |dataPrefix| be <a>a copy of the bytes held</a>
-        by <code>|filter|.dataPrefix</code>.
-        Otherwise, let |dataPrefix| be an empty sequence of bytes.
-      </li>
-      <li>
-        If <code>|filter|.{{BluetoothDataFilterInit/mask}}</code> is present,
-        let |mask| be <a>a copy of the bytes held</a>
-        by <code>|filter|.mask</code>.
-        Otherwise, let |mask| be a sequence of `0xFF` bytes the same length as |dataPrefix|.
-      </li>
-      <li>
-        If |mask| is not the same length as |dataPrefix|,
-        throw a {{TypeError}} and abort these steps.
-      </li>
-      <li>
-        Return `{dataPrefix: new Uint8Array(|dataPrefix|), mask: new Uint8Array(|mask|)}`.
-      </li>
-    </ol>
-  </div>
-
-  <div algorithm>
-    <p>
-      To <dfn>scan for devices</dfn> with
-      an optional <var>set of <a>Service</a> UUIDs</var>, defaulting to the set of all UUIDs,
-      the UA MUST perform the following steps:
-    </p>
-    <ol>
-      <li>
-        If the UA has scanned for devices recently
-        <span class="issue">TODO: Nail down the amount of time.</span>
-        with a set of UUIDs that was a superset of the UUIDs for the current scan,
-        then the UA MAY return the result of that scan and abort these steps.
-      </li>
-      <li>
-        Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s,
-        initially equal to the set of devices that
-        are connected (have an <a>ATT Bearer</a>) to the UA.
-      </li>
-      <li>
-        If the UA supports the LE transport, perform the <a>General Discovery Procedure</a>,
-        except that the UA may include devices that have no <a>Discoverable Mode</a> flag set,
-        and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
-        The UA SHOULD enable the <a>Privacy Feature</a>.
-
-        <p class="issue">
-          Both <a>passive scanning</a> and
-          the <a>Privacy Feature</a> avoid leaking the unique, immutable device ID.
-          We ought to require UAs to use either one,
-          but none of the OS APIs appear to expose either.
-          Bluetooth also makes it hard to use <a>passive scanning</a> since
-          it doesn't require <a>Central</a> devices to support the
-          <a>Observation Procedure</a>.
-        </p>
-      </li>
-      <li>
-        If the UA supports the BR/EDR transport, perform the <a>Device Discovery Procedure</a>
-        and add the discovered <a>Bluetooth device</a>s to <var>nearbyDevices</var>.
-
-        <p class="issue">
-          All forms of BR/EDR inquiry/discovery
-          appear to leak the unique, immutable device address.
-        </p>
-      </li>
-      <li>Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.</li>
-      <li>
-        For each <a>Bluetooth device</a> <var>device</var> in <var>nearbyDevices</var>,
-        do the following sub-steps:
-        <ol>
-          <li>
-            If <var>device</var>'s <a>supported physical transports</a> include LE and
-            its <a>Bluetooth Device Name</a> is partial or absent,
-            the UA SHOULD perform the <a>Name Discovery Procedure</a>
-            to acquire a complete name.
-          </li>
-          <li>
-            If <var>device</var>'s advertised <a>Service UUIDs</a>
-            have a non-empty intersection with the <var>set of <a>Service</a> UUIDs</var>,
-            add <var>device</var> to <var>result</var> and abort these sub-steps.
-
-            <p class="note">
-              For BR/EDR devices, there is no way to distinguish GATT from non-GATT services
-              in the <a>Extended Inquiry Response</a>.
-              If a site filters to the UUID of a non-GATT service,
-              the user may be able to select a device
-              for the result of <code>requestDevice</code>
-              that this API provides no way to interact with.
-            </p>
-          </li>
-          <li>
-            The UA MAY connect to <var>device</var> and <a>populate the Bluetooth cache</a>
-            with all Services whose UUIDs are in the <var>set of <a>Service</a> UUIDs</var>.
-            If <var>device</var>'s <a>supported physical transports</a> include BR/EDR,
-            then in addition to the standard GATT procedures,
-            the UA MAY use the Service Discovery Protocol (<a>Searching for Services</a>)
-            when populating the cache.
-
-            <div class="note" id="note-extra-discovery">
-              <p>
-                Connecting to every nearby device to discover services costs power and
-                can slow down other use of the Bluetooth radio.
-                UAs should only discover extra services on a device if
-                they have some reason to expect that device to be interesting.
-              </p>
-
-              <p>
-                UAs should also help developers avoid relying on this extra discovery behavior.
-                For example, say a developer has previously connected to a device,
-                so the UA knows the device's full set of supported services.
-                If this developer then filters using a non-advertised UUID,
-                the dialog they see may include this device,
-                even if the filter would likely exclude the device on users' machines.
-                The UA could provide a developer option to warn when this happens or
-                to include only advertised services in matching filters.
-              </p>
-            </div>
-          </li>
-          <li>
-            If the <a>Bluetooth cache</a> contains
-            known-present Services inside <var>device</var>
-            with UUIDs in the <var>set of <a>Service</a> UUIDs</var>,
-            the UA MAY add <var>device</var> to <var>result</var>.
-          </li>
-        </ol>
-      </li>
-      <li>Return <var>result</var> from the scan.</li>
-    </ol>
-  </div>
-
-  <p class="issue">
-    We need a way for a site to register to receive an event
-    when an interesting device comes within range.
-  </p>
-
-  <section class="unstable">
-    <h3 id="permission-api-integration">Permission API Integration</h3>
-
-    <p>
-      The [[permissions]] API provides a uniform way
-      for websites to request permissions from users
-      and query which permissions they have.
-    </p>
-
-    <div class="example" id="example-permission-api-request">
-      <p>
-        Sites can use
-        <code highlight="js">navigator.permissions.{{Permissions/request()|request}}({<a idl for="PermissionDescriptor">name</a>: "bluetooth", ...})</code>
-        as an alternate spelling of
-        <code highlight="js">navigator.bluetooth.{{Bluetooth/requestDevice()}}</code>.
-      </p>
-      <pre highlight="js">
-        navigator.permissions.<a idl for="Permissions" lt="request()">request</a>({
-          name: "bluetooth",
-          filters: [{
-            services: ['heart_rate'],
-          }]
-        }).then(result => {
-          if (result.<a idl for="BluetoothPermissionResult">devices</a>.length >= 1) {
-            return result.devices[0];
-          } else {
-            throw new <a idl>DOMException</a>("Chooser cancelled", "NotFoundError");
-          }
-        }).then(device => {
-          sessionStorage.lastDevice = device.<a idl for="BluetoothDevice">id</a>;
-        });
-      </pre>
-      <p>
-        The {{BluetoothPermissionDescriptor/deviceId}} member
-        is ignored in calls to {{Permissions/request()}}.
-      </p>
+    <div class="note">
+      Note: For example, if an <a
+      href="https://developers.google.com/beacons/eddystone">Eddystone</a>
+      beacon advertises a URL, the UA may allow the user to navigate to this
+      URL.
     </div>
 
-    <div class="example" id="example-permission-api-query">
-      <p>
-        Once a site has been granted access to a set of devices,
-        it can use
-        <code highlight="js">navigator.permissions.{{Permissions/query()|query}}({<a idl for="PermissionDescriptor">name</a>: "bluetooth", ...})</code>
-        to retrieve those devices after a reload.
-      </p>
-      <pre highlight="js">
-        navigator.permissions.<a idl for="Permissions" lt="query()">query</a>({
-          name: "bluetooth",
-          deviceId: sessionStorage.lastDevice,
-        }).then(result => {
-          if (result.<a idl for="BluetoothPermissionResult">devices</a>.length == 1) {
-            return result.devices[0];
-          } else {
-            throw new <a idl>DOMException</a>("Lost permission", "NotFoundError");
-          }
-        }).then(...);
-      </pre>
-    </div>
+    If this happens, then as part of <a>initializing the `Document` object</a>,
+    the UA MUST run the following steps:
+    
+    1. Let <var>referringDevice</var> be the device that caused the navigation.
+    1. <a>Get the <code>BluetoothDevice</code> representing</a>
+        <var>referringDevice</var> inside `navigator.bluetooth`, and let
+        |referringDeviceObj| be the result.
+    1. If the previous step threw an exception, abort these steps.
 
-    <p>
-      The <dfn enum-value for="PermissionName">"bluetooth"</dfn> <a>powerful feature</a>'s
-      permission-related algorithms and types
-      are defined as follows:
-    </p>
-    <dl>
-      <dt>
-        <a>permission descriptor type</a>
-      </dt>
-      <dd>
-        <pre class="idl">
-          dictionary BluetoothPermissionDescriptor : PermissionDescriptor {
-            DOMString deviceId;
-            // These match RequestDeviceOptions.
-            sequence&lt;BluetoothLEScanFilterInit> filters;
-            sequence&lt;BluetoothServiceUUID> optionalServices = [];
-            boolean acceptAllDevices = false;
-          };
-        </pre>
-      </dd>
-      <dt>
-        <a>extra permission data type</a>
-      </dt>
-      <dd>
-        <p oldids="allowed-devices-map,device-id,allowed-services-list">
-        {{BluetoothPermissionData}}, defined as:</p>
-        <pre class="idl">
-          dictionary AllowedBluetoothDevice {
-            required DOMString deviceId;
-            required boolean mayUseGATT;
-            // An allowedServices of "all" means all services are allowed.
-            required (DOMString or sequence&lt;UUID>) allowedServices;
-          };
-          dictionary BluetoothPermissionData {
-            required sequence&lt;AllowedBluetoothDevice> allowedDevices;
-          };
-        </pre>
-        <p>
-          {{AllowedBluetoothDevice}} instances have an <a>internal slot</a>
-          <dfn attribute for="AllowedBluetoothDevice">\[[device]]</dfn>
-          that holds a <a>Bluetooth device</a>.
-        </p>
-      </dd>
-
-      <dt>
-        <a>extra permission data constraints</a>
-      </dt>
-      <dd>
-        <p>
-          Distinct elements of {{BluetoothPermissionData/allowedDevices}}
-          must have different {{AllowedBluetoothDevice/[[device]]}}s
-          and different {{AllowedBluetoothDevice/deviceId}}s.
-        </p>
-        <p>
-          If {{AllowedBluetoothDevice/mayUseGATT}} is `false`,
-          {{AllowedBluetoothDevice/allowedServices}} must be `[]`.
-        </p>
-        <div class="note" id="note-device-id-tracking">
-          <p>
-            A {{AllowedBluetoothDevice/deviceId}} allows a site to track that
-            a {{BluetoothDevice}} instance seen at one time represents
-            the same device as another {{BluetoothDevice}} instance seen at another time,
-            possibly in a different <a>realm</a>.
-            UAs should consider whether their user intends that tracking to happen or not-happen
-            when returning {{"bluetooth"}}'s <a>extra permission data</a>.
-          </p>
-          <p>
-            For example, users generally don't intend two different origins to know
-            that they're interacting with the same device,
-            and they generally don't intend unique identifiers to persist
-            after they've cleared an origin's cookies.
-          </p>
+        <div class="note">
+          Note: This means the UA didn't infer that the user intended to grant
+          the current <a>realm</a> access to |referringDevice|. For example, the
+          user might have denied GATT access globally.
         </div>
-      </dd>
-      <dt>
-        <a>permission result type</a>
-      </dt>
-      <dd>
-        <pre class="idl">
-          [Exposed=Window]
-          interface BluetoothPermissionResult : PermissionStatus {
-            attribute FrozenArray&lt;BluetoothDevice> devices;
-          };
-        </pre>
-      </dd>
-      <dt>
-        <a>permission request algorithm</a>
-      </dt>
-      <dd algorithm="permission request">
-        <p>
-          To <dfn export>request the "bluetooth" permission</dfn> with
-          a {{BluetoothPermissionDescriptor}} <var>options</var>
-          and a {{BluetoothPermissionResult}} <var>status</var>,
-          the UA MUST run the following steps:
-        </p>
-        <ol link-for-hint="BluetoothPermissionDescriptor">
-          <li>
-            If <code>|options|.{{filters}}</code> is present
-            and <code>|options|.{{acceptAllDevices}}</code> is `true`,
-            or if <code>|options|.{{filters}}</code> is not present
-            and <code>|options|.{{acceptAllDevices}}</code> is `false`,
-            throw a {{TypeError}}.
+    1. Set <code>navigator.bluetooth.{{[[referringDevice]]}}</code> to
+        |referringDeviceObj|.
+  </div>
+</div>
 
-            Note: This enforces that
-            exactly one of {{filters}} or <code>{{acceptAllDevices}}:true</code> is present.
-          </li>
-          <li>
-            <a>Request Bluetooth devices</a>,
-            passing <code>|options|.{{filters}}</code>
-            if <code>|options|.{{acceptAllDevices}}</code> is `false`
-            or `null` otherwise,
-            and passing <code>|options|.{{optionalServices}}</code>,
-            propagating any exception,
-            and let |devices| be the result.
-          </li>
-          <li>
-            Set <code>|status|.devices</code> to
-            a new {{FrozenArray}} whose contents are the elements of |devices|.
-          </li>
-        </ol>
-      </dd>
+<div algorithm="matching Bluetooth device with a filter">
+A <a>Bluetooth device</a> <var>device</var> <dfn local-lt="match a
+filter|matches any filter">matches a filter</dfn> <var>filter</var> if the
+following steps return `match`:
 
-      <dt>
-        <a>permission query algorithm</a>
-      </dt>
-      <dd algorithm>
-        To <dfn export>query the "bluetooth" permission</dfn> with
-        a {{BluetoothPermissionDescriptor}} <var>desc</var>
-        and a {{BluetoothPermissionResult}} <var>status</var>, the UA must:
-        <ol>
-          <li>
-            Let <var>global</var> be the <a>relevant global object</a> for <var>status</var>.
-          </li>
-          <li>
-            Set <code><var>status</var>.{{PermissionStatus/state}}</code>
-            to |desc|'s <a>permission state</a>.
-          </li>
-          <li>
-            If <code>|status|.{{PermissionStatus/state}}</code> is {{"denied"}},
-            set <code>|status|.devices</code> to an empty {{FrozenArray}}
-            and abort these steps.
-          </li>
-          <li>
-            Let <var>matchingDevices</var> be a new {{Array}}.
-          </li>
-          <li>
-            Let |data|, a {{BluetoothPermissionData}},
-            be {{"bluetooth"}}'s <a>extra permission data</a>
-            for the <a>current settings object</a>.
-          </li>
-          <li>
-            For each |allowedDevice| in <code>|data|.allowedDevices</code>,
-            run the following sub-steps:
-            <ol>
-              <li>
-                If <code><var>desc</var>.deviceId</code> is set
-                and <code><var>allowedDevice</var>.deviceId != <var>desc</var>.deviceId</code>,
-                continue to the next <var>allowedDevice</var>.
-              </li>
-              <li>
-                If <code><var>desc</var>.filters</code> is set, do the following sub-steps:
-                <ol>
-                  <li>
-                    Replace each filter in <code>|desc|.filters</code>
-                    with the result of <a for="BluetoothLEScanFilterInit">canonicalizing</a> it.
-                    If any of these canonicalizations throws an error, return that error and abort these steps.
-                  </li>
-                  <li>
-                    If <code><var>allowedDevice</var>.{{[[device]]}}</code> does not
-                    <a>match a filter</a> in <code>|desc|.filters</code>,
-                    continue to the next <var>allowedDevice</var>.
-                  </li>
-                </ol>
-              </li>
-              <li>
-                <a>Get the `BluetoothDevice` representing</a>
-                <code><var>allowedDevice</var>.{{[[device]]}}</code>
-                within <code><var>global</var>.navigator.bluetooth</code>,
-                and add the result to <var>matchingDevices</var>.
-              </li>
-            </ol>
-            <p class="note">
-              Note: The <code>|desc|.optionalServices</code> field does not affect the result.
-            </p>
-          </li>
-          <li>
-            Set <code><var>status</var>.devices</code> to
-            a new {{FrozenArray}} whose contents are <var>matchingDevices</var>.
-          </li>
-        </ol>
-      </dd>
+1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/name}}</code> is
+    present then, if <var>device</var>'s <a>Bluetooth Device Name</a> isn't
+    complete and equal to <code><var>filter</var>.name</code>, return
+    `mismatch`.
+1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/namePrefix}}</code> is
+    present then if <var>device</var>'s <a>Bluetooth Device Name</a> isn't
+    present or doesn't start with <code><var>filter</var>.namePrefix</code>,
+    return `mismatch`.
+1. For each <var>uuid</var> in
+    <code><var>filter</var>.{{BluetoothLEScanFilterInit/services}}</code>, if
+    the UA has not received advertising data, an <a>extended inquiry
+    response</a>, or a service discovery response indicating that the device
+    supports a primary (vs included) service with UUID <var>uuid</var>, return
+    `mismatch`.
+1. If
+    <code><var>filter</var>.{{BluetoothLEScanFilterInit/manufacturerData}}</code>
+    is present then for each |manufacturerId| in
+    <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>, if
+    <var>device</var> hasn't advertised <a>manufacturer specific data</a> with a
+    company identifier code that stringifies in base 10 to |manufacturerId| and
+    with data that <a for="BluetoothDataFilterInit">matches</a>
+    <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}[|manufacturerId|]</code>
+    return `mismatch`.
+1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/serviceData}}</code>
+    is present then for each |uuid| in
+    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}.{{Object/[[OwnPropertyKeys]]}}()</code>,
+    if <var>device</var> hasn't advertised <a>service data</a> with a UUID whose
+    128-bit form is |uuid| and with data that <a
+    for="BluetoothDataFilterInit">matches</a>
+    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}[|uuid|]</code>,
+    return `mismatch`.
+1. Return `match`.
 
-      <dt>
-        <a>permission revocation algorithm</a>
-      </dt>
-      <dd algorithm>
-        <p>
-          To <dfn>revoke Bluetooth access</dfn> to devices the user no longer intends to expose,
-          the UA MUST run the following steps:
-        </p>
-        <ol>
-          <li>
-            Let |data|, a {{BluetoothPermissionData}},
-            be {{"bluetooth"}}'s <a>extra permission data</a>
-            for the <a>current settings object</a>.
-          </li>
-          <li>
-            For each {{BluetoothDevice}} instance |deviceObj| in the <a>current realm</a>,
-            run the following sub-steps:
-            <ol>
-              <li>
-                If there is an {{AllowedBluetoothDevice}} |allowedDevice| in <code>|data|.{{allowedDevices}}</code>
-                such that:
-                <ul>
-                  <li>
-                    <code>|allowedDevice|.{{[[device]]}}</code> is
-                    the <a>same device</a> as <code>|deviceObj|.{{[[representedDevice]]}}</code>, and
-                  </li>
-                  <li>
-                    <code>|allowedDevice|.{{AllowedBluetoothDevice/deviceId}} ===
-                    |deviceObj|.{{BluetoothDevice/id}}</code>,
-                  </li>
-                </ul>
-                then update <code>|deviceObj|.{{[[allowedServices]]}}</code> to be
-                <code>|allowedDevice|.{{allowedServices}}</code>,
-                and continue to the next |deviceObj|.
-              </li>
-              <li>
-                Otherwise, detach |deviceObj| from its device by running the remaining steps.
-              </li>
-              <li>
-                Call <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
+</div>
 
-                Note: This fires a {{gattserverdisconnected}} event at |deviceObj|.
-              </li>
-              <li>
-                Set <code><var>deviceObj</var>.{{[[representedDevice]]}}</code> to `null`.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </dd>
-    </dl>
-  </section>
+<div algorithm="matching Bluetooth device data with a filter">
+An array of bytes |data| <dfn for="BluetoothDataFilterInit" export>matches</dfn>
+a {{BluetoothDataFilterInit}} |filter| if the following steps return `match`.
 
-  <section>
-    <h3 id="availability">Overall Bluetooth availability</h3>
+<div class="note">
+  Note: This algorithm assumes that |filter| has already been <a
+  for="BluetoothDataFilterInit" lt="canonicalizing">canonicalized</a>.
+</div>
 
-    <p>
-      The UA may be running on a computer that has no Bluetooth radio.
-      {{requestDevice()}} handles this by failing to discover any devices,
-      which results in a {{NotFoundError}},
-      but websites may be able to handle it more gracefully.
-    </p>
+1. Let |expectedPrefix| be <a>a copy of the bytes held</a> by
+    <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code>.
+1. Let |mask| be <a>a copy of the bytes held</a> by
+    <code>|filter|.{{BluetoothDataFilterInit/mask}}</code>.
+1. If |data| has fewer bytes than |expectedPrefix|, return `mismatch`.
+1. For each `1` bit in |mask|, if the corresponding bit in |data| is not equal
+    to the corresponding bit in |expectedPrefix|, return `mismatch`.
+1. Return `match`.
 
-    <div class="example" id="example-getavailability">
-      <p>
-        To show Bluetooth UI only to users who have a Bluetooth adapter:
-      </p>
-      <pre highlight="js">
-      const bluetoothUI = document.querySelector('#bluetoothUI');
-      navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
-        bluetoothUI.hidden = !isAvailable;
-      });
-      navigator.bluetooth.addEventListener('<a idl>availabilitychanged</a>', e => {
-        bluetoothUI.hidden = !e.value;
-      });
-      </pre>
+</div>
+
+<div class="note">
+  The list of Service UUIDs that a device advertises might not include all the
+  UUIDs the device supports. The advertising data does specify whether this list
+  is complete. If a website filters for a UUID that a nearby device supports but
+  doesn't advertise, that device might not be included in the list of devices
+  presented to the user. The UA would need to connect to the device to discover
+  the full list of supported services, which can impair radio performance and
+  cause delays, so this spec doesn't require it.
+</div>
+
+<div algorithm="requestDevice invocation">
+The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)
+</dfn></code> method, when invoked, MUST return <a>a new promise</a> |promise|
+and run the following steps <a>in parallel</a>:
+
+1. If <code>|options|.{{RequestDeviceOptions/filters}}</code> is present and
+    <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `true`,
+    or if <code>|options|.{{RequestDeviceOptions/filters}}</code> is not present
+    and <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is
+    `false`, <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+
+    <div class="note">
+      Note: This enforces that exactly one of {{RequestDeviceOptions/filters}}
+      or <code>{{RequestDeviceOptions/acceptAllDevices}}:true</code> is present.
     </div>
+1. <a>Request Bluetooth devices</a>, passing
+    <code>|options|.{{RequestDeviceOptions/filters}}</code> if
+    <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `false`
+    or `null` otherwise, and passing
+    <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>, and let
+    |devices| be the result.
+1. If the previous step threw an exception, <a>reject</a> |promise| with that
+    exception and abort these steps.
+1. If |devices| is an empty sequence, <a>reject</a> |promise| with a
+    {{NotFoundError}} and abort these steps.
+1. <a>Resolve</a> |promise| with <code>|devices|[0]</code>.
 
-    <div algorithm>
-      <p>
-        The <code><dfn method for="Bluetooth">getAvailability()</dfn></code> method,
-        when invoked, MUST return <a>a new promise</a> |promise|
-        and run the following steps <a>in parallel</a>:
-      </p>
-      <ol>
-        <li id="override-availability">
-          If the user has configured the UA to
-          return a particular answer from this function for the current origin,
-          <a>queue a task</a> to <a>resolve</a> |promise| with the configured answer,
-          and abort these steps.
+</div>
 
-          Note: If the Web Bluetooth permission has been blocked by the user,
-          the UA may <a>resolve</a> |promise| with  `false`.
-        </li>
-        <li>
-          If the UA is running on a system that has a Bluetooth radio
-          <a>queue a task</a> to <a>resolve</a> |promise| with `true` regardless
-          of the powered state of the Bluetooth radio.
-        </li>
-        <li>
-          Otherwise, <a>queue a task</a> to <a>resolve</a> |promise| with `false`.
-        </li>
-      </ol>
+<div algorithm="requesting a Bluetooth device">
+To <dfn>request Bluetooth devices</dfn>, given a sequence of
+{{BluetoothLEScanFilterInit}}s, |filters|, which can be `null` to represent that
+all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
+|optionalServices|, the UA MUST run the following steps:
 
-      Note: The promise is resolved <a>in parallel</a>
-      to let the UA call out to other systems
-      to determine whether Bluetooth is available.
+<div class="note">
+  Note: These steps can block, so uses of this algorithm must be <a>in
+  parallel</a>.
+</div>
+
+<div class="note">
+  Note: Calls to this algorithm will eventually be able to request multiple
+  devices, but for now it only ever returns a single one.
+</div>
+
+1. <p id="requestDevice-user-gesture">Check that the algorithm is triggered
+    while its [=relevant global object=] has a
+    <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+    activation</a>, otherwise throw a {{SecurityError}} and abort these
+    steps.</p>
+1. In order to convert the arguments from service names and aliases to just
+    <a>UUID</a>s, do the following sub-steps:
+    1. If <code>|filters| !== null && |filters|.length === 0</code>, throw a
+        {{TypeError}} and abort these steps.
+    1. Let <var>uuidFilters</var> be a new {{Array}} and
+        <var>requiredServiceUUIDs</var> be a new {{Set}}.
+    1. If |filters| is `null`, then set |requiredServiceUUIDs| to the set of all
+        UUIDs.
+    1. If |filters| isn't `null`, then for each |filter| in |filters|, do the
+        following steps:
+        1. Let |canonicalFilter| be the result of <a
+            for="BluetoothLEScanFilterInit">canonicalizing</a> |filter|.
+        1. Append |canonicalFilter| to |uuidFilters|.
+        1. Add the contents of <code>|canonicalFilter|.services</code> to
+            |requiredServiceUUIDs|.
+    1. Let <var>optionalServiceUUIDs</var> be
+        <code>{{Array.prototype.map}}.call(|optionalServices|,
+        {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+    1. If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}}
+        calls threw an exception, throw that exception and abort these steps.
+    1. Remove from <var>optionalServiceUUIDs</var> any UUIDs that are
+        <a>blocklisted</a>.
+1. Let |descriptor| be
+    <xmp highlight="js">
+    {
+      name: "bluetooth",
+      filters: |uuidFilters|,
+      optionalServices: |optionalServiceUUIDs|,
+      acceptAllDevices: |filters| !== null,
+    }
+    </xmp>
+1. Let |state| be |descriptor|'s <a>permission state</a>.
+
+    <div class="note">
+      Note: |state| will be {{"denied"}} in <a>non-secure contexts</a> because
+      {{"bluetooth"}} doesn't set the <a>allowed in non-secure contexts</a>
+      flag.
     </div>
+1. If |state| is {{"denied"}}, return `[]` and abort these steps.
+1. If the UA can prove that no devices could possibly be found in the next step,
+    for example because there is no Bluetooth adapter with which to scan, or
+    because the filters can't be matched by any possible advertising packet, the
+    UA MAY return `[]` and abort these steps.
+1. <a>Scan for devices</a> with <var>requiredServiceUUIDs</var> as the <i>set of
+    <a>Service</a> UUIDs</i>, and let <var>scanResult</var> be the result.
+1. If |filters| isn't null, remove devices from <var>scanResult</var> if they do
+    not <a>match a filter</a> in <var>uuidFilters</var>.
+1. <p id="requestDevice-prompt">Even if <var>scanResult</var> is empty,
+    <a>prompt the user to choose</a> one of the devices in |scanResult|,
+    associated with |descriptor|, and let |device| be the result.
 
-    <div class="example" id="example-getAvailability-PermissionStatus-onchange">
-      <p>If the user has blocked the permission and the UA resolves the
-      <code><a idl>getAvailability</a></code> promise with false, the following can be used to detect
-      when Bluetooth is available again to show Bluetooth UI:</p>
-      <pre highlight="js">
-      function checkAvailability() {
-        const bluetoothUI = document.querySelector('#bluetoothUI');
-        navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
-          bluetoothUI.hidden = !isAvailable;
-        });
-      }
+    The UA MAY allow the user to select a nearby device that does not match
+    <var>uuidFilters</var>.
 
-      navigator.permission.query({name: "bluetooth"}).then(status => {
-        if (status.state !== 'denied') checkAvailability();
-
-        // Bluetooth is blocked, listen for change in PermissionStatus.
-        status.onchange = () => {
-          if (this.state !== 'denied') checkAvailability();
-        };
-      });
-      </pre>
+    <div class="note">
+      Note: The UA should show the user the human-readable name of each device.
+      If this name is not available because, for example, the UA's Bluetooth
+      system doesn't support privacy-enabled scans, the UA should allow the user
+      to indicate interest and then perform a privacy-disabled scan to retrieve
+      the name.
     </div>
-
-    <div algorithm="availabilitychanged" id="availability-changed-algorithm"
-        class="unstable">
-      <p>
-        If the UA becomes able or unable to use Bluetooth,
-        for example because a radio was physically attached or detached,
-        or the user has changed
-        their <a href="#override-availability">configuration</a> for
-        the answer returned from {{getAvailability()}},
-        the UA must <a>queue a task</a> on
-        each <a>global object</a> |global|'s <a>responsible event loop</a>
-        to run the following steps:
-      </p>
-      <ol>
-        <li>
-          Let |oldAvailability| be
-          the value {{getAvailability()}} would have returned before the change.
-        </li>
-        <li>
-          Let |newAvailability| be
-          the value {{getAvailability()}} would return after the change.
-        </li>
-        <li>
-          If |oldAvailability| is not the same as |newAvailability|,
-          <a>fire an event</a> named {{availabilitychanged}}
-          using the {{ValueEvent}} interface
-          at <code>|global|.navigator.bluetooth</code>
-          with its {{ValueEvent/value}} attribute initialized to |newAvailability|.
-        </li>
-      </ol>
+1. If |device| is {{"denied"}}, return `[]` and abort these steps.
+1. <div class="note">
+    Note: Choosing a |device| probably indicates that the user
+    intends that device to appear in the
+    {{BluetoothPermissionData/allowedDevices}} list of {{"bluetooth"}}'s
+    <a>extra permission data</a> for at least the <a>current settings
+    object</a>, for its {{AllowedBluetoothDevice/mayUseGATT}} field to be
+    `true`, and for all the services in the union of
+    <var>requiredServiceUUIDs</var> and <var>optionalServiceUUIDs</var> to
+    appear in its {{AllowedBluetoothDevice/allowedServices}} list, in addition
+    to any services that were already there.
     </div>
+1. The UA MAY <a>populate the Bluetooth cache</a> with all Services inside
+    <var>device</var>. Ignore any errors from this step.
+1. <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
+    inside the <a>context object</a>, propagating any exception, and let
+    |deviceObj| be the result.
+1. Return <code>[|deviceObj|]</code>.
 
-    <pre class="idl">
-      [
-        Exposed=Window,
-        SecureContext
-      ]
-      interface ValueEvent : Event {
-        constructor(DOMString type, optional ValueEventInit initDict = {});
-        readonly attribute any value;
+</div>
+
+<div algorithm="canonicalizing an LE scan filter">
+The result of <dfn for="BluetoothLEScanFilterInit" export>canonicalizing</dfn>
+the {{BluetoothLEScanFilterInit}} |filter|, is the {{BluetoothLEScanFilterInit}}
+returned from the following steps:
+1. If none of <var>filter</var>'s members is present, throw a {{TypeError}} and
+    abort these steps.
+1. Let <var>canonicalizedFilter</var> be `{}`.
+1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/services}}</code> is
+    present, do the following sub-steps:
+    1. If <code><var>filter</var>.services.length === 0</code>, throw a
+        {{TypeError}} and abort these steps.
+    1. Let <var>services</var> be
+        <code>{{Array.prototype.map}}.call(<var>filter</var>.services,
+        {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
+    1. If any of the {{BluetoothUUID/getService()|BluetoothUUID.getService()}}
+        calls threw an exception, throw that exception and abort these steps.
+    1. If any service in <var>services</var> is <a>blocklisted</a>, throw a
+        {{SecurityError}} and abort these steps.
+    1. Set <code><var>canonicalizedFilter</var>.services</code> to
+        <var>services</var>.
+1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/name}}</code> is
+    present, do the following sub-steps.
+    1. If the <a lt="utf-8 encode">UTF-8 encoding</a> of
+        <code><var>filter</var>.name</code> is more than 248 bytes long, throw a
+        {{TypeError}} and abort these steps.
+
+        <div class="note">
+          Note: 248 is the maximum number of UTF-8 code units in a <a>Bluetooth
+          Device Name</a>.
+        </div>
+    1. Set <code><var>canonicalizedFilter</var>.name</code> to
+        <code><var>filter</var>.name</code>.
+1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/namePrefix}}</code> is
+    present, do the following sub-steps.
+    1. If <code><var>filter</var>.namePrefix.length === 0</code> or if the <a
+        lt="utf-8 encode">UTF-8 encoding</a> of
+        <code><var>filter</var>.namePrefix</code> is more than 248 bytes long,
+        throw a {{TypeError}} and abort these steps.
+
+        <div class="note">
+          Note: 248 is the maximum number of UTF-8 code units in a <a>Bluetooth
+          Device Name</a>.
+        </div>
+    1. Set <code><var>canonicalizedFilter</var>.namePrefix</code> to
+        <code><var>filter</var>.namePrefix</code>.
+1. Set <code>|canonicalizedFilter|.manufacturerData</code> to `{}`.
+1. If <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}</code> is
+    present, do the following sub-steps for each |key| in
+    <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>. If
+    there are no such keys, throw a {{TypeError}} and abort these steps.
+    1. Let |manufacturerId| be <a
+        abstract-op>CanonicalNumericIndexString</a>(|key|).
+    1. If |manufacturerId| is `undefined` or `-0`, or <a
+        abstract-op>IsInteger</a>(|manufacturerId|) is `false`, or
+        |manufacturerId| is outside the range from 0–65535 inclusive, throw a
+        {{TypeError}} and abort these steps.
+    1. Let |dataFilter| be
+        <code>|filter|.manufacturerData[|manufacturerId|]</code>, <a>converted
+        to an IDL value</a> of type {{BluetoothDataFilterInit}}. If this
+        conversion throws an exception, propagate it and abort these steps.
+    1. Let |canonicalizedDataFilter| be the result of <a
+        for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
+        <a>converted to an ECMAScript value</a>. If this throws an exception,
+        propagate that exception and abort these steps.
+    1. Call <a abstract-op>CreateDataProperty</a>
+        (|canonicalizedFilter|.manufacturerData, |key|,
+        |canonicalizedDataFilter|).
+1. Set <code>|canonicalizedFilter|.serviceData</code> to `{}`.
+1. If <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}</code> is
+    present, do the following sub-steps for each |key| in
+    <code>|filter|.serviceData.{{Object/[[OwnPropertyKeys]]}}()</code>. If there
+    are no such keys, throw a {{TypeError}} and abort these steps.
+    1. Let |serviceName| be <a
+        abstract-op>CanonicalNumericIndexString</a>(|key|).
+    1. If |serviceName| is `undefined`, set |serviceName| to |key|.
+    1. Let |service| be
+        <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|serviceName|)</code>.
+    1. If the previous step threw an exception, throw that exception and abort
+        these steps.
+    1. If |service| is <a>blocklisted</a>, throw a {{SecurityError}} and abort
+        these steps.
+    1. Let |dataFilter| be <code>|filter|.serviceData[|service|]</code>,
+        <a>converted to an IDL value</a> of type {{BluetoothDataFilterInit}}.
+        If this conversion throws an exception, propagate it and abort these
+        steps.
+    1. Let |canonicalizedDataFilter| be the result of <a
+        for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
+        <a>converted to an ECMAScript value</a>. If this throws an exception,
+        propagate that exception and abort these steps.
+    1. Call <a
+        abstract-op>CreateDataProperty</a>(|canonicalizedFilter|.serviceData,
+        |service|, |canonicalizedDataFilter|).
+1. Return |canonicalizedFilter|.
+
+</div>
+
+<div algorithm="canonicalizing a data filter">
+The result of <dfn for="BluetoothDataFilterInit" export>canonicalizing</dfn> the
+{{BluetoothDataFilterInit}} |filter|, is the {{BluetoothDataFilterInit}}
+returned from the following steps:
+
+1. If <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code> is present,
+    let |dataPrefix| be <a>a copy of the bytes held</a> by
+    <code>|filter|.dataPrefix</code>. Otherwise, let |dataPrefix| be an empty
+    sequence of bytes.
+1. If <code>|filter|.{{BluetoothDataFilterInit/mask}}</code> is present, let
+    |mask| be <a>a copy of the bytes held</a> by <code>|filter|.mask</code>.
+    Otherwise, let |mask| be a sequence of `0xFF` bytes the same length as
+    |dataPrefix|.
+1. If |mask| is not the same length as |dataPrefix|, throw a {{TypeError}} and
+    abort these steps.
+1. Return `{dataPrefix: new Uint8Array(|dataPrefix|), mask: new
+    Uint8Array(|mask|)}`.
+
+</div>
+
+<div algorithm="scanning for Bluetooth devices">
+To <dfn>scan for devices</dfn> with an optional <var>set of <a>Service</a>
+UUIDs</var>, defaulting to the set of all UUIDs, the UA MUST perform the
+following steps:
+1. If the UA has scanned for devices recently with a set of UUIDs that was a
+    superset of the UUIDs for the current scan, then the UA MAY return the
+    result of that scan and abort these steps.
+
+    <div class="issue">TODO: Nail down the amount of time.</div>
+1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
+    equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
+    to the UA.
+1. If the UA supports the LE transport, perform the <a>General Discovery
+    Procedure</a>, except that the UA may include devices that have no
+    <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
+    device</a>s to <var>nearbyDevices</var>. The UA SHOULD enable the <a>Privacy
+    Feature</a>.
+
+    <div class="issue">
+      Both <a>passive scanning</a> and the <a>Privacy Feature</a> avoid leaking
+      the unique, immutable device ID. We ought to require UAs to use either
+      one, but none of the OS APIs appear to expose either. Bluetooth also makes
+      it hard to use <a>passive scanning</a> since it doesn't require
+      <a>Central</a> devices to support the <a>Observation Procedure</a>.
+    </div>
+1. If the UA supports the BR/EDR transport, perform the <a>Device Discovery
+    Procedure</a> and add the discovered <a>Bluetooth device</a>s to
+    <var>nearbyDevices</var>.
+
+    <div class="issue">
+      All forms of BR/EDR inquiry/discovery appear to leak the unique, immutable
+      device address.
+    </div>
+1. Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.
+1. For each <a>Bluetooth device</a> <var>device</var> in
+    <var>nearbyDevices</var>, do the following sub-steps:
+    1. If <var>device</var>'s <a>supported physical transports</a> include LE
+        and its <a>Bluetooth Device Name</a> is partial or absent, the UA SHOULD
+        perform the <a>Name Discovery Procedure</a> to acquire a complete name.
+    1. If <var>device</var>'s advertised <a>Service UUIDs</a> have a non-empty
+        intersection with the <var>set of <a>Service</a> UUIDs</var>, add
+        <var>device</var> to <var>result</var> and abort these sub-steps.
+
+        <div class="note">
+          Note: For BR/EDR devices, there is no way to distinguish GATT from
+          non-GATT services in the <a>Extended Inquiry Response</a>. If a site
+          filters to the UUID of a non-GATT service, the user may be able to
+          select a device for the result of <code>requestDevice</code> that this
+          API provides no way to interact with.
+        </div>
+    1. The UA MAY connect to <var>device</var> and <a>populate the Bluetooth
+        cache</a> with all Services whose UUIDs are in the <var>set of
+        <a>Service</a> UUIDs</var>. If <var>device</var>'s <a>supported physical
+        transports</a> include BR/EDR, then in addition to the standard GATT
+        procedures, the UA MAY use the Service Discovery Protocol (<a>Searching
+        for Services</a>) when populating the cache.
+
+        <div class="note" id="note-extra-discovery">
+          Note: Connecting to every nearby device to discover services costs
+          power and can slow down other use of the Bluetooth radio. UAs should
+          only discover extra services on a device if they have some reason to
+          expect that device to be interesting.
+
+          UAs should also help developers avoid relying on this extra discovery
+          behavior. For example, say a developer has previously connected to a
+          device, so the UA knows the device's full set of supported services.
+          If this developer then filters using a non-advertised UUID, the dialog
+          they see may include this device, even if the filter would likely
+          exclude the device on users' machines. The UA could provide a
+          developer option to warn when this happens or to include only
+          advertised services in matching filters.
+        </div>
+    1. If the <a>Bluetooth cache</a> contains known-present Services inside
+        <var>device</var> with UUIDs in the <var>set of <a>Service</a>
+        UUIDs</var>, the UA MAY add <var>device</var> to <var>result</var>.
+1. Return <var>result</var> from the scan.
+
+</div>
+
+<div class="issue">
+We need a way for a site to register to receive an event when an interesting
+device comes within range.
+</div>
+
+<div class="unstable">
+## Permission API Integration ## {#permission-api-integration}
+
+The [[permissions]] API provides a uniform way for websites to request
+permissions from users and query which permissions they have.
+
+<div class="example" id="example-permission-api-request"> Sites can use <code
+highlight="js">navigator.permissions.{{Permissions/request()|request}}({<a idl
+for="PermissionDescriptor">name</a>: "bluetooth", ...})</code> as an alternate
+spelling of <code
+highlight="js">navigator.bluetooth.{{Bluetooth/requestDevice()}}</code>.
+
+<pre highlight="js">
+  navigator.permissions.<a idl for="Permissions" lt="request()">request</a>({
+    name: "bluetooth",
+    filters: [{
+      services: ['heart_rate'],
+    }]
+  }).then(result => {
+    if (result.<a idl for="BluetoothPermissionResult">devices</a>.length >= 1) {
+      return result.devices[0];
+    } else {
+      throw new <a idl>DOMException</a>("Chooser cancelled", "NotFoundError");
+    }
+  }).then(device => {
+    sessionStorage.lastDevice = device.<a idl for="BluetoothDevice">id</a>;
+  });
+</pre>
+
+The {{BluetoothPermissionDescriptor/deviceId}} member is ignored in calls to
+{{Permissions/request()}}.
+</div>
+
+<div class="example" id="example-permission-api-query">
+Once a site has been granted access to a set of devices, it can use <code
+highlight="js">navigator.permissions.{{Permissions/query()|query}}({<a idl
+for="PermissionDescriptor">name</a>: "bluetooth", ...})</code> to retrieve those
+devices after a reload.
+
+<pre highlight="js">
+  navigator.permissions.<a idl for="Permissions" lt="query()">query</a>({
+    name: "bluetooth",
+    deviceId: sessionStorage.lastDevice,
+  }).then(result => {
+    if (result.<a idl for="BluetoothPermissionResult">devices</a>.length == 1) {
+      return result.devices[0];
+    } else {
+      throw new <a idl>DOMException</a>("Lost permission", "NotFoundError");
+    }
+  }).then(...);
+</pre>
+</div>
+
+The <dfn enum-value for="PermissionName">"bluetooth"</dfn> <a>powerful
+feature</a>'s permission-related algorithms and types are defined as follows:
+
+<dl>
+  <dt><a>permission descriptor type</a></dt>
+  <dd>
+    <xmp class="idl">
+      dictionary BluetoothPermissionDescriptor : PermissionDescriptor {
+        DOMString deviceId;
+        // These match RequestDeviceOptions.
+        sequence<BluetoothLEScanFilterInit> filters;
+        sequence<BluetoothServiceUUID> optionalServices = [];
+        boolean acceptAllDevices = false;
       };
+    </xmp>
+  </dd>
 
-      dictionary ValueEventInit : EventInit {
-        any value = null;
+  <dt><a>extra permission data type</a></dt>
+  <dd>
+    {{BluetoothPermissionData}}, defined as:
+    
+    <xmp class="idl">
+      dictionary AllowedBluetoothDevice {
+        required DOMString deviceId;
+        required boolean mayUseGATT;
+        // An allowedServices of "all" means all services are allowed.
+        required (DOMString or sequence<UUID>) allowedServices;
       };
-    </pre>
+      dictionary BluetoothPermissionData {
+        required sequence<AllowedBluetoothDevice> allowedDevices;
+      };
+    </xmp>
 
-    <p>
-      {{ValueEvent}} instances are constructed
-      as specified in [[DOM#constructing-events]].
-    </p>
+    {{AllowedBluetoothDevice}} instances have an <a>internal slot</a> <dfn
+    attribute for="AllowedBluetoothDevice">\[[device]]</dfn> that holds a
+    <a>Bluetooth device</a>.
+  </dd>
 
-    <p>
-      The <dfn attribute for="ValueEvent">value</dfn> attribute
-      must return the value it was initialized to.
-    </p>
+  <dt><a>extra permission data constraints</a></dt>
+  <dd>
+    Distinct elements of {{BluetoothPermissionData/allowedDevices}} must have
+    different {{AllowedBluetoothDevice/[[device]]}}s and different
+    {{AllowedBluetoothDevice/deviceId}}s.
 
-    <p class="issue" id="ValueEvent-too-generic">
-      Such a generic event type belongs in [[HTML]] or [[DOM]], not here.
-    </p>
-  </section>
-</section>
+    If {{AllowedBluetoothDevice/mayUseGATT}} is `false`,
+    {{AllowedBluetoothDevice/allowedServices}} must be `[]`.
+
+    <div class="note" id="note-device-id-tracking">
+      Note: A {{AllowedBluetoothDevice/deviceId}} allows a site to track that a
+      {{BluetoothDevice}} instance seen at one time represents the same device
+      as another {{BluetoothDevice}} instance seen at another time, possibly in
+      a different <a>realm</a>. UAs should consider whether their user intends
+      that tracking to happen or not-happen when returning {{"bluetooth"}}'s
+      <a>extra permission data</a>.
+
+      For example, users generally don't intend two different origins to know
+      that they're interacting with the same device, and they generally don't
+      intend unique identifiers to persist after they've cleared an origin's
+      cookies.
+    </div>
+  </dd>
+
+  <dt><a>permission result type</a></dt>
+  <dd>
+    <xmp class="idl">
+      [Exposed=Window]
+      interface BluetoothPermissionResult : PermissionStatus {
+        attribute FrozenArray<BluetoothDevice> devices;
+      };
+    </xmp>
+  </dd>
+
+  <dt><a>permission request algorithm</a></dt>
+  <dd algorithm="permission request">
+    To <dfn export>request the "bluetooth" permission</dfn> with
+    a {{BluetoothPermissionDescriptor}} <var>options</var>
+    and a {{BluetoothPermissionResult}} <var>status</var>,
+    the UA MUST run the following steps:
+
+    1. If <code>|options|.{{BluetoothPermissionDescriptor/filters}}</code> is
+        present and
+        <code>|options|.{{BluetoothPermissionDescriptor/acceptAllDevices}}</code>
+        is `true`, or if
+        <code>|options|.{{BluetoothPermissionDescriptor/filters}}</code> is not
+        present and
+        <code>|options|.{{BluetoothPermissionDescriptor/acceptAllDevices}}</code>
+        is `false`, throw a {{TypeError}}.
+
+        <div class="note">
+          Note: This enforces that exactly one of
+          {{BluetoothPermissionDescriptor/filters}} or
+          <code>{{BluetoothPermissionDescriptor/acceptAllDevices}}:true</code>
+          is present.
+        </div>
+    1. <a>Request Bluetooth devices</a>, passing
+        <code>|options|.{{BluetoothPermissionDescriptor/filters}}</code> if
+        <code>|options|.{{BluetoothPermissionDescriptor/acceptAllDevices}}</code>
+        is `false` or `null` otherwise, and passing
+        <code>|options|.{{BluetoothPermissionDescriptor/optionalServices}}</code>,
+        propagating any exception, and let |devices| be the result.
+    1. Set <code>|status|.devices</code> to a new {{FrozenArray}} whose contents
+        are the elements of |devices|.
+  </dd>
+
+  <dt><a>permission query algorithm</a></dt>
+  <dd algorithm="permission query">
+    To <dfn export>query the "bluetooth" permission</dfn> with a
+    {{BluetoothPermissionDescriptor}} <var>desc</var> and a
+    {{BluetoothPermissionResult}} <var>status</var>, the UA must:
+    
+    1. Let <var>global</var> be the <a>relevant global object</a> for
+        <var>status</var>.
+    1. Set <code><var>status</var>.{{PermissionStatus/state}}</code> to |desc|'s
+        <a>permission state</a>.
+    1. If <code>|status|.{{PermissionStatus/state}}</code> is {{"denied"}}, set
+        <code>|status|.devices</code> to an empty {{FrozenArray}} and abort
+        these steps.
+    1. Let <var>matchingDevices</var> be a new {{Array}}.
+    1. Let |data|, a {{BluetoothPermissionData}}, be {{"bluetooth"}}'s <a>extra
+        permission data</a> for the <a>current settings object</a>.
+    1. For each |allowedDevice| in <code>|data|.allowedDevices</code>, run the
+        following sub-steps:
+        1. If <code><var>desc</var>.deviceId</code> is set and
+            <code><var>allowedDevice</var>.deviceId !=
+            <var>desc</var>.deviceId</code>, continue to the next
+            <var>allowedDevice</var>.
+        1. If <code><var>desc</var>.filters</code> is set, do the following sub-steps:
+            1. Replace each filter in <code>|desc|.filters</code> with the
+                result of <a for="BluetoothLEScanFilterInit">canonicalizing</a>
+                it. If any of these canonicalizations throws an error, return
+                that error and abort these steps.
+            1. If <code><var>allowedDevice</var>.{{[[device]]}}</code> does not
+                <a>match a filter</a> in <code>|desc|.filters</code>, continue
+                to the next <var>allowedDevice</var>.
+        1. <a>Get the `BluetoothDevice` representing</a>
+            <code><var>allowedDevice</var>.{{[[device]]}}</code> within
+            <code><var>global</var>.navigator.bluetooth</code>, and add the
+            result to <var>matchingDevices</var>.
+
+        <div class="note">
+          Note: The <code>|desc|.optionalServices</code> field does not affect
+          the result.
+        </div>
+    1. Set <code><var>status</var>.devices</code> to a new {{FrozenArray}} whose
+        contents are <var>matchingDevices</var>.
+  </dd>
+
+  <dt><a>permission revocation algorithm</a></dt>
+  <dd algorithm="permission revocation">
+    To <dfn>revoke Bluetooth access</dfn> to devices the user no longer intends to expose,
+    the UA MUST run the following steps:
+
+    1. Let |data|, a {{BluetoothPermissionData}}, be {{"bluetooth"}}'s <a>extra
+        permission data</a> for the <a>current settings object</a>.
+    1. For each {{BluetoothDevice}} instance |deviceObj| in the <a>current
+        realm</a>, run the following sub-steps:
+        1. If there is an {{AllowedBluetoothDevice}} |allowedDevice| in
+            <code>|data|.{{allowedDevices}}</code> such that:
+
+            * <code>|allowedDevice|.{{[[device]]}}</code> is the <a>same
+                device</a> as
+                <code>|deviceObj|.{{[[representedDevice]]}}</code>, and
+            * <code>|allowedDevice|.{{AllowedBluetoothDevice/deviceId}} ===
+                |deviceObj|.{{BluetoothDevice/id}}</code>,
+
+            then update <code>|deviceObj|.{{[[allowedServices]]}}</code> to be
+            <code>|allowedDevice|.{{allowedServices}}</code>, and continue to
+            the next |deviceObj|.
+        1. Otherwise, detach |deviceObj| from its device by running the
+            remaining steps.
+        1. Call <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
+
+            <div class="note">
+              Note: This fires a {{gattserverdisconnected}} event at
+              |deviceObj|.
+            </div>
+        1. Set <code><var>deviceObj</var>.{{[[representedDevice]]}}</code> to
+            `null`.
+  </dd>
+</dl>
+</div>
+
+## Overall Bluetooth availability ## {#availability}
+
+The UA may be running on a computer that has no Bluetooth radio.
+{{requestDevice()}} handles this by failing to discover any devices, which
+results in a {{NotFoundError}}, but websites may be able to handle it more
+gracefully.
+
+<div class="example" id="example-getavailability">
+To show Bluetooth UI only to users who have a Bluetooth adapter:
+
+<pre highlight="js">
+const bluetoothUI = document.querySelector('#bluetoothUI');
+navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
+  bluetoothUI.hidden = !isAvailable;
+});
+navigator.bluetooth.addEventListener('<a idl>availabilitychanged</a>', e => {
+  bluetoothUI.hidden = !e.value;
+});
+</pre>
+</div>
+
+<div algorithm>
+The <code><dfn method for="Bluetooth">getAvailability()</dfn></code> method,
+when invoked, MUST return <a>a new promise</a> |promise| and run the following
+steps <a>in parallel</a>:
+
+1. <p id="override-availability">If the user has configured the UA to return a
+    particular answer from this function for the current origin, <a>queue a
+    task</a> to <a>resolve</a> |promise| with the configured answer, and abort
+    these steps.</p>
+
+    <div class="note">
+      Note: If the Web Bluetooth permission has been blocked by the user, the UA
+      may <a>resolve</a> |promise| with  `false`.
+    </div>
+1. If the UA is running on a system that has a Bluetooth radio <a>queue a
+    task</a> to <a>resolve</a> |promise| with `true` regardless of the powered
+    state of the Bluetooth radio.
+1. Otherwise, <a>queue a task</a> to <a>resolve</a> |promise| with `false`.
+
+    <div class="note">
+      Note: The promise is resolved <a>in parallel</a> to let the UA call out to
+      other systems to determine whether Bluetooth is available.
+    </div>
+
+</div>
+
+<div class="example" id="example-getAvailability-PermissionStatus-onchange">
+If the user has blocked the permission and the UA resolves the <code><a
+idl>getAvailability</a></code> promise with false, the following can be used to
+detect when Bluetooth is available again to show Bluetooth UI:
+
+<pre highlight="js">
+function checkAvailability() {
+  const bluetoothUI = document.querySelector('#bluetoothUI');
+  navigator.bluetooth.<a idl>getAvailability()</a>.then(isAvailable => {
+    bluetoothUI.hidden = !isAvailable;
+  });
+}
+
+navigator.permission.query({name: "bluetooth"}).then(status => {
+  if (status.state !== 'denied') checkAvailability();
+
+  // Bluetooth is blocked, listen for change in PermissionStatus.
+  status.onchange = () => {
+    if (this.state !== 'denied') checkAvailability();
+  };
+});
+</pre>
+
+</div>
+
+<div algorithm="availabilitychanged" id="availability-changed-algorithm"
+    class="unstable">
+If the UA becomes able or unable to use Bluetooth, for example because a radio
+was physically attached or detached, or the user has changed their <a
+href="#override-availability">configuration</a> for the answer returned from
+{{getAvailability()}}, the UA must <a>queue a task</a> on each <a>global
+object</a> |global|'s <a>responsible event loop</a> to run the following steps:
+
+1. Let |oldAvailability| be the value {{getAvailability()}} would have returned
+    before the change.
+1. Let |newAvailability| be the value {{getAvailability()}} would return after
+    the change.
+1. If |oldAvailability| is not the same as |newAvailability|, <a>fire an
+    event</a> named {{availabilitychanged}} using the {{ValueEvent}} interface
+    at <code>|global|.navigator.bluetooth</code> with its {{ValueEvent/value}}
+    attribute initialized to |newAvailability|.
+
+</div>
+
+<pre class="idl">
+  [
+    Exposed=Window,
+    SecureContext
+  ]
+  interface ValueEvent : Event {
+    constructor(DOMString type, optional ValueEventInit initDict = {});
+    readonly attribute any value;
+  };
+
+  dictionary ValueEventInit : EventInit {
+    any value = null;
+  };
+</pre>
+
+{{ValueEvent}} instances are constructed as specified in
+[[DOM#constructing-events]].
+
+The <dfn attribute for="ValueEvent">value</dfn> attribute must return the value
+it was initialized to.
+
+<div class="issue" id="ValueEvent-too-generic">
+  Such a generic event type belongs in [[HTML]] or [[DOM]], not here.
+</div>
 
 <section>
   <h2 id="device-representation">Device Representation</h2>
