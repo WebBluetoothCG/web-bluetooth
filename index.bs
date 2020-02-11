@@ -1215,14 +1215,14 @@ all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
     1. Remove from <var>optionalServiceUUIDs</var> any UUIDs that are
         <a>blocklisted</a>.
 1. Let |descriptor| be
-    <xmp highlight="js">
+    <pre highlight="js">
     {
       name: "bluetooth",
-      filters: |uuidFilters|,
-      optionalServices: |optionalServiceUUIDs|,
-      acceptAllDevices: |filters| !== null,
+      filters: <var>uuidFilters</var>
+      optionalServices: <var>optionalServiceUUIDs</var>,
+      acceptAllDevices: <var>filters</var> !== null,
     }
-    </xmp>
+    </pre>
 1. Let |state| be |descriptor|'s <a>permission state</a>.
 
     <div class="note">
@@ -1253,18 +1253,19 @@ all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
       to indicate interest and then perform a privacy-disabled scan to retrieve
       the name.
     </div>
-1. If |device| is {{"denied"}}, return `[]` and abort these steps.
-1. <div class="note">
-    Note: Choosing a |device| probably indicates that the user
-    intends that device to appear in the
-    {{BluetoothPermissionData/allowedDevices}} list of {{"bluetooth"}}'s
-    <a>extra permission data</a> for at least the <a>current settings
-    object</a>, for its {{AllowedBluetoothDevice/mayUseGATT}} field to be
-    `true`, and for all the services in the union of
-    <var>requiredServiceUUIDs</var> and <var>optionalServiceUUIDs</var> to
-    appear in its {{AllowedBluetoothDevice/allowedServices}} list, in addition
-    to any services that were already there.
+
+    <div class="note">
+      Note: Choosing a |device| probably indicates that the user
+      intends that device to appear in the
+      {{BluetoothPermissionData/allowedDevices}} list of {{"bluetooth"}}'s
+      <a>extra permission data</a> for at least the <a>current settings
+      object</a>, for its {{AllowedBluetoothDevice/mayUseGATT}} field to be
+      `true`, and for all the services in the union of
+      <var>requiredServiceUUIDs</var> and <var>optionalServiceUUIDs</var> to
+      appear in its {{AllowedBluetoothDevice/allowedServices}} list, in addition
+      to any services that were already there.
     </div>
+1. If |device| is {{"denied"}}, return `[]` and abort these steps.
 1. The UA MAY <a>populate the Bluetooth cache</a> with all Services inside
     <var>device</var>. Ignore any errors from this step.
 1. <a>Get the <code>BluetoothDevice</code> representing</a> <var>device</var>
