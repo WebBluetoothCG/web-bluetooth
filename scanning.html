@@ -1167,6 +1167,18 @@ Possible extra rowspan handling
 		margin-left: auto;
 		margin-right: auto;
 	}
+	.overlarge {
+		/* Magic to create good table positioning:
+		   "content column" is 50ems wide at max; less on smaller screens.
+		   Extra space (after ToC + content) is empty on the right.
+
+		   1. When table < content column, centers table in column.
+		   2. When content < table < available, left-aligns.
+		   3. When table > available, fills available + scroll bar.
+		*/ 
+		display: grid;
+		grid-template-columns: minmax(0, 50em);
+	}
 	.overlarge > table {
 		/* limit preferred width of table */
 		max-width: 50em;
@@ -1176,7 +1188,6 @@ Possible extra rowspan handling
 
 	@media (min-width: 55em) {
 		.overlarge {
-			margin-left: calc(13px + 26.5rem - 50vw);
 			margin-right: calc(13px + 26.5rem - 50vw);
 			max-width: none;
 		}
@@ -1184,14 +1195,12 @@ Possible extra rowspan handling
 	@media screen and (min-width: 78em) {
 		body:not(.toc-inline) .overlarge {
 			/* 30.5em body padding 50em content area */
-			margin-left: calc(40em - 50vw) !important;
 			margin-right: calc(40em - 50vw) !important;
 		}
 	}
 	@media screen and (min-width: 90em) {
 		body:not(.toc-inline) .overlarge {
 			/* 4em html margin 30.5em body padding 50em content area */
-			margin-left: 0 !important;
 			margin-right: calc(84.5em - 100vw) !important;
 		}
 	}
@@ -1212,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version f5a6d58a6b9207b620f985d7239601eb3a483162" name="generator">
+  <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/scanning.html" rel="canonical">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
@@ -1476,7 +1485,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth Scanning</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-11-04">4 November 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-02-11">11 February 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1495,7 +1504,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2019 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2020 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -1658,9 +1667,9 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan②">requestLEScan()</a></code> summary</div>
      <p> <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan③">requestLEScan(options)</a></code></code> starts scanning for BLE advertisements,
       asking the user for permission if they haven’t yet granted it. </p>
-     <p> Because this could show a prompt,
-      it requires a <a data-link-type="dfn" href="https://w3c.github.io/webappsec-secure-contexts/#secure-contexts" id="ref-for-secure-contexts">secure context</a>,
-      and UAs are likely to require a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation" id="ref-for-triggered-by-user-activation">user gesture</a>. </p>
+     <p> Because this could show a prompt, it requires a <a data-link-type="dfn" href="https://w3c.github.io/webappsec-secure-contexts/#secure-contexts" id="ref-for-secure-contexts">secure context</a>.
+      Additionally, UAs are likely to require a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+      user activation</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a> when <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan④">requestLEScan</a></code> is called. </p>
      <p> Advertising events that <a data-link-type="dfn" href="#bluetoothlescanfilter-match" id="ref-for-bluetoothlescanfilter-match">match</a> a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanfilter" id="ref-for-bluetoothlescanfilter">BluetoothLEScanFilter</a></code> in an active <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan①">BluetoothLEScan</a></code> cause <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived" id="ref-for-eventdef-bluetoothdevice-advertisementreceived①">advertisementreceived</a></code> events to be dispatched
       to the sending <code class="idl"><a data-link-type="idl" href="index.html#bluetoothdevice" id="ref-for-bluetoothdevice">BluetoothDevice</a></code>.
       A filter matches if the advertisement includes data equal to each <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-present" id="ref-for-dfn-present">present</a> member.
@@ -1698,7 +1707,8 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   acceptAllAdvertisements<c- o>:</c-> <var>options</var><c- p>.</c->acceptAllAdvertisements<c- p>,</c->
 <c- p>}</c->
 </pre>
-       <p class="note" role="note"><span>Note:</span> This may require that this algorithm was <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation" id="ref-for-triggered-by-user-activation①">triggered by user activation</a>.</p>
+       <p class="note" role="note"><span>Note:</span> This may require that this algorithm has a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+        activation</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a> when triggered.</p>
       <li> If the result is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied" id="ref-for-dom-permissionstate-denied">"denied"</a></code>,
         reject <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code> and abort these steps. 
       <li>
@@ -1899,7 +1909,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
       <dd class="algorithm" data-algorithm="permission-request">
        <p> Given a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothlescanpermissiondescriptor" id="ref-for-dictdef-bluetoothlescanpermissiondescriptor①">BluetoothLEScanPermissionDescriptor</a></code> <var>descriptor</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanpermissionresult" id="ref-for-bluetoothlescanpermissionresult①">BluetoothLEScanPermissionResult</a></code> <var>result</var>: </p>
        <ol class="algorithm">
-        <li> Let <var>promise</var> be the result of <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan④">requestLEScan</a></code>(<var>descriptor</var>)</code>. 
+        <li> Let <var>promise</var> be the result of <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan⑤">requestLEScan</a></code>(<var>descriptor</var>)</code>. 
         <li>Wait for <var>promise</var> to settle.
         <li> If <var>promise</var> rejected, throw the reason it rejected with,
             and abort these steps. 
@@ -2021,7 +2031,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
     <p> When an algorithm in this specification uses a name defined in this or another specification,
     the name MUST resolve to its initial value,
     ignoring any changes that have been made to the name in the current execution environment.
-    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan⑤">requestLEScan()</a></code> algorithm says to call <code><var>options</var>.filters.map(filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter②">BluetoothLEScanFilter</a></code>(filter))</code>,
+    For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan⑥">requestLEScan()</a></code> algorithm says to call <code><var>options</var>.filters.map(filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter②">BluetoothLEScanFilter</a></code>(filter))</code>,
     this MUST apply the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map" id="ref-for-sec-array.prototype.map">Array.prototype.map</a></code> algorithm defined in <a data-link-type="biblio" href="#biblio-ecmascript">[ECMAScript]</a> with <code><var>options</var>.services</code> as its <code>this</code> parameter and
     the algorithm defined at <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter③">BluetoothLEScanFilter()</a></code> as its <code>callbackfn</code> parameter,
     regardless of any modifications that have been made to <code>window</code>, <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>, <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothLEScanFilter</code>, or other objects. </p>
@@ -2384,6 +2394,12 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
     <li><a href="#ref-for-queue-a-task">5.1. Responding to advertising events</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-relevant-global">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-relevant-global">4. Scanning for BLE advertisements</a> <a href="#ref-for-concept-relevant-global①">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
    <ul>
@@ -2394,12 +2410,6 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-responsible-event-loop">5.1. Responding to advertising events</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="term-for-triggered-by-user-activation">
-   <a href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-triggered-by-user-activation">4. Scanning for BLE advertisements</a> <a href="#ref-for-triggered-by-user-activation①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-permissionstate-denied">
@@ -2746,9 +2756,9 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
     <ul>
      <li><span class="dfn-paneled" id="term-for-in-parallel" style="color:initial">in parallel</span>
      <li><span class="dfn-paneled" id="term-for-queue-a-task" style="color:initial">queue a task</span>
+     <li><span class="dfn-paneled" id="term-for-concept-relevant-global" style="color:initial">relevant global object</span>
      <li><span class="dfn-paneled" id="term-for-relevant-settings-object" style="color:initial">relevant settings object</span>
      <li><span class="dfn-paneled" id="term-for-responsible-event-loop" style="color:initial">responsible event loop</span>
-     <li><span class="dfn-paneled" id="term-for-triggered-by-user-activation" style="color:initial">triggered by user activation</span>
     </ul>
    <li>
     <a data-link-type="biblio">[permissions]</a> defines the following terms:
@@ -2943,9 +2953,9 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
    <b><a href="#dom-bluetooth-requestlescan">#dom-bluetooth-requestlescan</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetooth-requestlescan">1.1. Examples</a>
-    <li><a href="#ref-for-dom-bluetooth-requestlescan①">4. Scanning for BLE advertisements</a> <a href="#ref-for-dom-bluetooth-requestlescan②">(2)</a> <a href="#ref-for-dom-bluetooth-requestlescan③">(3)</a>
-    <li><a href="#ref-for-dom-bluetooth-requestlescan④">4.2. Permission to scan</a>
-    <li><a href="#ref-for-dom-bluetooth-requestlescan⑤">7. Terminology and conventions</a>
+    <li><a href="#ref-for-dom-bluetooth-requestlescan①">4. Scanning for BLE advertisements</a> <a href="#ref-for-dom-bluetooth-requestlescan②">(2)</a> <a href="#ref-for-dom-bluetooth-requestlescan③">(3)</a> <a href="#ref-for-dom-bluetooth-requestlescan④">(4)</a>
+    <li><a href="#ref-for-dom-bluetooth-requestlescan⑤">4.2. Permission to scan</a>
+    <li><a href="#ref-for-dom-bluetooth-requestlescan⑥">7. Terminology and conventions</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothdatafilter">

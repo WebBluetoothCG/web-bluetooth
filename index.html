@@ -1167,6 +1167,18 @@ Possible extra rowspan handling
 		margin-left: auto;
 		margin-right: auto;
 	}
+	.overlarge {
+		/* Magic to create good table positioning:
+		   "content column" is 50ems wide at max; less on smaller screens.
+		   Extra space (after ToC + content) is empty on the right.
+
+		   1. When table < content column, centers table in column.
+		   2. When content < table < available, left-aligns.
+		   3. When table > available, fills available + scroll bar.
+		*/ 
+		display: grid;
+		grid-template-columns: minmax(0, 50em);
+	}
 	.overlarge > table {
 		/* limit preferred width of table */
 		max-width: 50em;
@@ -1176,7 +1188,6 @@ Possible extra rowspan handling
 
 	@media (min-width: 55em) {
 		.overlarge {
-			margin-left: calc(13px + 26.5rem - 50vw);
 			margin-right: calc(13px + 26.5rem - 50vw);
 			max-width: none;
 		}
@@ -1184,14 +1195,12 @@ Possible extra rowspan handling
 	@media screen and (min-width: 78em) {
 		body:not(.toc-inline) .overlarge {
 			/* 30.5em body padding 50em content area */
-			margin-left: calc(40em - 50vw) !important;
 			margin-right: calc(40em - 50vw) !important;
 		}
 	}
 	@media screen and (min-width: 90em) {
 		body:not(.toc-inline) .overlarge {
 			/* 4em html margin 30.5em body padding 50em content area */
-			margin-left: 0 !important;
 			margin-right: calc(84.5em - 100vw) !important;
 		}
 	}
@@ -1212,7 +1221,7 @@ Possible extra rowspan handling
 		}
 	}
 </style>
-  <meta content="Bikeshed version f5a6d58a6b9207b620f985d7239601eb3a483162" name="generator">
+  <meta content="Bikeshed version b43aa594f5014ff14748da1aace9afaa73d2b3e6" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
@@ -1504,7 +1513,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"></p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2019-11-04">4 November 2019</time></span></h2>
+   <h2 class="no-num no-toc no-ref heading settled" id="subtitle"><span class="content">Draft Community Group Report, <time class="dt-updated" datetime="2020-02-11">11 February 2020</time></span></h2>
    <div data-fill-with="spec-metadata">
     <dl>
      <dt>This version:
@@ -1525,7 +1534,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </dl>
    </div>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2019 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2020 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -1958,7 +1967,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
 
 <c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-requestdeviceoptions"><code><c- g>RequestDeviceOptions</c-></code></dfn> {
   <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit"><c- n>BluetoothLEScanFilterInit</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters"><c- g>filters</c-></a>;
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid①"><c- n>BluetoothServiceUUID</c-></a>> <a class="idl-code" data-default="None" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices"><c- g>optionalServices</c-></a> = [];
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid①"><c- n>BluetoothServiceUUID</c-></a>> <a class="idl-code" data-default="[]" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices"><c- g>optionalServices</c-></a> = [];
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices"><c- g>acceptAllDevices</c-></a> = <c- b>false</c->;
 };
 
@@ -2429,8 +2438,10 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      <p class="note" role="note"> Calls to this algorithm will eventually be able to request multiple devices,
       but for now it only ever returns a single one. </p>
      <ol>
-      <li id="requestDevice-user-gesture"><a class="self-link" href="#requestDevice-user-gesture"></a> If the algorithm is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation" id="ref-for-triggered-by-user-activation">triggered by user activation</a>,
-        throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror" id="ref-for-securityerror">SecurityError</a></code> and abort these steps. 
+      <li id="requestDevice-user-gesture"><a class="self-link" href="#requestDevice-user-gesture"></a> Check that the algorithm is triggered while its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global
+        object</a> has a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+        activation</a>, otherwise throw a <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#securityerror" id="ref-for-securityerror">SecurityError</a></code> and abort these
+        steps. 
       <li>
         In order to convert the arguments from service names and aliases to just <a data-link-type="dfn" href="#uuid" id="ref-for-uuid">UUID</a>s,
         do the following sub-steps: 
@@ -2729,7 +2740,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②"><c- b>DOMString</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="DOMString " id="dom-bluetoothpermissiondescriptor-deviceid"><code><c- g>deviceId</c-></code></dfn>;
   // These match RequestDeviceOptions.
   <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit④"><c- n>BluetoothLEScanFilterInit</c-></a>> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="sequence<BluetoothLEScanFilterInit> " id="dom-bluetoothpermissiondescriptor-filters"><code><c- g>filters</c-></code></dfn>;
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid③"><c- n>BluetoothServiceUUID</c-></a>> <dfn class="dfn-paneled idl-code" data-default="None" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices"><code><c- g>optionalServices</c-></code></dfn> = [];
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid③"><c- n>BluetoothServiceUUID</c-></a>> <dfn class="dfn-paneled idl-code" data-default="[]" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="sequence<BluetoothServiceUUID> " id="dom-bluetoothpermissiondescriptor-optionalservices"><code><c- g>optionalServices</c-></code></dfn> = [];
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean②"><c- b>boolean</c-></a> <dfn class="dfn-paneled idl-code" data-default="false" data-dfn-for="BluetoothPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="boolean " id="dom-bluetoothpermissiondescriptor-acceptalldevices"><code><c- g>acceptAllDevices</c-></code></dfn> = <c- b>false</c->;
 };
 </pre>
@@ -2799,7 +2810,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
         To <dfn data-dfn-type="dfn" data-export id="query-the-bluetooth-permission">query the "bluetooth" permission<a class="self-link" href="#query-the-bluetooth-permission"></a></dfn> with
         a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondescriptor" id="ref-for-dictdef-bluetoothpermissiondescriptor①">BluetoothPermissionDescriptor</a></code> <var>desc</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothpermissionresult" id="ref-for-bluetoothpermissionresult①">BluetoothPermissionResult</a></code> <var>status</var>, the UA must: 
        <ol>
-        <li> Let <var>global</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a> for <var>status</var>. 
+        <li> Let <var>global</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a> for <var>status</var>. 
         <li> Set <code><var>status</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state">state</a></code></code> to <var>desc</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#permission-state" id="ref-for-permission-state①">permission state</a>. 
         <li> If <code><var>status</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state①">state</a></code></code> is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied" id="ref-for-dom-permissionstate-denied③">"denied"</a></code>,
             set <code><var>status</var>.devices</code> to an empty <code class="idl"><a data-link-type="idl" href="https://heycam.github.io/webidl/#idl-frozen-array" id="ref-for-idl-frozen-array①">FrozenArray</a></code> and abort these steps. 
@@ -2943,7 +2954,7 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
 };
 </pre>
      <p> <code class="idl"><a data-link-type="idl" href="#valueevent" id="ref-for-valueevent①">ValueEvent</a></code> instances are constructed
-      as specified in <a href="https://dom.spec.whatwg.org/#constructing-events">DOM Standard §constructing-events</a>. </p>
+      as specified in <a href="https://dom.spec.whatwg.org/#constructing-events">DOM §2.5 Constructing events</a>. </p>
      <p> The <dfn class="dfn-paneled idl-code" data-dfn-for="ValueEvent" data-dfn-type="attribute" data-export id="dom-valueevent-value"><code>value</code></dfn> attribute
       must return the value it was initialized to. </p>
      <p class="issue" id="ValueEvent-too-generic"><a class="self-link" href="#ValueEvent-too-generic"></a> Such a generic event type belongs in <a data-link-type="biblio" href="#biblio-html">[HTML]</a> or <a data-link-type="biblio" href="#biblio-dom">[DOM]</a>, not here. </p>
@@ -4554,7 +4565,7 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
         <li> Let <var>changedDevices</var> be the set of <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device①⑥">Bluetooth device</a>s that
             contain any <a data-link-type="dfn" href="#service" id="ref-for-service①⑦">Service</a> in <var>removedAttributes</var>, <var>addedAttributes</var>, and <var>changedServices</var>. 
         <li>
-          For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice④①">BluetoothDevice</a></code> <var>deviceObj</var> that is connected to a device in <var>changedDevices</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑦">queue a task</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop④">responsible event loop</a> to do the following steps: 
+          For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice④①">BluetoothDevice</a></code> <var>deviceObj</var> that is connected to a device in <var>changedDevices</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑦">queue a task</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global②">relevant global object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop④">responsible event loop</a> to do the following steps: 
          <ol>
           <li>
             For each <a data-link-type="dfn" href="#service" id="ref-for-service①⑧">Service</a> <var>service</var> in <var>removedAttributes</var>: 
@@ -6072,8 +6083,9 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
   <aside class="dfn-panel" data-for="term-for-concept-relevant-global">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-relevant-global">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-concept-relevant-global①">5.6.5. Responding to Service Changes</a>
+    <li><a href="#ref-for-concept-relevant-global">3. Device Discovery</a>
+    <li><a href="#ref-for-concept-relevant-global①">3.1. Permission API Integration</a>
+    <li><a href="#ref-for-concept-relevant-global②">5.6.5. Responding to Service Changes</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
@@ -6093,12 +6105,6 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
     <li><a href="#ref-for-responsible-event-loop①">4.2.1. Responding to Advertising Events</a>
     <li><a href="#ref-for-responsible-event-loop②">5.6.3. Responding to Disconnection</a>
     <li><a href="#ref-for-responsible-event-loop③">5.6.5. Responding to Service Changes</a> <a href="#ref-for-responsible-event-loop④">(2)</a>
-   </ul>
-  </aside>
-  <aside class="dfn-panel" data-for="term-for-triggered-by-user-activation">
-   <a href="https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation">https://html.spec.whatwg.org/multipage/interaction.html#triggered-by-user-activation</a><b>Referenced in:</b>
-   <ul>
-    <li><a href="#ref-for-triggered-by-user-activation">3. Device Discovery</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dom-permissionstate-denied">
@@ -6594,7 +6600,6 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
      <li><span class="dfn-paneled" id="term-for-concept-relevant-global" style="color:initial">relevant global object</span>
      <li><span class="dfn-paneled" id="term-for-relevant-settings-object" style="color:initial">relevant settings object</span>
      <li><span class="dfn-paneled" id="term-for-responsible-event-loop" style="color:initial">responsible event loop</span>
-     <li><span class="dfn-paneled" id="term-for-triggered-by-user-activation" style="color:initial">triggered by user activation</span>
     </ul>
    <li>
     <a data-link-type="biblio">[permissions]</a> defines the following terms:
@@ -6726,7 +6731,7 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
 
 <c- b>dictionary</c-> <a href="#dictdef-requestdeviceoptions"><code><c- g>RequestDeviceOptions</c-></code></a> {
   <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit⑤"><c- n>BluetoothLEScanFilterInit</c-></a>> <a class="idl-code" data-link-type="dict-member" data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters⑦"><c- g>filters</c-></a>;
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid①①"><c- n>BluetoothServiceUUID</c-></a>> <a class="idl-code" data-default="None" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices④"><c- g>optionalServices</c-></a> = [];
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid①①"><c- n>BluetoothServiceUUID</c-></a>> <a class="idl-code" data-default="[]" data-link-type="dict-member" data-type="sequence<BluetoothServiceUUID> " href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices④"><c- g>optionalServices</c-></a> = [];
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean①⑦"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean " href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices⑨"><c- g>acceptAllDevices</c-></a> = <c- b>false</c->;
 };
 
@@ -6746,7 +6751,7 @@ navigator<c- p>.</c->permission<c- p>.</c->query<c- p>({</c->name<c- o>:</c-> <c
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-DOMString" id="ref-for-idl-DOMString②①"><c- b>DOMString</c-></a> <a data-type="DOMString " href="#dom-bluetoothpermissiondescriptor-deviceid"><code><c- g>deviceId</c-></code></a>;
   // These match RequestDeviceOptions.
   <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit④①"><c- n>BluetoothLEScanFilterInit</c-></a>> <a data-type="sequence<BluetoothLEScanFilterInit> " href="#dom-bluetoothpermissiondescriptor-filters"><code><c- g>filters</c-></code></a>;
-  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid③①"><c- n>BluetoothServiceUUID</c-></a>> <a data-default="None" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothpermissiondescriptor-optionalservices"><code><c- g>optionalServices</c-></code></a> = [];
+  <c- b>sequence</c->&lt;<a class="n" data-link-type="idl-name" href="#typedefdef-bluetoothserviceuuid" id="ref-for-typedefdef-bluetoothserviceuuid③①"><c- n>BluetoothServiceUUID</c-></a>> <a data-default="[]" data-type="sequence<BluetoothServiceUUID> " href="#dom-bluetoothpermissiondescriptor-optionalservices"><code><c- g>optionalServices</c-></code></a> = [];
   <a class="idl-code" data-link-type="interface" href="https://heycam.github.io/webidl/#idl-boolean" id="ref-for-idl-boolean②①"><c- b>boolean</c-></a> <a data-default="false" data-type="boolean " href="#dom-bluetoothpermissiondescriptor-acceptalldevices"><code><c- g>acceptAllDevices</c-></code></a> = <c- b>false</c->;
 };
 
