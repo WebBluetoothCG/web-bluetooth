@@ -1399,7 +1399,7 @@ following steps:
     superset of the UUIDs for the current scan, then the UA MAY return the
     result of that scan and abort these steps.
 
-    <div class="issue">TODO: Nail down the amount of time.</div>
+    Issue: TODO: Nail down the amount of time.
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
@@ -1409,21 +1409,17 @@ following steps:
     device</a>s to <var>nearbyDevices</var>. The UA SHOULD enable the <a>Privacy
     Feature</a>.
 
-    <div class="issue">
-      Both <a>passive scanning</a> and the <a>Privacy Feature</a> avoid leaking
-      the unique, immutable device ID. We ought to require UAs to use either
-      one, but none of the OS APIs appear to expose either. Bluetooth also makes
-      it hard to use <a>passive scanning</a> since it doesn't require
-      <a>Central</a> devices to support the <a>Observation Procedure</a>.
-    </div>
+    Issue: Both <a>passive scanning</a> and the <a>Privacy Feature</a> avoid
+    leaking the unique, immutable device ID. We ought to require UAs to use
+    either one, but none of the OS APIs appear to expose either. Bluetooth also
+    makes it hard to use <a>passive scanning</a> since it doesn't require
+    <a>Central</a> devices to support the <a>Observation Procedure</a>.
 1. If the UA supports the BR/EDR transport, perform the <a>Device Discovery
     Procedure</a> and add the discovered <a>Bluetooth device</a>s to
     <var>nearbyDevices</var>.
 
-    <div class="issue">
-      All forms of BR/EDR inquiry/discovery appear to leak the unique, immutable
-      device address.
-    </div>
+    Issue: All forms of BR/EDR inquiry/discovery appear to leak the unique,
+    immutable device address.
 1. Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.
 1. For each <a>Bluetooth device</a> <var>device</var> in
     <var>nearbyDevices</var>, do the following sub-steps:
@@ -1470,10 +1466,8 @@ following steps:
 
 </div>
 
-<div class="issue">
-We need a way for a site to register to receive an event when an interesting
+Issue: We need a way for a site to register to receive an event when an interesting
 device comes within range.
-</div>
 
 <div class="unstable">
 ## Permission API Integration ## {#permission-api-integration}
@@ -1822,9 +1816,7 @@ object</a> |global|'s <a>responsible event loop</a> to run the following steps:
 The <dfn attribute for="ValueEvent">value</dfn> attribute must return the value
 it was initialized to.
 
-<div class="issue" id="ValueEvent-too-generic">
-  Such a generic event type belongs in [[HTML]] or [[DOM]], not here.
-</div>
+Issue: Such a generic event type belongs in [[HTML]] or [[DOM]], not here.
 
 # Device Representation # {#device-representation}
 
@@ -2353,2376 +2345,1762 @@ constructor MUST perform the following steps:
   </section>
 </div>
 
-<section>
-  <h2 id="gatt-interaction">GATT Interaction</h2>
+# GATT Interaction # {#gatt-interaction}
 
-  <section id="">
-    <h3 id="information-model">GATT Information Model</h3>
+## GATT Information Model ## {#information-model}
+
+<div class="note">
+The <a>GATT Profile Hierarchy</a> describes how a
+<a idl lt="BluetoothRemoteGATTServer">GATT Server</a> contains a hierarchy of
+Profiles, Primary <a>Service</a>s, <a>Included Service</a>s,
+<a>Characteristic</a>s, and <a>Descriptor</a>s.
+
+Profiles are purely logical: the specification of a Profile describes the
+expected interactions between the other GATT entities the Profile contains, but
+it's impossible to query which Profiles a device supports.
+
+<a>GATT Client</a>s can discover and interact with the Services,
+Characteristics, and Descriptors on a device using a set of <a>GATT
+procedures</a>. This spec refers to Services, Characteristics, and Descriptors
+collectively as <dfn>Attribute</dfn>s. All Attributes have a type that's
+identified by a <a>UUID</a>. Each Attribute also has a 16-bit <a>Attribute
+Handle</a> that distinguishes it from other Attributes of the same type on the
+same <a>GATT Server</a>. Attributes are notionally ordered within their <a>GATT
+Server</a> by their <a>Attribute Handle</a>, but while platform interfaces
+provide attributes in some order, they do not guarantee that it's consistent
+with the <a>Attribute Handle</a> order.
+
+<p link-for-hint="BluetoothRemoteGATTService">
+A <a idl lt="BluetoothRemoteGATTService">Service</a> contains a collection of
+<a idl lt="getIncludedService()">Included Service</a>s and
+<a idl lt="getCharacteristic()">Characteristic</a>s. The Included Services are
+references to other Services, and a single Service can be included by more than
+one other Service. Services are known as <a idl lt="isPrimary">Primary
+Services</a> if they appear directly under the
+<a idl lt="BluetoothRemoteGATTServer">GATT Server</a>, and Secondary Services if
+they're only included by other Services, but Primary Services can also be
+included.
+</p>
+<p link-for-hint="BluetoothRemoteGATTCharacteristic">
+A <a idl lt="BluetoothRemoteGATTCharacteristic">Characteristic</a> contains a
+value, which is an array of bytes, and a collection of
+<a idl lt="getDescriptor()">Descriptor</a>s. Depending on the
+<a idl lt="BluetoothCharacteristicProperties">properties</a> of the
+Characteristic, a <a>GATT Client</a> can read or write its value, or register to
+be notified when the value changes.
+</p>
+
+Finally, a <a idl lt="BluetoothRemoteGATTDescriptor">Descriptor</a> contains a
+value (again an array of bytes) that describes or configures its
+<a>Characteristic</a>.
+</div>
+
+### Persistence across connections ### {#persistence}
+
+The Bluetooth <a>Attribute Caching</a> system allows <a>bonded</a> clients to
+save references to attributes from one connection to the next. Web Bluetooth
+treats websites as <em>not</em> <a>bonded</a> to devices they have permission to
+access: {{BluetoothRemoteGATTService}}, {{BluetoothRemoteGATTCharacteristic}},
+and {{BluetoothRemoteGATTDescriptor}} objects become invalid on
+<a href="#disconnection-events">disconnection</a>, and the site must retrieved
+them again when it re-connects.
+
+### The Bluetooth cache ### {#bluetooth-cache}
+
+The UA MUST maintain a <a>Bluetooth cache</a> of the hierarchy of Services,
+Characteristics, and Descriptors it has discovered on a device. The UA MAY share
+this cache between multiple origins accessing the same device. Each potential
+entry in the cache is either known-present, known-absent, or unknown. The cache
+MUST NOT contain two entries that are for the <a>same attribute</a>. Each
+known-present entry in the cache is associated with an optional
+<code>Promise&lt;{{BluetoothRemoteGATTService}}></code>,
+<code>Promise&lt;{{BluetoothRemoteGATTCharacteristic}}></code>, or
+<code>Promise&lt;{{BluetoothRemoteGATTDescriptor}}></code> instance for each
+{{Bluetooth}} instance.
+
+<div class="note">
+Note: For example, if a user calls the
+<code>serviceA.getCharacteristic(uuid1)</code> function with an initially empty
+<a>Bluetooth cache</a>, the UA uses the <a>Discover Characteristics by UUID</a>
+procedure to fill the needed cache entries, and the UA ends the procedure early
+because it only needs one Characteristic to fulfil the returned {{Promise}},
+then the first Characteristic with UUID <code>uuid1</code> inside
+<code>serviceA</code> is known-present, and any subsequent Characteristics with
+that UUID remain unknown. If the user later calls
+<code>serviceA.getCharacteristics(uuid1)</code>, the UA needs to resume or
+restart the <a>Discover Characteristics by UUID</a> procedure. If it turns out
+that <code>serviceA</code> only has one Characteristic with UUID
+<code>uuid1</code>, then the subsequent Characteristics become known-absent.
+</div>
+
+The known-present entries in the <a>Bluetooth cache</a> are ordered: Primary
+Services appear in a particular order within a device, Included Services and
+Characteristics appear in a particular order within Services, and Descriptors
+appear in a particular order within Characteristics. The order SHOULD match the
+order of <a>Attribute Handle</a>s on the device, but UAs MAY use another order
+if the device's order isn't available.
+
+<div algorithm="populate Bluetooth cache">
+To <dfn>populate the Bluetooth cache</dfn> with entries matching some
+description, the UA MUST run the following steps.
+
+<div class="note">
+Note: These steps can block, so uses of this algorithm must be <a>in
+parallel</a>.
+</div>
+
+1. Attempt to make all matching entries in the cache either known-present or
+    known-absent, using any sequence of <a>GATT procedures</a> that
+    [[BLUETOOTH42]] specifies will return enough information. Handle errors as
+    described in <a href="#error-handling"></a>.
+1. If the previous step returns an error, return that error from this algorithm.
+
+</div>
+
+<div algorithm="query Bluetooth cache">
+To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
+<var>deviceObj</var> for entries matching some description, the UA MUST return a
+<code><var>deviceObj</var>.gatt</code>-<a>connection-checking wrapper</a> around
+<a>a new promise</a> <var>promise</var> and run the following steps <a>in
+parallel</a>:
+
+1. <a>Populate the Bluetooth cache</a> with entries matching the description.
+1. If the previous step returns an error, <a>reject</a> <var>promise</var> with
+    that error and abort these steps.
+1. Let <var>entries</var> be the sequence of known-present cache entries
+    matching the description.
+1. Let <var>context</var> be
+    <code><var>deviceObj</var>.{{BluetoothDevice/[[context]]}}</code>.
+1. Let <var>result</var> be a new sequence.
+1. For each <var>entry</var> in <var>entries</var>:
+    1. If <var>entry</var> has no associated
+        <code>Promise&lt;BluetoothGATT*></code> instance in
+        <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}, <a>create a
+        <code>BluetoothRemoteGATTService</code> representing</a>
+        <var>entry</var>, <a>create a
+        <code>BluetoothRemoteGATTCharacteristic</code> representing</a>
+        <var>entry</var>, or <a>create a
+        <code>BluetoothRemoteGATTDescriptor</code> representing</a>
+        <var>entry</var>, depending on whether <var>entry</var> is a Service,
+        Characteristic, or Descriptor, and add a mapping from <var>entry</var>
+        to the resulting <code>Promise</code> in
+        <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Append to <var>result</var> the <code>Promise&lt;BluetoothGATT*></code>
+        instance associated with <var>entry</var> in
+        <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
+1. <a>Resolve</a> <var>promise</var> with the result of <a>waiting for all</a>
+    elements of <var>result</var>.
+
+</div>
+
+<div algorithm="represented properties">
+<dfn>Represented</dfn>(|obj|: Device or GATT Attribute) returns, depending on
+the type of |obj|:
+<dl class="switch">
+  <dt>{{BluetoothDevice}}</dt>
+  <dd><code>|obj|.{{[[representedDevice]]}}</code></dd>
+
+  <dt>{{BluetoothRemoteGATTService}}</dt>
+  <dd><code>|obj|.{{[[representedService]]}}</code></dd>
+
+  <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
+  <dd><code>|obj|.{{[[representedCharacteristic]]}}</code></dd>
+
+  <dt>{{BluetoothRemoteGATTDescriptor}}</dt>
+  <dd><code>|obj|.{{[[representedDescriptor]]}}</code></dd>
+</dl>
+</div>
+
+### Navigating the Bluetooth Hierarchy ### {#navigating-bluetooth-hierarchy}
+
+<div algorithm="get GATT children">
+To <dfn>GetGATTChildren</dfn>(<span class="argument-list">
+  <var>attribute</var>: GATT Attribute,<br>
+  <var>single</var>: boolean,<br>
+  <var>uuidCanonicalizer</var>: function,<br>
+  <var>uuid</var>: optional <code>(DOMString or unsigned int)</code>,<br>
+  <var>allowedUuids</var>: optional <code>("all" or Array&lt;DOMString>)</code>,<br>
+  <var>child type</var>: GATT declaration type),</span><br>
+the UA MUST perform the following steps:
+
+1. If <var>uuid</var> is present, set it to
+    <var>uuidCanonicalizer</var>(<var>uuid</var>). If
+    <var>uuidCanonicalizer</var> threw an exception, return <a>a promise
+    rejected with</a> that exception and abort these steps.
+1. If <var>uuid</var> is present and is <a>blocklisted</a>, return <a>a promise
+    rejected with</a> a {{SecurityError}} and abort these steps.
+1. Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>:
+    <dl class="switch">
+      <dt>{{BluetoothDevice}}</dt>
+      <dd><code><var>attribute</var></code></dd>
+      <dt>{{BluetoothRemoteGATTService}}</dt>
+      <dd><code><var>attribute</var>.{{BluetoothRemoteGATTService/device}}</code></dd>
+      <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
+      <dd><code>
+        <var>attribute</var>.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}
+      </code></dd>
+    </dl>
+1. If
+    <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+    is `false`, return <a>a promise rejected with</a> with a {{NetworkError}}
+    and abort these steps.
+1. If <a>Represented</a>(|attribute|) is `null`, return <a>a promise rejected
+    with</a> an {{InvalidStateError}} and abort these steps.
+
+    Note: This happens when a Service or Characteristic is removed from the
+    device or invalidated by a disconnection, and then its object is used again.
+1. <a>Query the Bluetooth cache</a> in <code><var>deviceObj</var></code> for
+    entries that:
+    * are within <a>Represented</a>(|attribute|),
+    * have a type described by <var>child type</var>,
+    * have a UUID that is not <a>blocklisted</a>,
+    * if <var>uuid</var> is present, have a UUID of <var>uuid</var>,
+    * if <var>allowedUuids</var> is present and not `"all"`, have a UUID in
+        <var>allowedUuids</var>, and
+    * if the <var>single</var> flag is set, are the first of these.
+
+    Let <var>promise</var> be the result.
+1. <a>Upon fulfillment</a> of <var>promise</var> with |result|, run the
+    following steps:
+    * If |result| is empty, throw a {{NotFoundError}},</li>
+    * Otherwise, if the <var>single</var> flag is set, returns the first (only)
+        element of |result|.
+    * Otherwise, return |result|.
+
+</div>
+
+### Identifying Services, Characteristics, and Descriptors ### {#identifying-attributes}
+
+When checking whether two Services, Characteristics, or Descriptors <var>a</var>
+and <var>b</var> are the <dfn>same attribute</dfn>, the UA SHOULD determine that
+they are the same if <var>a</var> and <var>b</var> are inside the <a>same
+device</a> and have the same <a>Attribute Handle</a>, but MAY use any algorithm
+it wants with the constraint that <var>a</var> and <var>b</var> MUST NOT be
+considered the <a>same attribute</a> if they fit any of the following
+conditions:
+
+* They are not both Services, both Characteristics, or both Descriptors.
+* They are both Services, but are not both primary or both secondary services.
+* They have different UUIDs.
+* Their parent Devices aren't the <a>same device</a> or their parent Services or
+    Characteristics aren't the <a>same attribute</a>.
+
+<div class="note">
+Note: This definition is loose because platform APIs expose their own notion of
+identity without documenting whether it's based on <a>Attribute Handle</a>
+equality.
+</div>
+
+<div class="note">
+Note: For two Javascript objects <var>x</var> and <var>y</var> representing
+Services, Characteristics, or Descriptors, <code><var>x</var> ===
+<var>y</var></code> returns whether the objects represent the <a>same
+attribute</a>, because of how the <a>query the Bluetooth cache</a> algorithm
+creates and caches new objects.
+</div>
+
+## BluetoothRemoteGATTServer ## {#bluetoothgattremoteserver-interface}
+
+{{BluetoothRemoteGATTServer}} represents a <a>GATT Server</a> on a remote device.
+
+<xmp class="idl">
+[Exposed=Window, SecureContext]
+interface BluetoothRemoteGATTServer {
+  [SameObject]
+  readonly attribute BluetoothDevice device;
+  readonly attribute boolean connected;
+  Promise<BluetoothRemoteGATTServer> connect();
+  void disconnect();
+  Promise<BluetoothRemoteGATTService> getPrimaryService(BluetoothServiceUUID service);
+  Promise<sequence<BluetoothRemoteGATTService>>
+    getPrimaryServices(optional BluetoothServiceUUID service);
+};
+</xmp>
+
+<div class="note" heading="{{BluetoothRemoteGATTServer}} attributes"
+    dfn-for="BluetoothRemoteGATTServer" dfn-type="attribute">
+<dfn>device</dfn> is the device running this server.
+
+<dfn>connected</dfn> is true while this instance is connected to
+<code>this.device</code>. It can be false while the UA is physically connected,
+for example when there are other connected {{BluetoothRemoteGATTServer}}
+instances for other <a>global object</a>s.
+</div>
+
+When no ECMAScript code can
+observe an instance of {{BluetoothRemoteGATTServer}} <var>server</var> anymore,
+the UA SHOULD run <code><var>server</var>.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
+
+<div class="note">
+Note: Because {{BluetoothDevice}} instances are stored in
+<code>navigator.bluetooth.{{Bluetooth/[[deviceInstanceMap]]}}</code>, this can't
+happen at least until navigation releases the global object or closing the tab
+or window destroys the <a>browsing context</a>.
+</div>
+
+<div class="note">
+Note: Disconnecting on garbage collection ensures that the UA doesn't keep consuming
+resources on the remote device unnecessarily.
+</div>
+
+Instances of {{BluetoothRemoteGATTServer}} are created with the <a>internal
+slots</a> described in the following table:
+
+<table class="data" dfn-for="BluetoothRemoteGATTServer" dfn-type="attribute">
+  <tr>
+    <th><a>Internal Slot</a></th>
+    <th>Initial Value</th>
+    <th>Description (non-normative)</th>
+  </tr>
+  <tr>
+    <td><dfn>\[[activeAlgorithms]]</dfn></td>
+    <td><code>new {{Set}}()</code></td>
+    <td>
+      Contains a {{Promise}} corresponding to each algorithm using this server's
+      connection. {{disconnect()}} empties this set so that the algorithm can
+      tell whether its <a>realm</a> was ever disconnected while it was running.
+    </td>
+  </tr>
+</table>
+
+<div algorithm="BluetoothRemoteGATTServer connect">
+The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code>
+method, when invoked, MUST perform the following steps:
+
+1. Let |promise| be <a>a new promise</a>.
+1. If <code>this.device.{{[[representedDevice]]}}</code> is `null`, <a>queue a
+    task</a> to <a>reject</a> |promise| with a {{NetworkError}}, return
+    |promise|, and abort these steps.
+1. If the UA is currently using the Bluetooth system, it MAY <a>queue a task</a>
+    to <a>reject</a> |promise| with a {{NetworkError}}, return |promise|, and
+    abort these steps.
+
+    Issue(188): Implementations may be able to avoid this {{NetworkError}},
+    but for now sites need to serialize their use of this API
+    and/or give the user a way to retry failed operations.
+1. Add |promise| to <code>this.{{[[activeAlgorithms]]}}</code>.
+1. Return |promise| and run the following steps <a>in parallel</a>:
+    1. If <code>this.device.{{[[representedDevice]]}}</code> has no <a>ATT
+        Bearer</a>, do the following sub-steps:
+        1. <p id="create-an-att-bearer">Attempt to create an <a>ATT Bearer</a>
+            using the procedures described in "Connection Establishment" under
+            <a>GAP Interoperability Requirements</a>. Abort this attempt if
+            |promise| is removed from
+            <code>this.{{[[activeAlgorithms]]}}</code>.</p>
+
+            <div class="note">
+              Note: These procedures can wait forever
+              if a connectable advertisement isn't received.
+              The website should call {{disconnect()}}
+              if it no longer wants to connect.
+            </div>
+        1. If this attempt was aborted because |promise| was removed from
+            <code>this.{{[[activeAlgorithms]]}}</code>, <a>reject</a>
+            <var>promise</var> with an {{AbortError}} and abort these steps.
+        1. If this attempt failed for another reason, <a>reject</a>
+            <var>promise</var> with a {{NetworkError}} and abort these steps.
+        1. Use the <a>Exchange MTU</a> procedure to negotiate the largest
+            supported MTU. Ignore any errors from this step.
+        1. The UA MAY attempt to bond with the remote device using the <a>BR/EDR
+            Bonding Procedure</a> or the <a>LE Bonding Procedure</a>.
+
+            Note: We would normally prefer to give the website control over
+            whether and when bonding happens, but the [Core
+            Bluetooth](https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html)
+            platform API doesn't provide a way for UAs to implement such a knob.
+            Having a bond is more secure than not having one, so this
+            specification allows the UA to opportunistically create one on
+            platforms where that's possible. This may cause a user-visible
+            pairing dialog to appear when a connection is created, instead of
+            when a restricted characteristic is accessed.
+    1. <a>Queue a task</a> to perform the following sub-steps:
+        1. If |promise| is not in <code>this.{{[[activeAlgorithms]]}}</code>,
+            <a>reject</a> <var>promise</var> with an {{AbortError}},
+            <a>garbage-collect the connection</a> of
+            <code>this.{{[[representedDevice]]}}</code>, and abort these steps.
+        1. Remove |promise| from <code>this.{{[[activeAlgorithms]]}}</code>.
+        1. If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}},
+            <a>garbage-collect the connection</a> of
+            <code>this.{{[[representedDevice]]}}</code>, and abort these steps.
+        1. Set `this.connected` to `true`.
+        1. <a>Resolve</a> <var>promise</var> with <code>this</code>.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTServer disconnect">
+The <code><dfn method for="BluetoothRemoteGATTServer">disconnect()</dfn></code>
+method, when invoked, MUST perform the following steps:
+
+1. Clear <code>this.{{[[activeAlgorithms]]}}</code> to abort any <a
+    href="#create-an-att-bearer">active `connect()` calls</a>.
+1. If <code>this.{{connected}}</code> is <code>false</code>, abort these steps.
+1. <a>Clean up the disconnected device</a> <code>this.device</code>.
+1. Let <var>device</var> be <code>this.device.{{[[representedDevice]]}}</code>.
+1. <a>Garbage-collect the connection</a> of |device|.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTServer connection garbage collection">
+To <dfn>garbage-collect the connection</dfn> of a |device|, the UA must, do the
+following steps <a>in parallel</a>:
+
+1. If systems that aren't using this API, either inside or outside of the UA,
+    are using the <var>device</var>'s <a>ATT Bearer</a>, abort this algorithm.
+1. For all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA:
+    1. If <code><var>deviceObj</var>.{{[[representedDevice]]}}</code> is not the
+        <a>same device</a> as <var>device</var>, continue to the next
+        |deviceObj|.
+    1. If
+        <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+        is `true`, abort this algorithm.
+    1. If <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>
+        contains the {{Promise}} of a call to {{connect()}}, abort this
+        algorithm.
+1. Destroy <var>device</var>'s <a>ATT Bearer</a>.
+
+</div>
+
+<div algorithm="GATT connection watcher">
+<div class="note">
+Note: Algorithms need to fail if their {{BluetoothRemoteGATTServer}} was
+disconnected while they were running, even if the UA stays connected the whole
+time and the {{BluetoothRemoteGATTServer}} is subsequently re-connected before
+they finish. We wrap the returned {{Promise}} to accomplish this.
+</div>
+
+To create a <var>gattServer</var>-<dfn>connection-checking wrapper</dfn>
+around a {{Promise}} <var>promise</var>, the UA MUST:
+
+1. If <code><var>gattServer</var>.connected</code> is `true`, add
+    <var>promise</var> to
+    <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
+1. <a>React</a> to <var>promise</var>:
+    * If |promise| was fulfilled with value |result|, then:
+          1. If <var>promise</var> is in
+              <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
+              remove it and return |result|.
+          1. Otherwise, throw a {{NetworkError}}.
+              <div class="note">
+                Note: This error is thrown because <var>gattServer</var> was
+                disconnected during the execution of the main algorithm.
+              </div>
+    * If |promise| was rejected with reason |error|, then:
+          1. If <var>promise</var> is in
+              <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
+              remove it and throw |error|.
+          1. Otherwise, throw a {{NetworkError}}.
+              <div class="note">
+                Note: This error is thrown because <var>gattServer</var> was
+                disconnected during the execution of the main algorithm.
+              </div>
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTServer getPrimaryService">
+The <code><dfn method
+for="BluetoothRemoteGATTServer">getPrimaryService(<var>service</var>)</dfn></code>
+method, when invoked, MUST perform the following steps:
+
+1. If <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code> is not
+    `"all"` and <var>service</var> is not in
+    <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>, return
+    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+1. Return <a>GetGATTChildren</a>(<span
+    class="argument-list"><i>attribute</i>=<code>this.device</code>,<br>
+    <i>single</i>=true,<br>
+    <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+    <i>uuid</i>=<code><var>service</var></code>,<br>
+    <i>allowedUuids</i>=<code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
+    <i>child type</i>="GATT Primary Service")</span>
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTServer getPrimaryServices">
+The <code><dfn method
+for="BluetoothRemoteGATTServer">getPrimaryServices(<var>service</var>)</dfn></code>
+method, when invoked, MUST perform the following steps:
+
+1. If <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code> is not
+    `"all"`, and <var>service</var> is present and not in
+    <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>, return
+    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+1. Return <a>GetGATTChildren</a>(<span
+    class="argument-list"><i>attribute</i>=<code>this.device</code>,<br>
+    <i>single</i>=false,<br>
+    <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+    <i>uuid</i>=<code><var>service</var></code>,<br>
+    <i>allowedUuids</i>=<code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
+    <i>child type</i>="GATT Primary Service")</span>
+
+</div>
+
+## BluetoothRemoteGATTService ## {#bluetoothgattservice-interface}
+
+{{BluetoothRemoteGATTService}} represents a GATT <a>Service</a>, a collection of
+characteristics and relationships to other services that encapsulate the
+behavior of part of a device.
+
+<xmp class="idl">
+[Exposed=Window, SecureContext]
+interface BluetoothRemoteGATTService : EventTarget {
+  [SameObject]
+  readonly attribute BluetoothDevice device;
+  readonly attribute UUID uuid;
+  readonly attribute boolean isPrimary;
+  Promise<BluetoothRemoteGATTCharacteristic>
+    getCharacteristic(BluetoothCharacteristicUUID characteristic);
+  Promise<sequence<BluetoothRemoteGATTCharacteristic>>
+    getCharacteristics(optional BluetoothCharacteristicUUID characteristic);
+  Promise<BluetoothRemoteGATTService>
+    getIncludedService(BluetoothServiceUUID service);
+  Promise<sequence<BluetoothRemoteGATTService>>
+    getIncludedServices(optional BluetoothServiceUUID service);
+};
+BluetoothRemoteGATTService includes CharacteristicEventHandlers;
+BluetoothRemoteGATTService includes ServiceEventHandlers;
+</xmp>
+
+<div class="note" heading="{{BluetoothRemoteGATTService}} attributes"
+    dfn-for="BluetoothRemoteGATTService" dfn-type="attribute">
+<dfn>device</dfn> is the {{BluetoothDevice}} representing the remote peripheral
+that the GATT service belongs to.
+
+<dfn>uuid</dfn> is the UUID of the service, e.g.
+<code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the <a idl
+lt="org.bluetooth.service.heart_rate">Heart Rate</a> service.
+
+<dfn>isPrimary</dfn> indicates whether the type of this service is primary or
+secondary.
+</div>
+
+Instances of {{BluetoothRemoteGATTService}} are created with the <a>internal
+slots</a> described in the following table:
+
+<table dfn-for="BluetoothRemoteGATTService" dfn-type="attribute">
+<tr>
+  <th><a>Internal Slot</a></th>
+  <th>Initial Value</th>
+  <th>Description (non-normative)</th>
+</tr>
+<tr>
+  <td><dfn>\[[representedService]]</dfn></td>
+  <td>&lt;always set in prose></td>
+  <td>
+    The <a>Service</a> this object represents,
+    or `null` if the Service has been removed or otherwise invalidated.
+  </td>
+</tr>
+</table>
+
+<div algorithm="BluetoothRemoteGATTService construction">
+To <dfn>create a <code>BluetoothRemoteGATTService</code> representing</dfn> a
+Service <var>service</var>, the UA must return <a>a new promise</a>
+<var>promise</var> and run the following steps <a>in parallel</a>.
+
+1. Let <var>result</var> be a new instance of {{BluetoothRemoteGATTService}}
+    with its {{[[representedService]]}} slot initialized to |service|.
+1. <a>Get the <code>BluetoothDevice</code> representing</a> the device in which
+    <var>service</var> appears, and let <var>device</var> be the result.
+1. If the previous step threw an error, <a>reject</a> <var>promise</var> with
+    that error and abort these steps.
+1. Initialize <code><var>result</var>.device</code> from <var>device</var>.
+1. Initialize <code><var>result</var>.uuid</code> from the UUID of
+    <var>service</var>.
+1. If <var>service</var> is a Primary Service, initialize
+    <code><var>result</var>.isPrimary</code> to true. Otherwise initialize
+    <code><var>result</var>.isPrimary</code> to false.
+1. <a>Resolve</a> <var>promise</var> with <var>result</var>.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTService getCharacteristic">
+The <code><dfn method for="BluetoothRemoteGATTService">
+getCharacteristic(<var>characteristic</var>)</dfn></code> method retrieves a
+<a>Characteristic</a> inside this Service. When invoked, it MUST return
+
+> <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+>   <i>single</i>=true,<br>
+>   <i>uuidCanonicalizer</i>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
+>   <i>uuid</i>=<code><var>characteristic</var></code>,<br>
+>   <i>allowedUuids</i>=<code>undefined</code>,<br>
+>   <i>child type</i>="GATT Characteristic")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTService getCharacteristics">
+The <code><dfn method for="BluetoothRemoteGATTService">
+getCharacteristics(<var>characteristic</var>)</dfn></code> method retrieves a
+list of <a>Characteristic</a>s inside this Service. When invoked, it MUST return
+
+> <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+>   <i>single</i>=false,<br>
+>   <i>uuidCanonicalizer</i>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
+>   <i>uuid</i>=<code><var>characteristic</var></code>,<br>
+>   <i>allowedUuids</i>=<code>undefined</code>,<br>
+>   <i>child type</i>="GATT Characteristic")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTService getIncludedService" class="unstable">
+The <code><dfn method for="BluetoothRemoteGATTService">
+getIncludedService(<var>service</var>)</dfn></code> method retrieves an
+<a>Included Service</a> inside this Service. When invoked, it MUST return
+
+> <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+>   <i>single</i>=true,<br>
+>   <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+>   <i>uuid</i>=<code><var>service</var></code>,<br>
+>   <i>allowedUuids</i>=<code>undefined</code>,<br>
+>   <i>child type</i>="GATT Included Service")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTService getIncludedServices"
+    class="unstable">
+The <code><dfn method for="BluetoothRemoteGATTService">
+getIncludedServices(<var>service</var>)</dfn></code> method retrieves a list of
+<a>Included Service</a>s inside this Service. When invoked, it MUST return
+
+> <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+>   <i>single</i>=false,<br>
+>   <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
+>   <i>uuid</i>=<code><var>service</var></code>,<br>
+>   <i>allowedUuids</i>=<code>undefined</code>,<br>
+>   <i>child type</i>="GATT Included Service")</span>
+</div>
+
+## BluetoothRemoteGATTCharacteristic ## {#bluetoothgattcharacteristic-interface}
+
+{{BluetoothRemoteGATTCharacteristic}} represents a GATT <a>Characteristic</a>,
+which is a basic data element that provides further information about a
+peripheral's service.
+
+<xmp class="idl">
+  [Exposed=Window, SecureContext]
+  interface BluetoothRemoteGATTCharacteristic : EventTarget {
+    [SameObject]
+    readonly attribute BluetoothRemoteGATTService service;
+    readonly attribute UUID uuid;
+    readonly attribute BluetoothCharacteristicProperties properties;
+    readonly attribute DataView? value;
+    Promise<BluetoothRemoteGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
+    Promise<sequence<BluetoothRemoteGATTDescriptor>>
+      getDescriptors(optional BluetoothDescriptorUUID descriptor);
+    Promise<DataView> readValue();
+    Promise<void> writeValue(BufferSource value);
+    Promise<void> writeValueWithResponse(BufferSource value);
+    Promise<void> writeValueWithoutResponse(BufferSource value);
+    Promise<BluetoothRemoteGATTCharacteristic> startNotifications();
+    Promise<BluetoothRemoteGATTCharacteristic> stopNotifications();
+  };
+  BluetoothRemoteGATTCharacteristic includes CharacteristicEventHandlers;
+</xmp>
+
+<div class="note" heading="{{BluetoothRemoteGATTCharacteristic}} attributes"
+      dfn-for="BluetoothRemoteGATTCharacteristic" dfn-type="attribute">
+<dfn>service</dfn> is the GATT service this characteristic belongs to.
+
+<dfn>uuid</dfn> is the UUID of the characteristic, e.g.
+<code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the
+<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
+Heart Rate Measurement</a> characteristic.
+
+<dfn>properties</dfn> holds the properties of this characteristic.
+
+<dfn>value</dfn> is the currently cached characteristic value. This value gets
+updated when the value of the characteristic is read or updated via a
+notification or indication.
+</div>
+
+Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
+<a>internal slots</a> described in the following table:
+
+<table dfn-for="BluetoothRemoteGATTCharacteristic" dfn-type="attribute">
+  <tr>
+    <th><a>Internal Slot</a></th>
+    <th>Initial Value</th>
+    <th>Description (non-normative)</th>
+  </tr>
+  <tr>
+    <td><dfn>\[[representedCharacteristic]]</dfn></td>
+    <td>&lt;always set in prose></td>
+    <td>
+      The <a>Characteristic</a> this object represents, or `null` if the
+      Characteristic has been removed or otherwise invalidated.
+    </td>
+  </tr>
+</table>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic constructor">
+To <dfn>create a <code>BluetoothRemoteGATTCharacteristic</code>
+representing</dfn> a Characteristic <var>characteristic</var>, the UA must
+return <a>a new promise</a> <var>promise</var> and run the following steps <a>in
+parallel</a>.
+
+1. Let <var>result</var> be a new instance of
+    {{BluetoothRemoteGATTCharacteristic}} with its
+    {{[[representedCharacteristic]]}} slot initialized to |characteristic|.
+1. Initialize <code><var>result</var>.service</code> from the
+    {{BluetoothRemoteGATTService}} instance representing the Service in which
+    <var>characteristic</var> appears.
+1. Initialize <code><var>result</var>.uuid</code> from the UUID of
+    <var>characteristic</var>.
+1. <a>Create a <code>BluetoothCharacteristicProperties</code> instance from the
+    Characteristic</a> <var>characteristic</var>, and let
+    <var>propertiesPromise</var> be the result.
+1. Wait for <var>propertiesPromise</var> to settle.
+1. If <var>propertiesPromise</var> was rejected, <a>resolve</a>
+    <var>promise</var> with <var>propertiesPromise</var> and abort these steps.
+1. Initialize <code><var>result</var>.properties</code> from the value
+    <var>propertiesPromise</var> was fulfilled with.
+1. Initialize <code><var>result</var>.value</code> to <code>null</code>. The UA
+    MAY initialize <code><var>result</var>.value</code> to a new {{DataView}}
+    wrapping a new {{ArrayBuffer}} containing the most recently read value from
+    <var>characteristic</var> if this value is available.
+1. <a>Resolve</a> <var>promise</var> with <var>result</var>.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic getDescriptor"
+    class="unstable">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+getDescriptor(<var>descriptor</var>)</dfn></code> method retrieves a
+<a>Descriptor</a> inside this Characteristic. When invoked, it MUST return
+
+> <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+>   <i>single</i>=true,<br>
+>   <i>uuidCanonicalizer</i>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
+>   <i>uuid</i>=<code><var>descriptor</var></code>,<br>
+>   <i>allowedUuids</i>=<code>undefined</code>,<br>
+>   <i>child type</i>="GATT Descriptor")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic getDescriptors"
+    class="unstable">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+getDescriptors(<var>descriptor</var>)</dfn></code> method retrieves a list of
+<a>Descriptor</a>s inside this Characteristic. When invoked, it MUST return
+
+> <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
+>   <i>single</i>=false,<br>
+>   <i>uuidCanonicalizer</i>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
+>   <i>uuid</i>=<code><var>descriptor</var></code>,<br>
+>   <i>allowedUuids</i>=<code>undefined</code>,<br>
+>   <i>child type</i>="GATT Descriptor")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic readValue()">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
+</code> method, when invoked, MUST run the following steps:
+
+1. If <code>this.uuid</code> is <a>blocklisted for reads</a>, return <a>a promise
+    rejected with</a> a {{SecurityError}} and abort these steps.
+1. If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}
+    </code> is `false`, return <a>a promise rejected with</a> a {{NetworkError}}
+    and abort these steps.
+1. Let |characteristic| be <code>this.{{[[representedCharacteristic]]}}</code>.
+1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
+    {{InvalidStateError}} and abort these steps.
+1. Return a <code>this.service.device.gatt</code>-<a>connection-checking
+    wrapper</a> around <a>a new promise</a> <var>promise</var> and run the
+    following steps <a>in parallel</a>:
+    1. If the <code>Read</code> bit is not set in <var>characteristic</var>'s
+        <a lt="Characteristic Properties">properties</a>, <a>reject</a>
+        <var>promise</var> with a {{NotSupportedError}} and abort these steps.
+    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
+        |promise| with a {{NetworkError}} and abort these steps.
+
+        Issue(188): Implementations may be able to avoid this {{NetworkError}},
+        but for now sites need to serialize their use of this API and/or give
+        the user a way to retry failed operations.
+    1. Use any combination of the sub-procedures in the <a>Characteristic Value
+        Read</a> procedure to retrieve the value of <var>characteristic</var>.
+        Handle errors as described in <a href="#error-handling"></a>.
+    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
+        with that error and abort these steps.
+    1. <a>Queue a task</a> to perform the following steps:
+        1. If <var>promise</var> is not in <code>
+            this.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+            these steps.
+        1. Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved
+            value, and assign <code>new DataView(<var>buffer</var>)</code> to
+            <code>this.value</code>.
+        1. <a>Fire an event</a> named {{characteristicvaluechanged}} with its
+            <code>bubbles</code> attribute initialized to <code>true</code> at
+            <code>this</code>.
+        1. <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+
+</div>
+
+<div algorithm="Write Characteristic value">
+To <dfn>WriteCharacteristicValue</dfn>(<span class="argument-list">
+  <var>this</var>: BluetoothRemoteGATTCharacteristic,<br>
+  <var>value</var>: BufferSource,<br>
+  <var>response</var>: string),
+</span><br>
+the UA MUST perform the following steps:
+
+1. If <code>|this|.uuid</code> is <a>blocklisted for writes</a>, return
+    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+1. Let <var>bytes</var> be <a>a copy of the bytes held</a> by
+    <code><var>value</var></code>.
+1. If <var>bytes</var> is more than 512 bytes long (the maximum length of an
+    attribute value, per <a>Long Attribute Values</a>) return <a>a promise
+    rejected with</a> an {{InvalidModificationError}} and abort these steps.
+1. If <code>|this|.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}
+    </code> is `false`, return <a>a promise rejected with</a> a {{NetworkError}}
+    and abort these steps.
+1. Let |characteristic| be
+    <code>|this|.{{[[representedCharacteristic]]}}</code>.
+1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
+    {{InvalidStateError}} and abort these steps.
+1. Return a <code>|this|.service.device.gatt</code>-
+    <a>connection-checking wrapper</a> around <a>a new promise</a>
+    <var>promise</var> and run the following steps in parallel.
+    1. Assert: |response| is one of "required", "never", or "optional".
+    1. <a>Reject</a> <var>promise</var> with a {{NotSupportedError}} and abort
+        these steps if any of the following is true:
+        1. |response| is "required" and <code>Write</code> bit is not set in
+            <var>characteristic</var>'s
+            <a lt="Characteristic Properties">properties</a>
+        1. |response| is "never" and none of <code>Write Without Response</code>
+            or <code>Authenticated Signed Writes</code> bits are set in
+            <var>characteristic</var>'s
+            <a lt="Characteristic Properties">properties</a>
+        1. |response| is "optional" and none of the <code>Write</code>,
+            <code>Write Without Response</code> or <code>Authenticated Signed
+            Writes</code> bits are set in <var>characteristic</var>'s <a
+            lt="Characteristic Properties">properties</a>
+    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
+        |promise| with a {{NetworkError}} and abort these steps.
+
+        Issue(188): Implementations may be able to avoid this {{NetworkError}},
+        but for now sites need to serialize their use of this API
+        and/or give the user a way to retry failed operations.
+    1. Write <var>bytes</var> to <var>characteristic</var> by performing the
+        following steps:
+
+        <dl class="switch">
+          <dt>If |response| is "required"</dt>
+          <dd>
+            Use the <a>Write Characteristic Value</a> procedure.
+          </dd>
+          <dt>If |response| is "never"</dt>
+          <dd>
+            Use the <a>Write Without Response</a> procedure.
+          </dd>
+          <dt>Otherwise</dt>
+          <dd>
+            Use any combination of the sub-procedures in
+            the <a>Characteristic Value Write</a> procedure.
+          </dd>
+        </dl>
+        Handle errors as described in <a href="#error-handling"></a>.
+    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
+        with that error and abort these steps.
+    1. <a>Queue a task</a> to perform the following steps:
+        1. If <var>promise</var> is not in
+            <code>|this|.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+            these steps.
+        1. Set <code>|this|.value</code> to a new {{DataView}} wrapping a new
+            {{ArrayBuffer}} containing <var>bytes</var>.
+        1. <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic writeValue">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+writeValue(<var>value</var>)</dfn></code> method, when invoked, MUST return
+
+> <a>WriteCharacteristicValue</a>(<span class="argument-list">
+>   <i>this</i>=<code>this</code>,<br>
+>   <i>value</i>=<code><var>value</var></code>,<br>
+>   <i>response</i>="optional")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic writeValueWithResponse"
+    class="unstable">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+writeValueWithResponse(<var>value</var>)</dfn></code> method, when invoked, MUST
+return
+
+> <a>WriteCharacteristicValue</a>(<span class="argument-list">
+>   <i>this</i>=<code>this</code>,<br>
+>   <i>value</i>=<code><var>value</var></code>,<br>
+>   <i>response</i>="required")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic writeValueWithoutResponse"
+    class="unstable">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+writeValueWithoutResponse(<var>value</var>)</dfn></code> method, when invoked,
+MUST return
+
+> <a>WriteCharacteristicValue</a>(<span class="argument-list">
+>   <i>this</i>=<code>this</code>,<br>
+>   <i>value</i>=<code><var>value</var></code>,<br>
+>   <i>response</i>="never")</span>
+</div>
+
+The UA MUST maintain a map from each known GATT <a>Characteristic</a> to a set
+of {{Bluetooth}} objects known as the characteristic's <dfn>active notification
+context set</dfn>.
+
+<div class="note">
+Note: The set for a given characteristic holds the
+{{Navigator/bluetooth|navigator.bluetooth}} objects for each <a>Realm</a> that
+has registered for notifications. All notifications become inactive when a
+device is disconnected. A site that wants to keep getting notifications after
+reconnecting needs to call {{startNotifications()}} again, and there is an
+unavoidable risk that some notifications will be missed in the gap before
+{{startNotifications()}} takes effect.
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic startNotifications">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+startNotifications()</dfn></code> method, when invoked, MUST return <a>a new
+promise</a> <var>promise</var> and run the following steps <a>in parallel</a>.
+See <a href="#notification-events"></a> for details of receiving notifications.
+
+1. If <code>this.uuid</code> is <a>blocklisted for reads</a>, <a>reject</a>
+    <var>promise</var> with a {{SecurityError}} and abort these steps.
+1. If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}
+    </code> is `false`, <a>reject</a> <var>promise</var> with a {{NetworkError}}
+    and abort these steps.
+1. Let |characteristic| be <code>this.{{[[representedCharacteristic]]}}</code>.
+1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
+    {{InvalidStateError}} and abort these steps.
+1. If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
+    in <var>characteristic</var>'s <a lt="Characteristic
+    Properties">properties</a>, <a>reject</a> <var>promise</var> with a
+    {{NotSupportedError}} and abort these steps.
+1. If <var>characteristic</var>'s <a>active notification context set</a>
+    contains {{Navigator/bluetooth|navigator.bluetooth}}, <a>resolve</a>
+    <var>promise</var> with `this` and abort these steps.
+1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
+    |promise| with a {{NetworkError}} and abort these steps.
+
+    Issue(188): Implementations may be able to avoid this {{NetworkError}}, but
+    for now sites need to serialize their use of this API and/or give the user a
+    way to retry failed operations.
+1. If the characteristic has a <a>Client Characteristic Configuration</a>
+    descriptor, use any of the <a>Characteristic Descriptors</a> procedures to
+    ensure that one of the <code>Notification</code> or <code>Indication</code>
+    bits in <var>characteristic</var>'s <a>Client Characteristic
+    Configuration</a> descriptor is set, matching the constraints in
+    <var>characteristic</var>'s <a lt="Characteristic
+    Properties">properties</a>. The UA SHOULD avoid setting both bits, and MUST
+    deduplicate <a href="#notification-events">value-change events</a> if both
+    bits are set. Handle errors as described in <a href="#error-handling"></a>.
 
     <div class="note">
-      <p>
-        The <a>GATT Profile Hierarchy</a> describes how a
-        <a idl lt="BluetoothRemoteGATTServer">GATT Server</a>
-        contains a hierarchy of Profiles, Primary <a>Service</a>s,
-        <a>Included Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
-      </p>
-      <p>
-        Profiles are purely logical:
-        the specification of a Profile describes the expected interactions between
-        the other GATT entities the Profile contains,
-        but it's impossible to query which Profiles a device supports.
-      </p>
-      <p>
-        <a>GATT Client</a>s can discover and interact with
-        the Services, Characteristics, and Descriptors on a device
-        using a set of <a>GATT procedures</a>.
-        This spec refers to Services, Characteristics, and Descriptors
-        collectively as <dfn>Attribute</dfn>s.
-        All Attributes have a type that's identified by a <a>UUID</a>.
-        Each Attribute also has a 16-bit <a>Attribute Handle</a>
-        that distinguishes it from other Attributes
-        of the same type on the same <a>GATT Server</a>.
-        Attributes are notionally ordered within their <a>GATT Server</a>
-        by their <a>Attribute Handle</a>,
-        but while platform interfaces provide attributes in some order,
-        they do not guarantee that it's consistent with the <a>Attribute Handle</a> order.
-      </p>
-      <p link-for-hint="BluetoothRemoteGATTService">
-        A <a idl lt="BluetoothRemoteGATTService">Service</a> contains
-        a collection of <a idl lt="getIncludedService()">Included Service</a>s
-        and <a idl lt="getCharacteristic()">Characteristic</a>s.
-        The Included Services are references to other Services,
-        and a single Service can be included by more than one other Service.
-        Services are known as
-        <a idl lt="isPrimary">Primary Services</a> if they appear directly under the
-        <a idl lt="BluetoothRemoteGATTServer">GATT Server</a>,
-        and Secondary Services if they're only included by other Services,
-        but Primary Services can also be included.
-      </p>
-      <p link-for-hint="BluetoothRemoteGATTCharacteristic">
-        A <a idl lt="BluetoothRemoteGATTCharacteristic">Characteristic</a>
-        contains a value, which is an array of bytes,
-        and a collection of <a idl lt="getDescriptor()">Descriptor</a>s.
-        Depending on the <a idl lt="BluetoothCharacteristicProperties">properties</a> of the Characteristic,
-        a <a>GATT Client</a> can read or write its value,
-        or register to be notified when the value changes.
-      </p>
-      <p>
-        Finally, a <a idl lt="BluetoothRemoteGATTDescriptor">Descriptor</a>
-        contains a value (again an array of bytes)
-        that describes or configures its <a>Characteristic</a>.
-      </p>
+      Note: Some devices have characteristics whose properties include the
+      Notify or Indicate bit but that don't have a <a>Client Characteristic
+      Configuration</a> descriptor. These non-standard-compliant characteristics
+      tend to send notifications or indications unconditionally, so this
+      specification allows applications to simply subscribe to their messages.
     </div>
+1. If the previous step returned an error, <a>reject</a> <var>promise</var> with
+    that error and abort these steps.
+1. Add {{Navigator/bluetooth|navigator.bluetooth}} to
+    <var>characteristic</var>'s <a>active notification context set</a>.
+1. <a>Resolve</a> <var>promise</var> with `this`.
 
-    <section>
-      <h4 id="persistence">Persistence across connections</h4>
+<div class="note">
+Note: After notifications are enabled, the resulting <a
+href="#notification-events">value-change events</a> won't be delivered until
+after the current <a lt="perform a microtask checkpoint">microtask
+checkpoint</a>. This allows a developer to set up handlers in the
+<code>.then</code> handler of the result promise.
+</div>
+</div>
 
-      The Bluetooth <a>Attribute Caching</a> system allows <a>bonded</a> clients
-      to save references to attributes from one connection to the next.
-      Web Bluetooth treats websites as <em>not</em> <a>bonded</a>
-      to devices they have permission to access:
-      {{BluetoothRemoteGATTService}}, {{BluetoothRemoteGATTCharacteristic}},
-      and {{BluetoothRemoteGATTDescriptor}} objects
-      become invalid on <a href="#disconnection-events">disconnection</a>,
-      and the site must retrieved them again when it re-connects.
-    </section>
+<div algorithm="BluetoothRemoteGATTCharacteristic stopNotifications">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
+stopNotifications()</dfn></code> method, when invoked, MUST return <a>a new
+promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
 
-    <section>
-      <h4 id="bluetooth-cache" dfn-type="dfn" data-lt="Bluetooth cache">The Bluetooth cache</h4>
+1. Let |characteristic| be <code>this.{{[[representedCharacteristic]]}}</code>.
+1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
+    {{InvalidStateError}} and abort these steps.
+1. If <var>characteristic</var>'s <a>active notification context set</a>
+    contains {{Navigator/bluetooth|navigator.bluetooth}}, remove it.
+1. If <var>characteristic</var>'s <a>active notification context set</a> became
+    empty and the characteristic has a <a>Client Characteristic
+    Configuration</a> descriptor, the UA SHOULD use any of the <a>Characteristic
+    Descriptors</a> procedures to clear the <code>Notification</code> and
+    <code>Indication</code> bits in <var>characteristic</var>'s <a>Client
+    Characteristic Configuration</a> descriptor. </li>
+1. <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
 
-      <p>
-        The UA MUST maintain a <a>Bluetooth cache</a>
-        of the hierarchy of Services, Characteristics, and Descriptors
-        it has discovered on a device.
-        The UA MAY share this cache between multiple origins accessing the same device.
-        Each potential entry in the cache is either known-present, known-absent, or unknown.
-        The cache MUST NOT contain two entries that are for the <a>same attribute</a>.
-        Each known-present entry in the cache is associated with an optional
-        <code>Promise&lt;{{BluetoothRemoteGATTService}}></code>,
-        <code>Promise&lt;{{BluetoothRemoteGATTCharacteristic}}></code>,
-        or <code>Promise&lt;{{BluetoothRemoteGATTDescriptor}}></code> instance
-        for each {{Bluetooth}} instance.
-      </p>
+<div class="note">
+Note: Queuing a task to resolve the promise ensures that no
+<a href="#notification-events">value change events</a> due to notifications
+arrive after the promise resolves.
+</div>
+</div>
 
-      <p class="note">
-        For example, if a user calls the <code>serviceA.getCharacteristic(uuid1)</code> function
-        with an initially empty <a>Bluetooth cache</a>,
-        the UA uses the <a>Discover Characteristics by UUID</a> procedure
-        to fill the needed cache entries,
-        and the UA ends the procedure early because
-        it only needs one Characteristic to fulfil the returned {{Promise}},
-        then the first Characteristic with UUID <code>uuid1</code> inside <code>serviceA</code>
-        is known-present,
-        and any subsequent Characteristics with that UUID remain unknown.
-        If the user later calls <code>serviceA.getCharacteristics(uuid1)</code>,
-        the UA needs to resume or restart the <a>Discover Characteristics by UUID</a> procedure.
-        If it turns out that
-        <code>serviceA</code> only has one Characteristic with UUID <code>uuid1</code>,
-        then the subsequent Characteristics become known-absent.
-      </p>
+### BluetoothCharacteristicProperties ### {#characteristicproperties-interface}
 
-      <p>
-        The known-present entries in the <a>Bluetooth cache</a> are ordered:
-        Primary Services appear in a particular order within a device,
-        Included Services and Characteristics appear in a particular order within Services,
-        and Descriptors appear in a particular order within Characteristics.
-        The order SHOULD match the order of <a>Attribute Handle</a>s on the device,
-        but UAs MAY use another order if the device's order isn't available.
-      </p>
+Each {{BluetoothRemoteGATTCharacteristic}} exposes its <a>characteristic
+properties</a> through a {{BluetoothCharacteristicProperties}} object. These
+properties express what operations are valid on the characteristic.
 
-      <div algorithm>
-        <p>
-          To <dfn>populate the Bluetooth cache</dfn> with entries matching some description,
-          the UA MUST run the following steps.
-          <span class="note">Note that these steps can block,
-            so uses of this algorithm must be <a>in parallel</a>.</span>
-        </p>
-        <ol>
-          <li>
-            Attempt to make all matching entries in the cache either known-present or known-absent,
-            using any sequence of <a>GATT procedures</a> that [[BLUETOOTH42]] specifies
-            will return enough information.
-            Handle errors as described in <a href="#error-handling"></a>.
-          </li>
-          <li>
-            If the previous step returns an error, return that error from this algorithm.
-          </li>
-        </ol>
-      </div>
+<xmp class="idl">
+[Exposed=Window, SecureContext]
+interface BluetoothCharacteristicProperties {
+  readonly attribute boolean broadcast;
+  readonly attribute boolean read;
+  readonly attribute boolean writeWithoutResponse;
+  readonly attribute boolean write;
+  readonly attribute boolean notify;
+  readonly attribute boolean indicate;
+  readonly attribute boolean authenticatedSignedWrites;
+  readonly attribute boolean reliableWrite;
+  readonly attribute boolean writableAuxiliaries;
+};
+</xmp>
 
-      <div algorithm>
-        <p>
-          To <dfn>query the Bluetooth cache</dfn> in
-          a {{BluetoothDevice}} instance <var>deviceObj</var>
-          for entries matching some description,
-          the UA MUST return a
-          <code><var>deviceObj</var>.gatt</code>-<a>connection-checking wrapper</a> around
-          <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>:
-        </p>
-        <ol>
-          <li>
-            <a>Populate the Bluetooth cache</a> with entries matching the description.
-          </li>
-          <li>
-            If the previous step returns an error,
-            <a>reject</a> <var>promise</var> with that error and abort these steps.
-          </li>
-          <li>
-            Let <var>entries</var> be the sequence
-            of known-present cache entries matching the description.
-          </li>
-          <li>
-            Let <var>context</var> be
-            <code><var>deviceObj</var>.{{BluetoothDevice/[[context]]}}</code>.
-          </li>
-          <li>
-            Let <var>result</var> be a new sequence.
-          </li>
-          <li>
-            For each <var>entry</var> in <var>entries</var>:
-            <ol>
-              <li>
-                If <var>entry</var> has no associated <code>Promise&lt;BluetoothGATT*></code> instance
-                in <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}},
-                <a>create a <code>BluetoothRemoteGATTService</code>
-                representing</a> <var>entry</var>,
-                <a>create a <code>BluetoothRemoteGATTCharacteristic</code>
-                representing</a> <var>entry</var>,
-                or <a>create a <code>BluetoothRemoteGATTDescriptor</code>
-                representing</a> <var>entry</var>,
-                depending on whether <var>entry</var> is a Service, Characteristic, or Descriptor,
-                and add a mapping from <var>entry</var> to the resulting <code>Promise</code>
-                in <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
-              </li>
-              <li>
-                Append to <var>result</var>
-                the <code>Promise&lt;BluetoothGATT*></code> instance
-                associated with <var>entry</var>
-                in <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
-              </li>
-            </ol>
-          </li>
-          <li>
-            <a>Resolve</a> <var>promise</var> with the result of
-            <a>waiting for all</a> elements of <var>result</var>.
-          </li>
-        </ol>
-      </div>
+<div algorithm="BluetoothCharacteristicProperties constructor">
+To <dfn>create a <code>BluetoothCharacteristicProperties</code> instance from
+the Characteristic</dfn> <var>characteristic</var>, the UA MUST return <a>a new
+promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
 
-      <div algorithm>
-        <p>
-          <dfn>Represented</dfn>(|obj|: Device or GATT Attribute) returns,
-          depending on the type of |obj|:
-        </p>
-        <dl class="switch">
-          <dt>{{BluetoothDevice}}</dt>
-          <dd><code>|obj|.{{[[representedDevice]]}}</code></dd>
-
-          <dt>{{BluetoothRemoteGATTService}}</dt>
-          <dd><code>|obj|.{{[[representedService]]}}</code></dd>
-
-          <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
-          <dd><code>|obj|.{{[[representedCharacteristic]]}}</code></dd>
-
-          <dt>{{BluetoothRemoteGATTDescriptor}}</dt>
-          <dd><code>|obj|.{{[[representedDescriptor]]}}</code></dd>
-        </dl>
-      </div>
-    </section>
-
-    <section>
-      <h4 id="navigating-bluetooth-hierarchy">Navigating the Bluetooth Hierarchy</h4>
-
-      <div algorithm>
-        <p>
-          To <dfn>GetGATTChildren</dfn>(<span class="argument-list"><var>attribute</var>: GATT Attribute,<br>
-          <var>single</var>: boolean,<br>
-          <var>uuidCanonicalizer</var>: function,<br>
-          <var>uuid</var>: optional <code>(DOMString or unsigned int)</code>,<br>
-          <var>allowedUuids</var>: optional <code>("all" or Array&lt;DOMString>)</code>,<br>
-          <var>child type</var>: GATT declaration type),</span><br>
-          the UA MUST perform the following steps:
-        </p>
-        <ol>
-          <li>
-            If <var>uuid</var> is present,
-            set it to <var>uuidCanonicalizer</var>(<var>uuid</var>).
-            If <var>uuidCanonicalizer</var> threw an exception,
-            return <a>a promise rejected with</a> that exception and abort these steps.
-          </li>
-          <li>
-            If <var>uuid</var> is present and is <a>blocklisted</a>,
-            return <a>a promise rejected with</a> a {{SecurityError}}
-            and abort these steps.
-          </li>
-          <li>
-            Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>:
-            <dl class="switch">
-              <dt>{{BluetoothDevice}}</dt>
-              <dd><code><var>attribute</var></code></dd>
-              <dt>{{BluetoothRemoteGATTService}}</dt>
-              <dd><code><var>attribute</var>.{{BluetoothRemoteGATTService/device}}</code></dd>
-              <dt>{{BluetoothRemoteGATTCharacteristic}}</dt>
-              <dd><code><var>attribute</var>.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}</code></dd>
-            </dl>
-          </li>
-          <li>
-            If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-            is `false`,
-            return <a>a promise rejected with</a> with a {{NetworkError}} and
-            abort these steps.
-          </li>
-          <li>
-            If <a>Represented</a>(|attribute|) is `null`,
-            return <a>a promise rejected with</a> an {{InvalidStateError}} and
-            abort these steps.
-
-            Note: This happens when a Service or Characteristic is removed from the device
-            or invalidated by a disconnection,
-            and then its object is used again.
-          </li>
-          <li>
-            <a>Query the Bluetooth cache</a> in <code><var>deviceObj</var></code>
-            for entries that:
-            <ul>
-              <li>are within <a>Represented</a>(|attribute|),</li>
-              <li>have a type described by <var>child type</var>,</li>
-              <li>have a UUID that is not <a>blocklisted</a>,</li>
-              <li>if <var>uuid</var> is present, have a UUID of <var>uuid</var>,</li>
-              <li>
-                if <var>allowedUuids</var> is present and not `"all"`,
-                have a UUID in <var>allowedUuids</var>, and
-              </li>
-              <li>if the <var>single</var> flag is set, are the first of these.</li>
-            </ul>
-            Let <var>promise</var> be the result.
-          </li>
-          <li>
-            <a>Upon fulfillment</a> of <var>promise</var> with |result|, run the
-            following steps:
-            <ul>
-              <li>If |result| is empty, throw a {{NotFoundError}},</li>
-              <li>
-                Otherwise, if the <var>single</var> flag is set,
-                returns the first (only) element of |result|.
-              </li>
-              <li>Otherwise, return |result|.</li>
-            </ul>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <section>
-      <h4 id="identifying-attributes">Identifying Services, Characteristics, and Descriptors</h4>
-
-      <p>
-        When checking whether two Services, Characteristics, or Descriptors
-        <var>a</var> and <var>b</var> are the <dfn>same attribute</dfn>,
-        the UA SHOULD determine that they are the same if <var>a</var> and <var>b</var>
-        are inside the <a>same device</a> and have the same <a>Attribute Handle</a>,
-        but MAY use any algorithm it wants with the constraint that
-        <var>a</var> and <var>b</var> MUST NOT be considered the <a>same attribute</a> if
-        they fit any of the following conditions:
-      </p>
-      <ul>
-        <li>They are not both Services, both Characteristics, or both Descriptors.</li>
-        <li>They are both Services, but are not both primary or both secondary services.</li>
-        <li>They have different UUIDs.</li>
-        <li>
-          Their parent Devices aren't the <a>same device</a> or
-          their parent Services or Characteristics aren't the <a>same attribute</a>.
-        </li>
-      </ul>
-
-      <p class="note">
-        This definition is loose because platform APIs expose their own notion of identity
-        without documenting whether it's based on <a>Attribute Handle</a> equality.
-      </p>
-
-      <p class="note">
-        For two Javascript objects <var>x</var> and <var>y</var>
-        representing Services, Characteristics, or Descriptors,
-        <code><var>x</var> === <var>y</var></code> returns
-        whether the objects represent the <a>same attribute</a>,
-        because of how the <a>query the Bluetooth cache</a> algorithm
-        creates and caches new objects.
-      </p>
-    </section>
-  </section>
-
-  <section link-for-hint="BluetoothRemoteGATTServer">
-    <h3 oldids="bluetoothgattremoteserver"
-        dfn-type="interface">BluetoothRemoteGATTServer</h3>
-
-    <p>
-      {{BluetoothRemoteGATTServer}} represents a <a>GATT Server</a> on a remote device.
-    </p>
-
-    <pre class="idl">
-      [Exposed=Window, SecureContext]
-      interface BluetoothRemoteGATTServer {
-        [SameObject]
-        readonly attribute BluetoothDevice device;
-        readonly attribute boolean connected;
-        Promise&lt;BluetoothRemoteGATTServer> connect();
-        void disconnect();
-        Promise&lt;BluetoothRemoteGATTService> getPrimaryService(BluetoothServiceUUID service);
-        Promise&lt;sequence&lt;BluetoothRemoteGATTService>>
-          getPrimaryServices(optional BluetoothServiceUUID service);
-      };
-    </pre>
-
-    <div class="note" heading="{{BluetoothRemoteGATTServer}} attributes"
-         dfn-for="BluetoothRemoteGATTServer" dfn-type="attribute">
-      <p>
-        <dfn>device</dfn> is the device running this server.
-      </p>
-
-      <p>
-        <dfn>connected</dfn> is true while this instance
-        is connected to <code>this.device</code>.
-        It can be false while the UA is physically connected,
-        for example when there are other connected {{BluetoothRemoteGATTServer}} instances
-        for other <a>global object</a>s.
-      </p>
-    </div>
-
-    <p>
-      When no ECMAScript code can
-      observe an instance of {{BluetoothRemoteGATTServer}} <var>server</var> anymore,
-      the UA SHOULD run <code><var>server</var>.{{BluetoothRemoteGATTServer/disconnect()}}</code>.
-      <span class="note">
-        Because {{BluetoothDevice}} instances are stored in
-        <code>navigator.bluetooth.{{Bluetooth/[[deviceInstanceMap]]}}</code>,
-        this can't happen at least until navigation releases the global object or
-        closing the tab or window destroys the <a>browsing context</a>.
-      </span>
-      <span class="note">
-        Disconnecting on garbage collection ensures that
-        the UA doesn't keep consuming resources on the remote device unnecessarily.
-      </span>
-    </p>
-
-    <p>
-      Instances of {{BluetoothRemoteGATTServer}} are created with the <a>internal slots</a>
-      described in the following table:
-    </p>
-
-    <table class="data" dfn-for="BluetoothRemoteGATTServer" dfn-type="attribute">
-      <thead>
-        <th><a>Internal Slot</a></th>
-        <th>Initial Value</th>
-        <th>Description (non-normative)</th>
-      </thead>
+1. Let <var>propertiesObj</var> be a new instance of
+    {{BluetoothCharacteristicProperties}}.
+1. Let <var>properties</var> be the <a>characteristic properties</a> of
+    <var>characteristic</var>.
+1. Initialize the attributes of <var>propertiesObj</var> from the corresponding
+    bits in <var>properties</var>:
+    <table>
       <tr>
-        <td><dfn>\[[activeAlgorithms]]</dfn></td>
-        <td><code>new {{Set}}()</code></td>
-        <td>
-          Contains a {{Promise}} corresponding to each algorithm using this server's connection.
-          {{disconnect()}} empties this set so that
-          the algorithm can tell whether its <a>realm</a> was ever disconnected while it was running.
-        </td>
+        <th>Attribute</th>
+        <th>Bit</th>
+      </tr>
+      <tr>
+        <td><code>broadcast</code></td>
+        <td>Broadcast</td>
+      </tr>
+      <tr>
+        <td><code>read</code></td>
+        <td>Read</td>
+      </tr>
+      <tr>
+        <td><code>writeWithoutResponse</code></td>
+        <td>Write Without Response</td>
+      </tr>
+      <tr>
+        <td><code>write</code></td>
+        <td>Write</td>
+      </tr>
+      <tr>
+        <td><code>notify</code></td>
+        <td>Notify</td>
+      </tr>
+      <tr>
+        <td><code>indicate</code></td>
+        <td>Indicate</td>
+      </tr>
+      <tr>
+        <td><code>authenticatedSignedWrites</code></td>
+        <td>Authenticated Signed Writes</td>
       </tr>
     </table>
+1. If the Extended Properties bit of the <a>characteristic properties</a> is not
+    set, initialize <code><var>propertiesObj</var>.reliableWrite</code> and
+    <code><var>propertiesObj</var>.writableAuxiliaries</code> to
+    <code>false</code>. Otherwise, run the following steps:
+    1. <a lt="Characteristic Descriptor Discovery">Discover</a> the
+        <a>Characteristic Extended Properties</a> descriptor for
+        <var>characteristic</var> and <a lt="Read Characteristic
+        Descriptors">read its value</a> into <var>extendedProperties</var>.
+        Handle errors as described in <a href="#error-handling"></a>.
 
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code> method, when invoked,
-        MUST perform the following steps:
-      </p>
-      <ol>
-        <li>Let |promise| be <a>a new promise</a>.</li>
-        <li>
-          If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
-          <a>queue a task</a> to <a>reject</a> |promise| with a {{NetworkError}},
-          return |promise|,
-          and abort these steps.
-        </li>
-        <li>
-          If the UA is currently using the Bluetooth system,
-          it MAY <a>queue a task</a> to <a>reject</a> |promise| with a {{NetworkError}},
-          return |promise|,
-          and abort these steps.
+        Issue: <a>Characteristic Extended Properties</a> isn't clear whether
+        the extended properties are immutable for a given Characteristic.
+        If they are, the UA should be allowed to cache them.
+    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
+        with that error and abort these steps.
+    1. Initialize <code><var>propertiesObj</var>.reliableWrite</code> from the
+        Reliable Write bit of <var>extendedProperties</var>.
+    1. Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
+        the Writable Auxiliaries bit of <var>extendedProperties</var>.
+1. <a>Resolve</a> <var>promise</var> with <var>propertiesObj</var>.
 
-          Issue(188): Implementations may be able to avoid this {{NetworkError}},
-          but for now sites need to serialize their use of this API
-          and/or give the user a way to retry failed operations.
-        </li>
-        <li>
-          Add |promise| to <code>this.{{[[activeAlgorithms]]}}</code>.
-        </li>
-        <li>
-          Return |promise| and run the following steps <a>in parallel</a>:
-          <ol>
-            <li>
-              If <code>this.device.{{[[representedDevice]]}}</code> has no <a>ATT Bearer</a>,
-              do the following sub-steps:
-              <ol>
-                <li id="create-an-att-bearer">
-                  Attempt to create an <a>ATT Bearer</a> using the procedures described
-                  in "Connection Establishment" under <a>GAP Interoperability Requirements</a>.
-                  Abort this attempt if |promise| is removed from <code>this.{{[[activeAlgorithms]]}}</code>.
+</div>
 
-                  Note: These procedures can wait forever
-                  if a connectable advertisement isn't received.
-                  The website should call {{disconnect()}}
-                  if it no longer wants to connect.
-                </li>
-                <li>
-                  If this attempt was aborted because
-                  |promise| was removed from <code>this.{{[[activeAlgorithms]]}}</code>,
-                  <a>reject</a> <var>promise</var> with an {{AbortError}} and abort these steps.
-                </li>
-                <li>
-                  If this attempt failed for another reason,
-                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-                </li>
-                <li>
-                  Use the <a>Exchange MTU</a> procedure to negotiate the largest supported MTU.
-                  Ignore any errors from this step.
-                </li>
-                <li>
-                  The UA MAY attempt to bond with the remote device using
-                  the <a>BR/EDR Bonding Procedure</a> or
-                  the <a>LE Bonding Procedure</a>.
+<div class="unstable">
+## BluetoothRemoteGATTDescriptor ## {#bluetoothgattdescriptor-interface}
 
-                  Note: We would normally prefer to give the website control
-                  over whether and when bonding happens,
-                  but the [Core Bluetooth](https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html)
-                  platform API doesn't provide a way for UAs to implement such a knob.
-                  Having a bond is more secure than not having one,
-                  so this specification allows the UA to opportunistically create one
-                  on platforms where that's possible.
-                  This may cause a user-visible pairing dialog to appear
-                  when a connection is created,
-                  instead of when a restricted characteristic is accessed.
-                </li>
-              </ol>
-            </li>
-            <li>
-              <a>Queue a task</a> to perform the following sub-steps:
-              <ol>
-                <li>
-                  If |promise| is not in <code>this.{{[[activeAlgorithms]]}}</code>,
-                  <a>reject</a> <var>promise</var> with an {{AbortError}},
-                  <a>garbage-collect the connection</a> of
-                  <code>this.{{[[representedDevice]]}}</code>,
-                  and abort these steps.
-                </li>
-                <li>
-                  Remove |promise| from <code>this.{{[[activeAlgorithms]]}}</code>.
-                </li>
-                <li>
-                  If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
-                  <a>reject</a> <var>promise</var> with a {{NetworkError}},
-                  <a>garbage-collect the connection</a> of
-                  <code>this.{{[[representedDevice]]}}</code>,
-                  and abort these steps.
-                </li>
-                <li>
-                  Set `this.connected` to `true`.
-                </li>
-                <li>
-                  <a>Resolve</a> <var>promise</var> with <code>this</code>.
-                </li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ol>
+{{BluetoothRemoteGATTDescriptor}} represents a GATT <a>Descriptor</a>, which
+provides further information about a <a>Characteristic</a>'s value.
+
+<xmp class="idl">
+[Exposed=Window, SecureContext]
+interface BluetoothRemoteGATTDescriptor {
+  [SameObject]
+  readonly attribute BluetoothRemoteGATTCharacteristic characteristic;
+  readonly attribute UUID uuid;
+  readonly attribute DataView? value;
+  Promise<DataView> readValue();
+  Promise<void> writeValue(BufferSource value);
+};
+</xmp>
+
+<div class="note" heading="{{BluetoothRemoteGATTDescriptor}} attributes"
+    dfn-for="BluetoothRemoteGATTDescriptor" dfn-type="attribute">
+<dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
+
+<dfn>uuid</dfn> is the UUID of the characteristic descriptor, e.g.
+<code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the
+<a idl lt="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
+Client Characteristic Configuration</a> descriptor.
+
+<dfn>value</dfn> is the currently cached descriptor value. This value gets
+updated when the value of the descriptor is read.
+</div>
+
+Instances of {{BluetoothRemoteGATTDescriptor}} are created with the <a>internal
+slots</a> described in the following table:
+
+<table dfn-for="BluetoothRemoteGATTDescriptor" dfn-type="attribute">
+<tr>
+  <th><a>Internal Slot</a></th>
+  <th>Initial Value</th>
+  <th>Description (non-normative)</th>
+</tr>
+<tr>
+  <td><dfn>\[[representedDescriptor]]</dfn></td>
+  <td>&lt;always set in prose></td>
+  <td>
+    The <a>Descriptor</a> this object represents, or `null` if the Descriptor
+    has been removed or otherwise invalidated.
+  </td>
+</tr>
+</table>
+
+<div algorithm="BluetoothRemoteGATTDescriptor constructor">
+To <dfn>create a <code>BluetoothRemoteGATTDescriptor</code> representing</dfn>
+a Descriptor <var>descriptor</var>,
+the UA must return <a>a new promise</a> <var>promise</var>
+and run the following steps <a>in parallel</a>.
+
+1. Let <var>result</var> be a new instance of {{BluetoothRemoteGATTDescriptor}}
+    with its {{[[representedDescriptor]]}} slot initialized to |descriptor|.
+1. Initialize <code><var>result</var>.characteristic</code> from
+    the {{BluetoothRemoteGATTCharacteristic}} instance representing
+    the Characteristic in which <var>descriptor</var> appears.
+1. Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
+1. Initialize <code><var>result</var>.value</code> to <code>null</code>.
+    The UA MAY initialize <code><var>result</var>.value</code> to
+    a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
+    the most recently read value from <var>descriptor</var>
+    if this value is available.
+1. <a>Resolve</a> <var>promise</var> with <var>result</var>.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTDescriptor readValue">
+The <code><dfn method for="BluetoothRemoteGATTDescriptor">
+readValue()</dfn></code> method, when invoked, MUST run the following steps:
+
+1. If <code>this.uuid</code> is <a>blocklisted for reads</a>, return
+    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+1. If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+    is `false`, return <a>a promise rejected with</a> a {{NetworkError}} and
+    abort these steps.
+1. Let |descriptor| be <code>this.{{[[representedDescriptor]]}}</code>.
+1. If |descriptor| is `null`, return <a>a promise rejected with</a> an
+    {{InvalidStateError}} and abort these steps.
+1. Return a <code>this.characteristic.service.device.gatt</code>-
+    <a>connection-checking wrapper</a> around <a>a new promise</a>
+    <var>promise</var> and run the following steps <a>in parallel</a>:
+    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
+        |promise| with a {{NetworkError}} and abort these steps.
+
+        Issue(188): Implementations may be able to avoid this {{NetworkError}},
+        but for now sites need to serialize their use of this API
+        and/or give the user a way to retry failed operations.
+    1. Use either the <a>Read Characteristic Descriptors</a> or the
+        <a>Read Long Characteristic Descriptors</a> sub-procedure to retrieve
+        the value of <var>descriptor</var>. Handle errors as described in <a
+        href="#error-handling"></a>.
+    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
+        with that error and abort these steps.
+    1. <a>Queue a task</a> to perform the following steps:
+        1. If <var>promise</var> is not in
+            <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+            these steps.
+        1. Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved
+            value, and assign <code>new DataView(<var>buffer</var>)</code> to
+            <code>this.value</code>.
+        1. <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+
+</div>
+
+<div algorithm="BluetoothRemoteGATTDescriptor writeValue">
+The <code><dfn method for="BluetoothRemoteGATTDescriptor">
+writeValue(<var>value</var>)</dfn></code> method, when invoked, MUST  run the
+following steps:
+
+1. If <code>this.uuid</code> is <a>blocklisted for writes</a>, return
+    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
+1. Let <var>bytes</var> be <a>a copy of the bytes held</a> by
+    <code><var>value</var></code>.
+1. If <var>bytes</var> is more than 512 bytes long (the maximum length of an
+    attribute value, per <a>Long Attribute Values</a>) return <a>a promise
+    rejected with</a> an {{InvalidModificationError}} and abort these steps.
+1. If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+    is `false`, return <a>a promise rejected with</a> a {{NetworkError}} and
+    abort these steps.
+1. Let |descriptor| be <code>this.{{[[representedDescriptor]]}}</code>.
+1. If |descriptor| is `null`, return <a>a promise rejected with</a> an
+    {{InvalidStateError}} and abort these steps.
+1. Return a <code>this.characteristic.service.device.gatt</code>-
+    <a>connection-checking wrapper</a> around <a>a new promise</a>
+    <var>promise</var> and run the following steps in parallel.
+    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
+        |promise| with a {{NetworkError}} and abort these steps.
+
+        Issue(188): Implementations may be able to avoid this {{NetworkError}},
+        but for now sites need to serialize their use of this API
+        and/or give the user a way to retry failed operations.
+    1. Use either the <a>Write Characteristic Descriptors</a> or the <a>Write
+        Long Characteristic Descriptors</a> sub-procedure to write
+        <var>bytes</var> to <var>descriptor</var>. Handle errors as described in
+        <a href="#error-handling"></a>.
+    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
+        with that error and abort these steps.
+    1. <a>Queue a task</a> to perform the following steps:
+        1. If <var>promise</var> is not in
+            <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
+            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+            these steps.
+        1. Set <code>this.value</code> to a new {{DataView}} wrapping a new
+            {{ArrayBuffer}} containing <var>bytes</var>.
+        1. <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+
+</div>
+</div>
+
+## Events ## {#events}
+
+<div class="unstable">
+### Bluetooth Tree ### {#bluetooth-tree}
+
+{{Navigator/bluetooth|navigator.bluetooth}} and objects implementing the
+{{BluetoothDevice}}, {{BluetoothRemoteGATTService}},
+{{BluetoothRemoteGATTCharacteristic}}, or {{BluetoothRemoteGATTDescriptor}}
+interface <a>participate in a tree</a>, simply named the <a>Bluetooth tree</a>.
+
+* The <a>children</a> of {{Navigator/bluetooth|navigator.bluetooth}}</code></a>
+    are the {{BluetoothDevice}} objects representing devices in the
+    {{BluetoothPermissionData/allowedDevices}} list in {{"bluetooth"}}'s
+    <a>extra permission data</a> for
+    {{Navigator/bluetooth|navigator.bluetooth}}'s <a>relevant settings
+    object</a>, in an unspecified order.
+* The <a>children</a> of a {{BluetoothDevice}} are the
+    {{BluetoothRemoteGATTService}} objects representing Primary and Secondary
+    <a>Service</a>s on its <a>GATT Server</a> whose UUIDs are on the origin and
+    device's {{AllowedBluetoothDevice/allowedServices}} list. The order of the
+    primary services MUST be consistent with the order returned by the
+    <a>Discover Primary Service by Service UUID</a> procedure, but secondary
+    services and primary services with different UUIDs may be in any order.
+* The <a>children</a> of a {{BluetoothRemoteGATTService}} are the
+    {{BluetoothRemoteGATTCharacteristic}} objects representing its
+    Characteristics. The order of the characteristics MUST be consistent with
+    the order returned by the <a>Discover Characteristics by UUID</a> procedure,
+    but characteristics with different UUIDs may be in any order.
+* The <a>children</a> of a {{BluetoothRemoteGATTCharacteristic}} are the
+    {{BluetoothRemoteGATTDescriptor}} objects representing its Descriptors in
+    the order returned by the <a>Discover All Characteristic Descriptors</a>
+    procedure.
+
+</div>
+
+### Event types ### {#event-types}
+
+<dl>
+  <dt>
+    <dfn event for="BluetoothDevice"><code>advertisementreceived</code></dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothDevice}} when an
+    <a href="#advertising-event-algorithm">advertising event is received from
+    that device</a>.
+  </dd>
+
+  <dt><dfn event for="Bluetooth"><code>availabilitychanged</code></dfn></dt>
+  <dd>
+    Fired on {{Bluetooth|navigator.bluetooth}} when
+    <a href="#availability-changed-algorithm">the Bluetooth system as a whole
+    becomes available or unavailable to the UA</a>.
+  </dd>
+
+  <dt>
+    <dfn event for="BluetoothRemoteGATTCharacteristic">
+      <code>characteristicvaluechanged</code>
+    </dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothRemoteGATTCharacteristic}} when its value changes,
+    either as a result of a
+    <a idl for="BluetoothRemoteGATTCharacteristic" lt="readValue()">
+    read request </a>, or a <a href="#notification-events">
+    value change notification/indication</a>.
+  </dd>
+
+  <dt>
+    <dfn event for="BluetoothDevice"><code>gattserverdisconnected</code></dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothDevice}} when
+    <a href="#disconnection-events">an active GATT connection is lost</a>.
+  </dd>
+
+  <dt>
+    <dfn event for="BluetoothRemoteGATTService"><code>serviceadded</code></dfn>
+  </dt>
+  <dd>
+    Fired on a new {{BluetoothRemoteGATTService}}
+    <a href="#service-change-events">when it has been discovered on a remote
+    device</a>, just after it is added to the <a>Bluetooth tree</a>.
+  </dd>
+
+  <dt>
+    <dfn event for="BluetoothRemoteGATTService">
+      <code>servicechanged</code>
+    </dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothRemoteGATTService}}
+    <a href="#service-change-events">when its state changes</a>.
+    This involves any characteristics and/or descriptors that get added or
+    removed from the service, as well as <a>Service Changed</a> indications from
+    the remote device.
+  </dd>
+
+  <dt>
+    <dfn event for="BluetoothRemoteGATTService">
+      <code>serviceremoved</code>
+    </dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothRemoteGATTService}}
+    <a href="#service-change-events">when it has been removed from its
+    device</a>, just before it is removed from the <a>Bluetooth tree</a>.
+  </dd>
+</dl>
+
+### Responding to Disconnection ### {#disconnection-events}
+
+<div algorithm="disconnection">
+When a <a>Bluetooth device</a> <var>device</var>'s <a>ATT Bearer</a> is lost
+(e.g. because the remote device moved out of range or the user used a platform
+feature to disconnect it), for each {{BluetoothDevice}} <var>deviceObj</var> the
+UA MUST <a>queue a task</a> on <var>deviceObj</var>'s <a>relevant settings
+object</a>'s <a>responsible event loop</a> to perform the following steps:
+
+1. If <code><var>deviceObj</var>.{{BluetoothDevice/[[representedDevice]]}}</code>
+    is not the <a>same device</a> as <var>device</var>, abort these steps.
+1. If <code>!<var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>,
+    abort these steps.
+1. <a>Clean up the disconnected device</a> |deviceObj|.
+
+</div>
+
+<div algorithm="clean up disconnected Bluetooth device">
+To <dfn>clean up the disconnected device</dfn> |deviceObj|, the UA must:
+
+1. Set <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+    to `false`.
+1. Clear <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>.
+1. Let |context| be <code>|deviceObj|.{{[[context]]}}</code>.
+1. Remove all entries from <code>|context|.{{[[attributeInstanceMap]]}}</code>
+    whose keys are inside <code>|deviceObj|.{{[[representedDevice]]}}</code>.
+1. For each {{BluetoothRemoteGATTService}} |service| in |deviceObj|'s
+    <a>realm</a>, set <code>|service|.{{[[representedService]]}}</code> to
+    `null`.
+1. For each {{BluetoothRemoteGATTCharacteristic}} |characteristic| in
+    |deviceObj|'s <a>realm</a>, do the following sub-steps:
+    1. Let |notificationContexts| be
+        <code>|characteristic|.{{[[representedCharacteristic]]}}</code>'s
+        <a>active notification context set</a>.
+    1. Remove |context| from |notificationContexts|.
+    1. If |notificationContexts| became empty and there is still an <a>ATT
+        Bearer</a> to <code>|deviceObj|.{{[[representedDevice]]}}</code> and
+        <var>characteristic</var> has a <a>Client Characteristic
+        Configuration</a> descriptor, the UA SHOULD use any of the
+        <a>Characteristic Descriptors</a> procedures to clear the
+        <code>Notification</code> and <code>Indication</code> bits in
+        <var>characteristic</var>'s <a>Client Characteristic Configuration</a>
+        descriptor.
+    1. Set <code>|characteristic|.{{[[representedCharacteristic]]}}</code>
+        to `null`.
+1. For each {{BluetoothRemoteGATTDescriptor}} |descriptor| in |deviceObj|'s
+    <a>realm</a>, set <code>|descriptor|.{{[[representedDescriptor]]}}</code> to
+    `null`.
+1. <a>Fire an event</a> named {{gattserverdisconnected}} with its
+    {{Event/bubbles}} attribute initialized to `true` at
+    <code><var>deviceObj</var></code>.
+    <div class="note">
+      Note: This event is <em>not</em> fired at the
+      {{BluetoothRemoteGATTServer}}.
     </div>
 
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTServer">disconnect()</dfn></code> method, when invoked,
-        MUST perform the following steps:
-      </p>
-      <ol>
-        <li>
-          Clear <code>this.{{[[activeAlgorithms]]}}</code>
-          to abort any <a href="#create-an-att-bearer">active `connect()` calls</a>.
-        <li>
-          If <code>this.{{connected}}</code> is <code>false</code>, abort these steps.
-        </li>
-        <li>
-          <a>Clean up the disconnected device</a> <code>this.device</code>.
-        </li>
-        <li>
-          Let <var>device</var> be <code>this.device.{{[[representedDevice]]}}</code>.
-        </li>
-        <li>
-          <a>Garbage-collect the connection</a> of |device|.
-        </li>
-      </ol>
-    </div>
+</div>
 
-    <div algorithm>
-      <p>
-        To <dfn>garbage-collect the connection</dfn> of a |device|,
-        the UA must, do the following steps <a>in parallel</a>:
-      </p>
-      <ol>
-        <li>
-          If systems that aren't using this API,
-          either inside or outside of the UA,
-          are using the <var>device</var>'s <a>ATT Bearer</a>,
-          abort this algorithm.
-        </li>
-        <li>
-          For all {{BluetoothDevice}}s <code><var>deviceObj</var></code> in the whole UA:
-          <ol>
-            <li>
-              If <code><var>deviceObj</var>.{{[[representedDevice]]}}</code> is
-              not the <a>same device</a> as <var>device</var>,
-              continue to the next |deviceObj|.
-            </li>
-            <li>
-              If <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-              is `true`,
-              abort this algorithm.
-            </li>
-            <li>
-              If <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>
-              contains the {{Promise}} of a call to {{connect()}},
-              abort this algorithm.
-            </li>
-          </ol>
-        </li>
-        <li>
-          Destroy <var>device</var>'s <a>ATT Bearer</a>.
-        </li>
-      </ol>
-    </div>
+### Responding to Notifications and Indications ### {#notification-events}
 
-    <div algorithm>
-      <p class="note">
-        Algorithms need to fail if
-        their {{BluetoothRemoteGATTServer}} was disconnected while they were running,
-        even if the UA stays connected the whole time
-        and the {{BluetoothRemoteGATTServer}} is subsequently re-connected before they finish.
-        We wrap the returned {{Promise}} to accomplish this.
-      </p>
-      <p>
-        To create a <var>gattServer</var>-<dfn>connection-checking wrapper</dfn>
-        around a {{Promise}} <var>promise</var>, the UA MUST:
-      </p>
-      <ol>
-        <li>
-          If <code><var>gattServer</var>.connected</code> is `true`,
-          add <var>promise</var> to
-          <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>.
-        </li>
-        <li>
-          <a>React</a> to <var>promise</var>:
-          <ul>
-            <li>If |promise| was fulfilled with value |result|, then:
-              <ol>
-                <li>
-                  If <var>promise</var> is in
-                  <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
-                  remove it and return |result|.
-                </li>
-                <li>
-                  Otherwise, throw a {{NetworkError}}.
-                  <span class="note">
-                    Because <var>gattServer</var> was disconnected
-                    during the execution of the main algorithm.
-                  </span>
-                </li>
-              </ol>
-            </li>
-            <li>If |promise| was rejected with reason |error|, then:
-              <ol>
-                <li>
-                  If <var>promise</var> is in
-                  <code><var>gattServer</var>.{{BluetoothRemoteGATTServer/[[activeAlgorithms]]}}</code>,
-                  remove it and throw |error|.
-                </li>
-                <li>
-                  Otherwise, throw a {{NetworkError}}.
-                  <span class="note">
-                    Because <var>gattServer</var> was disconnected
-                    during the execution of the main algorithm.
-                  </span>
-                </li>
-              </ol>
-            </li>
-          </ul>
-        </li>
-      </ol>
-    </div>
+<div algorithm="notifications">
+When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
+or <a lt="Characteristic Value Indications">Indication</a>,
+it must perform the following steps:
 
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryService(<var>service</var>)</dfn></code> method, when invoked,
-        MUST perform the following steps:
-      </p>
-      <ol>
-        <li>
-          If <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`
-          and <var>service</var> is not in
-          <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,
-          return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-        </li>
-        <li>
-        Return <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br>
-          <i>single</i>=true,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-          <i>uuid</i>=<code><var>service</var></code>,<br>
-          <i>allowedUuids</i>=<code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
-          <i>child type</i>="GATT Primary Service")</span>
-        </li>
-      </ol>
-    </div>
+1. For each <var>bluetoothGlobal</var> in the Characteristic's <a>active
+    notification context set</a>, <a>queue a task</a> on the event loop of the
+    script settings object of <var>bluetoothGlobal</var> to do the following
+    sub-steps:
+    1. Let <var>characteristicObject</var> be the
+        {{BluetoothRemoteGATTCharacteristic}} in the <a>Bluetooth tree</a>
+        rooted at <var>bluetoothGlobal</var> that represents the
+        <a>Characteristic</a>.
+    1. If <code><var>characteristicObject</var>
+        .service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+        is `false`, abort these sub-steps.
+    1. Set <code><var>characteristicObject</var>.value</code> to a new
+        {{DataView}} wrapping a new {{ArrayBuffer}} holding the new value of the
+        <a>Characteristic</a>.
+    1. <a>Fire an event</a> named {{characteristicvaluechanged}} with its
+        <code>bubbles</code> attribute initialized to <code>true</code> at
+        <var>characteristicObject</var>.
 
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTServer">getPrimaryServices(<var>service</var>)</dfn></code> method, when invoked,
-        MUST perform the following steps:
-      </p>
-      <ol>
-        <li>
-          If <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code> is not `"all"`,
-          and <var>service</var> is present
-          and not in <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,
-          return <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-        </li>
-        <li>
-          Return <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br>
-          <i>single</i>=false,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-          <i>uuid</i>=<code><var>service</var></code>,<br>
-          <i>allowedUuids</i>=<code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,<br>
-          <i>child type</i>="GATT Primary Service")</span>
-        </li>
-      </ol>
-    </div>
-  </section>
+</div>
 
-  <section>
-    <h3 oldids="bluetoothgattservice"
-        dfn-type="interface">BluetoothRemoteGATTService</h3>
+<div class="unstable">
+### Responding to Service Changes ### {#service-change-events}
 
-    <p>
-      {{BluetoothRemoteGATTService}} represents a GATT <a>Service</a>,
-      a collection of characteristics and relationships to other services
-      that encapsulate the behavior of part of a device.
-    </p>
+<div algorithm="service changes">
+The Bluetooth <a>Attribute Caching</a> system allows clients to track changes to
+<a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s. Before
+discovering any of these attributes for the purpose of exposing them to a web
+page the UA MUST subscribe to Indications from the <a>Service Changed</a>
+characteristic, if it exists. When the UA receives an Indication on the Service
+Changed characteristic, it MUST perform the following steps.
 
-    <pre class="idl">
-      [Exposed=Window, SecureContext]
-      interface BluetoothRemoteGATTService : EventTarget {
-        [SameObject]
-        readonly attribute BluetoothDevice device;
-        readonly attribute UUID uuid;
-        readonly attribute boolean isPrimary;
-        Promise&lt;BluetoothRemoteGATTCharacteristic>
-          getCharacteristic(BluetoothCharacteristicUUID characteristic);
-        Promise&lt;sequence&lt;BluetoothRemoteGATTCharacteristic>>
-          getCharacteristics(optional BluetoothCharacteristicUUID characteristic);
-        Promise&lt;BluetoothRemoteGATTService>
-          getIncludedService(BluetoothServiceUUID service);
-        Promise&lt;sequence&lt;BluetoothRemoteGATTService>>
-          getIncludedServices(optional BluetoothServiceUUID service);
-      };
-      BluetoothRemoteGATTService includes CharacteristicEventHandlers;
-      BluetoothRemoteGATTService includes ServiceEventHandlers;
-    </pre>
+1. Let <var>removedAttributes</var> be the list of attributes in the range
+    indicated by the Service Changed characteristic that the UA had discovered
+    before the Indication.
+1. Use the <a>Primary Service Discovery</a>, <a>Relationship Discovery</a>,
+    <a>Characteristic Discovery</a>, and <a>Characteristic Descriptor
+    Discovery</a> procedures to re-discover attributes in the range indicated by
+    the Service Changed characteristic. The UA MAY skip discovering all or part
+    of the indicated range if it can prove that the results of that discovery
+    could not affect the events fired below.
+1. Let <var>addedAttributes</var> be the list of attributes discovered in the
+    previous step.
+1. If an attribute with the same definition (see the <a>Service Interoperability
+    Requirements</a>), ignoring Characteristic and Descriptor values, appears in
+    both <var>removedAttributes</var> and <var>addedAttributes</var>, remove it
+    from both.
 
-    <div class="note" heading="{{BluetoothRemoteGATTService}} attributes"
-         dfn-for="BluetoothRemoteGATTService" dfn-type="attribute">
-      <p>
-        <dfn>device</dfn> is the {{BluetoothDevice}} representing
-        the remote peripheral that the GATT service belongs to.
-      </p>
-      <p>
-        <dfn>uuid</dfn> is the UUID of the service,
-        e.g. <code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the
-        <a idl lt="org.bluetooth.service.heart_rate">Heart Rate</a> service.
-      </p>
-      <p>
-        <dfn>isPrimary</dfn> indicates whether the type of this service is primary or secondary.
-      </p>
-    </div>
-
-    <p>
-      Instances of {{BluetoothRemoteGATTService}} are created with the <a>internal slots</a>
-      described in the following table:
-    </p>
-    <table class="data" dfn-for="BluetoothRemoteGATTService" dfn-type="attribute">
-      <thead>
-        <th><a>Internal Slot</a></th>
-        <th>Initial Value</th>
-        <th>Description (non-normative)</th>
-      </thead>
-      <tr>
-        <td><dfn>\[[representedService]]</dfn></td>
-        <td>&lt;always set in prose></td>
-        <td>
-          The <a>Service</a> this object represents,
-          or `null` if the Service has been removed or otherwise invalidated.
-        </td>
-      </tr>
-    </table>
-
-    <div algorithm>
-      <p>
-        To <dfn>create a <code>BluetoothRemoteGATTService</code> representing</dfn>
-        a Service <var>service</var>,
-        the UA must return <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>.
-      </p>
-      <ol>
-        <li>
-          Let <var>result</var> be a new instance of {{BluetoothRemoteGATTService}}
-          with its {{[[representedService]]}} slot initialized to |service|.
-        </li>
-        <li>
-          <a>Get the <code>BluetoothDevice</code> representing</a>
-          the device in which <var>service</var> appears,
-          and let <var>device</var> be the result.
-        </li>
-        <li>
-          If the previous step threw an error,
-          <a>reject</a> <var>promise</var> with that error and abort these steps.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.device</code> from
-          <var>device</var>.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.uuid</code> from the UUID of <var>service</var>.
-        </li>
-        <li>
-          If <var>service</var> is a Primary Service,
-          initialize <code><var>result</var>.isPrimary</code> to true.
-          Otherwise initialize <code><var>result</var>.isPrimary</code> to false.
-        </li>
-        <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
-      </ol>
-    </div>
-
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristic(<var>characteristic</var>)</dfn></code> method
-        retrieves a <a>Characteristic</a> inside this Service.
-        When invoked, it MUST return
-      </p>
-      <blockquote>
-        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
-          <i>single</i>=true,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
-          <i>uuid</i>=<code><var>characteristic</var></code>,<br>
-          <i>allowedUuids</i>=<code>undefined</code>,<br>
-          <i>child type</i>="GATT Characteristic")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTService">getCharacteristics(<var>characteristic</var>)</dfn></code> method
-        retrieves a list of <a>Characteristic</a>s inside this Service.
-        When invoked, it MUST return
-      </p>
-      <blockquote>
-        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
-          <i>single</i>=false,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}},<br>
-          <i>uuid</i>=<code><var>characteristic</var></code>,<br>
-          <i>allowedUuids</i>=<code>undefined</code>,<br>
-          <i>child type</i>="GATT Characteristic")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm class="unstable">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTService">getIncludedService(<var>service</var>)</dfn></code> method
-        retrieves an <a>Included Service</a> inside this Service.
-        When invoked, it MUST return
-      </p>
-      <blockquote>
-        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
-          <i>single</i>=true,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-          <i>uuid</i>=<code><var>service</var></code>,<br>
-          <i>allowedUuids</i>=<code>undefined</code>,<br>
-          <i>child type</i>="GATT Included Service")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm class="unstable">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTService">getIncludedServices(<var>service</var>)</dfn></code> method
-        retrieves a list of <a>Included Service</a>s inside this Service.
-        When invoked, it MUST return
-      </p>
-      <blockquote>
-        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
-          <i>single</i>=false,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getService()|BluetoothUUID.getService}},<br>
-          <i>uuid</i>=<code><var>service</var></code>,<br>
-          <i>allowedUuids</i>=<code>undefined</code>,<br>
-          <i>child type</i>="GATT Included Service")</span>
-      </blockquote>
-    </div>
-  </section>
-
-  <section>
-    <h3 oldids="bluetoothgattcharacteristic"
-        dfn-type="interface">BluetoothRemoteGATTCharacteristic</h3>
-
-    <p>{{BluetoothRemoteGATTCharacteristic}} represents a GATT <a>Characteristic</a>, which is a basic data element that provides further information about a peripheral's service.</p>
-
-    <pre class="idl">
-      [Exposed=Window, SecureContext]
-      interface BluetoothRemoteGATTCharacteristic : EventTarget {
-        [SameObject]
-        readonly attribute BluetoothRemoteGATTService service;
-        readonly attribute UUID uuid;
-        readonly attribute BluetoothCharacteristicProperties properties;
-        readonly attribute DataView? value;
-        Promise&lt;BluetoothRemoteGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
-        Promise&lt;sequence&lt;BluetoothRemoteGATTDescriptor>>
-          getDescriptors(optional BluetoothDescriptorUUID descriptor);
-        Promise&lt;DataView> readValue();
-        Promise&lt;void> writeValue(BufferSource value);
-        Promise&lt;void> writeValueWithResponse(BufferSource value);
-        Promise&lt;void> writeValueWithoutResponse(BufferSource value);
-        Promise&lt;BluetoothRemoteGATTCharacteristic> startNotifications();
-        Promise&lt;BluetoothRemoteGATTCharacteristic> stopNotifications();
-      };
-      BluetoothRemoteGATTCharacteristic includes CharacteristicEventHandlers;
-    </pre>
-
-    <div class="note" heading="{{BluetoothRemoteGATTCharacteristic}} attributes"
-         dfn-for="BluetoothRemoteGATTCharacteristic" dfn-type="attribute">
-      <p>
-        <dfn>service</dfn> is the GATT service this characteristic belongs to.
-      </p>
-      <p>
-        <dfn>uuid</dfn> is the UUID of the characteristic,
-        e.g. <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the
-        <a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
-           Heart Rate Measurement</a> characteristic.
-      </p>
-      <p>
-        <dfn>properties</dfn> holds the properties of this characteristic.
-      </p>
-      <p>
-        <dfn>value</dfn> is the currently cached characteristic value.
-        This value gets updated when the value of the characteristic is read or updated via a notification or indication.
-      </p>
-    </div>
-
-    <p>
-      Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the <a>internal slots</a>
-      described in the following table:
-    </p>
-    <table class="data" dfn-for="BluetoothRemoteGATTCharacteristic" dfn-type="attribute">
-      <thead>
-        <th><a>Internal Slot</a></th>
-        <th>Initial Value</th>
-        <th>Description (non-normative)</th>
-      </thead>
-      <tr>
-        <td><dfn>\[[representedCharacteristic]]</dfn></td>
-        <td>&lt;always set in prose></td>
-        <td>
-          The <a>Characteristic</a> this object represents,
-          or `null` if the Characteristic has been removed or otherwise invalidated.
-        </td>
-      </tr>
-    </table>
-
-    <div algorithm>
-      <p>
-        To <dfn>create a <code>BluetoothRemoteGATTCharacteristic</code> representing</dfn>
-        a Characteristic <var>characteristic</var>,
-        the UA must return <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>.
-      </p>
-      <ol>
-        <li>
-          Let <var>result</var> be a new instance of {{BluetoothRemoteGATTCharacteristic}}
-          with its {{[[representedCharacteristic]]}} slot initialized to |characteristic|.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.service</code> from
-          the {{BluetoothRemoteGATTService}} instance representing
-          the Service in which <var>characteristic</var> appears.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.uuid</code> from
-          the UUID of <var>characteristic</var>.
-        </li>
-        <li>
-          <a>Create a <code>BluetoothCharacteristicProperties</code> instance
-          from the Characteristic</a> <var>characteristic</var>,
-          and let <var>propertiesPromise</var> be the result.
-        </li>
-        <li>Wait for <var>propertiesPromise</var> to settle.</li>
-        <li>
-          If <var>propertiesPromise</var> was rejected,
-          <a>resolve</a> <var>promise</var> with <var>propertiesPromise</var> and
-          abort these steps.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.properties</code> from
-          the value <var>propertiesPromise</var> was fulfilled with.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.value</code> to <code>null</code>.
-          The UA MAY initialize <code><var>result</var>.value</code> to
-          a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
-          the most recently read value from <var>characteristic</var>
-          if this value is available.
-        </li>
-        <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
-      </ol>
-    </div>
-
-    <div algorithm class="unstable">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptor(<var>descriptor</var>)</dfn></code> method
-        retrieves a <a>Descriptor</a> inside this Characteristic.
-        When invoked, it MUST return
-      </p>
-      <blockquote>
-        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
-          <i>single</i>=true,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
-          <i>uuid</i>=<code><var>descriptor</var></code>,<br>
-          <i>allowedUuids</i>=<code>undefined</code>,<br>
-          <i>child type</i>="GATT Descriptor")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm class="unstable">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getDescriptors(<var>descriptor</var>)</dfn></code> method
-        retrieves a list of <a>Descriptor</a>s inside this Characteristic.
-        When invoked, it MUST return
-      </p>
-      <blockquote>
-        <a>GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this</code>,<br>
-          <i>single</i>=false,<br>
-          <i>uuidCanonicalizer</i>={{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}},<br>
-          <i>uuid</i>=<code><var>descriptor</var></code>,<br>
-          <i>allowedUuids</i>=<code>undefined</code>,<br>
-          <i>child type</i>="GATT Descriptor")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm="Characteristic.readValue()">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn></code> method, when invoked,
-        MUST run the following steps:
-      </p>
-      <ol>
-        <li>
-          If <code>this.uuid</code> is <a>blocklisted for reads</a>,
-          return <a>a promise rejected with</a> a {{SecurityError}}
-          and abort these steps.
-        </li>
-        <li>
-          If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-          is `false`,
-          return <a>a promise rejected with</a> a {{NetworkError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let |characteristic| be
-          <code>this.{{[[representedCharacteristic]]}}</code>.
-        </li>
-        <li>
-          If |characteristic| is `null`,
-          return <a>a promise rejected with</a> an {{InvalidStateError}} and
-          abort these steps.
-        </li>
-        <li>
-          Return a <code>this.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-          <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>:
-          <ol>
-            <li>
-              If the <code>Read</code> bit is not set
-              in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
-              <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
-            </li>
-            <li>
-              If the UA is currently using the Bluetooth system,
-              it MAY <a>reject</a> |promise| with a {{NetworkError}}
-              and abort these steps.
-
-              Issue(188): Implementations may be able to avoid this {{NetworkError}},
-              but for now sites need to serialize their use of this API
-              and/or give the user a way to retry failed operations.
-            </li>
-            <li>
-              Use any combination of the sub-procedures in
-              the <a>Characteristic Value Read</a> procedure
-              to retrieve the value of <var>characteristic</var>.
-              Handle errors as described in <a href="#error-handling"></a>.
-            </li>
-            <li>
-              If the previous step returned an error,
-              <a>reject</a> <var>promise</var> with that error and abort these steps.
-            </li>
-            <li>
-              <a>Queue a task</a> to perform the following steps:
-              <ol>
-                <li>
-                  If <var>promise</var> is not in
-                  <code>this.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-                </li>
-                <li>
-                  Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
-                  and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
-                </li>
-                <li>
-                  <a>Fire an event</a> named {{characteristicvaluechanged}}
-                  with its <code>bubbles</code> attribute initialized to <code>true</code>
-                  at <code>this</code>.
-                </li>
-                <li>
-                  <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
-                </li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ol>
-    </div>
-
-    <div algorithm="WriteCharacteristicValue">
-      <p>
-        To <dfn>WriteCharacteristicValue</dfn>(<span class="argument-list"><var>this</var>: BluetoothRemoteGATTCharacteristic,<br>
-        <var>value</var>: BufferSource,<br>
-        <var>response</var>: string),</span><br>
-        the UA MUST perform the following steps:
-      </p>
-      <ol>
-        <li>
-          If <code>|this|.uuid</code> is <a>blocklisted for writes</a>,
-          return <a>a promise rejected with</a> a {{SecurityError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let <var>bytes</var> be
-          <a>a copy of the bytes held</a> by <code><var>value</var></code>.
-        </li>
-        <li>
-          If <var>bytes</var> is more than 512 bytes long
-          (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
-          return <a>a promise rejected with</a> an {{InvalidModificationError}}
-          and abort these steps.
-        </li>
-        <li>
-          If <code>|this|.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
-          return <a>a promise rejected with</a> a {{NetworkError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let |characteristic| be
-          <code>|this|.{{[[representedCharacteristic]]}}</code>.
-        </li>
-        <li>
-          If |characteristic| is `null`,
-          return <a>a promise rejected with</a> an {{InvalidStateError}} and
-          abort these steps.
-        </li>
-        <li>
-          Return a <code>|this|.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-          <a>a new promise</a> <var>promise</var>
-          and run the following steps in parallel.
-          <ol>
-            <li>
-              Assert: |response| is one of "required", "never", or "optional".
-            </li>
-            <li>
-              <a>Reject</a> <var>promise</var> with a {{NotSupportedError}} and
-              abort these steps if any of the following is true:
-              <ol>
-                <li>
-                 |response| is "required" and <code>Write</code> bit is not set in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
-                </li>
-                <li>
-                 |response| is "never" and none of <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
-                 in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
-                </li>
-                <li>
-                 |response| is "optional" and none of the <code>Write</code>, <code>Write Without Response</code> or <code>Authenticated Signed Writes</code> bits are set
-                 in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>
-                </li>
-              </ol>
-            </li>
-            <li>
-              If the UA is currently using the Bluetooth system,
-              it MAY <a>reject</a> |promise| with a {{NetworkError}}
-              and abort these steps.
-
-              Issue(188): Implementations may be able to avoid this {{NetworkError}},
-              but for now sites need to serialize their use of this API
-              and/or give the user a way to retry failed operations.
-            </li>
-            <li>
-              Write <var>bytes</var> to <var>characteristic</var> by performing
-              the following steps:
-              <dl class="switch">
-                <dt>If |response| is "required"</dt>
-                <dd>
-                  Use the <a>Write Characteristic Value</a> procedure.
-                </dd>
-                <dt>If |response| is "never"</dt>
-                <dd>
-                  Use the <a>Write Without Response</a> procedure.
-                </dd>
-                <dt>Otherwise</dt>
-                <dd>
-                  Use any combination of the sub-procedures in
-                  the <a>Characteristic Value Write</a> procedure.
-                </dd>
-              </dl>
-              Handle errors as described in <a href="#error-handling"></a>.
-            </li>
-            <li>
-              If the previous step returned an error,
-              <a>reject</a> <var>promise</var> with that error and abort these steps.
-            </li>
-            <li>
-              <a>Queue a task</a> to perform the following steps:
-              <ol>
-                <li>
-                  If <var>promise</var> is not in
-                  <code>|this|.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-                </li>
-                <li>
-                  Set <code>|this|.value</code> to
-                  a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
-                </li>
-                <li>
-                  <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
-                </li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ol>
-    </div>
-
-    <div algorithm="Characteristic.writeValue()">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValue(<var>value</var>)</dfn></code> method, 
-        when invoked, MUST return
-      </p>
-      <blockquote>
-        <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
-          <i>value</i>=<code><var>value</var></code>,<br>
-          <i>response</i>="optional")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm="Characteristic.writeValueWithResponse()" class="unstable">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValueWithResponse(<var>value</var>)</dfn></code> method, 
-        when invoked, MUST return
-      </p>
-      <blockquote>
-        <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
-          <i>value</i>=<code><var>value</var></code>,<br>
-          <i>response</i>="required")</span>
-      </blockquote>
-    </div>
-
-    <div algorithm="Characteristic.writeValueWithoutResponse()" class="unstable">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">writeValueWithoutResponse(<var>value</var>)</dfn></code> method, 
-        when invoked, MUST return
-      </p>
-      <blockquote>
-        <a>WriteCharacteristicValue</a>(<span class="argument-list"><i>this</i>=<code>this</code>,<br>
-          <i>value</i>=<code><var>value</var></code>,<br>
-          <i>response</i>="never")</span>
-      </blockquote>
-    </div>
-
-    <p>
-      The UA MUST maintain a map from each known GATT <a>Characteristic</a> to
-      a set of {{Bluetooth}} objects known as
-      the characteristic's <dfn>active notification context set</dfn>.
-      <span class="note">
-        The set for a given characteristic holds
-        the {{Navigator/bluetooth|navigator.bluetooth}} objects for
-        each <a>Realm</a> that has registered for notifications.
-        All notifications become inactive when a device is disconnected.
-        A site that wants to keep getting notifications after reconnecting
-        needs to call {{startNotifications()}} again,
-        and there is an unavoidable risk that
-        some notifications will be missed
-        in the gap before {{startNotifications()}} takes effect.
-      </span>
-    </p>
-
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">startNotifications()</dfn></code> method, when invoked,
-        MUST return <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>.
-        See <a href="#notification-events"></a> for details of receiving notifications.
-      </p>
-      <ol>
-        <li>
-          If <code>this.uuid</code> is <a>blocklisted for reads</a>,
-          <a>reject</a> <var>promise</var> with a {{SecurityError}} and abort these steps.
-        </li>
-        <li>
-          If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code> is `false`,
-          <a>reject</a> <var>promise</var> with a {{NetworkError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let |characteristic| be
-          <code>this.{{[[representedCharacteristic]]}}</code>.
-        </li>
-        <li>
-          If |characteristic| is `null`,
-          return <a>a promise rejected with</a> an {{InvalidStateError}} and
-          abort these steps.
-        </li>
-        <li>
-          If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-          in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>,
-          <a>reject</a> <var>promise</var> with a {{NotSupportedError}} and abort these steps.
-        </li>
-        <li>
-          If <var>characteristic</var>'s <a>active notification context set</a> contains
-          {{Navigator/bluetooth|navigator.bluetooth}},
-          <a>resolve</a> <var>promise</var> with `this` and abort these steps.
-        </li>
-        <li>
-          If the UA is currently using the Bluetooth system,
-          it MAY <a>reject</a> |promise| with a {{NetworkError}}
-          and abort these steps.
-
-          Issue(188): Implementations may be able to avoid this {{NetworkError}},
-          but for now sites need to serialize their use of this API
-          and/or give the user a way to retry failed operations.
-        </li>
-        <li>
-          If the characteristic has a <a>Client Characteristic Configuration</a>
-          descriptor, use any of the <a>Characteristic Descriptors</a> procedures
-          to ensure that one of the <code>Notification</code> or <code>Indication</code> bits in
-          <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor
-          is set, matching the constraints
-          in <var>characteristic</var>'s <a lt="Characteristic Properties">properties</a>.
-          The UA SHOULD avoid setting both bits,
-          and MUST deduplicate <a href="#notification-events">value-change events</a>
-          if both bits are set.
-          Handle errors as described in <a href="#error-handling"></a>.
-
-          Note: Some devices have characteristics whose properties include the
-          Notify or Indicate bit but that don't have a <a>Client Characteristic
-          Configuration</a> descriptor. These non-standard-compliant characteristics
-          tend to send notifications or indications unconditionally, so this
-          specification allows applications to simply subscribe to their
-          messages.
-        </li>
-        <li>
-          If the previous step returned an error,
-          <a>reject</a> <var>promise</var> with that error and abort these steps.
-        </li>
-        <li>
-          Add {{Navigator/bluetooth|navigator.bluetooth}}
-          to <var>characteristic</var>'s <a>active notification context set</a>.
-        </li>
-        <li>
-          <a>Resolve</a> <var>promise</var> with `this`.
-        </li>
-      </ol>
-
-      <p class="note">
-        After notifications are enabled,
-        the resulting <a href="#notification-events">value-change events</a> won't be delivered
-        until after the current
-        <a lt="perform a microtask checkpoint">microtask checkpoint</a>.
-        This allows a developer to set up handlers
-        in the <code>.then</code> handler of the result promise.
-      </p>
-    </div>
-
-    <div algorithm>
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTCharacteristic">stopNotifications()</dfn></code> method, when invoked,
-        MUST return <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>:
-      </p>
-      <ol>
-        <li>
-          Let |characteristic| be
-          <code>this.{{[[representedCharacteristic]]}}</code>.
-        </li>
-        <li>
-          If |characteristic| is `null`,
-          return <a>a promise rejected with</a> an {{InvalidStateError}} and
-          abort these steps.
-        </li>
-        <li>
-          If <var>characteristic</var>'s <a>active notification context set</a> contains
-          {{Navigator/bluetooth|navigator.bluetooth}},
-          remove it.
-        </li>
-        <li>
-          If <var>characteristic</var>'s <a>active notification context set</a> became empty
-          and the characteristic has a <a>Client Characteristic Configuration</a> descriptor,
-          the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
-          to clear the <code>Notification</code> and <code>Indication</code> bits in
-          <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
-        </li>
-        <li>
-          <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
-        </li>
-      </ol>
-
-      <p class="note">
-        Queuing a task to resolve the promise ensures that
-        no <a href="#notification-events">value change events</a> due to notifications
-        arrive after the promise resolves.
-      </p>
-    </div>
-
-    <section>
-      <h4 id="characteristicproperties"><dfn interface>BluetoothCharacteristicProperties</dfn></h4>
-
-      <p>
-        Each {{BluetoothRemoteGATTCharacteristic}} exposes its <a>characteristic properties</a>
-        through a {{BluetoothCharacteristicProperties}} object.
-        These properties express what operations are valid on the characteristic.
-      </p>
-
-      <pre class="idl">
-        [Exposed=Window, SecureContext]
-        interface BluetoothCharacteristicProperties {
-          readonly attribute boolean broadcast;
-          readonly attribute boolean read;
-          readonly attribute boolean writeWithoutResponse;
-          readonly attribute boolean write;
-          readonly attribute boolean notify;
-          readonly attribute boolean indicate;
-          readonly attribute boolean authenticatedSignedWrites;
-          readonly attribute boolean reliableWrite;
-          readonly attribute boolean writableAuxiliaries;
-        };
-      </pre>
-
-      <div algorithm>
-        <p>
-          To <dfn>create a <code>BluetoothCharacteristicProperties</code> instance
-          from the Characteristic</dfn> <var>characteristic</var>,
-          the UA MUST return <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>:
-        </p>
-        <ol>
-          <li>
-            Let <var>propertiesObj</var> be a new instance of {{BluetoothCharacteristicProperties}}.
-          </li>
-          <li>
-            Let <var>properties</var> be
-            the <a>characteristic properties</a> of <var>characteristic</var>.
-          </li>
-          <li>
-            Initialize the attributes of <var>propertiesObj</var> from
-            the corresponding bits in <var>properties</var>:
-            <table class="data">
-              <thead><th>Attribute</th><th>Bit</th></thead>
-              <tr><td><code>broadcast</code></td><td>Broadcast</td></tr>
-              <tr><td><code>read</code></td><td>Read</td></tr>
-              <tr><td><code>writeWithoutResponse</code></td><td>Write Without Response</td></tr>
-              <tr><td><code>write</code></td><td>Write</td></tr>
-              <tr><td><code>notify</code></td><td>Notify</td></tr>
-              <tr><td><code>indicate</code></td><td>Indicate</td></tr>
-              <tr>
-                <td><code>authenticatedSignedWrites</code></td>
-                <td>Authenticated Signed Writes</td>
-              </tr>
-            </table>
-          </li>
-          <li>
-            If the Extended Properties bit of the <a>characteristic properties</a> is not set,
-            initialize <code><var>propertiesObj</var>.reliableWrite</code> and
-            <code><var>propertiesObj</var>.writableAuxiliaries</code> to <code>false</code>.
-            Otherwise, run the following steps:
-            <ol>
-              <li>
-                <a lt="Characteristic Descriptor Discovery">Discover</a> the
-                <a>Characteristic Extended Properties</a> descriptor for <var>characteristic</var>
-                and <a lt="Read Characteristic Descriptors">read its value</a>
-                into <var>extendedProperties</var>.
-                Handle errors as described in <a href="#error-handling"></a>.
-                <p class="issue">
-                  <a>Characteristic Extended Properties</a> isn't clear whether
-                  the extended properties are immutable for a given Characteristic.
-                  If they are, the UA should be allowed to cache them.
-                </p>
-              </li>
-              <li>
-                If the previous step returned an error,
-                <a>reject</a> <var>promise</var> with that error and abort these steps.
-              </li>
-              <li>
-                Initialize <code><var>propertiesObj</var>.reliableWrite</code> from
-                the Reliable Write bit of <var>extendedProperties</var>.
-              </li>
-              <li>
-                Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
-                the Writable Auxiliaries bit of <var>extendedProperties</var>.
-              </li>
-            </ol>
-          </li>
-          <li>
-            <a>Resolve</a> <var>promise</var> with <var>propertiesObj</var>.
-          </li>
-        </ol>
-      </div>
-    </section>
-  </section>
-
-  <section class="unstable">
-    <h3 oldids="bluetoothgattdescriptor"
-        dfn-type="interface">BluetoothRemoteGATTDescriptor</h3>
-
-    <p>{{BluetoothRemoteGATTDescriptor}} represents a GATT <a>Descriptor</a>, which provides further information about a <a>Characteristic</a>'s value.</p>
-
-    <pre class="idl">
-      [Exposed=Window, SecureContext]
-      interface BluetoothRemoteGATTDescriptor {
-        [SameObject]
-        readonly attribute BluetoothRemoteGATTCharacteristic characteristic;
-        readonly attribute UUID uuid;
-        readonly attribute DataView? value;
-        Promise&lt;DataView> readValue();
-        Promise&lt;void> writeValue(BufferSource value);
-      };
-    </pre>
-
-    <div class="note" heading="{{BluetoothRemoteGATTDescriptor}} attributes"
-         dfn-for="BluetoothRemoteGATTDescriptor" dfn-type="attribute">
-      <p>
-        <dfn>characteristic</dfn> is the GATT characteristic this descriptor belongs to.
-      </p>
-      <p>
-        <dfn>uuid</dfn> is the UUID of the characteristic descriptor,
-        e.g. <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the
-        <a idl lt="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
-           Client Characteristic Configuration</a> descriptor.
-      </p>
-      <p>
-        <dfn>value</dfn> is the currently cached descriptor value.
-        This value gets updated when the value of the descriptor is read.
-      </p>
-    </div>
-
-    <p>
-      Instances of {{BluetoothRemoteGATTDescriptor}} are created with the <a>internal slots</a>
-      described in the following table:
-    </p>
-    <table class="data" dfn-for="BluetoothRemoteGATTDescriptor" dfn-type="attribute">
-      <thead>
-        <th><a>Internal Slot</a></th>
-        <th>Initial Value</th>
-        <th>Description (non-normative)</th>
-      </thead>
-      <tr>
-        <td><dfn>\[[representedDescriptor]]</dfn></td>
-        <td>&lt;always set in prose></td>
-        <td>
-          The <a>Descriptor</a> this object represents,
-          or `null` if the Descriptor has been removed or otherwise invalidated.
-        </td>
-      </tr>
-    </table>
-
-    <div algorithm>
-      <p>
-        To <dfn>create a <code>BluetoothRemoteGATTDescriptor</code> representing</dfn>
-        a Descriptor <var>descriptor</var>,
-        the UA must return <a>a new promise</a> <var>promise</var>
-        and run the following steps <a>in parallel</a>.
-      </p>
-      <ol>
-        <li>
-          Let <var>result</var> be a new instance of {{BluetoothRemoteGATTDescriptor}}
-          with its {{[[representedDescriptor]]}} slot initialized to |descriptor|.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.characteristic</code> from
-          the {{BluetoothRemoteGATTCharacteristic}} instance representing
-          the Characteristic in which <var>descriptor</var> appears.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
-        </li>
-        <li>
-          Initialize <code><var>result</var>.value</code> to <code>null</code>.
-          The UA MAY initialize <code><var>result</var>.value</code> to
-          a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
-          the most recently read value from <var>descriptor</var>
-          if this value is available.
-        </li>
-        <li><a>Resolve</a> <var>promise</var> with <var>result</var>.</li>
-      </ol>
-    </div>
-
-    <div algorithm="Descriptor.readValue()">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTDescriptor">readValue()</dfn></code> method, when invoked,
-        MUST run the following steps:
-      </p>
-      <ol>
-        <li>
-          If <code>this.uuid</code> is <a>blocklisted for reads</a>,
-          return <a>a promise rejected with</a> a {{SecurityError}}
-          and abort these steps.
-        </li>
-        <li>
-          If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-          is `false`,
-          return <a>a promise rejected with</a> a {{NetworkError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let |descriptor| be
-          <code>this.{{[[representedDescriptor]]}}</code>.
-        </li>
-        <li>
-          If |descriptor| is `null`,
-          return <a>a promise rejected with</a> an {{InvalidStateError}} and
-          abort these steps.
-        </li>
-        <li>
-          Return a
-          <code>this.characteristic.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-          <a>a new promise</a> <var>promise</var>
-          and run the following steps <a>in parallel</a>:
-          <ol>
-            <li>
-              If the UA is currently using the Bluetooth system,
-              it MAY <a>reject</a> |promise| with a {{NetworkError}}
-              and abort these steps.
-
-              Issue(188): Implementations may be able to avoid this {{NetworkError}},
-              but for now sites need to serialize their use of this API
-              and/or give the user a way to retry failed operations.
-            </li>
-            <li>
-              Use either the <a>Read Characteristic Descriptors</a> or
-              the <a>Read Long Characteristic Descriptors</a> sub-procedure
-              to retrieve the value of <var>descriptor</var>.
-              Handle errors as described in <a href="#error-handling"></a>.
-            </li>
-            <li>
-              If the previous step returned an error,
-              <a>reject</a> <var>promise</var> with that error and abort these steps.
-            </li>
-            <li>
-              <a>Queue a task</a> to perform the following steps:
-              <ol>
-                <li>
-                  If <var>promise</var> is not in
-                  <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-                </li>
-                <li>
-                  Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved value,
-                  and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.
-                </li>
-                <li>
-                  <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
-                </li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ol>
-    </div>
-
-    <div algorithm="Descriptor.writeValue()">
-      <p>
-        The <code><dfn method for="BluetoothRemoteGATTDescriptor">writeValue(<var>value</var>)</dfn></code> method, when invoked,
-        MUST  run the following steps:
-      </p>
-      <ol>
-        <li>
-          If <code>this.uuid</code> is <a>blocklisted for writes</a>,
-          return <a>a promise rejected with</a> a {{SecurityError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let <var>bytes</var> be
-          <a>a copy of the bytes held</a> by <code><var>value</var></code>.
-        </li>
-        <li>
-          If <var>bytes</var> is more than 512 bytes long
-          (the maximum length of an attribute value, per <a>Long Attribute Values</a>)
-          return <a>a promise rejected with</a> an {{InvalidModificationError}}
-          and abort these steps.
-        </li>
-        <li>
-          If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-          is `false`,
-          return <a>a promise rejected with</a> a {{NetworkError}}
-          and abort these steps.
-        </li>
-        <li>
-          Let |descriptor| be
-          <code>this.{{[[representedDescriptor]]}}</code>.
-        </li>
-        <li>
-          If |descriptor| is `null`,
-          return <a>a promise rejected with</a> an {{InvalidStateError}} and
-          abort these steps.
-        </li>
-        <li>
-          Return a
-          <code>this.characteristic.service.device.gatt</code>-<a>connection-checking wrapper</a> around
-          <a>a new promise</a> <var>promise</var>
-          and run the following steps in parallel.
-          <ol>
-            <li>
-              If the UA is currently using the Bluetooth system,
-              it MAY <a>reject</a> |promise| with a {{NetworkError}}
-              and abort these steps.
-
-              Issue(188): Implementations may be able to avoid this {{NetworkError}},
-              but for now sites need to serialize their use of this API
-              and/or give the user a way to retry failed operations.
-            </li>
-            <li>
-              Use either the <a>Write Characteristic Descriptors</a> or
-              the <a>Write Long Characteristic Descriptors</a> sub-procedure
-              to write <var>bytes</var> to <var>descriptor</var>.
-              Handle errors as described in <a href="#error-handling"></a>.
-            </li>
-            <li>
-              If the previous step returned an error,
-              <a>reject</a> <var>promise</var> with that error and abort these steps.
-            </li>
-            <li>
-              <a>Queue a task</a> to perform the following steps:
-              <ol>
-                <li>
-                  If <var>promise</var> is not in
-                  <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-                  <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort these steps.
-                </li>
-                <li>
-                  Set <code>this.value</code> to
-                  a new {{DataView}} wrapping a new {{ArrayBuffer}} containing <var>bytes</var>.
-                </li>
-                <li>
-                  <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
-                </li>
-              </ol>
-            </li>
-          </ol>
-        </li>
-      </ol>
-    </div>
-  </section>
-
-  <section>
-    <h3 id="events">Events</h3>
-
-    <section class="unstable">
-      <h4 id="bluetooth-tree" dfn-type="dfn">Bluetooth Tree</h4>
-
-      <p>
-        {{Navigator/bluetooth|navigator.bluetooth}} and
-        objects implementing the {{BluetoothDevice}}, {{BluetoothRemoteGATTService}},
-        {{BluetoothRemoteGATTCharacteristic}}, or {{BluetoothRemoteGATTDescriptor}} interface
-        <a>participate in a tree</a>,
-        simply named the <a>Bluetooth tree</a>.
-
-      <ul>
-        <li>
-          The <a>children</a>
-          of {{Navigator/bluetooth|navigator.bluetooth}}</code></a>
-          are the {{BluetoothDevice}} objects representing
-          devices in the {{BluetoothPermissionData/allowedDevices}} list
-          in {{"bluetooth"}}'s <a>extra permission data</a>
-          for {{Navigator/bluetooth|navigator.bluetooth}}'s <a>relevant settings object</a>,
-          in an unspecified order.
-        </li>
-        <li>
-          The <a>children</a> of a {{BluetoothDevice}}
-          are the {{BluetoothRemoteGATTService}} objects representing
-          Primary and Secondary <a>Service</a>s on its <a>GATT Server</a>
-          whose UUIDs are on the origin and device's
-          {{AllowedBluetoothDevice/allowedServices}} list.
-          The order of the primary services MUST be consistent with the order returned by
-          the <a>Discover Primary Service by Service UUID</a> procedure,
-          but secondary services and primary services with different UUIDs may be in any order.
-        </li>
-        <li>
-          The <a>children</a> of a {{BluetoothRemoteGATTService}} are
-          the {{BluetoothRemoteGATTCharacteristic}} objects representing its Characteristics.
-          The order of the characteristics MUST be consistent with the order returned by
-          the <a>Discover Characteristics by UUID</a> procedure,
-          but characteristics with different UUIDs may be in any order.
-        </li>
-        <li>
-          The <a>children</a> of a {{BluetoothRemoteGATTCharacteristic}} are
-          the {{BluetoothRemoteGATTDescriptor}} objects representing its Descriptors
-          in the order returned by the <a>Discover All Characteristic Descriptors</a> procedure.
-        </li>
-      </ul>
-    </section>
-
-    <section>
-      <h4 id="event-types">Event types</h4>
+    <div class="example" id="example-changed-service">
+      Given the following device states:
 
       <dl>
-        <dt><dfn event for="BluetoothDevice"><code>advertisementreceived</code></dfn></dt>
+        <dt>State 1</dt>
         <dd>
-          Fired on a {{BluetoothDevice}}
-          when an <a href="#advertising-event-algorithm">advertising event
-          is received from that device</a>.
+          <ul>
+            <li>Service A
+              <ul>
+                <li>Characteristic C: value `[1, 2, 3]`</li>
+              </ul>
+            </li>
+            <li>Service B</li>
+          </ul>
         </dd>
 
-        <dt><dfn event for="Bluetooth"><code>availabilitychanged</code></dfn></dt>
+        <dt>State 2</dt>
         <dd>
-          Fired on {{Bluetooth|navigator.bluetooth}} when
-          <a href="#availability-changed-algorithm">the Bluetooth system as a whole
-          becomes available or unavailable to the UA</a>.
+          <ul>
+            <li>Service A
+              <ul>
+                <li>Characteristic C: value `[3, 2, 1]`</li>
+              </ul>
+            </li>
+            <li>Service B</li>
+          </ul>
         </dd>
 
-        <dt><dfn event for="BluetoothRemoteGATTCharacteristic"><code>characteristicvaluechanged</code></dfn></dt>
+        <dt>State 3</dt>
         <dd>
-          Fired on a {{BluetoothRemoteGATTCharacteristic}} when its value changes,
-          either as a result of
-          a <a idl for="BluetoothRemoteGATTCharacteristic" lt="readValue()">read request</a>,
-          or a <a href="#notification-events">value change notification/indication</a>.
+          <ul>
+            <li>Service A
+              <ul>
+                <li>Characteristic D: value `[3, 2, 1]`</li>
+              </ul>
+            </li>
+            <li>Service B</li>
+          </ul>
         </dd>
 
-        <dt><dfn event for="BluetoothDevice"><code>gattserverdisconnected</code></dfn></dt>
+        <dt>State 4</dt>
         <dd>
-          Fired on a {{BluetoothDevice}} when
-          <a href="#disconnection-events">an active GATT connection is lost</a>.
+          <ul>
+            <li>Service A
+              <ul>
+                <li>Characteristic C: value `[1, 2, 3]`</li>
+              </ul>
+            </li>
+            <li>Service B
+              <ul>
+                <li>Include Service A</li>
+              </ul>
+            </li>
+          </ul>
         </dd>
-
-        <dt><dfn event for="BluetoothRemoteGATTService"><code>serviceadded</code></dfn></dt>
-        <dd>
-          Fired on a new {{BluetoothRemoteGATTService}}
-          <a href="#service-change-events">when it has been discovered on a remote device</a>,
-          just after it is added to the <a>Bluetooth tree</a>.
-        </dd>
-
-        <dt><dfn event for="BluetoothRemoteGATTService"><code>servicechanged</code></dfn></dt>
-        <dd>
-          Fired on a {{BluetoothRemoteGATTService}}
-          <a href="#service-change-events">when its state changes</a>.
-          This involves any characteristics and/or descriptors
-          that get added or removed from the service,
-          as well as <a>Service Changed</a> indications from the remote device.
-        </dd>
-
-        <dt><dfn event for="BluetoothRemoteGATTService"><code>serviceremoved</code></dfn></dt>
-        <dd>
-          Fired on a {{BluetoothRemoteGATTService}}
-          <a href="#service-change-events">when it has been removed from its device</a>,
-          just before it is removed from the <a>Bluetooth tree</a>.
-        </dd>
-
       </dl>
-    </section>
 
-    <section>
-      <h4 id="disconnection-events">Responding to Disconnection</h4>
+      A transition from state 1 to 2 leaves service A with "the same definition,
+      ignoring Characteristic and Descriptor values", which means it's removed
+      from both |removedAttributes| and |addedAttributes|, and it wouldn't
+      appear in any {{servicechanged}} events.
 
-      <div algorithm="disconnection">
-        <p>
-          When a <a>Bluetooth device</a> <var>device</var>'s <a>ATT Bearer</a> is lost
-          (e.g. because the remote device moved out of range
-          or the user used a platform feature to disconnect it),
-          for each {{BluetoothDevice}} <var>deviceObj</var> the UA MUST
-          <a>queue a task</a> on <var>deviceObj</var>'s <a>relevant settings object</a>'s
-          <a>responsible event loop</a>
-          to perform the following steps:
-        </p>
-        <ol>
-          <li>
-            If <code><var>deviceObj</var>.{{BluetoothDevice/[[representedDevice]]}}</code>
-            is not the <a>same device</a> as <var>device</var>,
-            abort these steps.
-          </li>
-          <li>
-            If <code>!<var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>,
-            abort these steps.
-          </li>
-          <li>
-            <a>Clean up the disconnected device</a> |deviceObj|.
-          </li>
-        </ol>
-      </div>
+      A transition from state 1 to 3 leaves service A with a different
+      definition, because a <a>service definition</a> includes its
+      characteristic definitions, so it's left in both |removedAttributes| and
+      |addedAttributes|. Then in <a href="#same-service-removed-and-added">step
+      8</a>, the service is moved to |changedServices|, which makes it cause a
+      {{servicechanged}} event instead of both a {{serviceadded}} and
+      {{serviceremoved}}.
+      <a href="#characteristic-descriptor-change-adds-changed-service">
+      Step 9</a> also adds service A to |changedServices| because characteristic
+      C was removed and characteristic D was added.
 
-      <div algorithm>
-        <p>
-          To <dfn>clean up the disconnected device</dfn> |deviceObj|, the UA must:
-        </p>
-        <ol>
-          <li>
-            Set <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-            to `false`.
-          </li>
-          <li>
-            Clear <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>.
-          </li>
-          <li>
-            Let |context| be <code>|deviceObj|.{{[[context]]}}</code>.
-          </li>
-          <li>
-            Remove all entries from <code>|context|.{{[[attributeInstanceMap]]}}</code>
-            whose keys are inside <code>|deviceObj|.{{[[representedDevice]]}}</code>.
-          </li>
-          <li>
-            For each {{BluetoothRemoteGATTService}} |service|
-            in |deviceObj|'s <a>realm</a>,
-            set <code>|service|.{{[[representedService]]}}</code> to `null`.
-          </li>
-          <li>
-            For each {{BluetoothRemoteGATTCharacteristic}} |characteristic|
-            in |deviceObj|'s <a>realm</a>, do the following sub-steps:
-            <ol>
-              <li>
-                Let |notificationContexts| be
-                <code>|characteristic|.{{[[representedCharacteristic]]}}</code>'s
-                <a>active notification context set</a>.
-              <li>
-                Remove |context| from |notificationContexts|.
-              </li>
-              <li>
-                If |notificationContexts| became empty
-                and there is still an <a>ATT Bearer</a>
-                to <code>|deviceObj|.{{[[representedDevice]]}}</code>
-                and <var>characteristic</var> has a <a>Client Characteristic
-                Configuration</a> descriptor,
-                the UA SHOULD use any of the <a>Characteristic Descriptors</a> procedures
-                to clear the <code>Notification</code> and <code>Indication</code> bits in
-                <var>characteristic</var>'s <a>Client Characteristic Configuration</a> descriptor.
-              </li>
-              <li>
-                Set <code>|characteristic|.{{[[representedCharacteristic]]}}</code>
-                to `null`.
-              </li>
-            </ol>
-          </li>
-          <li>
-            For each {{BluetoothRemoteGATTDescriptor}} |descriptor|
-            in |deviceObj|'s <a>realm</a>,
-            set <code>|descriptor|.{{[[representedDescriptor]]}}</code> to `null`.
-          </li>
-          <li>
-            <a>Fire an event</a> named {{gattserverdisconnected}}
-            with its {{Event/bubbles}} attribute initialized to `true`
-            at <code><var>deviceObj</var></code>.
-            <p class="note">
-              This event is <em>not</em> fired at the {{BluetoothRemoteGATTServer}}.
-            </p>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <section>
-      <h4 id="notification-events">Responding to Notifications and Indications</h4>
-
-      <div algorithm="notifications">
-        <p>
-          When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
-          or <a lt="Characteristic Value Indications">Indication</a>,
-          it must perform the following steps:
-        </p>
-        <ol>
-          <li>
-            For each <var>bluetoothGlobal</var> in
-            the Characteristic's <a>active notification context set</a>,
-            <a>queue a task</a>
-            on the event loop of the script settings object of <var>bluetoothGlobal</var>
-            to do the following sub-steps:
-
-            <ol>
-              <li>
-                Let <var>characteristicObject</var> be the {{BluetoothRemoteGATTCharacteristic}} in
-                the <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var>
-                that represents the <a>Characteristic</a>.
-              </li>
-              <li>
-                If <code><var>characteristicObject</var>.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-                is `false`,
-                abort these sub-steps.
-              </li>
-              <li>
-                Set <code><var>characteristicObject</var>.value</code> to
-                a new {{DataView}} wrapping a new {{ArrayBuffer}} holding
-                the new value of the <a>Characteristic</a>.
-              </li>
-              <li>
-                <a>Fire an event</a> named {{characteristicvaluechanged}}
-                with its <code>bubbles</code> attribute initialized to <code>true</code>
-                at <var>characteristicObject</var>.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <section class="unstable">
-      <h4 id="service-change-events">Responding to Service Changes</h4>
-
-      <div algorithm="service changes">
-        <p>
-          The Bluetooth <a>Attribute Caching</a> system allows clients
-          to track changes to <a>Service</a>s, <a>Characteristic</a>s, and <a>Descriptor</a>s.
-          Before discovering any of these attributes for the purpose of exposing them to a web page
-          the UA MUST subscribe to Indications from the
-          <a>Service Changed</a> characteristic, if it exists.
-          When the UA receives an Indication on the Service Changed characteristic,
-          it MUST perform the following steps.
-        </p>
-        <ol>
-          <li>
-            Let <var>removedAttributes</var> be the list of attributes in
-            the range indicated by the Service Changed characteristic
-            that the UA had discovered before the Indication.
-          </li>
-          <li>
-            Use the <a>Primary Service Discovery</a>, <a>Relationship Discovery</a>, <a>Characteristic Discovery</a>,
-            and <a>Characteristic Descriptor Discovery</a> procedures
-            to re-discover attributes in the range indicated by the Service Changed characteristic.
-            The UA MAY skip discovering all or part of the indicated range
-            if it can prove that the results of that discovery
-            could not affect the events fired below.
-          </li>
-          <li>
-            Let <var>addedAttributes</var> be the list of attributes discovered in the previous step.
-          </li>
-          <li>
-            If an attribute with the same definition
-            (see the <a>Service Interoperability Requirements</a>),
-            ignoring Characteristic and Descriptor values,
-            appears in both <var>removedAttributes</var> and <var>addedAttributes</var>,
-            remove it from both.
-
-            <div class="example" id="example-changed-service">
-              <p>
-                Given the following device states:
-              </p>
-
-              <dl>
-                <dt>State 1</dt>
-                <dd>
-                  <ul>
-                    <li>Service A
-                      <ul>
-                        <li>Characteristic C: value `[1, 2, 3]`</li>
-                      </ul>
-                    </li>
-                    <li>Service B</li>
-                  </ul>
-                </dd>
-
-                <dt>State 2</dt>
-                <dd>
-                  <ul>
-                    <li>Service A
-                      <ul>
-                        <li>Characteristic C: value `[3, 2, 1]`</li>
-                      </ul>
-                    </li>
-                    <li>Service B</li>
-                  </ul>
-                </dd>
-
-                <dt>State 3</dt>
-                <dd>
-                  <ul>
-                    <li>Service A
-                      <ul>
-                        <li>Characteristic D: value `[3, 2, 1]`</li>
-                      </ul>
-                    </li>
-                    <li>Service B</li>
-                  </ul>
-                </dd>
-
-                <dt>State 4</dt>
-                <dd>
-                  <ul>
-                    <li>Service A
-                      <ul>
-                        <li>Characteristic C: value `[1, 2, 3]`</li>
-                      </ul>
-                    </li>
-                    <li>Service B
-                      <ul>
-                        <li>Include Service A</li>
-                      </ul>
-                    </li>
-                  </ul>
-                </dd>
-              </dl>
-
-              <p>
-                A transition from state 1 to 2 leaves service A with
-                "the same definition, ignoring Characteristic and Descriptor values",
-                which means it's removed from both |removedAttributes| and |addedAttributes|,
-                and it wouldn't appear in any {{servicechanged}} events.
-              </p>
-              <p>
-                A transition from state 1 to 3 leaves service A with a different definition,
-                because a <a>service definition</a> includes its characteristic definitions,
-                so it's left in both |removedAttributes| and |addedAttributes|.
-                Then in <a href="#same-service-removed-and-added">step 8</a>,
-                the service is moved to |changedServices|,
-                which makes it cause a {{servicechanged}} event
-                instead of both a {{serviceadded}} and {{serviceremoved}}.
-                <a href="#characteristic-descriptor-change-adds-changed-service">Step 9</a>
-                also adds service A to |changedServices| because
-                characteristic C was removed and characteristic D was added.
-              </p>
-              <p>
-                A transition from state 1 to 4 is similar to the 1->3 transition.
-                Service B is moved to |changedServices| in
-                <a href="#same-service-removed-and-added">step 8</a>,
-                but no characteristics or descriptors have changed,
-                so it's not redundantly added in
-                <a href="#characteristic-descriptor-change-adds-changed-service">step 9</a>.
-              </p>
-            </div>
-          </li>
-          <li>
-            Let |invalidatedAttributes| be
-            the attributes in |removedAttributes| but not |addedAttributes|.
-          </li>
-          <li>
-            For each <a>environment settings object</a> |settings| in the UA,
-            <a>queue a task</a> on its <a>responsible event loop</a> to
-            do the following sub-steps:
-            <ol>
-              <li>
-                For each {{BluetoothRemoteGATTService}} |service|
-                whose <a>relevant settings object</a> is |settings|,
-                if <code>|service|.{{[[representedService]]}}</code>
-                is in |invalidatedAttributes|,
-                set <code>|service|.{{[[representedService]]}}</code> to `null`.
-              </li>
-              <li>
-                For each {{BluetoothRemoteGATTCharacteristic}} |characteristic|
-                whose <a>relevant settings object</a> is |settings|,
-                if <code>|characteristic|.{{[[representedCharacteristic]]}}</code>
-                is in |invalidatedAttributes|,
-                set <code>|characteristic|.{{[[representedCharacteristic]]}}</code> to `null`.
-              </li>
-              <li>
-                For each {{BluetoothRemoteGATTDescriptor}} |descriptor|
-                whose <a>relevant settings object</a> is |settings|,
-                if <code>|descriptor|.{{[[representedDescriptor]]}}</code>
-                is in |invalidatedAttributes|,
-                set <code>|descriptor|.{{[[representedDescriptor]]}}</code> to `null`.
-              </li>
-              <li>
-                Let |global| be |settings|'
-                <a for="environment settings object">global object</a>.
-              </li>
-              <li>
-                Remove every entry
-                from <code>|global|.navigator.bluetooth.{{[[attributeInstanceMap]]}}</code>
-                that represents an attribute that
-                is in |invalidatedAttributes|.
-              </li>
-            </ol>
-          </li>
-          <li>
-            Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
-          </li>
-          <li id="same-service-removed-and-added">
-            If the <a lt="same attribute">same</a> <a>Service</a> appears in
-            both <var>removedAttributes</var> and <var>addedAttributes</var>,
-            remove it from both, and add it to <var>changedServices</var>.
-          </li>
-          <li id="characteristic-descriptor-change-adds-changed-service">
-            For each <a>Characteristic</a> and <a>Descriptor</a>
-            in <var>removedAttributes</var> or <var>addedAttributes</var>,
-            remove it from its original list,
-            and add its parent <a>Service</a> to <var>changedServices</var>.
-            <span class="note">After this point, <var>removedAttributes</var> and <var>addedAttributes</var> contain only <a>Service</a>s.</span>
-          </li>
-          <li id="only-notify-for-requested-services">
-            If a <a>Service</a> in <var>addedAttributes</var>
-            would not have been returned from any previous call to
-            <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
-            <code>getIncludedService</code>, or <code>getIncludedServices</code>
-            if it had existed at the time of the call,
-            the UA MAY remove the <a>Service</a> from <var>addedAttributes</var>.
-          </li>
-          <li>
-            Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
-            contain any <a>Service</a> in
-            <var>removedAttributes</var>, <var>addedAttributes</var>, and <var>changedServices</var>.
-          </li>
-          <li>
-            For each {{BluetoothDevice}} <var>deviceObj</var>
-            that is connected to a device in <var>changedDevices</var>,
-            <a>queue a task</a> on its <a>relevant global object</a>'s
-            <a>responsible event loop</a>
-            to do the following steps:
-            <ol>
-              <li>
-                For each <a>Service</a> <var>service</var> in <var>removedAttributes</var>:
-                <ol>
-                  <li>
-                    If <code><var>deviceObj</var>.{{BluetoothDevice/[[allowedServices]]}}</code>
-                    is `"all"` or contains the Service's UUID,
-                    <a>fire an event</a> named {{serviceremoved}}
-                    with its <code>bubbles</code> attribute initialized to <code>true</code>
-                    at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
-                  </li>
-                  <li>
-                    Remove this {{BluetoothRemoteGATTService}} from the <a>Bluetooth tree</a>.
-                  </li>
-                </ol>
-              </li>
-              <li>
-                For each <a>Service</a> in <var>addedAttributes</var>,
-                if <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code>
-                is `"all"` or contains the Service's UUID,
-                add the {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the <a>Bluetooth tree</a>
-                and then <a>fire an event</a> named {{serviceadded}}
-                with its <code>bubbles</code> attribute initialized to <code>true</code>
-                at the {{BluetoothRemoteGATTService}}.
-              </li>
-              <li>
-                For each <a>Service</a> in <var>changedServices</var>,
-                if <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code>
-                is `"all"` or contains the Service's UUID,
-                <a>fire an event</a> named {{servicechanged}}
-                with its <code>bubbles</code> attribute initialized to <code>true</code>
-                at the {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
-              </li>
-            </ol>
-          </li>
-        </ol>
-      </div>
-    </section>
-
-    <section>
-      <h4 id="idl-event-handlers">IDL event handlers</h4>
-
-      <pre class="idl">
-        [SecureContext]
-        interface mixin CharacteristicEventHandlers {
-          attribute EventHandler oncharacteristicvaluechanged;
-        };
-      </pre>
-      <p>
-        <dfn attribute for="CharacteristicEventHandlers">oncharacteristicvaluechanged</dfn>
-        is an <a>Event handler IDL attribute</a>
-        for the {{characteristicvaluechanged}} event type.
-      </p>
-
-      <pre class="idl">
-        [SecureContext]
-        interface mixin BluetoothDeviceEventHandlers {
-          attribute EventHandler onadvertisementreceived;
-          attribute EventHandler ongattserverdisconnected;
-        };
-      </pre>
-      <p>
-        <dfn attribute for="BluetoothDeviceEventHandlers">onadvertisementreceived</dfn>
-        is an <a>Event handler IDL attribute</a> for the
-        {{advertisementreceived}} event type.
-      </p>
-      <p>
-        <dfn attribute for="BluetoothDeviceEventHandlers">ongattserverdisconnected</dfn>
-        is an <a>Event handler IDL attribute</a>
-        for the {{gattserverdisconnected}} event type.
-      </p>
-
-      <pre class="idl">
-        [SecureContext]
-        interface mixin ServiceEventHandlers {
-          attribute EventHandler onserviceadded;
-          attribute EventHandler onservicechanged;
-          attribute EventHandler onserviceremoved;
-        };
-      </pre>
-      <p>
-        <dfn attribute for="ServiceEventHandlers">onserviceadded</dfn>
-        is an <a>Event handler IDL attribute</a>
-        for the {{serviceadded}} event type.
-      </p>
-      <p>
-        <dfn attribute for="ServiceEventHandlers">onservicechanged</dfn>
-        is an <a>Event handler IDL attribute</a>
-        for the {{servicechanged}} event type.
-      </p>
-      <p>
-        <dfn attribute for="ServiceEventHandlers">onserviceremoved</dfn>
-        is an <a>Event handler IDL attribute</a>
-        for the {{serviceremoved}} event type.
-      </p>
-    </section>
-  </section>
-
-  <section>
-    <h3 id="error-handling">Error handling</h3>
-
-    <p class="note">
-      This section primarily defines the mapping from system errors to Javascript error names
-      and allows UAs to retry certain operations.
-      The retry logic and possible error distinctions
-      are highly constrained by the operating system,
-      so places these requirements don't reflect reality
-      are likely <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues">spec bugs</a>
-      instead of browser bugs.
-    </p>
-
-    <div algorithm="error handling">
-      <p>
-        When the UA is using a <a>GATT procedure</a>
-        to execute a step in an algorithm or to handle a query to the <a>Bluetooth cache</a>
-        (both referred to as a "step", here),
-        and the GATT procedure returns an <code><a>Error Response</a></code>,
-        the UA MUST perform the following steps:
-      </p>
-
-      <ol>
-        <li>
-          If the <a>procedure times out</a> or
-          the ATT Bearer (described in <a>Profile Fundamentals</a>) is
-          absent or terminated for any reason,
-          return a {{NetworkError}} from the step and abort these steps.
-        </li>
-        <li>
-          Take the following actions depending on the <code>Error Code</code>:
-          <dl class="switch">
-            <dt><code>Invalid PDU</code></dt>
-            <dt><code>Invalid Offset</code></dt>
-            <dt><code>Attribute Not Found</code></dt>
-            <dt><code>Unsupported Group Type</code></dt>
-            <dd>
-              These error codes indicate that something unexpected happened at the protocol layer,
-              likely either due to a UA or device bug.
-              Return a {{NotSupportedError}} from the step.
-            </dd>
-
-            <dt><code>Invalid Handle</code></dt>
-            <dd>
-              Return an {{InvalidStateError}} from the step.
-            </dd>
-
-            <dt><code>Invalid Attribute Value Length</code></dt>
-            <dd>
-              Return an {{InvalidModificationError}} from the step.
-            </dd>
-
-            <dt><code>Attribute Not Long</code></dt>
-            <dd>
-              <p>
-                If this error code is received without having used a "Long" sub-procedure,
-                this may indicate a device bug.
-                Return a {{NotSupportedError}} from the step.
-              </p>
-
-              <p>
-                Otherwise, retry the step without using a "Long" sub-procedure.
-                If this is impossible due to the length of the value being written,
-                return an {{InvalidModificationError}} from the step.
-              </p>
-            </dd>
-
-            <dt><code>Insufficient Authentication</code></dt>
-            <dt><code>Insufficient Encryption</code></dt>
-            <dt><code>Insufficient Encryption Key Size</code></dt>
-            <dd>
-              The UA SHOULD attempt to increase the security level of the connection.
-              If this attempt fails or the UA doesn't support any higher security,
-              Return a {{SecurityError}} from the step.
-              Otherwise, retry the step at the new higher security level.
-            </dd>
-
-            <dt><code>Insufficient Authorization</code></dt>
-            <dd>
-              Return a {{SecurityError}} from the step.
-            </dd>
-
-            <dt><code>Application Error</code></dt>
-            <dd>
-              If the GATT procedure was a Write,
-              return an {{InvalidModificationError}} from the step.
-              Otherwise, return a {{NotSupportedError}} from the step.
-            </dd>
-
-            <dt><code>Read Not Permitted</code></dt>
-            <dt><code>Write Not Permitted</code></dt>
-            <dt><code>Request Not Supported</code></dt>
-            <dt><code>Prepare Queue Full</code></dt>
-            <dt><code>Insufficient Resources</code></dt>
-            <dt><code>Unlikely Error</code></dt>
-            <dt>Anything else</dt>
-            <dd>
-              Return a {{NotSupportedError}} from the step.
-            </dd>
-          </dl>
-        </li>
-      </ol>
+      A transition from state 1 to 4 is similar to the 1->3 transition. Service
+      B is moved to |changedServices| in <a
+      href="#same-service-removed-and-added">step 8</a>, but no characteristics
+      or descriptors have changed, so it's not redundantly added in
+      <a href="#characteristic-descriptor-change-adds-changed-service">
+      step 9</a>.
     </div>
-  </section>
-</section>
+1. Let |invalidatedAttributes| be the attributes in |removedAttributes| but not
+    |addedAttributes|.
+1. For each <a>environment settings object</a> |settings| in the UA, <a>queue a
+    task</a> on its <a>responsible event loop</a> to do the following sub-steps:
+    1. For each {{BluetoothRemoteGATTService}} |service| whose <a>relevant
+        settings object</a> is |settings|, if
+        <code>|service|.{{[[representedService]]}}</code> is in
+        |invalidatedAttributes|, set
+        <code>|service|.{{[[representedService]]}}</code> to `null`.
+    1. For each {{BluetoothRemoteGATTCharacteristic}} |characteristic| whose
+        <a>relevant settings object</a> is |settings|, if
+        <code>|characteristic|.{{[[representedCharacteristic]]}}</code> is in
+        |invalidatedAttributes|, set
+        <code>|characteristic|.{{[[representedCharacteristic]]}}</code> to
+        `null`.
+    1. For each {{BluetoothRemoteGATTDescriptor}} |descriptor| whose <a>relevant
+        settings object</a> is |settings|, if
+        <code>|descriptor|.{{[[representedDescriptor]]}}</code> is in
+        |invalidatedAttributes|, set
+        <code>|descriptor|.{{[[representedDescriptor]]}}</code> to `null`.
+    1. Let |global| be |settings|'
+        <a for="environment settings object">global object</a>.
+    1. Remove every entry from <code>
+        |global|.navigator.bluetooth.{{[[attributeInstanceMap]]}}</code> that
+        represents an attribute that is in |invalidatedAttributes|.
+1. Let <var>changedServices</var> be a set of <a>Service</a>s, initially empty.
+1. <p id="same-service-removed-and-added">If the <a lt="same attribute">same</a>
+    <a>Service</a> appears in both <var>removedAttributes</var> and
+    <var>addedAttributes</var>, remove it from both, and add it to
+    <var>changedServices</var>.</p>
+1. <p id="characteristic-descriptor-change-adds-changed-service">For each
+    <a>Characteristic</a> and <a>Descriptor</a> in <var>removedAttributes</var>
+    or <var>addedAttributes</var>, remove it from its original list, and add its
+    parent <a>Service</a> to <var>changedServices</var>.</p>
+
+    <div class="note">
+      Note: After this point, <var>removedAttributes</var> and
+      <var>addedAttributes</var> contain only <a>Service</a>s.
+    </div>
+1. <p id="only-notify-for-requested-services">If a <a>Service</a> in
+    <var>addedAttributes</var> would not have been returned from any previous
+    call to <code>getPrimaryService</code>, <code>getPrimaryServices</code>,
+    <code>getIncludedService</code>, or <code>getIncludedServices</code> if it
+    had existed at the time of the call, the UA MAY remove the <a>Service</a>
+    from <var>addedAttributes</var>.</p>
+1. Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
+    contain any <a>Service</a> in <var>removedAttributes</var>,
+    <var>addedAttributes</var>, and <var>changedServices</var>.
+1. For each {{BluetoothDevice}} <var>deviceObj</var> that is connected to a
+    device in <var>changedDevices</var>, <a>queue a task</a> on its <a>relevant
+    global object</a>'s <a>responsible event loop</a> to do the following steps:
+    1. For each <a>Service</a> <var>service</var> in
+        <var>removedAttributes</var>:
+        1. If <code><var>deviceObj</var>.{{BluetoothDevice/[[allowedServices]]}}</code>
+            is `"all"` or contains the Service's UUID, <a>fire an event</a>
+            named {{serviceremoved}} with its <code>bubbles</code> attribute
+            initialized to <code>true</code> at the
+            {{BluetoothRemoteGATTService}} representing the <a>Service</a>.
+        1. Remove this {{BluetoothRemoteGATTService}} from the <a>Bluetooth
+            tree</a>.
+    1. For each <a>Service</a> in <var>addedAttributes</var>, if
+        <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code> is
+        `"all"` or contains the Service's UUID, add the
+        {{BluetoothRemoteGATTService}} representing this <a>Service</a> to the
+        <a>Bluetooth tree</a> and then <a>fire an event</a> named
+        {{serviceadded}} with its <code>bubbles</code> attribute initialized to
+        <code>true</code> at the {{BluetoothRemoteGATTService}}.
+    1. For each <a>Service</a> in <var>changedServices</var>, if
+        <code>deviceObj.{{BluetoothDevice/[[allowedServices]]}}</code> is
+        `"all"` or contains the Service's UUID, <a>fire an event</a> named
+        {{servicechanged}} with its <code>bubbles</code> attribute initialized
+        to <code>true</code> at the {{BluetoothRemoteGATTService}} representing
+        the <a>Service</a>.
+
+</div>
+</div>
+
+### IDL event handlers ### {#idl-event-handlers}
+
+<xmp class="idl">
+  [SecureContext]
+  interface mixin CharacteristicEventHandlers {
+    attribute EventHandler oncharacteristicvaluechanged;
+  };
+</xmp>
+
+<dfn attribute for="CharacteristicEventHandlers">
+oncharacteristicvaluechanged</dfn> is an <a>Event handler IDL attribute</a> for
+the {{characteristicvaluechanged}} event type.
+
+<xmp class="idl">
+  [SecureContext]
+  interface mixin BluetoothDeviceEventHandlers {
+    attribute EventHandler onadvertisementreceived;
+    attribute EventHandler ongattserverdisconnected;
+  };
+</xmp>
+
+<dfn attribute for="BluetoothDeviceEventHandlers">onadvertisementreceived</dfn>
+is an <a>Event handler IDL attribute</a> for the {{advertisementreceived}} event
+type.
+
+<dfn attribute for="BluetoothDeviceEventHandlers">ongattserverdisconnected</dfn>
+is an <a>Event handler IDL attribute</a> for the {{gattserverdisconnected}}
+event type.
+
+<xmp class="idl">
+  [SecureContext]
+  interface mixin ServiceEventHandlers {
+    attribute EventHandler onserviceadded;
+    attribute EventHandler onservicechanged;
+    attribute EventHandler onserviceremoved;
+  };
+</xmp>
+
+<dfn attribute for="ServiceEventHandlers">onserviceadded</dfn> is an <a>Event
+handler IDL attribute</a> for the {{serviceadded}} event type.
+
+<dfn attribute for="ServiceEventHandlers">onservicechanged</dfn> is an <a>Event
+handler IDL attribute</a> for the {{servicechanged}} event type.
+
+<dfn attribute for="ServiceEventHandlers">onserviceremoved</dfn> is an <a>Event
+handler IDL attribute</a> for the {{serviceremoved}} event type.
+
+## Error handling ## {#error-handling}
+
+<div class="note">
+Note: This section primarily defines the mapping from system errors to Javascript
+error names and allows UAs to retry certain operations. The retry logic and
+possible error distinctions are highly constrained by the operating system, so
+places these requirements don't reflect reality are likely
+<a href="https://github.com/WebBluetoothCG/web-bluetooth/issues">spec bugs</a>
+instead of browser bugs.
+</div>
+
+<div algorithm="error handling">
+When the UA is using a <a>GATT procedure</a> to execute a step in an algorithm
+or to handle a query to the <a>Bluetooth cache</a> (both referred to as a
+"step", here), and the GATT procedure returns an <code><a>Error
+Response</a></code>, the UA MUST perform the following steps:
+
+1. If the <a>procedure times out</a> or the ATT Bearer (described in <a>Profile
+    Fundamentals</a>) is absent or terminated for any reason, return a
+    {{NetworkError}} from the step and abort these steps.
+1. Take the following actions depending on the <code>Error Code</code>:
+    <dl class="switch">
+      <dt><code>Invalid PDU</code></dt>
+      <dt><code>Invalid Offset</code></dt>
+      <dt><code>Attribute Not Found</code></dt>
+      <dt><code>Unsupported Group Type</code></dt>
+      <dd>
+        These error codes indicate that something unexpected happened at the
+        protocol layer, likely either due to a UA or device bug. Return a
+        {{NotSupportedError}} from the step.
+      </dd>
+
+      <dt><code>Invalid Handle</code></dt>
+      <dd>
+        Return an {{InvalidStateError}} from the step.
+      </dd>
+
+      <dt><code>Invalid Attribute Value Length</code></dt>
+      <dd>
+        Return an {{InvalidModificationError}} from the step.
+      </dd>
+
+      <dt><code>Attribute Not Long</code></dt>
+      <dd>
+        <p>
+          If this error code is received without having used a "Long"
+          sub-procedure, this may indicate a device bug. Return a
+          {{NotSupportedError}} from the step.
+        </p>
+
+        <p>
+          Otherwise, retry the step without using a "Long" sub-procedure.
+          If this is impossible due to the length of the value being written,
+          return an {{InvalidModificationError}} from the step.
+        </p>
+      </dd>
+
+      <dt><code>Insufficient Authentication</code></dt>
+      <dt><code>Insufficient Encryption</code></dt>
+      <dt><code>Insufficient Encryption Key Size</code></dt>
+      <dd>
+        The UA SHOULD attempt to increase the security level of the connection.
+        If this attempt fails or the UA doesn't support any higher security,
+        Return a {{SecurityError}} from the step.
+        Otherwise, retry the step at the new higher security level.
+      </dd>
+
+      <dt><code>Insufficient Authorization</code></dt>
+      <dd>
+        Return a {{SecurityError}} from the step.
+      </dd>
+
+      <dt><code>Application Error</code></dt>
+      <dd>
+        If the GATT procedure was a Write,
+        return an {{InvalidModificationError}} from the step.
+        Otherwise, return a {{NotSupportedError}} from the step.
+      </dd>
+
+      <dt><code>Read Not Permitted</code></dt>
+      <dt><code>Write Not Permitted</code></dt>
+      <dt><code>Request Not Supported</code></dt>
+      <dt><code>Prepare Queue Full</code></dt>
+      <dt><code>Insufficient Resources</code></dt>
+      <dt><code>Unlikely Error</code></dt>
+      <dt>Anything else</dt>
+      <dd>
+        Return a {{NotSupportedError}} from the step.
+      </dd>
+    </dl>
+
+</div>
 
 <section>
   <h2 id="uuids">UUIDs</h2>
