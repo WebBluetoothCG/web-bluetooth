@@ -700,7 +700,7 @@ again, then the resulting {{Promise}} will resolve into an array containing the
 devices D1 and D2. The A, B, C, and D services will be accessible on device D1,
 while A, B, and E services will be accessible on device D2.
 
-The allowed services also applies if the device changes after the user grants
+The allowed services also apply if the device changes after the user grants
 access. For example, if the user selects D1 in the previous
 <code>requestDevice()</code> call, and D1 later adds a new E service, that will
 fire the {{serviceadded}} event, and the web page will be able to access service
@@ -1184,9 +1184,14 @@ invoked and given a {{BluetoothPermissionStorage}} |storage|, MUST return
 
     <div class="note unstable">
       Note: The {{BluetoothDevice}}s in |devices| may be devices that are not
-      currently in range of the Bluetooth radio. To check if these devices comes
-      into range, the {{BluetoothDevice/watchAdvertisements()}} method can be
-      used.
+      currently in range of the Bluetooth radio. To observe when a |device| in
+      |devices| comes into range, the {{BluetoothDevice/watchAdvertisements()}}
+      method can be used. This method will enable {{advertisementreceived}}
+      events to be fired on |device|. Once an {{advertisementreceived}} |event|
+      is perceived,
+      <code>|event|.device.gatt.{{BluetoothRemoteGATTServer/connect()}}</code>
+      will resolve with a {{BluetoothRemoteGATTServer}} if successful or reject
+      if the device is not able to be connected to.
     </div>
 
 </div>
@@ -1531,8 +1536,8 @@ UA MUST run the following steps:
 1. Add the contents of |optionalServiceUUIDs| to |grantedServiceUUIDs|.
 1. Search for an element |allowedDevice| in
     <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code> where
-    |device| is in <code>|allowedDevice|@{{[[device]]}}</code>. If one is found,
-    perform the following sub-steps:
+    |device| is equal to <code>|allowedDevice|@{{[[device]]}}</code>. If one is
+    found, perform the following sub-steps:
     1. Add the contents of
         <code>|allowedDevice|.{{AllowedBluetoothDevice/allowedServices}}</code>
         to |grantedServiceUUIDs|.
