@@ -529,6 +529,7 @@ that UAs will choose not to prompt.
     attribute EventHandler onavailabilitychanged;
     [SameObject]
     readonly attribute BluetoothDevice? referringDevice;
+    Promise<sequence<BluetoothDevice>> getDevices();
     Promise<BluetoothDevice> requestDevice(optional RequestDeviceOptions options = {});
   };
 
@@ -538,10 +539,11 @@ that UAs will choose not to prompt.
 </xmp>
 
 <div class="note" heading="{{Bluetooth}} members">
-Note: {{Bluetooth/getAvailability()}} informs the page whether Bluetooth is available
-at all. An adapter that's disabled through software should count as available.
-Changes in availability, for example when the user physically attaches or
-detaches an adapter, are reported through the {{availabilitychanged}} event.
+Note: {{Bluetooth/getAvailability()}} informs the page whether Bluetooth is
+available at all. An adapter that's disabled through software should count as
+available. Changes in availability, for example when the user physically
+attaches or detaches an adapter, are reported through the
+{{availabilitychanged}} event.
 
 <p class="unstable">
   {{Bluetooth/referringDevice}} gives access to the device from which the user
@@ -550,6 +552,11 @@ detaches an adapter, are reported through the {{availabilitychanged}} event.
   might advertise a URL, which the UA allows the user to open. A
   {{BluetoothDevice}} representing the beacon would be available through
   <code>navigator.bluetooth.{{referringDevice}}</code>.
+</p>
+
+<p class="unstable">
+  {{Bluetooth/getDevices()}} enables the page to retrieve Bluetooth devices that
+  the user has granted access to.
 </p>
 
 {{Bluetooth/requestDevice(options)}} asks the user to grant this origin access
@@ -659,6 +666,15 @@ On the other hand, if the website calls
 the dialog will contain devices D1, D2, and D3, and if the user selects D1, the
 website will be able to access services A, B, C, and D.
 
+If the website then calls
+
+<pre highlight="js">
+  navigator.bluetooth.getDevices();
+</pre>
+
+the resulting {{Promise}} will resolve into an array containing device D1, and
+the website will be able to access services A, B, C, and D.
+
 The <code>optionalServices</code> list doesn't add any devices to the dialog the
 user sees, but it does affect which services the website can use from the device
 the user picks.
@@ -674,7 +690,17 @@ Shows a dialog containing D1 and D2, but not D4, since D4 doesn't contain the
 required services. If the user selects D2, unlike in the first example, the
 website will be able to access services A, B, and E.
 
-The allowed services also apply if the device changes after the user grants
+If the website calls
+
+<pre highlight="js">
+  navigator.bluetooth.getDevices();
+</pre>
+
+again, then the resulting {{Promise}} will resolve into an array containing the
+devices D1 and D2. The A, B, C, and D services will be accessible on device D1,
+while A, B, and E services will be accessible on device D2.
+
+The allowed services also applies if the device changes after the user grants
 access. For example, if the user selects D1 in the previous
 <code>requestDevice()</code> call, and D1 later adds a new E service, that will
 fire the {{serviceadded}} event, and the web page will be able to access service
@@ -1144,6 +1170,27 @@ a {{BluetoothDataFilterInit}} |filter| if the following steps return `match`.
   cause delays, so this spec doesn't require it.
 </div>
 
+<div algorithm="getDevice invocation">
+To <code><dfn method for="Bluetooth">getDevices()</dfn></code> method, when
+invoked and given a {{BluetoothPermissionStorage}} |storage|, MUST return
+[=a new promise=] |promise| and run the following steps [=in parallel=]:
+
+1. Let |devices| be a new empty {{Array}}.
+1. For each |allowedDevice| in
+    <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>, add
+    the {{BluetoothDevice}} object representing |allowedDevice|@{{[[device]]}}
+    to |devices|.
+1. [=Resolve=] |promise| with |devices|.
+
+    <div class="note unstable">
+      Note: The {{BluetoothDevice}}s in |devices| may be devices that are not
+      currently in range of the Bluetooth radio. To check if these devices comes
+      into range, the {{BluetoothDevice/watchAdvertisements()}} method can be
+      used.
+    </div>
+
+</div>
+
 <div algorithm="requestDevice invocation">
 The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)
 </dfn></code> method, when invoked, MUST return <a>a new promise</a> |promise|
@@ -1174,7 +1221,8 @@ and run the following steps <a>in parallel</a>:
 </div>
 
 <div algorithm="requesting a Bluetooth device">
-To <dfn>request Bluetooth devices</dfn>, given a sequence of
+To <dfn>request Bluetooth devices</dfn>, given a
+{{BluetoothPermissionStorage}} |storage| and a sequence of
 {{BluetoothLEScanFilterInit}}s, |filters|, which can be `null` to represent that
 all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
 |optionalServices|, the UA MUST run the following steps:
@@ -1255,11 +1303,12 @@ all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
       to indicate interest and then perform a privacy-disabled scan to retrieve
       the name.
     </div>
+1. The UA MAY <a>add |device| to |storage|</a>.
 
     <div class="note">
       Note: Choosing a |device| probably indicates that the user
       intends that device to appear in the
-      {{BluetoothPermissionData/allowedDevices}} list of {{"bluetooth"}}'s
+      {{BluetoothPermissionStorage/allowedDevices}} list of {{"bluetooth"}}'s
       <a>extra permission data</a> for at least the <a>current settings
       object</a>, for its {{AllowedBluetoothDevice/mayUseGATT}} field to be
       `true`, and for all the services in the union of
@@ -1471,6 +1520,35 @@ following steps:
 Issue: We need a way for a site to register to receive an event when an interesting
 device comes within range.
 
+<div algorithm="add Bluetooth device to storage">
+To <dfn data-lt="add device to storage">add an allowed
+[=Bluetooth device=]</dfn> |device| to {{BluetoothPermissionStorage}} |storage|
+given a set of |requiredServiceUUIDs| and a set of |optionalServiceUUIDs|, the
+UA MUST run the following steps:
+
+1. Let |grantedServiceUUIDs| be a new {{Set}}.
+1. Add the contents of |requiredServiceUUIDs| to |grantedServiceUUIDs|.
+1. Add the contents of |optionalServiceUUIDs| to |grantedServiceUUIDs|.
+1. Search for an element |allowedDevice| in
+    <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code> where
+    |device| is in <code>|allowedDevice|@{{[[device]]}}</code>. If one is found,
+    perform the following sub-steps:
+    1. Add the contents of
+        <code>|allowedDevice|.{{AllowedBluetoothDevice/allowedServices}}</code>
+        to |grantedServiceUUIDs|.
+
+    If one is not found, perform the following sub-steps:
+    1. Let |allowedDevice|.{{AllowedBluetoothDevice/deviceId}} be a unique ID to
+        the extent that the UA can determine that two Bluetooth connections are
+        the same device and to the extent that the
+        <a href="#note-device-id-tracking">user wants to expose that fact to
+        script</a>.
+1. Set |allowedDevice|.{{AllowedBluetoothDevice/allowedServices}} to
+    |grantedServiceUUIDs|.
+1. Set |allowedDevice|.{{AllowedBluetoothDevice/mayUseGATT}} to `true`.
+
+</div>
+
 <div class="unstable">
 ## Permission API Integration ## {#permission-api-integration}
 
@@ -1543,7 +1621,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
 
   <dt><a>extra permission data type</a></dt>
   <dd>
-    {{BluetoothPermissionData}}, defined as:
+    {{BluetoothPermissionStorage}}, defined as:
     
     <xmp class="idl">
       dictionary AllowedBluetoothDevice {
@@ -1552,7 +1630,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
         // An allowedServices of "all" means all services are allowed.
         required (DOMString or sequence<UUID>) allowedServices;
       };
-      dictionary BluetoothPermissionData {
+      dictionary BluetoothPermissionStorage {
         required sequence<AllowedBluetoothDevice> allowedDevices;
       };
     </xmp>
@@ -1564,7 +1642,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
 
   <dt><a>extra permission data constraints</a></dt>
   <dd>
-    Distinct elements of {{BluetoothPermissionData/allowedDevices}} must have
+    Distinct elements of {{BluetoothPermissionStorage/allowedDevices}} must have
     different {{AllowedBluetoothDevice/[[device]]}}s and different
     {{AllowedBluetoothDevice/deviceId}}s.
 
@@ -1642,9 +1720,9 @@ feature</a>'s permission-related algorithms and types are defined as follows:
         <code>|status|.devices</code> to an empty {{FrozenArray}} and abort
         these steps.
     1. Let <var>matchingDevices</var> be a new {{Array}}.
-    1. Let |data|, a {{BluetoothPermissionData}}, be {{"bluetooth"}}'s <a>extra
-        permission data</a> for the <a>current settings object</a>.
-    1. For each |allowedDevice| in <code>|data|.allowedDevices</code>, run the
+    1. Let |storage|, a {{BluetoothPermissionStorage}}, be {{"bluetooth"}}'s
+        <a>extra permission data</a> for the <a>current settings object</a>.
+    1. For each |allowedDevice| in <code>|storage|.allowedDevices</code>, run the
         following sub-steps:
         1. If <code><var>desc</var>.deviceId</code> is set and
             <code><var>allowedDevice</var>.deviceId !=
@@ -1676,12 +1754,12 @@ feature</a>'s permission-related algorithms and types are defined as follows:
     To <dfn>revoke Bluetooth access</dfn> to devices the user no longer intends to expose,
     the UA MUST run the following steps:
 
-    1. Let |data|, a {{BluetoothPermissionData}}, be {{"bluetooth"}}'s <a>extra
-        permission data</a> for the <a>current settings object</a>.
+    1. Let |storage|, a {{BluetoothPermissionStorage}}, be {{"bluetooth"}}'s
+        <a>extra permission data</a> for the <a>current settings object</a>.
     1. For each {{BluetoothDevice}} instance |deviceObj| in the <a>current
         realm</a>, run the following sub-steps:
         1. If there is an {{AllowedBluetoothDevice}} |allowedDevice| in
-            <code>|data|.{{allowedDevices}}</code> such that:
+            <code>|storage|.{{allowedDevices}}</code> such that:
 
             * <code>|allowedDevice|.{{[[device]]}}</code> is the <a>same
                 device</a> as
@@ -1955,9 +2033,9 @@ To <dfn export>get the <code>BluetoothDevice</code> representing</dfn> a
 <a>Bluetooth device</a> <var>device</var> inside a {{Bluetooth}} instance
 <var>context</var>, the UA MUST run the following steps:
 
-1. Let |data|, a {{BluetoothPermissionData}}, be {{"bluetooth"}}'s <a>extra
-    permission data</a> for the <a>current settings object</a>.
-1. Find the |allowedDevice| in <code>|data|.{{allowedDevices}}</code> with
+1. Let |storage|, a {{BluetoothPermissionStorage}}, be {{"bluetooth"}}'s
+    <a>extra permission data</a> for the <a>current settings object</a>.
+1. Find the |allowedDevice| in <code>|storage|.{{allowedDevices}}</code> with
     <code><var>allowedDevice</var>.{{[[device]]}}</code> the <a>same device</a>
     as <var>device</var>. If there is no such object, throw a {{SecurityError}}
     and abort these steps.
@@ -1993,7 +2071,7 @@ attribute MUST perform the following steps:
 
 1. If {{"bluetooth"}}'s <a>extra permission data</a> for `this`'s <a>relevant
     settings object</a> has an {{AllowedBluetoothDevice}} |allowedDevice| in its
-    {{BluetoothPermissionData/allowedDevices}} list with
+    {{BluetoothPermissionStorage/allowedDevices}} list with
     <code>|allowedDevice|.{{AllowedBluetoothDevice/[[device]]}}</code> the
     <a>same device</a> as <code>this.{{[[representedDevice]]}}</code> and
     <code>|allowedDevice|.{{AllowedBluetoothDevice/mayUseGATT}}</code> equal to
@@ -3595,7 +3673,7 @@ interface <a>participate in a tree</a>.
 
 * The <a>children</a> of {{Navigator/bluetooth|navigator.bluetooth}}</code></a>
     are the {{BluetoothDevice}} objects representing devices in the
-    {{BluetoothPermissionData/allowedDevices}} list in {{"bluetooth"}}'s
+    {{BluetoothPermissionStorage/allowedDevices}} list in {{"bluetooth"}}'s
     <a>extra permission data</a> for
     {{Navigator/bluetooth|navigator.bluetooth}}'s <a>relevant settings
     object</a>, in an unspecified order.
