@@ -4,11 +4,15 @@ set -e # Exit with nonzero exit code if anything fails.
 SOURCE_BRANCH="master"
 TARGET_BRANCH="gh-pages"
 
+COLOR_RED="\e[31m"
+COLOR_DEFAULT="\e[39m"
+
 for SPEC in $SPECS; do
-  echo ${SPEC}.bs:
+  echo "Parsing ${SPEC}.bs:"
   ERR=$(curl https://api.csswg.org/bikeshed/ -f -F file=@${SPEC}.bs -F output=err)
   if [ -n "$ERR" ]; then
-    echo "$ERR"
+    echo -e "${COLOR_RED}Error occurred while parsing ${SPEC}.bs:${COLOR_DEFAULT}"
+    echo -e "$ERR"
     exit 1
   fi
 done
