@@ -2086,27 +2086,30 @@ attribute MUST perform the following steps:
 
 <div algorithm="watchAdvertisements" class="unstable">
 The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code>
-method, when invoked, MUST return <a>a new promise</a> |promise| and run the
-following steps <a>in parallel</a>:
+method, when invoked, MUST return <a>a new promise</a> |promise| and
+let |watchAdvertisementsQueue| be the result of
+<a href="https://html.spec.whatwg.org/multipage/infrastructure.html#starting-a-new-parallel-queue">
+starting a new parallel queue</a>:
 
-1. If <code>this.{{watchingAdvertisements}}</code> is `true`, resolve |promise|
-    with `undefined` and abort these steps.
-1. Ensure that the UA is scanning for this device's advertisements. The UA
-    SHOULD NOT filter out "duplicate" advertisements for the same device.
-1. If the UA fails to enable scanning, <a>reject</a> |promise| with one of the
-    following errors, and abort these steps:
+1. <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">
+    Enqueue the following steps</a> to |watchAdvertisementsQueue|:
+    1. If a <code>{{unwatchAdvertisements()}}</code> task is enqueued in
+        |watchAdvertisementsQueue| reject |promise| with {{InvalidStateError}}.
+    1. Ensure that the UA is scanning for this device's advertisements. The UA
+        SHOULD NOT filter out "duplicate" advertisements for the same device.
+    1. If the UA fails to enable scanning, <a>reject</a> |promise| with one of
+        the following errors, and abort these steps:
 
-    <dl class="switch">
-      <dt>The UA doesn't support scanning for advertisements</dt>
-      <dd>{{NotSupportedError}}</dd>
+        <dl class="switch">
+          <dt>The UA doesn't support scanning for advertisements</dt>
+          <dd>{{NotSupportedError}}</dd>
 
-      <dt>Bluetooth is turned off</dt>
-      <dd>{{InvalidStateError}}</dd>
+          <dt>Bluetooth is turned off</dt>
+          <dd>{{InvalidStateError}}</dd>
 
-      <dt>Other reasons</dt>
-      <dd>{{UnknownError}}</dd>
-    </dl>
-1. <a>Queue a task</a> to perform the following steps:
+          <dt>Other reasons</dt>
+          <dd>{{UnknownError}}</dd>
+        </dl>
     1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
     1. Resolve |promise| with `undefined`.
 
@@ -2119,9 +2122,12 @@ as soon as possible.
 
 <div algorithm="unwatchAdvertisements" class="unstable">
 The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code>
-method, when invoked, MUST run the following steps:
+method, when invoked, MUST let |watchAdvertisementsQueue| be the result of
+<a href="https://html.spec.whatwg.org/multipage/infrastructure.html#starting-a-new-parallel-queue">
+starting a new parallel queue</a>:
 
-1. If <code>this.{{watchingAdvertisements}}</code> is `false`, abort these steps.
+1. <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">
+    Enqueue the following steps</a> to |watchAdvertisementsQueue|:
 1. Set <code>this.{{watchingAdvertisements}}</code> to `false`.
 1. If no more {{BluetoothDevice}}s in the whole UA have
     {{watchingAdvertisements}} set to `true`, the UA SHOULD stop scanning for
