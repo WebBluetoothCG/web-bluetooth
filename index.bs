@@ -2090,10 +2090,11 @@ the result of [=starting a new parallel queue=].
 <div algorithm="watchAdvertisements" class="unstable">
 The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code>
 method, when invoked, MUST return <a>a new promise</a> |promise| and run the
-follwing steps:
+following steps:
 
 1. [=parallel queue/Enqueue the following steps=] to the [=watch advertisements
-    manager=]:
+    manager=], but [=abort when=] <code>this.{{unwatchAdvertisements()}}</code>
+    is called:
     1. Ensure that the UA is scanning for this device's advertisements. The UA
         SHOULD NOT filter out "duplicate" advertisements for the same device.
     1. If the UA fails to enable scanning, <a>reject</a> |promise| with one of
@@ -2112,6 +2113,7 @@ follwing steps:
     1. [=Queue a task=] to perform the following steps:
         1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
         1. Resolve |promise| with `undefined`.
+1. [=If aborted=], reject |promise| with {{InvalidStateError}}.
 
 <div class="note">
 Scanning costs power, so websites should avoid watching for advertisements
@@ -2124,6 +2126,7 @@ as soon as possible.
 The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code>
 method, when invoked, MUST run the following steps:
 
+1. Set <code>this.{{watchingAdvertisements}}</code> to `false`.
 1. [=parallel queue/Enqueue the following step=] to [=watch advertisements
     manager=]:
     1. If no more {{BluetoothDevice}}s in the whole UA have
@@ -2132,7 +2135,6 @@ method, when invoked, MUST run the following steps:
         representing the same device as `this` have {{watchingAdvertisements}}
         set to `true`, the UA SHOULD reconfigure the scan to avoid receiving
         reports for this device.
-1. Set <code>this.{{watchingAdvertisements}}</code> to `false`.
 
 </div>
 
