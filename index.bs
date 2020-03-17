@@ -2186,6 +2186,25 @@ To <dfn>abort {{BluetoothDevice/watchAdvertisements}}</dfn> for a
 </div>
 
 <div class="unstable">
+### Handling Document Loss of Full Activity ### {#handling-full-activity-loss}
+
+Operations that initiate a scan for Bluetooth devices may only run in a [=fully
+active=] [=document=]. When [=fully active|full activity=] is lost, scanning
+operations for that [=document=] need to be aborted.
+
+<div algorithm="handle full activity loss">
+When the user agent determines that a [=responsible document=] of the [=current
+settings object=] is no longer [=fully active=], it must run these steps:
+
+1. [=map/For each=] |device| in <code>{{Bluetooth}}.{{[[deviceInstanceMap]]}}
+    </code>, perform the following steps:
+    1. If |device|.watchingAdvertisements is `true`, run [=abort
+        watchAdvertisements=].
+
+</div>
+</div>
+
+<div class="unstable">
 ### Responding to Advertising Events ### {#advertising-events}
 
 When an <a>advertising event</a> arrives for a {{BluetoothDevice}}
