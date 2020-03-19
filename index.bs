@@ -2034,6 +2034,19 @@ described in the following table:
       a URL on that origin.
     </td>
   </tr>
+  <tr>
+    <td><dfn>\[[watchAdvertisementsState]]</dfn></td>
+    <td>`'not-watching'`</td>
+    <td>
+      An string enumeration describing the current state of a
+      {{BluetoothDevice/watchAdvertisements()}} operation. The possible
+      enumeration values are:
+      * `'not-watching'`
+      * `'pending-watch'`
+      * `'watching'`
+
+    </td>
+  </tr>
 </table>
 
 <div algorithm="get or create BluetoothDevice">
@@ -2101,31 +2114,49 @@ run the following steps:
     the following sub-steps:
     1. If <code>|options|.{{AbortSignal|signal}}</code>'s [=AbortSignal/aborted
         flag=] is set, then [=abort watchAdvertisements=] with `this` and
-        |promise|, and abort these steps.
+        abort these steps.
     1. [=AbortSignal/add|Add the following abort steps=] to <code>
         |options|.{{AbortSignal|signal}}</code>:
         1. Set |locallyAborted| to `true`.
-        1. [=Abort watchAdvertisements=] with `this` and |promise|.
+        1. [=Abort watchAdvertisements=] with `this`.
+        1. [=Reject=] |promise| with {{AbortError}}
 1. [=parallel queue/Enqueue the following steps=] to the [=watch advertisements
     manager=], but abort when |locallyAborted| becomes `true`:
-    1. Ensure that the UA is scanning for this device's advertisements. The UA
-        SHOULD NOT filter out "duplicate" advertisements for the same device.
-    1. If the UA fails to enable scanning, <a>reject</a> |promise| with one of
-        the following errors, and abort these steps:
+    1. If <code>this.{{[[watchAdvertisementsState]]}}</code> is
+        `'not-watching'`, perform the following steps:
+        1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+            `'pending-watch'`.
+        1. Ensure that the UA is scanning for this device's advertisements.
+            The UA SHOULD NOT filter out "duplicate" advertisements for the same
+            device.
+        1. If the UA fails to enable scanning, perform the following steps:
+            1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+                `'not-watching'`.
+            1. [=Reject=] |promise| with one of the following errors and
+                abort these steps:
 
-        <dl class="switch">
-          <dt>The UA doesn't support scanning for advertisements</dt>
-          <dd>{{NotSupportedError}}</dd>
+                <dl class="switch">
+                  <dt>The UA doesn't support scanning for advertisements</dt>
+                  <dd>{{NotSupportedError}}</dd>
 
-          <dt>Bluetooth is turned off</dt>
-          <dd>{{InvalidStateError}}</dd>
+                  <dt>Bluetooth is turned off</dt>
+                  <dd>{{InvalidStateError}}</dd>
 
-          <dt>Other reasons</dt>
-          <dd>{{UnknownError}}</dd>
-        </dl>
-    1. [=Queue a task=] to perform the following steps, but [=abort when=] |locallyAborted| becomes `true`:
-        1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
-        1. Resolve |promise| with `undefined`.
+                  <dt>Other reasons</dt>
+                  <dd>{{UnknownError}}</dd>
+                </dl>
+        1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+            `'watching'`.
+        1. [=Queue a task=] to perform the following steps, but [=abort when=]
+            |locallyAborted| becomes `true`:
+            1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
+            1. [=Resolve=] |promise| with `undefined`.
+    1. If <code>this.{{[[watchAdvertisementsState]]}}</code> is
+        `'pending-watch'`, [=reject=] |promise| with {{InvalidStateError}} and
+        abort these steps.
+    1. If <code>this.{{[[watchAdvertisementsState]]}}</code> is `'watching'`,
+        [=resolve=] |promise| with `undefined` and abort these steps.
+1. [=If aborted=], [=reject=] |promise| with {{AbortError}}.
 
 
 Note: Scanning costs power, so websites should avoid watching for advertisements
@@ -2135,15 +2166,13 @@ as soon as possible.
 
 <div algorithm="abort watchAdvertisements" class="unstable">
 To <dfn>abort {{BluetoothDevice/watchAdvertisements}}</dfn> for a
-{{BluetoothDevice}} |device| and a {{Promise}} |promise|, run these steps:
+{{BluetoothDevice}} |device|, run these steps:
 
+1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+    `'not-watching'`.
 1. Set <code>|device|.{{watchingAdvertisements}}</code> to `false`.
 1. [=parallel queue/Enqueue the following steps=] to [=watch advertisements
     manager=]:
-    1. Reject |promise| with {{AbortError}}.
-
-        Note: This is a no-op if |promise| has already
-        fulfulled.
     1. If no more {{BluetoothDevice}}s in the whole UA have
         {{watchingAdvertisements}} set to `true`, the UA SHOULD stop scanning
         for advertisements. Otherwise, if no more {{BluetoothDevice}}s
