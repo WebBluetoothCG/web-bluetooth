@@ -1610,11 +1610,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
       <li>
        <a href="#bluetoothdevice-interface"><span class="secno">4.2</span> <span class="content">BluetoothDevice</span></a>
        <ol class="toc">
+        <li><a href="#handling-full-activity-loss"><span class="secno">4.2.1</span> <span class="content">Handling Document Loss of Full Activity</span></a>
         <li>
-         <a href="#advertising-events"><span class="secno">4.2.1</span> <span class="content">Responding to Advertising Events</span></a>
+         <a href="#advertising-events"><span class="secno">4.2.2</span> <span class="content">Responding to Advertising Events</span></a>
          <ol class="toc">
-          <li><a href="#bluetoothmanufacturerdatamap"><span class="secno">4.2.1.1</span> <span class="content">BluetoothManufacturerDataMap</span></a>
-          <li><a href="#bluetoothservicedatamap"><span class="secno">4.2.1.2</span> <span class="content">BluetoothServiceDataMap</span></a>
+          <li><a href="#bluetoothmanufacturerdatamap"><span class="secno">4.2.2.1</span> <span class="content">BluetoothManufacturerDataMap</span></a>
+          <li><a href="#bluetoothservicedatamap"><span class="secno">4.2.2.2</span> <span class="content">BluetoothServiceDataMap</span></a>
          </ol>
        </ol>
      </ol>
@@ -3297,7 +3298,26 @@ reports for this device.</p>
     </ol>
    </div>
    <div class="unstable">
-    <h4 class="heading settled" data-level="4.2.1" id="advertising-events"><span class="secno">4.2.1. </span><span class="content">Responding to Advertising Events</span><a class="self-link" href="#advertising-events"></a></h4>
+    <h4 class="heading settled" data-level="4.2.1" id="handling-full-activity-loss"><span class="secno">4.2.1. </span><span class="content">Handling Document Loss of Full Activity</span><a class="self-link" href="#handling-full-activity-loss"></a></h4>
+    <p>Operations that initiate a scan for Bluetooth devices may only run in a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active">fully
+active</a> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document">document</a>. When <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active①">full activity</a> is lost, scanning
+operations for that <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document①">document</a> need to be aborted.</p>
+    <div class="algorithm" data-algorithm="handle full activity loss">
+      When the user agent determines that a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-document" id="ref-for-responsible-document">responsible document</a> of the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object④">current
+settings object</a> is no longer <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active②">fully active</a>, it must run these steps: 
+     <ol>
+      <li data-md>
+       <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-iterate" id="ref-for-map-iterate">For each</a> <var>device</var> in <code><code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth⑧">Bluetooth</a></code>.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot" id="ref-for-dom-bluetooth-deviceinstancemap-slot③">[[deviceInstanceMap]]</a></code></code>, perform the
+following steps:</p>
+       <ol>
+        <li data-md>
+         <p>If <code><var>device</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchadvertisementsstate-slot" id="ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot⑦">[[watchAdvertisementsState]]</a></code></code> is <code>pending-watch</code> or <code>watching</code>, run <a data-link-type="dfn" href="#abort-watchadvertisements" id="ref-for-abort-watchadvertisements②">abort watchAdvertisements</a> with <var>device</var>.</p>
+       </ol>
+     </ol>
+    </div>
+   </div>
+   <div class="unstable">
+    <h4 class="heading settled" data-level="4.2.2" id="advertising-events"><span class="secno">4.2.2. </span><span class="content">Responding to Advertising Events</span><a class="self-link" href="#advertising-events"></a></h4>
     <p>When an <a data-link-type="dfn" href="#advertising-event" id="ref-for-advertising-event">advertising event</a> arrives for a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice②④">BluetoothDevice</a></code> with <code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchingadvertisements" id="ref-for-dom-bluetoothdevice-watchingadvertisements⑤">watchingAdvertisements</a></code> set,
 the UA delivers an "<code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothdevice-advertisementreceived" id="ref-for-eventdef-bluetoothdevice-advertisementreceived①">advertisementreceived</a></code>" event.</p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#Exposed" id="ref-for-Exposed④"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext③"><c- g>SecureContext</c-></a>]
@@ -3514,12 +3534,12 @@ DataView(<var>bytes</var>)</code> in <code><var>event</var>.serviceData.<code cl
      </ol>
     </div>
     <section>
-     <h5 class="heading settled dfn-paneled idl-code" data-dfn-type="interface" data-export data-level="4.2.1.1" data-lt="BluetoothManufacturerDataMap" id="bluetoothmanufacturerdatamap"><span class="secno">4.2.1.1. </span><span class="content">BluetoothManufacturerDataMap</span></h5>
+     <h5 class="heading settled dfn-paneled idl-code" data-dfn-type="interface" data-export data-level="4.2.2.1" data-lt="BluetoothManufacturerDataMap" id="bluetoothmanufacturerdatamap"><span class="secno">4.2.2.1. </span><span class="content">BluetoothManufacturerDataMap</span></h5>
      <p> Instances of <code class="idl"><a data-link-type="idl" href="#bluetoothmanufacturerdatamap" id="ref-for-bluetoothmanufacturerdatamap③">BluetoothManufacturerDataMap</a></code> have a <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothManufacturerDataMap" data-dfn-type="attribute" data-export id="dom-bluetoothmanufacturerdatamap-backingmap-slot"><code>[[BackingMap]]</code></dfn> slot because they are <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-maplike" id="ref-for-dfn-maplike">maplike</a>, which maps manufacturer codes to
           the manufacturer’s data, converted to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor⑤">DataView</a></code>s. </p>
     </section>
     <section>
-     <h5 class="heading settled dfn-paneled idl-code" data-dfn-type="interface" data-export data-level="4.2.1.2" data-lt="BluetoothServiceDataMap" id="bluetoothservicedatamap"><span class="secno">4.2.1.2. </span><span class="content">BluetoothServiceDataMap</span></h5>
+     <h5 class="heading settled dfn-paneled idl-code" data-dfn-type="interface" data-export data-level="4.2.2.2" data-lt="BluetoothServiceDataMap" id="bluetoothservicedatamap"><span class="secno">4.2.2.2. </span><span class="content">BluetoothServiceDataMap</span></h5>
      <p> Instances of <code class="idl"><a data-link-type="idl" href="#bluetoothservicedatamap" id="ref-for-bluetoothservicedatamap③">BluetoothServiceDataMap</a></code> have a <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothServiceDataMap" data-dfn-type="attribute" data-export id="dom-bluetoothservicedatamap-backingmap-slot"><code>[[BackingMap]]</code></dfn> slot because they are <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-maplike" id="ref-for-dfn-maplike①">maplike</a>, which maps service UUIDs to the
           service’s data, converted to <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor⑥">DataView</a></code>s. </p>
     </section>
@@ -3569,7 +3589,7 @@ device. The UA MAY share this cache between multiple origins accessing the same
 device. Each potential entry in the cache is either known-present, known-absent,
 or unknown. The cache MUST NOT contain two entries that are for the <a data-link-type="dfn" href="#same-attribute" id="ref-for-same-attribute">same
 attribute</a>. Each known-present entry in the cache is associated with an
-optional <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice③">BluetoothRemoteGATTService</a></code>></code>, <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic④">BluetoothRemoteGATTCharacteristic</a></code>></code>, or <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor" id="ref-for-bluetoothremotegattdescriptor③">BluetoothRemoteGATTDescriptor</a></code>></code> instance for each <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth⑧">Bluetooth</a></code> instance.</p>
+optional <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattservice" id="ref-for-bluetoothremotegattservice③">BluetoothRemoteGATTService</a></code>></code>, <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic④">BluetoothRemoteGATTCharacteristic</a></code>></code>, or <code>Promise&lt;<code class="idl"><a data-link-type="idl" href="#bluetoothremotegattdescriptor" id="ref-for-bluetoothremotegattdescriptor③">BluetoothRemoteGATTDescriptor</a></code>></code> instance for each <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth⑨">Bluetooth</a></code> instance.</p>
    <div class="note" role="note"> Note: For example, if a user calls the <code>serviceA.getCharacteristic(uuid1)</code> function with an initially empty <a data-link-type="dfn" href="#bluetooth-cache-bluetooth-cache" id="ref-for-bluetooth-cache-bluetooth-cache②">Bluetooth cache</a>, the UA uses the <a data-link-type="dfn" href="#discover-characteristics-by-uuid" id="ref-for-discover-characteristics-by-uuid">Discover Characteristics by UUID</a> procedure to fill the needed cache entries, and the UA ends the procedure early
 because it only needs one Characteristic to fulfil the returned <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-promise-objects" id="ref-for-sec-promise-objects⑤">Promise</a></code>,
 then the first Characteristic with UUID <code>uuid1</code> inside <code>serviceA</code> is known-present, and any subsequent Characteristics with
@@ -3746,7 +3766,7 @@ for example when there are other connected <code class="idl"><a data-link-type="
    <p>When no ECMAScript code can
 observe an instance of <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattserver" id="ref-for-bluetoothremotegattserver⑧">BluetoothRemoteGATTServer</a></code> <var>server</var> anymore,
 the UA SHOULD run <code><var>server</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-disconnect" id="ref-for-dom-bluetoothremotegattserver-disconnect②">disconnect()</a></code></code>.</p>
-   <div class="note" role="note"> Note: Because <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice③④">BluetoothDevice</a></code> instances are stored in <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot" id="ref-for-dom-bluetooth-deviceinstancemap-slot③">[[deviceInstanceMap]]</a></code></code>, this can’t
+   <div class="note" role="note"> Note: Because <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice③④">BluetoothDevice</a></code> instances are stored in <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot" id="ref-for-dom-bluetooth-deviceinstancemap-slot④">[[deviceInstanceMap]]</a></code></code>, this can’t
 happen at least until navigation releases the global object or closing the tab
 or window destroys the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#browsing-context" id="ref-for-browsing-context①">browsing context</a>. </div>
    <div class="note" role="note"> Note: Disconnecting on garbage collection ensures that the UA doesn’t keep consuming
@@ -4232,7 +4252,7 @@ MUST return
     </blockquote>
    </div>
    <p>The UA MUST maintain a map from each known GATT <a data-link-type="dfn" href="#characteristic" id="ref-for-characteristic⑧">Characteristic</a> to a set
-of <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth⑨">Bluetooth</a></code> objects known as the characteristic’s <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="active notification context set" data-noexport id="active-notification-context-set">active notification
+of <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth①⓪">Bluetooth</a></code> objects known as the characteristic’s <dfn class="dfn-paneled" data-dfn-type="dfn" data-lt="active notification context set" data-noexport id="active-notification-context-set">active notification
 context set</dfn>.</p>
    <div class="note" role="note"> Note: The set for a given characteristic holds the <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth">navigator.bluetooth</a></code> objects for each <a data-link-type="dfn" href="https://tc39.github.io/ecma262/#sec-code-realms" id="ref-for-sec-code-realms④">Realm</a> that
 has registered for notifications. All notifications become inactive when a
@@ -4557,7 +4577,7 @@ the order returned by the <a data-link-type="dfn" href="#discover-all-characteri
     <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice④①">BluetoothDevice</a></code> when an <a href="#advertising-event-algorithm">advertising event is received from
     that device</a>. 
     <dt><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="event" data-export id="eventdef-bluetooth-availabilitychanged"><code>availabilitychanged</code></dfn>
-    <dd> Fired on <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth①⓪">navigator.bluetooth</a></code> when <a href="#availability-changed-algorithm">the Bluetooth system as a whole
+    <dd> Fired on <code class="idl"><a data-link-type="idl" href="#bluetooth" id="ref-for-bluetooth①①">navigator.bluetooth</a></code> when <a href="#availability-changed-algorithm">the Bluetooth system as a whole
     becomes available or unavailable to the UA</a>. 
     <dt> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTCharacteristic" data-dfn-type="event" data-export data-lt="characteristicvaluechanged" id="eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged"> <code>characteristicvaluechanged</code> </dfn> 
     <dd> Fired on a <code class="idl"><a data-link-type="idl" href="#bluetoothremotegattcharacteristic" id="ref-for-bluetoothremotegattcharacteristic②②">BluetoothRemoteGATTCharacteristic</a></code> when its value changes,
@@ -5021,7 +5041,7 @@ blocklist</a>.</p>
 <pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①④"><c- g>SecureContext</c-></a>]
 <c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator"><c- g>Navigator</c-></a> {
   [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject⑧"><c- g>SameObject</c-></a>]
-  <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①①"><c- n>Bluetooth</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="Navigator" data-dfn-type="attribute" data-export data-readonly data-type="Bluetooth" id="dom-navigator-bluetooth"><code><c- g>bluetooth</c-></code></dfn>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①②"><c- n>Bluetooth</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="Navigator" data-dfn-type="attribute" data-export data-readonly data-type="Bluetooth" id="dom-navigator-bluetooth"><code><c- g>bluetooth</c-></code></dfn>;
 };
 </pre>
    <h2 class="heading settled" data-level="9" id="terminology"><span class="secno">9. </span><span class="content">Terminology and Conventions</span><a class="self-link" href="#terminology"></a></h2>
@@ -5581,8 +5601,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     appearance
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-appearance">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-appearance">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-appearance">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-appearance">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
     </ul>
    <li><a href="#att-bearer">ATT Bearer</a><span>, in §9</span>
    <li><a href="#attribute">Attribute</a><span>, in §5.1</span>
@@ -5595,8 +5615,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     [[BackingMap]]
     <ul>
-     <li><a href="#dom-bluetoothmanufacturerdatamap-backingmap-slot">attribute for BluetoothManufacturerDataMap</a><span>, in §4.2.1.1</span>
-     <li><a href="#dom-bluetoothservicedatamap-backingmap-slot">attribute for BluetoothServiceDataMap</a><span>, in §4.2.1.2</span>
+     <li><a href="#dom-bluetoothmanufacturerdatamap-backingmap-slot">attribute for BluetoothManufacturerDataMap</a><span>, in §4.2.2.1</span>
+     <li><a href="#dom-bluetoothservicedatamap-backingmap-slot">attribute for BluetoothServiceDataMap</a><span>, in §4.2.2.2</span>
     </ul>
    <li><a href="#bd_addr">BD_ADDR</a><span>, in §9</span>
    <li><a href="#blocklisted">blocklisted</a><span>, in §7</span>
@@ -5605,9 +5625,9 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#bluetooth">Bluetooth</a><span>, in §3</span>
    <li><a href="#dom-navigator-bluetooth">bluetooth</a><span>, in §8</span>
    <li><a href="#dom-permissionname-bluetooth">"bluetooth"</a><span>, in §3.1</span>
-   <li><a href="#bluetoothadvertisingevent">BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-   <li><a href="#dictdef-bluetoothadvertisingeventinit">BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
-   <li><a href="#dom-bluetoothadvertisingevent-bluetoothadvertisingevent">BluetoothAdvertisingEvent(type, init)</a><span>, in §4.2.1</span>
+   <li><a href="#bluetoothadvertisingevent">BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+   <li><a href="#dictdef-bluetoothadvertisingeventinit">BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
+   <li><a href="#dom-bluetoothadvertisingevent-bluetoothadvertisingevent">BluetoothAdvertisingEvent(type, init)</a><span>, in §4.2.2</span>
    <li><a href="#bluetooth-cache-bluetooth-cache">Bluetooth cache</a><span>, in §5.1.2</span>
    <li><a href="#bluetoothcharacteristicproperties">BluetoothCharacteristicProperties</a><span>, in §5.4.1</span>
    <li><a href="#typedefdef-bluetoothcharacteristicuuid">BluetoothCharacteristicUUID</a><span>, in §6.1</span>
@@ -5618,7 +5638,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#bluetoothdeviceeventhandlers">BluetoothDeviceEventHandlers</a><span>, in §5.6.6</span>
    <li><a href="#bluetooth-device-name">Bluetooth Device Name</a><span>, in §9</span>
    <li><a href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a><span>, in §3</span>
-   <li><a href="#bluetoothmanufacturerdatamap">BluetoothManufacturerDataMap</a><span>, in §4.2.1</span>
+   <li><a href="#bluetoothmanufacturerdatamap">BluetoothManufacturerDataMap</a><span>, in §4.2.2</span>
    <li><a href="#dictdef-bluetoothpermissiondescriptor">BluetoothPermissionDescriptor</a><span>, in §3.1</span>
    <li><a href="#bluetoothpermissionresult">BluetoothPermissionResult</a><span>, in §3.1</span>
    <li><a href="#dictdef-bluetoothpermissionstorage">BluetoothPermissionStorage</a><span>, in §3.1</span>
@@ -5626,7 +5646,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#bluetoothremotegattdescriptor">BluetoothRemoteGATTDescriptor</a><span>, in §5.5</span>
    <li><a href="#bluetoothremotegattserver">BluetoothRemoteGATTServer</a><span>, in §5.2</span>
    <li><a href="#bluetoothremotegattservice">BluetoothRemoteGATTService</a><span>, in §5.3</span>
-   <li><a href="#bluetoothservicedatamap">BluetoothServiceDataMap</a><span>, in §4.2.1</span>
+   <li><a href="#bluetoothservicedatamap">BluetoothServiceDataMap</a><span>, in §4.2.2</span>
    <li><a href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a><span>, in §6.1</span>
    <li><a href="#bluetooth-tree-bluetooth-tree">Bluetooth tree</a><span>, in §5.6.1</span>
    <li><a href="#bluetoothuuid">BluetoothUUID</a><span>, in §6.1</span>
@@ -5661,7 +5681,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#dom-bluetoothremotegattserver-connected">connected</a><span>, in §5.2</span>
    <li><a href="#connection-checking-wrapper">connection-checking wrapper</a><span>, in §5.2</span>
    <li><a href="#dom-valueevent-valueevent">constructor(type)</a><span>, in §3.2</span>
-   <li><a href="#dom-bluetoothadvertisingevent-bluetoothadvertisingevent">constructor(type, init)</a><span>, in §4.2.1</span>
+   <li><a href="#dom-bluetoothadvertisingevent-bluetoothadvertisingevent">constructor(type, init)</a><span>, in §4.2.2</span>
    <li><a href="#dom-valueevent-valueevent">constructor(type, initDict)</a><span>, in §3.2</span>
    <li><a href="#dom-bluetoothdevice-context-slot">[[context]]</a><span>, in §4.2</span>
    <li><a href="#create-a-bluetoothcharacteristicproperties-instance-from-the-characteristic">create a BluetoothCharacteristicProperties instance from the Characteristic</a><span>, in §5.4.1</span>
@@ -5675,10 +5695,10 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     device
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-device">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-device">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
      <li><a href="#dom-bluetoothremotegattserver-device">attribute for BluetoothRemoteGATTServer</a><span>, in §5.2</span>
      <li><a href="#dom-bluetoothremotegattservice-device">attribute for BluetoothRemoteGATTService</a><span>, in §5.3</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-device">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-device">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
     </ul>
    <li><a href="#device-discovery-procedure">Device Discovery Procedure</a><span>, in §9</span>
    <li>
@@ -5703,7 +5723,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothpermissiondescriptor-filters">dict-member for BluetoothPermissionDescriptor</a><span>, in §3.1</span>
      <li><a href="#dom-requestdeviceoptions-filters">dict-member for RequestDeviceOptions</a><span>, in §3</span>
     </ul>
-   <li><a href="#fire-an-advertisementreceived-event">fire an advertisementreceived event</a><span>, in §4.2.1</span>
+   <li><a href="#fire-an-advertisementreceived-event">fire an advertisementreceived event</a><span>, in §4.2.2</span>
    <li><a href="#flags-data-type">Flags Data Type</a><span>, in §9</span>
    <li><a href="#gap-interoperability-requirements">GAP Interoperability Requirements</a><span>, in §9</span>
    <li><a href="#garbage-collect-the-connection">garbage-collect the connection</a><span>, in §5.2</span>
@@ -5750,8 +5770,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     manufacturerData
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-manufacturerdata">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-manufacturerdata">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-manufacturerdata">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-manufacturerdata">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
      <li><a href="#dom-bluetoothlescanfilterinit-manufacturerdata">dict-member for BluetoothLEScanFilterInit</a><span>, in §3</span>
     </ul>
    <li><a href="#manufacturer-specific-data">Manufacturer Specific Data</a><span>, in §9</span>
@@ -5764,9 +5784,9 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     name
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-name">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-name">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
      <li><a href="#dom-bluetoothdevice-name">attribute for BluetoothDevice</a><span>, in §4.2</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-name">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-name">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
      <li><a href="#dom-bluetoothlescanfilterinit-name">dict-member for BluetoothLEScanFilterInit</a><span>, in §3</span>
     </ul>
    <li><a href="#name-discovery-procedure">Name Discovery Procedure</a><span>, in §9</span>
@@ -5835,8 +5855,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     rssi
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-rssi">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-rssi">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-rssi">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-rssi">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
     </ul>
    <li><a href="#same-attribute">same attribute</a><span>, in §5.1.4</span>
    <li><a href="#same-bluetooth-device">same Bluetooth device</a><span>, in §4.1</span>
@@ -5851,8 +5871,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     serviceData
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-servicedata">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-servicedata">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-servicedata">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-servicedata">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
      <li><a href="#dom-bluetoothlescanfilterinit-servicedata">dict-member for BluetoothLEScanFilterInit</a><span>, in §3</span>
     </ul>
    <li><a href="#service-data">Service Data</a><span>, in §9</span>
@@ -5873,8 +5893,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     txPower
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-txpower">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-txpower">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-txpower">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-txpower">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
     </ul>
    <li><a href="#tx-power-level">TX Power Level</a><span>, in §9</span>
    <li>
@@ -5894,8 +5914,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li>
     uuids
     <ul>
-     <li><a href="#dom-bluetoothadvertisingevent-uuids">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.1</span>
-     <li><a href="#dom-bluetoothadvertisingeventinit-uuids">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.1</span>
+     <li><a href="#dom-bluetoothadvertisingevent-uuids">attribute for BluetoothAdvertisingEvent</a><span>, in §4.2.2</span>
+     <li><a href="#dom-bluetoothadvertisingeventinit-uuids">dict-member for BluetoothAdvertisingEventInit</a><span>, in §4.2.2</span>
     </ul>
    <li><a href="#valid-uuid">valid UUID</a><span>, in §6</span>
    <li>
@@ -5942,7 +5962,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-">
    <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.appearance.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#termref-for-">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-">
@@ -6011,14 +6031,14 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://dom.spec.whatwg.org/#event">https://dom.spec.whatwg.org/#event</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-event">3.2. Overall Bluetooth availability</a>
-    <li><a href="#ref-for-event①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-event①">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dictdef-eventinit">
    <a href="https://dom.spec.whatwg.org/#dictdef-eventinit">https://dom.spec.whatwg.org/#dictdef-eventinit</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-eventinit">3.2. Overall Bluetooth availability</a>
-    <li><a href="#ref-for-dictdef-eventinit①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dictdef-eventinit①">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-eventtarget">
@@ -6060,11 +6080,17 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-context-object">3. Device Discovery</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-concept-document">
+   <a href="https://dom.spec.whatwg.org/#concept-document">https://dom.spec.whatwg.org/#concept-document</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-concept-document">4.2.1. Handling Document Loss of Full Activity</a> <a href="#ref-for-concept-document①">(2)</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-concept-event-fire">
    <a href="https://dom.spec.whatwg.org/#concept-event-fire">https://dom.spec.whatwg.org/#concept-event-fire</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-event-fire">3.2. Overall Bluetooth availability</a>
-    <li><a href="#ref-for-concept-event-fire①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-concept-event-fire①">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-concept-event-fire②">5.4. BluetoothRemoteGATTCharacteristic</a>
     <li><a href="#ref-for-concept-event-fire③">5.6.3. Responding to Disconnection</a>
     <li><a href="#ref-for-concept-event-fire④">5.6.4. Responding to Notifications and Indications</a>
@@ -6074,7 +6100,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-dom-event-istrusted">
    <a href="https://dom.spec.whatwg.org/#dom-event-istrusted">https://dom.spec.whatwg.org/#dom-event-istrusted</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-event-istrusted">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-event-istrusted">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-tree-participate">
@@ -6100,7 +6126,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-sec-arraybuffer-constructor">
    <a href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor">https://tc39.github.io/ecma262/#sec-arraybuffer-constructor</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sec-arraybuffer-constructor">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-arraybuffer-constructor①">(2)</a>
+    <li><a href="#ref-for-sec-arraybuffer-constructor">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-sec-arraybuffer-constructor①">(2)</a>
     <li><a href="#ref-for-sec-arraybuffer-constructor②">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-arraybuffer-constructor③">(2)</a> <a href="#ref-for-sec-arraybuffer-constructor④">(3)</a>
     <li><a href="#ref-for-sec-arraybuffer-constructor⑤">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-arraybuffer-constructor⑥">(2)</a> <a href="#ref-for-sec-arraybuffer-constructor⑦">(3)</a>
     <li><a href="#ref-for-sec-arraybuffer-constructor⑧">5.6.4. Responding to Notifications and Indications</a>
@@ -6123,9 +6149,9 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://tc39.github.io/ecma262/#sec-dataview-constructor">https://tc39.github.io/ecma262/#sec-dataview-constructor</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sec-dataview-constructor">1.1. Examples</a>
-    <li><a href="#ref-for-sec-dataview-constructor①">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-dataview-constructor②">(2)</a> <a href="#ref-for-sec-dataview-constructor③">(3)</a> <a href="#ref-for-sec-dataview-constructor④">(4)</a>
-    <li><a href="#ref-for-sec-dataview-constructor⑤">4.2.1.1. BluetoothManufacturerDataMap</a>
-    <li><a href="#ref-for-sec-dataview-constructor⑥">4.2.1.2. BluetoothServiceDataMap</a>
+    <li><a href="#ref-for-sec-dataview-constructor①">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-sec-dataview-constructor②">(2)</a> <a href="#ref-for-sec-dataview-constructor③">(3)</a> <a href="#ref-for-sec-dataview-constructor④">(4)</a>
+    <li><a href="#ref-for-sec-dataview-constructor⑤">4.2.2.1. BluetoothManufacturerDataMap</a>
+    <li><a href="#ref-for-sec-dataview-constructor⑥">4.2.2.2. BluetoothServiceDataMap</a>
     <li><a href="#ref-for-sec-dataview-constructor⑦">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-dataview-constructor⑧">(2)</a> <a href="#ref-for-sec-dataview-constructor⑨">(3)</a> <a href="#ref-for-sec-dataview-constructor①⓪">(4)</a>
     <li><a href="#ref-for-sec-dataview-constructor①①">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-dataview-constructor①②">(2)</a> <a href="#ref-for-sec-dataview-constructor①③">(3)</a> <a href="#ref-for-sec-dataview-constructor①④">(4)</a>
     <li><a href="#ref-for-sec-dataview-constructor①⑤">5.6.4. Responding to Notifications and Indications</a>
@@ -6159,7 +6185,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <ul>
     <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror">3. Device Discovery</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①">(2)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror②">(3)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror③">(4)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror④">(5)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑤">(6)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑥">(7)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑦">(8)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑧">(9)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror⑨">(10)</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①⓪">(11)</a>
     <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①①">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①②">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①③">(2)</a>
+    <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①②">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①③">(2)</a>
     <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①④">6.1. Standardized UUIDs</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①⑤">(2)</a>
    </ul>
   </aside>
@@ -6208,7 +6234,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://encoding.spec.whatwg.org/#utf-8-decode-without-bom">https://encoding.spec.whatwg.org/#utf-8-decode-without-bom</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-utf-8-decode-without-bom">4.1. Global Bluetooth device properties</a>
-    <li><a href="#ref-for-utf-8-decode-without-bom①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-utf-8-decode-without-bom①">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-utf-8-encode">
@@ -6249,6 +6275,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-current-settings-object">3. Device Discovery</a>
     <li><a href="#ref-for-current-settings-object①">3.1. Permission API Integration</a> <a href="#ref-for-current-settings-object②">(2)</a>
     <li><a href="#ref-for-current-settings-object③">4.2. BluetoothDevice</a>
+    <li><a href="#ref-for-current-settings-object④">4.2.1. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-enqueue-the-following-steps">
@@ -6267,6 +6294,12 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes">https://html.spec.whatwg.org/multipage/webappapis.html#event-handler-idl-attributes</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-event-handler-idl-attributes">5.6.6. IDL event handlers</a> <a href="#ref-for-event-handler-idl-attributes①">(2)</a> <a href="#ref-for-event-handler-idl-attributes②">(3)</a> <a href="#ref-for-event-handler-idl-attributes③">(4)</a> <a href="#ref-for-event-handler-idl-attributes④">(5)</a> <a href="#ref-for-event-handler-idl-attributes⑤">(6)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-fully-active">
+   <a href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active">https://html.spec.whatwg.org/multipage/browsers.html#fully-active</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-fully-active">4.2.1. Handling Document Loss of Full Activity</a> <a href="#ref-for-fully-active①">(2)</a> <a href="#ref-for-fully-active②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-settings-object-global">
@@ -6311,7 +6344,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <ul>
     <li><a href="#ref-for-queue-a-task">3.2. Overall Bluetooth availability</a> <a href="#ref-for-queue-a-task①">(2)</a> <a href="#ref-for-queue-a-task②">(3)</a> <a href="#ref-for-queue-a-task③">(4)</a>
     <li><a href="#ref-for-queue-a-task④">4.2. BluetoothDevice</a> <a href="#ref-for-queue-a-task⑤">(2)</a>
-    <li><a href="#ref-for-queue-a-task⑥">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-queue-a-task⑥">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-queue-a-task⑦">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-queue-a-task⑧">(2)</a> <a href="#ref-for-queue-a-task⑨">(3)</a>
     <li><a href="#ref-for-queue-a-task①⓪">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-queue-a-task①①">(2)</a> <a href="#ref-for-queue-a-task①②">(3)</a>
     <li><a href="#ref-for-queue-a-task①③">5.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-queue-a-task①④">(2)</a>
@@ -6332,17 +6365,23 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-relevant-settings-object">4.2. BluetoothDevice</a>
-    <li><a href="#ref-for-relevant-settings-object①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-relevant-settings-object①">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-relevant-settings-object②">5.6.1. Bluetooth Tree</a>
     <li><a href="#ref-for-relevant-settings-object③">5.6.3. Responding to Disconnection</a>
     <li><a href="#ref-for-relevant-settings-object④">5.6.5. Responding to Service Changes</a> <a href="#ref-for-relevant-settings-object⑤">(2)</a> <a href="#ref-for-relevant-settings-object⑥">(3)</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-responsible-document">
+   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-document">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-document</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-responsible-document">4.2.1. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-responsible-event-loop">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-responsible-event-loop">3.2. Overall Bluetooth availability</a>
-    <li><a href="#ref-for-responsible-event-loop①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-responsible-event-loop①">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-responsible-event-loop②">5.6.3. Responding to Disconnection</a>
     <li><a href="#ref-for-responsible-event-loop③">5.6.5. Responding to Service Changes</a> <a href="#ref-for-responsible-event-loop④">(2)</a>
    </ul>
@@ -6357,6 +6396,12 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://infra.spec.whatwg.org/#abort-when">https://infra.spec.whatwg.org/#abort-when</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abort-when">4.2. BluetoothDevice</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-map-iterate">
+   <a href="https://infra.spec.whatwg.org/#map-iterate">https://infra.spec.whatwg.org/#map-iterate</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-map-iterate">4.2.1. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-if-aborted">
@@ -6507,7 +6552,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://heycam.github.io/webidl/#BufferSource">https://heycam.github.io/webidl/#BufferSource</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-BufferSource">3. Device Discovery</a> <a href="#ref-for-BufferSource①">(2)</a>
-    <li><a href="#ref-for-BufferSource②">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-BufferSource③">(2)</a>
+    <li><a href="#ref-for-BufferSource②">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-BufferSource③">(2)</a>
     <li><a href="#ref-for-BufferSource④">5.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-BufferSource⑤">(2)</a> <a href="#ref-for-BufferSource⑥">(3)</a>
     <li><a href="#ref-for-BufferSource⑦">5.5. BluetoothRemoteGATTDescriptor</a>
    </ul>
@@ -6525,7 +6570,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-idl-DOMString②">3.1. Permission API Integration</a> <a href="#ref-for-idl-DOMString③">(2)</a> <a href="#ref-for-idl-DOMString④">(3)</a>
     <li><a href="#ref-for-idl-DOMString⑤">3.2. Overall Bluetooth availability</a>
     <li><a href="#ref-for-idl-DOMString⑥">4.2. BluetoothDevice</a> <a href="#ref-for-idl-DOMString⑦">(2)</a>
-    <li><a href="#ref-for-idl-DOMString⑧">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-DOMString⑨">(2)</a> <a href="#ref-for-idl-DOMString①⓪">(3)</a> <a href="#ref-for-idl-DOMString①①">(4)</a>
+    <li><a href="#ref-for-idl-DOMString⑧">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-idl-DOMString⑨">(2)</a> <a href="#ref-for-idl-DOMString①⓪">(3)</a> <a href="#ref-for-idl-DOMString①①">(4)</a>
     <li><a href="#ref-for-idl-DOMString①②">6. UUIDs</a>
     <li><a href="#ref-for-idl-DOMString①③">6.1. Standardized UUIDs</a> <a href="#ref-for-idl-DOMString①④">(2)</a> <a href="#ref-for-idl-DOMString①⑤">(3)</a> <a href="#ref-for-idl-DOMString①⑥">(4)</a> <a href="#ref-for-idl-DOMString①⑦">(5)</a> <a href="#ref-for-idl-DOMString①⑧">(6)</a>
    </ul>
@@ -6543,7 +6588,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-Exposed①">3.1. Permission API Integration</a>
     <li><a href="#ref-for-Exposed②">3.2. Overall Bluetooth availability</a>
     <li><a href="#ref-for-Exposed③">4.2. BluetoothDevice</a>
-    <li><a href="#ref-for-Exposed④">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-Exposed⑤">(2)</a> <a href="#ref-for-Exposed⑥">(3)</a>
+    <li><a href="#ref-for-Exposed④">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-Exposed⑤">(2)</a> <a href="#ref-for-Exposed⑥">(3)</a>
     <li><a href="#ref-for-Exposed⑦">5.2. BluetoothRemoteGATTServer</a>
     <li><a href="#ref-for-Exposed⑧">5.3. BluetoothRemoteGATTService</a>
     <li><a href="#ref-for-Exposed⑨">5.4. BluetoothRemoteGATTCharacteristic</a>
@@ -6556,7 +6601,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://heycam.github.io/webidl/#idl-frozen-array">https://heycam.github.io/webidl/#idl-frozen-array</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-frozen-array">3.1. Permission API Integration</a> <a href="#ref-for-idl-frozen-array①">(2)</a> <a href="#ref-for-idl-frozen-array②">(3)</a>
-    <li><a href="#ref-for-idl-frozen-array③">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-frozen-array④">(2)</a>
+    <li><a href="#ref-for-idl-frozen-array③">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-idl-frozen-array④">(2)</a>
     <li><a href="#ref-for-idl-frozen-array⑤">9. Terminology and Conventions</a> <a href="#ref-for-idl-frozen-array⑥">(2)</a>
    </ul>
   </aside>
@@ -6608,7 +6653,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://heycam.github.io/webidl/#SameObject">https://heycam.github.io/webidl/#SameObject</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-SameObject">3. Device Discovery</a>
-    <li><a href="#ref-for-SameObject①">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-SameObject②">(2)</a> <a href="#ref-for-SameObject③">(3)</a>
+    <li><a href="#ref-for-SameObject①">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-SameObject②">(2)</a> <a href="#ref-for-SameObject③">(3)</a>
     <li><a href="#ref-for-SameObject④">5.2. BluetoothRemoteGATTServer</a>
     <li><a href="#ref-for-SameObject⑤">5.3. BluetoothRemoteGATTService</a>
     <li><a href="#ref-for-SameObject⑥">5.4. BluetoothRemoteGATTCharacteristic</a>
@@ -6622,7 +6667,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-SecureContext">3. Device Discovery</a>
     <li><a href="#ref-for-SecureContext①">3.2. Overall Bluetooth availability</a>
     <li><a href="#ref-for-SecureContext②">4.2. BluetoothDevice</a>
-    <li><a href="#ref-for-SecureContext③">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-SecureContext④">(2)</a> <a href="#ref-for-SecureContext⑤">(3)</a>
+    <li><a href="#ref-for-SecureContext③">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-SecureContext④">(2)</a> <a href="#ref-for-SecureContext⑤">(3)</a>
     <li><a href="#ref-for-SecureContext⑥">5.2. BluetoothRemoteGATTServer</a>
     <li><a href="#ref-for-SecureContext⑦">5.3. BluetoothRemoteGATTService</a>
     <li><a href="#ref-for-SecureContext⑧">5.4. BluetoothRemoteGATTCharacteristic</a>
@@ -6654,7 +6699,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">https://heycam.github.io/webidl/#dfn-get-buffer-source-copy</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-get-buffer-source-copy">3. Device Discovery</a> <a href="#ref-for-dfn-get-buffer-source-copy①">(2)</a> <a href="#ref-for-dfn-get-buffer-source-copy②">(3)</a> <a href="#ref-for-dfn-get-buffer-source-copy③">(4)</a>
-    <li><a href="#ref-for-dfn-get-buffer-source-copy④">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dfn-get-buffer-source-copy⑤">(2)</a>
+    <li><a href="#ref-for-dfn-get-buffer-source-copy④">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-dfn-get-buffer-source-copy⑤">(2)</a>
     <li><a href="#ref-for-dfn-get-buffer-source-copy⑥">5.4. BluetoothRemoteGATTCharacteristic</a>
     <li><a href="#ref-for-dfn-get-buffer-source-copy⑦">5.5. BluetoothRemoteGATTDescriptor</a>
    </ul>
@@ -6697,7 +6742,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-idl-byte">
    <a href="https://heycam.github.io/webidl/#idl-byte">https://heycam.github.io/webidl/#idl-byte</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-byte">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-byte①">(2)</a> <a href="#ref-for-idl-byte②">(3)</a> <a href="#ref-for-idl-byte③">(4)</a>
+    <li><a href="#ref-for-idl-byte">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-idl-byte①">(2)</a> <a href="#ref-for-idl-byte②">(3)</a> <a href="#ref-for-idl-byte③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-dfn-convert-idl-to-ecmascript-value">
@@ -6715,8 +6760,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-dfn-maplike">
    <a href="https://heycam.github.io/webidl/#dfn-maplike">https://heycam.github.io/webidl/#dfn-maplike</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dfn-maplike">4.2.1.1. BluetoothManufacturerDataMap</a>
-    <li><a href="#ref-for-dfn-maplike①">4.2.1.2. BluetoothServiceDataMap</a>
+    <li><a href="#ref-for-dfn-maplike">4.2.2.1. BluetoothManufacturerDataMap</a>
+    <li><a href="#ref-for-dfn-maplike①">4.2.2.2. BluetoothServiceDataMap</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-object">
@@ -6761,14 +6806,14 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-idl-unsigned-long">
    <a href="https://heycam.github.io/webidl/#idl-unsigned-long">https://heycam.github.io/webidl/#idl-unsigned-long</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-unsigned-long">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-idl-unsigned-long">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-idl-unsigned-long①">6.1. Standardized UUIDs</a> <a href="#ref-for-idl-unsigned-long②">(2)</a> <a href="#ref-for-idl-unsigned-long③">(3)</a> <a href="#ref-for-idl-unsigned-long④">(4)</a> <a href="#ref-for-idl-unsigned-long⑤">(5)</a> <a href="#ref-for-idl-unsigned-long⑥">(6)</a> <a href="#ref-for-idl-unsigned-long⑦">(7)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-unsigned-short">
    <a href="https://heycam.github.io/webidl/#idl-unsigned-short">https://heycam.github.io/webidl/#idl-unsigned-short</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-idl-unsigned-short">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-idl-unsigned-short①">(2)</a> <a href="#ref-for-idl-unsigned-short②">(3)</a> <a href="#ref-for-idl-unsigned-short③">(4)</a>
+    <li><a href="#ref-for-idl-unsigned-short">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-idl-unsigned-short①">(2)</a> <a href="#ref-for-idl-unsigned-short②">(3)</a> <a href="#ref-for-idl-unsigned-short③">(4)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-upon-fulfillment">
@@ -6812,6 +6857,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="term-for-dom-event-bubbles" style="color:initial">bubbles</span>
      <li><span class="dfn-paneled" id="term-for-concept-tree-child" style="color:initial">children</span>
      <li><span class="dfn-paneled" id="term-for-context-object" style="color:initial">context object</span>
+     <li><span class="dfn-paneled" id="term-for-concept-document" style="color:initial">document</span>
      <li><span class="dfn-paneled" id="term-for-concept-event-fire" style="color:initial">fire an event</span>
      <li><span class="dfn-paneled" id="term-for-dom-event-istrusted" style="color:initial">isTrusted</span>
      <li><span class="dfn-paneled" id="term-for-concept-tree-participate" style="color:initial">participate in a tree</span>
@@ -6856,6 +6902,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="term-for-enqueue-the-following-steps" style="color:initial">enqueue the following steps</span>
      <li><span class="dfn-paneled" id="term-for-environment-settings-object" style="color:initial">environment settings object</span>
      <li><span class="dfn-paneled" id="term-for-event-handler-idl-attributes" style="color:initial">event handler idl attribute</span>
+     <li><span class="dfn-paneled" id="term-for-fully-active" style="color:initial">fully active</span>
      <li><span class="dfn-paneled" id="term-for-concept-settings-object-global" style="color:initial">global object <small>(for environment settings object)</small></span>
      <li><span class="dfn-paneled" id="term-for-in-parallel" style="color:initial">in parallel</span>
      <li><span class="dfn-paneled" id="term-for-initialise-the-document-object" style="color:initial">initializing the document object</span>
@@ -6864,6 +6911,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="term-for-queue-a-task" style="color:initial">queue a task</span>
      <li><span class="dfn-paneled" id="term-for-concept-relevant-global" style="color:initial">relevant global object</span>
      <li><span class="dfn-paneled" id="term-for-relevant-settings-object" style="color:initial">relevant settings object</span>
+     <li><span class="dfn-paneled" id="term-for-responsible-document" style="color:initial">responsible document</span>
      <li><span class="dfn-paneled" id="term-for-responsible-event-loop" style="color:initial">responsible event loop</span>
      <li><span class="dfn-paneled" id="term-for-starting-a-new-parallel-queue" style="color:initial">starting a new parallel queue</span>
     </ul>
@@ -6871,6 +6919,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <a data-link-type="biblio">[INFRA]</a> defines the following terms:
     <ul>
      <li><span class="dfn-paneled" id="term-for-abort-when" style="color:initial">abort when</span>
+     <li><span class="dfn-paneled" id="term-for-map-iterate" style="color:initial">for each</span>
      <li><span class="dfn-paneled" id="term-for-if-aborted" style="color:initial">if aborted</span>
     </ul>
    <li>
@@ -7020,8 +7069,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <c- b>Promise</c->&lt;<a class="n" data-link-type="idl-name" href="#bluetoothdevice" id="ref-for-bluetoothdevice②①⓪"><c- n>BluetoothDevice</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice②①"><c- g>requestDevice</c-></a>(<c- b>optional</c-> <a class="n" data-link-type="idl-name" href="#dictdef-requestdeviceoptions" id="ref-for-dictdef-requestdeviceoptions①"><c- n>RequestDeviceOptions</c-></a> <a href="#dom-bluetooth-requestdevice-options-options"><code><c- g>options</c-></code></a> = {});
 };
 
-<a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①③"><c- n>Bluetooth</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bluetoothdeviceeventhandlers" id="ref-for-bluetoothdeviceeventhandlers②"><c- n>BluetoothDeviceEventHandlers</c-></a>;
-<a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①②"><c- n>Bluetooth</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#characteristiceventhandlers" id="ref-for-characteristiceventhandlers④"><c- n>CharacteristicEventHandlers</c-></a>;
+<a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①④"><c- n>Bluetooth</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#bluetoothdeviceeventhandlers" id="ref-for-bluetoothdeviceeventhandlers②"><c- n>BluetoothDeviceEventHandlers</c-></a>;
+<a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①③"><c- n>Bluetooth</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#characteristiceventhandlers" id="ref-for-characteristiceventhandlers④"><c- n>CharacteristicEventHandlers</c-></a>;
 <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth②①"><c- n>Bluetooth</c-></a> <c- b>includes</c-> <a class="n" data-link-type="idl-name" href="#serviceeventhandlers" id="ref-for-serviceeventhandlers③"><c- n>ServiceEventHandlers</c-></a>;
 
 <c- b>dictionary</c-> <a href="#dictdef-bluetoothpermissiondescriptor"><code><c- g>BluetoothPermissionDescriptor</c-></code></a> : <a class="n" data-link-type="idl-name" href="https://w3c.github.io/permissions/#dictdef-permissiondescriptor" id="ref-for-dictdef-permissiondescriptor①"><c- n>PermissionDescriptor</c-></a> {
@@ -7223,7 +7272,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
 [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SecureContext" id="ref-for-SecureContext①④①"><c- g>SecureContext</c-></a>]
 <c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator①"><c- g>Navigator</c-></a> {
   [<a class="idl-code" data-link-type="extended-attribute" href="https://heycam.github.io/webidl/#SameObject" id="ref-for-SameObject⑧①"><c- g>SameObject</c-></a>]
-  <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①①①"><c- n>Bluetooth</c-></a> <a data-readonly data-type="Bluetooth" href="#dom-navigator-bluetooth"><code><c- g>bluetooth</c-></code></a>;
+  <c- b>readonly</c-> <c- b>attribute</c-> <a class="n" data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①②①"><c- n>Bluetooth</c-></a> <a data-readonly data-type="Bluetooth" href="#dom-navigator-bluetooth"><code><c- g>bluetooth</c-></code></a>;
 };
 
 </pre>
@@ -7297,10 +7346,11 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <ul>
     <li><a href="#ref-for-bluetooth">3. Device Discovery</a> <a href="#ref-for-bluetooth①">(2)</a> <a href="#ref-for-bluetooth②">(3)</a> <a href="#ref-for-bluetooth③">(4)</a> <a href="#ref-for-bluetooth④">(5)</a>
     <li><a href="#ref-for-bluetooth⑤">4.2. BluetoothDevice</a> <a href="#ref-for-bluetooth⑥">(2)</a> <a href="#ref-for-bluetooth⑦">(3)</a>
-    <li><a href="#ref-for-bluetooth⑧">5.1.2. The Bluetooth cache</a>
-    <li><a href="#ref-for-bluetooth⑨">5.4. BluetoothRemoteGATTCharacteristic</a>
-    <li><a href="#ref-for-bluetooth①⓪">5.6.2. Event types</a>
-    <li><a href="#ref-for-bluetooth①①">8. Extensions to the Navigator Interface</a>
+    <li><a href="#ref-for-bluetooth⑧">4.2.1. Handling Document Loss of Full Activity</a>
+    <li><a href="#ref-for-bluetooth⑨">5.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-bluetooth①⓪">5.4. BluetoothRemoteGATTCharacteristic</a>
+    <li><a href="#ref-for-bluetooth①①">5.6.2. Event types</a>
+    <li><a href="#ref-for-bluetooth①②">8. Extensions to the Navigator Interface</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-requestdeviceoptions-filters">
@@ -7355,7 +7405,8 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#dom-bluetooth-deviceinstancemap-slot">#dom-bluetooth-deviceinstancemap-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetooth-deviceinstancemap-slot">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetooth-deviceinstancemap-slot①">(2)</a> <a href="#ref-for-dom-bluetooth-deviceinstancemap-slot②">(3)</a>
-    <li><a href="#ref-for-dom-bluetooth-deviceinstancemap-slot③">5.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-dom-bluetooth-deviceinstancemap-slot③">4.2.1. Handling Document Loss of Full Activity</a>
+    <li><a href="#ref-for-dom-bluetooth-deviceinstancemap-slot④">5.2. BluetoothRemoteGATTServer</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetooth-attributeinstancemap-slot">
@@ -7589,7 +7640,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
     <li><a href="#ref-for-bluetooth-device①⓪">3.1. Permission API Integration</a>
     <li><a href="#ref-for-bluetooth-device①①">4.1. Global Bluetooth device properties</a>
     <li><a href="#ref-for-bluetooth-device①②">4.2. BluetoothDevice</a> <a href="#ref-for-bluetooth-device①③">(2)</a> <a href="#ref-for-bluetooth-device①④">(3)</a>
-    <li><a href="#ref-for-bluetooth-device①⑤">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-bluetooth-device①⑤">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-bluetooth-device①⑥">5.6.3. Responding to Disconnection</a>
     <li><a href="#ref-for-bluetooth-device①⑦">5.6.5. Responding to Service Changes</a>
    </ul>
@@ -7605,7 +7656,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <ul>
     <li><a href="#ref-for-same-bluetooth-device">3.1. Permission API Integration</a>
     <li><a href="#ref-for-same-bluetooth-device①">4.2. BluetoothDevice</a> <a href="#ref-for-same-bluetooth-device②">(2)</a> <a href="#ref-for-same-bluetooth-device③">(3)</a> <a href="#ref-for-same-bluetooth-device④">(4)</a>
-    <li><a href="#ref-for-same-bluetooth-device⑤">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-same-bluetooth-device⑤">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-same-bluetooth-device⑥">5.1.4. Identifying Services, Characteristics, and Descriptors</a> <a href="#ref-for-same-bluetooth-device⑦">(2)</a>
     <li><a href="#ref-for-same-bluetooth-device⑧">5.2. BluetoothRemoteGATTServer</a>
     <li><a href="#ref-for-same-bluetooth-device⑨">5.6.3. Responding to Disconnection</a>
@@ -7617,7 +7668,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
     <li><a href="#ref-for-bluetoothdevice">3. Device Discovery</a> <a href="#ref-for-bluetoothdevice①">(2)</a> <a href="#ref-for-bluetoothdevice②">(3)</a> <a href="#ref-for-bluetoothdevice③">(4)</a> <a href="#ref-for-bluetoothdevice④">(5)</a> <a href="#ref-for-bluetoothdevice⑤">(6)</a> <a href="#ref-for-bluetoothdevice⑥">(7)</a> <a href="#ref-for-bluetoothdevice⑦">(8)</a> <a href="#ref-for-bluetoothdevice⑧">(9)</a>
     <li><a href="#ref-for-bluetoothdevice⑨">3.1. Permission API Integration</a> <a href="#ref-for-bluetoothdevice①⓪">(2)</a> <a href="#ref-for-bluetoothdevice①①">(3)</a> <a href="#ref-for-bluetoothdevice①②">(4)</a>
     <li><a href="#ref-for-bluetoothdevice①③">4.2. BluetoothDevice</a> <a href="#ref-for-bluetoothdevice①④">(2)</a> <a href="#ref-for-bluetoothdevice①⑤">(3)</a> <a href="#ref-for-bluetoothdevice①⑥">(4)</a> <a href="#ref-for-bluetoothdevice①⑦">(5)</a> <a href="#ref-for-bluetoothdevice①⑧">(6)</a> <a href="#ref-for-bluetoothdevice①⑨">(7)</a> <a href="#ref-for-bluetoothdevice②⓪">(8)</a> <a href="#ref-for-bluetoothdevice②①">(9)</a> <a href="#ref-for-bluetoothdevice②②">(10)</a> <a href="#ref-for-bluetoothdevice②③">(11)</a>
-    <li><a href="#ref-for-bluetoothdevice②④">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-bluetoothdevice②⑤">(2)</a> <a href="#ref-for-bluetoothdevice②⑥">(3)</a> <a href="#ref-for-bluetoothdevice②⑦">(4)</a> <a href="#ref-for-bluetoothdevice②⑧">(5)</a> <a href="#ref-for-bluetoothdevice②⑨">(6)</a>
+    <li><a href="#ref-for-bluetoothdevice②④">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-bluetoothdevice②⑤">(2)</a> <a href="#ref-for-bluetoothdevice②⑥">(3)</a> <a href="#ref-for-bluetoothdevice②⑦">(4)</a> <a href="#ref-for-bluetoothdevice②⑧">(5)</a> <a href="#ref-for-bluetoothdevice②⑨">(6)</a>
     <li><a href="#ref-for-bluetoothdevice③⓪">5.1.2. The Bluetooth cache</a> <a href="#ref-for-bluetoothdevice③①">(2)</a>
     <li><a href="#ref-for-bluetoothdevice③②">5.1.3. Navigating the Bluetooth Hierarchy</a>
     <li><a href="#ref-for-bluetoothdevice③③">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-bluetoothdevice③④">(2)</a> <a href="#ref-for-bluetoothdevice③⑤">(3)</a>
@@ -7651,7 +7702,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#dom-bluetoothdevice-watchingadvertisements">#dom-bluetoothdevice-watchingadvertisements</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-watchingadvertisements">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothdevice-watchingadvertisements①">(2)</a> <a href="#ref-for-dom-bluetoothdevice-watchingadvertisements②">(3)</a> <a href="#ref-for-dom-bluetoothdevice-watchingadvertisements③">(4)</a> <a href="#ref-for-dom-bluetoothdevice-watchingadvertisements④">(5)</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-watchingadvertisements⑤">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothdevice-watchingadvertisements⑥">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-watchingadvertisements⑤">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothdevice-watchingadvertisements⑥">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothdevice-context-slot">
@@ -7667,7 +7718,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot">3.1. Permission API Integration</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①">(2)</a>
     <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot②">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot③">(2)</a>
-    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot④">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot④">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot⑤">5.1.2. The Bluetooth cache</a>
     <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot⑥">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot⑦">(2)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot⑧">(3)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot⑨">(4)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①⓪">(5)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①①">(6)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①②">(7)</a>
     <li><a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①③">5.6.3. Responding to Disconnection</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①④">(2)</a> <a href="#ref-for-dom-bluetoothdevice-representeddevice-slot①⑤">(3)</a>
@@ -7692,6 +7743,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#dom-bluetoothdevice-watchadvertisementsstate-slot">#dom-bluetoothdevice-watchadvertisementsstate-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot">4.2. BluetoothDevice</a> <a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot①">(2)</a> <a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot②">(3)</a> <a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot③">(4)</a> <a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot④">(5)</a> <a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot⑤">(6)</a> <a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot⑥">(7)</a>
+    <li><a href="#ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot⑦">4.2.1. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="get-the-bluetoothdevice-representing">
@@ -7725,122 +7777,123 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#abort-watchadvertisements">#abort-watchadvertisements</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abort-watchadvertisements">4.2. BluetoothDevice</a> <a href="#ref-for-abort-watchadvertisements①">(2)</a>
+    <li><a href="#ref-for-abort-watchadvertisements②">4.2.1. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothadvertisingevent">
    <b><a href="#bluetoothadvertisingevent">#bluetoothadvertisingevent</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-bluetoothadvertisingevent">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-bluetoothadvertisingevent①">(2)</a> <a href="#ref-for-bluetoothadvertisingevent②">(3)</a>
+    <li><a href="#ref-for-bluetoothadvertisingevent">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-bluetoothadvertisingevent①">(2)</a> <a href="#ref-for-bluetoothadvertisingevent②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dictdef-bluetoothadvertisingeventinit">
    <b><a href="#dictdef-bluetoothadvertisingeventinit">#dictdef-bluetoothadvertisingeventinit</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dictdef-bluetoothadvertisingeventinit">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dictdef-bluetoothadvertisingeventinit">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingeventinit-uuids">
    <b><a href="#dom-bluetoothadvertisingeventinit-uuids">#dom-bluetoothadvertisingeventinit-uuids</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingeventinit-uuids">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingeventinit-uuids">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingeventinit-manufacturerdata">
    <b><a href="#dom-bluetoothadvertisingeventinit-manufacturerdata">#dom-bluetoothadvertisingeventinit-manufacturerdata</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingeventinit-manufacturerdata">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingeventinit-manufacturerdata">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingeventinit-servicedata">
    <b><a href="#dom-bluetoothadvertisingeventinit-servicedata">#dom-bluetoothadvertisingeventinit-servicedata</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingeventinit-servicedata">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingeventinit-servicedata">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-device">
    <b><a href="#dom-bluetoothadvertisingevent-device">#dom-bluetoothadvertisingevent-device</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-device">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothadvertisingevent-device①">(2)</a> <a href="#ref-for-dom-bluetoothadvertisingevent-device②">(3)</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-device">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothadvertisingevent-device①">(2)</a> <a href="#ref-for-dom-bluetoothadvertisingevent-device②">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-uuids">
    <b><a href="#dom-bluetoothadvertisingevent-uuids">#dom-bluetoothadvertisingevent-uuids</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-uuids">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-uuids">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-name">
    <b><a href="#dom-bluetoothadvertisingevent-name">#dom-bluetoothadvertisingevent-name</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-name">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-name">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-appearance">
    <b><a href="#dom-bluetoothadvertisingevent-appearance">#dom-bluetoothadvertisingevent-appearance</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-appearance">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-appearance">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-txpower">
    <b><a href="#dom-bluetoothadvertisingevent-txpower">#dom-bluetoothadvertisingevent-txpower</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-txpower">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-txpower">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-rssi">
    <b><a href="#dom-bluetoothadvertisingevent-rssi">#dom-bluetoothadvertisingevent-rssi</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-rssi">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-rssi">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-manufacturerdata">
    <b><a href="#dom-bluetoothadvertisingevent-manufacturerdata">#dom-bluetoothadvertisingevent-manufacturerdata</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-manufacturerdata">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-manufacturerdata">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-servicedata">
    <b><a href="#dom-bluetoothadvertisingevent-servicedata">#dom-bluetoothadvertisingevent-servicedata</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-servicedata">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-servicedata">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="fire-an-advertisementreceived-event">
    <b><a href="#fire-an-advertisementreceived-event">#fire-an-advertisementreceived-event</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-fire-an-advertisementreceived-event">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-fire-an-advertisementreceived-event">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothadvertisingevent-bluetoothadvertisingevent">
    <b><a href="#dom-bluetoothadvertisingevent-bluetoothadvertisingevent">#dom-bluetoothadvertisingevent-bluetoothadvertisingevent</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothadvertisingevent-bluetoothadvertisingevent">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothadvertisingevent-bluetoothadvertisingevent">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothmanufacturerdatamap">
    <b><a href="#bluetoothmanufacturerdatamap">#bluetoothmanufacturerdatamap</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-bluetoothmanufacturerdatamap">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-bluetoothmanufacturerdatamap①">(2)</a> <a href="#ref-for-bluetoothmanufacturerdatamap②">(3)</a>
-    <li><a href="#ref-for-bluetoothmanufacturerdatamap③">4.2.1.1. BluetoothManufacturerDataMap</a>
+    <li><a href="#ref-for-bluetoothmanufacturerdatamap">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-bluetoothmanufacturerdatamap①">(2)</a> <a href="#ref-for-bluetoothmanufacturerdatamap②">(3)</a>
+    <li><a href="#ref-for-bluetoothmanufacturerdatamap③">4.2.2.1. BluetoothManufacturerDataMap</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothmanufacturerdatamap-backingmap-slot">
    <b><a href="#dom-bluetoothmanufacturerdatamap-backingmap-slot">#dom-bluetoothmanufacturerdatamap-backingmap-slot</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothmanufacturerdatamap-backingmap-slot">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothmanufacturerdatamap-backingmap-slot">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bluetoothservicedatamap">
    <b><a href="#bluetoothservicedatamap">#bluetoothservicedatamap</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-bluetoothservicedatamap">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-bluetoothservicedatamap①">(2)</a> <a href="#ref-for-bluetoothservicedatamap②">(3)</a>
-    <li><a href="#ref-for-bluetoothservicedatamap③">4.2.1.2. BluetoothServiceDataMap</a>
+    <li><a href="#ref-for-bluetoothservicedatamap">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-bluetoothservicedatamap①">(2)</a> <a href="#ref-for-bluetoothservicedatamap②">(3)</a>
+    <li><a href="#ref-for-bluetoothservicedatamap③">4.2.2.2. BluetoothServiceDataMap</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothservicedatamap-backingmap-slot">
    <b><a href="#dom-bluetoothservicedatamap-backingmap-slot">#dom-bluetoothservicedatamap-backingmap-slot</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dom-bluetoothservicedatamap-backingmap-slot">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-dom-bluetoothservicedatamap-backingmap-slot">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="attribute">
@@ -8264,7 +8317,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#eventdef-bluetoothdevice-advertisementreceived">#eventdef-bluetoothdevice-advertisementreceived</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived">3. Device Discovery</a>
-    <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived①">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived②">(2)</a> <a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived③">(3)</a>
+    <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived①">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived②">(2)</a> <a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived③">(3)</a>
     <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived④">5.6.6. IDL event handlers</a>
    </ul>
   </aside>
@@ -8385,7 +8438,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#typedefdef-uuid">#typedefdef-uuid</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-typedefdef-uuid">3.1. Permission API Integration</a>
-    <li><a href="#ref-for-typedefdef-uuid①">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-typedefdef-uuid②">(2)</a> <a href="#ref-for-typedefdef-uuid③">(3)</a>
+    <li><a href="#ref-for-typedefdef-uuid①">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-typedefdef-uuid②">(2)</a> <a href="#ref-for-typedefdef-uuid③">(3)</a>
     <li><a href="#ref-for-typedefdef-uuid④">5.3. BluetoothRemoteGATTService</a>
     <li><a href="#ref-for-typedefdef-uuid⑤">5.4. BluetoothRemoteGATTCharacteristic</a>
     <li><a href="#ref-for-typedefdef-uuid⑥">5.5. BluetoothRemoteGATTDescriptor</a>
@@ -8441,7 +8494,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#dom-bluetoothuuid-getservice">#dom-bluetoothuuid-getservice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice">3. Device Discovery</a> <a href="#ref-for-dom-bluetoothuuid-getservice①">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice②">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice③">(4)</a> <a href="#ref-for-dom-bluetoothuuid-getservice④">(5)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice⑤">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothuuid-getservice⑥">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice⑤">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-dom-bluetoothuuid-getservice⑥">(2)</a>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice⑦">5.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothuuid-getservice⑧">(2)</a>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice⑨">5.3. BluetoothRemoteGATTService</a> <a href="#ref-for-dom-bluetoothuuid-getservice①⓪">(2)</a>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice①①">6.1. Standardized UUIDs</a> <a href="#ref-for-dom-bluetoothuuid-getservice①②">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice①③">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice①④">(4)</a> <a href="#ref-for-dom-bluetoothuuid-getservice①⑤">(5)</a>
@@ -8506,13 +8559,13 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
   <aside class="dfn-panel" data-for="read-only-arraybuffer">
    <b><a href="#read-only-arraybuffer">#read-only-arraybuffer</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-read-only-arraybuffer">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-read-only-arraybuffer①">(2)</a>
+    <li><a href="#ref-for-read-only-arraybuffer">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-read-only-arraybuffer①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="advertising-event">
    <b><a href="#advertising-event">#advertising-event</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-advertising-event">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-advertising-event①">(2)</a>
+    <li><a href="#ref-for-advertising-event">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-advertising-event①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="extended-inquiry-response">
@@ -8531,7 +8584,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
   <aside class="dfn-panel" data-for="rssi">
    <b><a href="#rssi">#rssi</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-rssi">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-rssi">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="searching-for-services">
@@ -8544,7 +8597,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#uuid">#uuid</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-uuid">3. Device Discovery</a>
-    <li><a href="#ref-for-uuid①">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-uuid①">4.2.2. Responding to Advertising Events</a>
     <li><a href="#ref-for-uuid②">5.1. GATT Information Model</a>
     <li><a href="#ref-for-uuid③">6. UUIDs</a> <a href="#ref-for-uuid④">(2)</a> <a href="#ref-for-uuid⑤">(3)</a> <a href="#ref-for-uuid⑥">(4)</a>
     <li><a href="#ref-for-uuid⑦">7. The GATT Blocklist</a> <a href="#ref-for-uuid⑧">(2)</a> <a href="#ref-for-uuid⑨">(3)</a>
@@ -8668,7 +8721,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
   <aside class="dfn-panel" data-for="ad-structure">
    <b><a href="#ad-structure">#ad-structure</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-ad-structure">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-ad-structure">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="bd_addr">
@@ -9022,13 +9075,13 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <ul>
     <li><a href="#ref-for-service-uuid-data-type">3. Device Discovery</a>
     <li><a href="#ref-for-service-uuid-data-type①">4.1. Global Bluetooth device properties</a>
-    <li><a href="#ref-for-service-uuid-data-type②">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-service-uuid-data-type③">(2)</a> <a href="#ref-for-service-uuid-data-type④">(3)</a> <a href="#ref-for-service-uuid-data-type⑤">(4)</a> <a href="#ref-for-service-uuid-data-type⑥">(5)</a> <a href="#ref-for-service-uuid-data-type⑦">(6)</a>
+    <li><a href="#ref-for-service-uuid-data-type②">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-service-uuid-data-type③">(2)</a> <a href="#ref-for-service-uuid-data-type④">(3)</a> <a href="#ref-for-service-uuid-data-type⑤">(4)</a> <a href="#ref-for-service-uuid-data-type⑥">(5)</a> <a href="#ref-for-service-uuid-data-type⑦">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="local-name-data-type">
    <b><a href="#local-name-data-type">#local-name-data-type</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-local-name-data-type">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-local-name-data-type①">(2)</a>
+    <li><a href="#ref-for-local-name-data-type">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-local-name-data-type①">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="flags-data-type">
@@ -9047,26 +9100,26 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <b><a href="#manufacturer-specific-data">#manufacturer-specific-data</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-manufacturer-specific-data">3. Device Discovery</a> <a href="#ref-for-manufacturer-specific-data①">(2)</a> <a href="#ref-for-manufacturer-specific-data②">(3)</a>
-    <li><a href="#ref-for-manufacturer-specific-data③">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-manufacturer-specific-data③">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="tx-power-level">
    <b><a href="#tx-power-level">#tx-power-level</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-tx-power-level">4.2.1. Responding to Advertising Events</a>
+    <li><a href="#ref-for-tx-power-level">4.2.2. Responding to Advertising Events</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="service-data">
    <b><a href="#service-data">#service-data</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-service-data">3. Device Discovery</a> <a href="#ref-for-service-data①">(2)</a> <a href="#ref-for-service-data②">(3)</a>
-    <li><a href="#ref-for-service-data③">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-service-data④">(2)</a> <a href="#ref-for-service-data⑤">(3)</a>
+    <li><a href="#ref-for-service-data③">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-service-data④">(2)</a> <a href="#ref-for-service-data⑤">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="appearance">
    <b><a href="#appearance">#appearance</a></b><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-appearance">4.2.1. Responding to Advertising Events</a> <a href="#ref-for-appearance①">(2)</a>
+    <li><a href="#ref-for-appearance">4.2.2. Responding to Advertising Events</a> <a href="#ref-for-appearance①">(2)</a>
    </ul>
   </aside>
 <script>/* script-var-click-highlighting */
