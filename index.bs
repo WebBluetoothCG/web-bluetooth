@@ -114,7 +114,7 @@ spec: html; urlPrefix: https://html.spec.whatwg.org/#
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
-        
+
 spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/browsing-the-web.html/#
     type: dfn
         text: initializing a new Document object; url: dfn-initialise-the-document-object
@@ -405,7 +405,7 @@ radio. In the past, these devices had to be exploited one-by-one, but this API
 makes it plausible to conduct large-scale attacks. This specification takes
 several approaches to make such attacks more difficult:
 
-* Pairing individual devices instead of device classes requires at least a user  
+* Pairing individual devices instead of device classes requires at least a user
     action before a device can be exploited.
 
 * Constraining access to <a>GATT</a>, as opposed to generic byte-stream access,
@@ -611,7 +611,7 @@ This implies that if developers filter just by name, they must use
 </div>
 
 <div class="example" id="example-filter-by-services">
-Say the UA is close to the following devices:  
+Say the UA is close to the following devices:
 
 <table>
   <tr>
@@ -1083,7 +1083,7 @@ described in the following table:
 
     If this happens, then as part of <a>initializing the `Document` object</a>,
     the UA MUST run the following steps:
-    
+
     1. Let <var>referringDevice</var> be the device that caused the navigation.
     1. <a>Get the <code>BluetoothDevice</code> representing</a>
         <var>referringDevice</var> inside `navigator.bluetooth`, and let
@@ -1626,7 +1626,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
   <dt><a>extra permission data type</a></dt>
   <dd>
     {{BluetoothPermissionStorage}}, defined as:
-    
+
     <xmp class="idl">
       dictionary AllowedBluetoothDevice {
         required DOMString deviceId;
@@ -1715,7 +1715,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
     To <dfn export>query the "bluetooth" permission</dfn> with a
     {{BluetoothPermissionDescriptor}} <var>desc</var> and a
     {{BluetoothPermissionResult}} <var>status</var>, the UA must:
-    
+
     1. Let <var>global</var> be the <a>relevant global object</a> for
         <var>status</var>.
     1. Set <code><var>status</var>.{{PermissionStatus/state}}</code> to |desc|'s
@@ -1959,13 +1959,17 @@ or {{Bluetooth}} instance).
     readonly attribute DOMString? name;
     readonly attribute BluetoothRemoteGATTServer? gatt;
 
-    Promise<void> watchAdvertisements();
-    void unwatchAdvertisements();
+    Promise<void> watchAdvertisements(
+        optional WatchAdvertisementsOptions options = {});
     readonly attribute boolean watchingAdvertisements;
   };
   BluetoothDevice includes BluetoothDeviceEventHandlers;
   BluetoothDevice includes CharacteristicEventHandlers;
   BluetoothDevice includes ServiceEventHandlers;
+
+  dictionary WatchAdvertisementsOptions {
+    AbortSignal signal;
+  };
 </xmp>
 
 <div class="note" heading="{{BluetoothDevice}} attributes"
@@ -2030,6 +2034,19 @@ described in the following table:
       a URL on that origin.
     </td>
   </tr>
+  <tr>
+    <td><dfn>\[[watchAdvertisementsState]]</dfn></td>
+    <td>`'not-watching'`</td>
+    <td>
+      An string enumeration describing the current state of a
+      {{BluetoothDevice/watchAdvertisements()}} operation. The possible
+      enumeration values are:
+      * `'not-watching'`
+      * `'pending-watch'`
+      * `'watching'`
+
+    </td>
+  </tr>
 </table>
 
 <div algorithm="get or create BluetoothDevice">
@@ -2088,46 +2105,76 @@ A user agent has an associated <dfn>watch advertisements manager</dfn> which is
 the result of [=starting a new parallel queue=].
 
 <div algorithm="watchAdvertisements" class="unstable">
-The <code><dfn method for="BluetoothDevice">watchAdvertisements()</dfn></code>
-method, when invoked, MUST return <a>a new promise</a> |promise| and run the
-following steps:
+The <code><dfn method for="BluetoothDevice">watchAdvertisements(|options|)</dfn>
+</code> method, when invoked, MUST return <a>a new promise</a> |promise| and
+run the following steps:
 
-1. [=parallel queue/Enqueue the following steps=] to the [=watch advertisements
-    manager=], but [=abort when=] <code>this.{{unwatchAdvertisements()}}</code>
-    is called:
-    1. Ensure that the UA is scanning for this device's advertisements. The UA
-        SHOULD NOT filter out "duplicate" advertisements for the same device.
-    1. If the UA fails to enable scanning, <a>reject</a> |promise| with one of
-        the following errors, and abort these steps:
+1. If <code>|options|.{{AbortSignal|signal}}</code> is present, then perform
+    the following sub-steps:
+    1. If <code>|options|.{{AbortSignal|signal}}</code>'s [=AbortSignal/aborted
+        flag=] is set, then [=abort watchAdvertisements=] with `this` and
+        abort these steps.
+    1. [=AbortSignal/add|Add the following abort steps=] to <code>
+        |options|.{{AbortSignal|signal}}</code>:
+        1. [=Abort watchAdvertisements=] with `this`.
+        1. [=Reject=] |promise| with {{AbortError}}
+1. If <code>this.{{[[watchAdvertisementsState]]}}</code> is:
 
-        <dl class="switch">
-          <dt>The UA doesn't support scanning for advertisements</dt>
-          <dd>{{NotSupportedError}}</dd>
+    <dl class="switch">
+      : `'not-watching'`
+      :: 1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+              `'pending-watch'`.
+          1. [=parallel queue/Enqueue the following steps=] to the [=watch
+              advertisements manager=], but abort when
+              <code>this.{{[[watchAdvertisementsState]]}}</code> becomes
+              `not-watching`:
+              1. Ensure that the UA is scanning for this device's
+                  advertisements. The UA SHOULD NOT filter out "duplicate"
+                  advertisements for the same device.
+              1. If the UA fails to enable scanning, [=queue a task=] to
+                  perform the following steps, and abort these steps:
+                  1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+                      `'not-watching'`.
+                  1. [=Reject=] |promise| with one of the following errors:
 
-          <dt>Bluetooth is turned off</dt>
-          <dd>{{InvalidStateError}}</dd>
+                      <dl class="switch">
+                        : The UA doesn't support scanning for advertisements
+                        :: {{NotSupportedError}}
+                        : Bluetooth is turned off
+                        :: {{InvalidStateError}}
+                        : Other reasons
+                        :: {{UnknownError}}
 
-          <dt>Other reasons</dt>
-          <dd>{{UnknownError}}</dd>
-        </dl>
-    1. [=Queue a task=] to perform the following steps:
-        1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
-        1. Resolve |promise| with `undefined`.
-1. [=If aborted=], reject |promise| with {{AbortError}}.
+                      </dl>
+              1. [=Queue a task=] to perform the following steps, but [=abort
+                  when=] <code>this.{{[[watchAdvertisementsState]]}}</code>
+                  becomes `not-watching`:
+                  1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+                      `watching`.
+                  1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
+                  1. [=Resolve=] |promise| with `undefined`.
+      : `'pending-watch'`
+      :: 1. [=Reject=] |promise| with {{InvalidStateError}}.
+      : `'watching'`
+      :: 1. [=Resolve=] |promise| with `undefined`.
 
-<div class="note">
-Scanning costs power, so websites should avoid watching for advertisements
-unnecessarily, and should call {{unwatchAdvertisements()}} to stop using power
+    </dl>
+1. [=If aborted=], [=reject=] |promise| with {{AbortError}}.
+
+
+Note: Scanning costs power, so websites should avoid watching for advertisements
+unnecessarily, and should use their {{AbortController}} to stop using power
 as soon as possible.
 </div>
-</div>
 
-<div algorithm="unwatchAdvertisements" class="unstable">
-The <code><dfn method for="BluetoothDevice">unwatchAdvertisements()</dfn></code>
-method, when invoked, MUST run the following steps:
+<div algorithm="abort watchAdvertisements" class="unstable">
+To <dfn>abort {{BluetoothDevice/watchAdvertisements}}</dfn> for a
+{{BluetoothDevice}} |device|, run these steps:
 
-1. Set <code>this.{{watchingAdvertisements}}</code> to `false`.
-1. [=parallel queue/Enqueue the following step=] to [=watch advertisements
+1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
+    `'not-watching'`.
+1. Set <code>|device|.{{watchingAdvertisements}}</code> to `false`.
+1. [=parallel queue/Enqueue the following steps=] to [=watch advertisements
     manager=]:
     1. If no more {{BluetoothDevice}}s in the whole UA have
         {{watchingAdvertisements}} set to `true`, the UA SHOULD stop scanning
