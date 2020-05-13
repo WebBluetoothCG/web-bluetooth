@@ -3317,19 +3317,6 @@ the UA MUST perform the following steps:
     <a>connection-checking wrapper</a> around <a>a new promise</a>
     <var>promise</var> and run the following steps in parallel.
     1. Assert: |response| is one of "required", "never", or "optional".
-    1. <a>Reject</a> <var>promise</var> with a {{NotSupportedError}} and abort
-        these steps if any of the following is true:
-        1. |response| is "required" and <code>Write</code> bit is not set in
-            <var>characteristic</var>'s
-            <a lt="Characteristic Properties">properties</a>
-        1. |response| is "never" and none of <code>Write Without Response</code>
-            or <code>Authenticated Signed Writes</code> bits are set in
-            <var>characteristic</var>'s
-            <a lt="Characteristic Properties">properties</a>
-        1. |response| is "optional" and none of the <code>Write</code>,
-            <code>Write Without Response</code> or <code>Authenticated Signed
-            Writes</code> bits are set in <var>characteristic</var>'s <a
-            lt="Characteristic Properties">properties</a>
     1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
         |promise| with a {{NetworkError}} and abort these steps.
 
@@ -3368,7 +3355,11 @@ the UA MUST perform the following steps:
 
 </div>
 
-<div algorithm="BluetoothRemoteGATTCharacteristic writeValue">
+<div algorithm="BluetoothRemoteGATTCharacteristic writeValue"
+    class="deprecated">
+<strong>Deprecated.</strong> Use {{writeValueWithResponse()}} and
+{{writeValueWithoutResponse()}} instead.
+
 The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
 writeValue(<var>value</var>)</dfn></code> method, when invoked, MUST return
 
@@ -3376,10 +3367,12 @@ writeValue(<var>value</var>)</dfn></code> method, when invoked, MUST return
 >   <i>this</i>=<code>this</code>,<br>
 >   <i>value</i>=<code><var>value</var></code>,<br>
 >   <i>response</i>="optional")</span>
+
+Issue(238): This method is for backwards compatibility only. New implementations
+should not implement this method.
 </div>
 
-<div algorithm="BluetoothRemoteGATTCharacteristic writeValueWithResponse"
-    class="unstable">
+<div algorithm="BluetoothRemoteGATTCharacteristic writeValueWithResponse">
 The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
 writeValueWithResponse(<var>value</var>)</dfn></code> method, when invoked, MUST
 return
@@ -3390,8 +3383,7 @@ return
 >   <i>response</i>="required")</span>
 </div>
 
-<div algorithm="BluetoothRemoteGATTCharacteristic writeValueWithoutResponse"
-    class="unstable">
+<div algorithm="BluetoothRemoteGATTCharacteristic writeValueWithoutResponse">
 The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
 writeValueWithoutResponse(<var>value</var>)</dfn></code> method, when invoked,
 MUST return
