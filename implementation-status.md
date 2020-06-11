@@ -11,7 +11,12 @@ Work is in progress:
 * **Linux** is partially implemented and not supported. The `chrome://flags/#enable-experimental-web-platform-features` flag must be enabled.
 * The Windows implementation is available in Chrome 70.0.3526.0 and requires **Windows 10 version 1703 (Creators Update)**.
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
-* Some Bluetooth GATT operations can't be run in parallel yet. See [#188 (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
+* Some Bluetooth GATT operations can't be run in parallel yet. See [#188
+  (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
+* The `getDevices()` and `watchAdvertisements()` APIs are behind the
+  `chrome://flags/#enable-experimental-web-platform-features` 🚩 flag.
+* The Persistent Device Permissions feature is behind the
+  `chrome://flags/#enable-web-bluetooth-new-permissions-backend` 🚩 flag.
 
 ## [GATT Communication API](https://webbluetoothcg.github.io/web-bluetooth/)
 
@@ -28,8 +33,9 @@ Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓     
 permissions.request()     |           |         |     |       |         |
 permissions.query()       |           |         |     |       |         |
 permissions.revoke()      |           |         |     |       |         |
-watchAdvertisements()     |           |         |     |       |         |
-Persistent Device IDs     |           |         |     |       |         |
+getDevices()              | 83 🚩     |  83 🚩  | 83 🚩 | 83 🚩 | 83 🚩 |
+watchAdvertisements()     |           |  85 🚩  | 85 🚩 |       | 85 🚩 |
+Persistent Device Permissions | 83 🚩 |  83 🚩  | 83 🚩 | 83 🚩 | 83 🚩 |
 GATT Server Connect       | ✓         | ✓       | ✓   | ✓     | ✓       |
 GATT Server Disconnect    | ✓         | ✓       | ✓   | ✓     | ✓       |
 Hanging connect() abortable by disconnect() |  | |    |       |         |
