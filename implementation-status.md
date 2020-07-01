@@ -22,7 +22,7 @@ Work is in progress:
 
 Feature/Platform          | Chrome OS | Android | Mac | Linux | Windows |
 ------------------------- | :-------: | :-----: | :-: | :---: | :-----: |
-getAvailability()         |           |         |     |       |         |
+getAvailability()         | ✓         | ✓       | ✓   | ✓     | ✓       |
 Referring Device (Physical Web) |     |         |     |       |         |
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Service list            | ✓         | ✓       | ✓   | ✓     | ✓       |
