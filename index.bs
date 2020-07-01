@@ -118,6 +118,10 @@ spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
 spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/browsing-the-web.html/#
     type: dfn
         text: initializing a new Document object; url: dfn-initialise-the-document-object
+
+spec: PAGE-VISIBILITY; urlPrefix: https://www.w3.org/TR/page-visibility-2/#
+    type: dfn
+        text: document visibility state; url: dom-visibilitystate
 </pre>
 <pre class="link-defaults">
 spec: fingerprinting-guidance
@@ -2104,7 +2108,7 @@ attribute MUST perform the following steps:
 A user agent has an associated <dfn>watch advertisements manager</dfn> which is
 the result of [=starting a new parallel queue=].
 
-<div algorithm="watchAdvertisements" class="unstable">
+<div algorithm="watchAdvertisements">
 The <code><dfn method for="BluetoothDevice">watchAdvertisements(|options|)</dfn>
 </code> method, when invoked, MUST return <a>a new promise</a> |promise| and
 run the following steps:
@@ -2167,7 +2171,7 @@ unnecessarily, and should use their {{AbortController}} to stop using power
 as soon as possible.
 </div>
 
-<div algorithm="abort watchAdvertisements" class="unstable">
+<div algorithm="abort watchAdvertisements">
 To <dfn>abort {{BluetoothDevice/watchAdvertisements}}</dfn> for a
 {{BluetoothDevice}} |device|, run these steps:
 
@@ -2185,7 +2189,42 @@ To <dfn>abort {{BluetoothDevice/watchAdvertisements}}</dfn> for a
 
 </div>
 
-<div class="unstable">
+<div algorithm="abort all active watchAdvertisments">
+To <dfn>abort all active {{BluetoothDevice/watchAdvertisements}}</dfn>
+operations, run these steps:
+
+1. [=map/For each=] <code>|device|</code> in
+    <code>{{Bluetooth}}.{{[[deviceInstanceMap]]}}</code>, perform the
+    following steps:
+    1. If <code>|device|.{{[[watchAdvertisementsState]]}}</code> is
+        `pending-watch` or `watching`, run [=abort watchAdvertisements=]
+        with |device|.
+
+</div>
+
+<div>
+### Handling Visibility Change ### {#handling-visibility-change}
+
+Operations that initiate a scan for Bluetooth devices may only run in a visible
+[=document=]. When [=document visibility state|visibility state=] is no longer
+<code>"visible"</code>, scanning operations for that [=document=] need to be
+aborted.
+
+<div algorithm="handle visibility change">
+When the user agent determines that the [=document visibility state|visibility
+state=] of the [=responsible document=] of the [=current settings object=]
+changes, it must run these steps:
+
+1. Let <code>|document|</code> be the [=responsible document=] of the [=current
+    settings object=].
+1. If <code>|document|</code>'s [=document visibility state|visibility state=]
+    is not <code>"visible"</code>, then [=abort all active watchAdvertisements=]
+    operations.
+
+</div>
+</div>
+
+<div>
 ### Handling Document Loss of Full Activity ### {#handling-full-activity-loss}
 
 Operations that initiate a scan for Bluetooth devices may only run in a [=fully
@@ -2196,12 +2235,7 @@ operations for that [=document=] need to be aborted.
 When the user agent determines that a [=responsible document=] of the [=current
 settings object=] is no longer [=fully active=], it must run these steps:
 
-1. [=map/For each=] |device| in
-    <code>{{Bluetooth}}.{{[[deviceInstanceMap]]}}</code>, perform the
-    following steps:
-    1. If <code>|device|.{{[[watchAdvertisementsState]]}}</code> is
-        `pending-watch` or `watching`, run [=abort watchAdvertisements=] with
-        |device|.
+1. Run [=abort all active watchAdvertisements=] operations.
 
 </div>
 </div>
