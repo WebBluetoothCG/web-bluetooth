@@ -10,13 +10,19 @@ install:
 - pip install --editable bikeshed
 - bikeshed update
 
+env:
+  global:
+  - SPECS="index scanning tests use-cases"
+  - COLOR_RED="\e[31m"
+  - COLOR_DEFAULT="\e[39m"
+
 script:
 - mkdir -p out
 - for SPEC in $SPECS; do
 -   echo "Parsing ${SPEC}.bs:"
 -   ERR=$(bikeshed --die-on=warning spec ${SPEC}.bs out/{SPEC}.html)
 -   if [ -n "$ERR" ]; then
--     echo -e "${COLOR_RED}Error occurred while parsing ${SPEC}.bs:${COLOR_DEFAULT}"
+-     echo -e "Error occurred while parsing ${SPEC}.bs:${COLOR_DEFAULT}"
 -     echo -e "$ERR"
 -     exit 1
 -   fi
