@@ -528,6 +528,7 @@ that UAs will choose not to prompt.
   dictionary RequestDeviceOptions {
     sequence<BluetoothLEScanFilterInit> filters;
     sequence<BluetoothServiceUUID> optionalServices = [];
+    sequence<unsigned short> optionalManufacturerData = [];
     boolean acceptAllDevices = false;
   };
 
@@ -612,7 +613,11 @@ After the user selects a device to pair with this origin, the origin is allowed
 to access any service whose UUID was listed in the
 {{BluetoothLEScanFilterInit/services}} list in any element of
 <code>options.filters</code> or in <code>options.<dfn dict-member
-for="RequestDeviceOptions">optionalServices</dfn></code>.
+for="RequestDeviceOptions">optionalServices</dfn></code>. The origin is also
+allowed to access any manufacturer data from manufacturer codes defined in
+<code>options.<dfn dict-member
+for="RequestDeviceOptions">optionalManufacturerData</dfn></code> from the
+device's advertisement data.
 
 This implies that if developers filter just by name, they must use
 {{RequestDeviceOptions/optionalServices}} to get access to any services.
@@ -1221,9 +1226,11 @@ and run the following steps <a>in parallel</a>:
 1. <a>Request Bluetooth devices</a>, passing
     <code>|options|.{{RequestDeviceOptions/filters}}</code> if
     <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `false`
-    or `null` otherwise, and passing
-    <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>, and let
-    |devices| be the result.
+    or `null` otherwise, passing
+    <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>, and
+    passing
+    <code>|options|.{{RequestDeviceOptions/optionalManufacturerData}}</code>,
+    and let |devices| be the result.
 1. If the previous step threw an exception, <a>reject</a> |promise| with that
     exception and abort these steps.
 1. If |devices| is an empty sequence, <a>reject</a> |promise| with a
@@ -1236,8 +1243,9 @@ and run the following steps <a>in parallel</a>:
 To <dfn>request Bluetooth devices</dfn>, given a
 {{BluetoothPermissionStorage}} |storage| and a sequence of
 {{BluetoothLEScanFilterInit}}s, |filters|, which can be `null` to represent that
-all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
-|optionalServices|, the UA MUST run the following steps:
+all devices can match, a sequence of {{BluetoothServiceUUID}}s,
+|optionalServices|, and a sequence of {{unsigned short}}s
+|optionalManufacturerData|, the UA MUST run the following steps:
 
 <div class="note">
   Note: These steps can block, so uses of this algorithm must be <a>in
@@ -1282,6 +1290,7 @@ all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
       name: "bluetooth",
       filters: <var>uuidFilters</var>
       optionalServices: <var>optionalServiceUUIDs</var>,
+      optionalManufacturerData: <var>optionalManufacturerData</var>
       acceptAllDevices: <var>filters</var> !== null,
     }
     </pre>
@@ -1323,10 +1332,12 @@ all devices can match, and a sequence of {{BluetoothServiceUUID}}s,
       {{BluetoothPermissionStorage/allowedDevices}} list of {{"bluetooth"}}'s
       <a>extra permission data</a> for at least the <a>current settings
       object</a>, for its {{AllowedBluetoothDevice/mayUseGATT}} field to be
-      `true`, and for all the services in the union of
-      <var>requiredServiceUUIDs</var> and <var>optionalServiceUUIDs</var> to
+      `true`, for all the services in the union of
+      |requiredServiceUUIDs| and |optionalServiceUUIDs| to
       appear in its {{AllowedBluetoothDevice/allowedServices}} list, in addition
-      to any services that were already there.
+      to any services that were already there, and for the manufacturer codes in
+      |optionalManufacturerData| to appear in its
+      {{AllowedBluetoothDevice/allowedManufacturerData}} list.
     </div>
 1. If |device| is {{"denied"}}, return `[]` and abort these steps.
 1. The UA MAY <a>populate the Bluetooth cache</a> with all Services inside
@@ -1564,35 +1575,8 @@ UA MUST run the following steps:
 <div class="unstable">
 ## Permission API Integration ## {#permission-api-integration}
 
-The [[permissions]] API provides a uniform way for websites to request
-permissions from users and query which permissions they have.
-
-<div class="example" id="example-permission-api-request"> Sites can use <code
-highlight="js">navigator.permissions.{{Permissions/request()|request}}({<a idl
-for="PermissionDescriptor">name</a>: "bluetooth", ...})</code> as an alternate
-spelling of <code
-highlight="js">navigator.bluetooth.{{Bluetooth/requestDevice()}}</code>.
-
-<pre highlight="js">
-  navigator.permissions.<a idl for="Permissions" lt="request()">request</a>({
-    name: "bluetooth",
-    filters: [{
-      services: ['heart_rate'],
-    }]
-  }).then(result => {
-    if (result.<a idl for="BluetoothPermissionResult">devices</a>.length >= 1) {
-      return result.devices[0];
-    } else {
-      throw new <a idl>DOMException</a>("Chooser cancelled", "NotFoundError");
-    }
-  }).then(device => {
-    sessionStorage.lastDevice = device.<a idl for="BluetoothDevice">id</a>;
-  });
-</pre>
-
-The {{BluetoothPermissionDescriptor/deviceId}} member is ignored in calls to
-{{Permissions/request()}}.
-</div>
+The [[permissions]] API provides a uniform way for websites to query which
+permissions they have.
 
 <div class="example" id="example-permission-api-query">
 Once a site has been granted access to a set of devices, it can use <code
@@ -1626,6 +1610,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
         // These match RequestDeviceOptions.
         sequence<BluetoothLEScanFilterInit> filters;
         sequence<BluetoothServiceUUID> optionalServices = [];
+        sequence<unsigned short> optionalManufacturerData = [];
         boolean acceptAllDevices = false;
       };
     </xmp>
@@ -1641,6 +1626,7 @@ feature</a>'s permission-related algorithms and types are defined as follows:
         required boolean mayUseGATT;
         // An allowedServices of "all" means all services are allowed.
         required (DOMString or sequence<UUID>) allowedServices;
+        required sequence<unsigned short> allowedManufacturerData;
       };
       dictionary BluetoothPermissionStorage {
         required sequence<AllowedBluetoothDevice> allowedDevices;
@@ -1659,7 +1645,8 @@ feature</a>'s permission-related algorithms and types are defined as follows:
     {{AllowedBluetoothDevice/deviceId}}s.
 
     If {{AllowedBluetoothDevice/mayUseGATT}} is `false`,
-    {{AllowedBluetoothDevice/allowedServices}} must be `[]`.
+    {{AllowedBluetoothDevice/allowedServices}} and
+    {{AllowedBluetoothDevice/allowedManufacturerData}} must both be `[]`.
 
     <div class="note" id="note-device-id-tracking">
       Note: A {{AllowedBluetoothDevice/deviceId}} allows a site to track that a
@@ -1684,38 +1671,6 @@ feature</a>'s permission-related algorithms and types are defined as follows:
         attribute FrozenArray<BluetoothDevice> devices;
       };
     </xmp>
-  </dd>
-
-  <dt><a>permission request algorithm</a></dt>
-  <dd algorithm="permission request">
-    To <dfn export>request the "bluetooth" permission</dfn> with
-    a {{BluetoothPermissionDescriptor}} <var>options</var>
-    and a {{BluetoothPermissionResult}} <var>status</var>,
-    the UA MUST run the following steps:
-
-    1. If <code>|options|.{{BluetoothPermissionDescriptor/filters}}</code> is
-        present and
-        <code>|options|.{{BluetoothPermissionDescriptor/acceptAllDevices}}</code>
-        is `true`, or if
-        <code>|options|.{{BluetoothPermissionDescriptor/filters}}</code> is not
-        present and
-        <code>|options|.{{BluetoothPermissionDescriptor/acceptAllDevices}}</code>
-        is `false`, throw a {{TypeError}}.
-
-        <div class="note">
-          Note: This enforces that exactly one of
-          {{BluetoothPermissionDescriptor/filters}} or
-          <code>{{BluetoothPermissionDescriptor/acceptAllDevices}}:true</code>
-          is present.
-        </div>
-    1. <a>Request Bluetooth devices</a>, passing
-        <code>|options|.{{BluetoothPermissionDescriptor/filters}}</code> if
-        <code>|options|.{{BluetoothPermissionDescriptor/acceptAllDevices}}</code>
-        is `false` or `null` otherwise, and passing
-        <code>|options|.{{BluetoothPermissionDescriptor/optionalServices}}</code>,
-        propagating any exception, and let |devices| be the result.
-    1. Set <code>|status|.devices</code> to a new {{FrozenArray}} whose contents
-        are the elements of |devices|.
   </dd>
 
   <dt><a>permission query algorithm</a></dt>
@@ -1754,7 +1709,8 @@ feature</a>'s permission-related algorithms and types are defined as follows:
             result to <var>matchingDevices</var>.
 
         <div class="note">
-          Note: The <code>|desc|.optionalServices</code> field does not affect
+          Note: The <code>|desc|.optionalServices</code> and
+          <code>|desc|.optionalManufacturerData</code> fields do not affect
           the result.
         </div>
     1. Set <code><var>status</var>.devices</code> to a new {{FrozenArray}} whose
@@ -2043,6 +1999,14 @@ described in the following table:
     </td>
   </tr>
   <tr>
+    <td><dfn>\[[allowedManufacturerData]]</dfn></td>
+    <td>&lt;always set in prose></td>
+    <td>
+      This device's {{AllowedBluetoothDevice/allowedManufacturerData}} list for
+      this origin.
+    </td>
+  </tr>
+  <tr>
     <td><dfn>\[[watchAdvertisementsState]]</dfn></td>
     <td>`'not-watching'`</td>
     <td>
@@ -2244,7 +2208,7 @@ settings object=] is no longer [=fully active=], it must run these steps:
 </div>
 </div>
 
-<div class="unstable">
+<div>
 ### Responding to Advertising Events ### {#advertising-events}
 
 When an <a>advertising event</a> arrives for a {{BluetoothDevice}}
@@ -2424,7 +2388,9 @@ the UA MUST perform the following steps:
         UUIDs</a>
       </dt>
       <dd>
-        Append the listed UUIDs to <code><var>event</var>.uuids</code>.
+        For each <code>|uuid|</code> in the listed UUIDs, if it is in
+        <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>, then
+        append <code>|uuid|</code> to <code><var>event</var>.uuids</code>.
       </dd>
 
       <dt>Shortened <a lt="Local Name Data Type">Local Name</a></dt>
@@ -2443,9 +2409,12 @@ the UA MUST perform the following steps:
 
       <dt><a>Manufacturer Specific Data</a></dt>
       <dd>
-        Add to <code><var>event</var>.manufacturerData</code> a mapping from the
-        16-bit Company Identifier Code to an {{ArrayBuffer}} containing the
-        manufacturer-specific data.
+        For each 16-bit Company Identifier Code
+        <code>|manufacturer_code|</code>, if it is in
+        <code>this.device.{{BluetoothDevice/[[allowedManufacturerData]]}}</code>,
+        then add a mapping of <code>|manufacturer_code|</code> to an
+        {{ArrayBuffer}} containing the manufacturer-specific data to
+        <code><var>event</var>.manufacturerData</code>.
       </dd>
 
       <dt><a>TX Power Level</a></dt>
@@ -2457,8 +2426,10 @@ the UA MUST perform the following steps:
       <dt><a>Service Data</a> - 32 bit UUID</dt>
       <dt><a>Service Data</a> - 128 bit UUID</dt>
       <dd>
-        Add to <code><var>event</var>.serviceData</code> a mapping from the
-        <a>UUID</a> to an {{ArrayBuffer}} containing the service data.
+        For each <a>UUID</a> <code>|uuid|</code> in the service data, if it is
+        in <code>this.device.{{BluetoothDevice/[[allowedServices]]}}</code>,
+        then add a mapping of |uuid| to an {{ArrayBuffer}} containing the
+        service data to <code><var>event</var>.serviceData</code>.
       </dd>
 
       <dt><a>Appearance</a></dt>
