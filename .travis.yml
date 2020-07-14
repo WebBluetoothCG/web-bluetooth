@@ -1,12 +1,42 @@
-language: generic
-sudo: false
+language: python
+python: 3.7
+addons:
+  apt:
+    packages:
+    - python-pip
 
-script: bash ./deploy.sh
+install:
+- git clone --depth=1 https://github.com/tabatkins/bikeshed.git
+- pip install --editable bikeshed
+- bikeshed update
 
-env:
-  global:
-    # DEPLOY_KEY_KEY=`32 random bytes, gpg passphrase for deploy_key.gpg, which holds the SSH RSA private key for fingerprint 9c:0d:5e:24:92:4e:50:f0:f2:e6:04:1f:4b:72:f4:eb`
-    - secure: "f/JmFnlrbbDjKdiOqwXffZkeFyak1/LZc94P1qkao8Es7mkAaQgGnKnDNmB0mbRTqMUwhSF/ndV+rGIxyqSnWdRMgZIX2om67+8FY4rBYGdW1cFpQDH+8bTAUbylgcihZqKM2a/RWnIj2MfxXo87+nX3Ltgo3qcvYp9FVnXTCqk="
-    - COMMIT_AUTHOR_NAME="Travis CI"
-    - COMMIT_AUTHOR_EMAIL="travis-ci@w3.org"
-    - SPECS="index scanning tests use-cases"
+script:
+- mkdir -p out
+- for SPEC in $SPECS; do
+-   echo "Parsing ${SPEC}.bs:"
+-   ERR=$(bikeshed --die-on=warning spec ${SPEC}.bs out/{SPEC}.html)
+-   if [ -n "$ERR" ]; then
+-     echo -e "${COLOR_RED}Error occurred while parsing ${SPEC}.bs:${COLOR_DEFAULT}"
+-     echo -e "$ERR"
+-     exit 1
+-   fi
+- done
+- # Keep links to gh-pages/implementation-status.md working.
+- cp -r implementation-status.md out/
+
+branches:
+  only:
+  - master
+
+deploy:
+  provider: pages:git
+  local_dir: out
+  deploy_key: deploy_key.gpg
+  on:
+    branch: master
+  edge: true
+
+notifications:
+  email:
+    on_success: never
+    on_failure: always
