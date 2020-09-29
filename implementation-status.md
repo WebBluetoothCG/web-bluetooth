@@ -97,7 +97,8 @@ In Samsung Internet v6.4, the GATT Communication API is shipped without any flag
 # Opera
 Supported but not working on latest versions on desktop:
 - https://forums.opera.com/topic/37464/web-bluetooth
-Works on android since version 46.
+
+Works on Android since version 46.
 
 # Vivaldi
 Supported but not working on desktop (same issue than Opera's).
