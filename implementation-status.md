@@ -95,30 +95,27 @@ In Samsung Internet v6.4, the GATT Communication API is shipped without any flag
 - https://samsunginter.net/docs/web-bluetooth
 
 # Opera
-Supported but not working on latest versions on desktop :
+Supported but not working on latest versions on desktop:
 - https://forums.opera.com/topic/37464/web-bluetooth
 Works on android since version 46.
 
 # Vivaldi
 Supported but not working on desktop (same issue than Opera's).
 
-Works on android.
-
-# Google Chrome
-Supported as of version 56 on desktop, version 84 on mobile.
+Works on Android.
 
 # Servo
 https://szeged.github.io/servo/
 
 # Firefox
-Not supported and no plan tu support it in the near future :
+Not supported and no plan tu support it in the near future:
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
 
 # Microsoft Edge
 Supported as of version 79.
 
 # Safari
-Won't support it in the near future :
+Won't support it in the near future:
 - https://webkit.org/tracking-prevention
 - https://bugs.webkit.org/show_bug.cgi?id=101034
 
