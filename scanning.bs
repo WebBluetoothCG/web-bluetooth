@@ -262,8 +262,9 @@ spec:web-bluetooth
       </li>
       <li>
         Let |filters| be
-        <code>|options|.filters.map(filter=>new
-        {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code> if <code>|options|.filters</code> is present, or an empty {{FrozenArray}} otherwise.
+        <code>{{Array.prototype.map}}.call(|options|.filters,
+          filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>
+        if <code>|options|.filters</code> is present, or an empty {{FrozenArray}} otherwise.
         If this throws an exception,
         <a>reject</a> |promise| with that exception and abort these steps.
       </li>
@@ -364,7 +365,7 @@ spec:web-bluetooth
         constructor(optional BluetoothLEScanFilterInit init);
         readonly attribute DOMString? name;
         readonly attribute DOMString? namePrefix;
-        readonly attribute FrozenArray&lt;UUID>? services;
+        readonly attribute FrozenArray&lt;UUID> services;
         readonly attribute BluetoothManufacturerDataFilter manufacturerData;
         readonly attribute BluetoothServiceDataFilter serviceData;
       };
@@ -412,9 +413,11 @@ spec:web-bluetooth
           <code>new BluetoothServiceDataFilter(|init|.{{BluetoothLEScanFilterInit/serviceData}})</code>.
         </li>
         <li>
-          If <code>|init|.{{BluetoothLEScanFilterInit/services}}</code> is present,
-          initialize <code>this.{{BluetoothLEScanFilter/services}}</code> as
-          <code>|init|.{{BluetoothLEScanFilterInit/services}}.map(service=>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(service))</code>.
+          Initialize <code>this.{{BluetoothLEScanFilter/services}}</code> as
+          <code>{{Array.prototype.map}}.call(|init|.{{BluetoothLEScanFilterInit/services}},
+            service=>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(service))</code>
+          if <code>|init|.{{BluetoothLEScanFilterInit/services}}</code> is present,
+          or an empty {{FrozenArray}} otherwise.
         </li>
         <li>
           For each other present member in |init|,
@@ -805,15 +808,14 @@ settings object=] is no longer [=fully active=], it must run these steps:
     the name MUST resolve to its initial value,
     ignoring any changes that have been made to the name in the current execution environment.
     For example, when the {{Bluetooth/requestLEScan()}} algorithm says to call
-    <code>|options|.filters.map(filter=>new
-    {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>,
-    this MUST apply the
-    {{Array.prototype.map}} algorithm defined in [[ECMAScript]]
-    with <code>|options|.services</code> as its <code>this</code> parameter and
-    the algorithm defined at {{BluetoothLEScanFilter/BluetoothLEScanFilter()}}
-    as its <code>callbackfn</code> parameter,
-    regardless of any modifications that have been made to <code>window</code>,
-    <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
+    <code>{{Array.prototype.map}}.call(|options|.filters,
+      filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>,
+    this MUST apply the {{Array.prototype.map}} algorithm defined in [[ECMAScript]]
+    with <code>|options|.filters</code> as its <code>this</code> parameter and
+    <code>filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter)</code>
+    as its <code>callbackfn</code> parameter, regardless of any modifications that have
+    been made to <code>window</code>, <code>Array</code>,
+    <code>Array.prototype</code>, <code>Array.prototype.map</code>,
     <code>Function</code>, <code>Function.prototype</code>,
     <code>BluetoothLEScanFilter</code>, or other objects.
   </p>
