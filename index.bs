@@ -519,14 +519,20 @@ that UAs will choose not to prompt.
     BufferSource mask;
   };
 
+  dictionary BluetoothManufacturerDataFilterInit : BluetoothDataFilterInit {
+    required unsigned short companyIdentifier;
+  };
+
+  dictionary BluetoothServiceDataFilterInit : BluetoothDataFilterInit {
+    required BluetoothServiceUUID service;
+  };
+
   dictionary BluetoothLEScanFilterInit {
     sequence<BluetoothServiceUUID> services;
     DOMString name;
     DOMString namePrefix;
-    // Maps unsigned shorts to BluetoothDataFilters.
-    object manufacturerData;
-    // Maps BluetoothServiceUUIDs to BluetoothDataFilters.
-    object serviceData;
+    sequence<BluetoothManufacturerDataFilterInit> manufacturerData;
+    sequence<BluetoothServiceDataFilterInit> serviceData;
   };
 
   dictionary RequestDeviceOptions {
@@ -585,11 +591,11 @@ device has to:
 * have a name starting with <dfn dict-member
     for="BluetoothLEScanFilterInit">namePrefix</dfn> if that member is present,
 * <div class="unstable"> advertise <a>manufacturer specific data</a> matching
-    all of the key/value pairs in <dfn dict-member
+    all of the values in <dfn dict-member
     for="BluetoothLEScanFilterInit">manufacturerData</dfn> if that member is
     present, and</div>
 * <div class="unstable"> advertise <a>service data</a> matching all of the
-    key/value pairs in <dfn dict-member
+    values in <dfn dict-member
     for="BluetoothLEScanFilterInit">serviceData</dfn> if that member is
     present.</div>
 
@@ -853,7 +859,7 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {17: {}}}]
+[{ manufacturerData: [{ companyIdentifier: 17 }] }]
       </pre>
     </td>
     <td>D1</td>
@@ -861,7 +867,7 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{serviceData: {"A": {}}}]
+[{ serviceData: [{ service: "A" }] }]
       </pre>
     </td>
     <td>D2</td>
@@ -869,8 +875,10 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {17: {}}},
-          {serviceData: {"A": {}}}]
+[
+  { manufacturerData: [{ companyIdentifier: 17 }] },
+  { serviceData: [{ service: "A" }] },
+]
       </pre>
     </td>
     <td>D1, D2</td>
@@ -878,8 +886,12 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {17: {}},
-          serviceData: {"A": {}}}]
+[
+  {
+    manufacturerData: [{ companyIdentifier: 17 }],
+    serviceData: [{ service: "A" }],
+  },
+]
       </pre>
     </td>
     <td><i>&lt;none></i></td>
@@ -887,9 +899,13 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {
-            17: {dataPrefix: new Uint8Array([1, 2, 3])},
-        }}]
+[
+  {
+    manufacturerData: [
+      { companyIdentifier: 17, dataPrefix: new Uint8Array([1, 2, 3]) },
+    ],
+  },
+]
       </pre>
     </td>
     <td>D1</td>
@@ -897,9 +913,13 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {
-            17: {dataPrefix: new Uint8Array([1, 2, 3, 4])},
-        }}]
+[
+  {
+    manufacturerData: [
+      { companyIdentifier: 17, dataPrefix: new Uint8Array([1, 2, 3, 4]) },
+    ],
+  },
+]
       </pre>
     </td>
     <td><i>&lt;none></i></td>
@@ -907,9 +927,13 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {
-            17: {dataPrefix: new Uint8Array([1])},
-        }}]
+[
+  {
+    manufacturerData: [
+      { companyIdentifier: 17, dataPrefix: new Uint8Array([1]) },
+    ],
+  },
+]
       </pre>
     </td>
     <td>D1</td>
@@ -917,10 +941,17 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {
-            17: {dataPrefix: new Uint8Array([0x91, 0xAA]),
-                mask: new Uint8Array([0x0F, 0x57])},
-        }}]
+[
+  {
+    manufacturerData: [
+      {
+        companyIdentifier: 17,
+        dataPrefix: new Uint8Array([0x91, 0xAA]),
+        mask: new Uint8Array([0x0f, 0x57]),
+      },
+    ],
+  },
+]
       </pre>
     </td>
     <td>D1</td>
@@ -928,10 +959,14 @@ values of <var>filters</var> passed to
   <tr>
     <td>
       <pre highlight="js">
-        [{manufacturerData: {
-            17: {},
-            18: {},
-        }}]
+[
+  {
+    manufacturerData: [
+      { companyIdentifier: 17 },
+      { companyIdentifier: 18 },
+    ]
+  }
+]
       </pre>
     </td>
     <td><i>&lt;none></i></td>
@@ -1002,7 +1037,7 @@ To accept all devices, use {{acceptAllDevices}} instead.
     <td>
       <pre highlight="js">
         requestDevice({
-          filters:[{namePrefix: ""}]
+          filters: [{namePrefix: ""}]
         })
       </pre>
     </td>
@@ -1014,7 +1049,7 @@ To accept all devices, use {{acceptAllDevices}} instead.
     <td>
       <pre highlight="js">
         requestDevice({
-          filters:[{manufacturerData: {}}]
+          filters: [{manufacturerData: []}]
         })
       </pre>
     </td>
@@ -1027,7 +1062,7 @@ To accept all devices, use {{acceptAllDevices}} instead.
     <td>
       <pre highlight="js">
         requestDevice({
-          filters:[{serviceData: {}}]
+          filters: [{serviceData: []}]
         })
       </pre>
     </td>
@@ -1136,23 +1171,19 @@ following steps return `match`:
     response</a>, or a service discovery response indicating that the device
     supports a primary (vs included) service with UUID <var>uuid</var>, return
     `mismatch`.
-1. If
-    <code><var>filter</var>.{{BluetoothLEScanFilterInit/manufacturerData}}</code>
-    is present then for each |manufacturerId| in
-    <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>, if
+1. For each <var>manufacturerData</var> in
+    <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}</code>, if
     <var>device</var> hasn't advertised <a>manufacturer specific data</a> with a
-    company identifier code that stringifies in base 10 to |manufacturerId| and
-    with data that <a for="BluetoothDataFilterInit">matches</a>
-    <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}[|manufacturerId|]</code>
-    return `mismatch`.
-1. If <code><var>filter</var>.{{BluetoothLEScanFilterInit/serviceData}}</code>
-    is present then for each |uuid| in
-    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}.{{Object/[[OwnPropertyKeys]]}}()</code>,
+    company identifier code equal to
+    <code>|manufacturerData|.{{BluetoothManufacturerDataFilterInit/companyIdentifier}}</code>
+    and with data that <a for="BluetoothDataFilterInit">matches</a>
+    <code>|manufacturerData|</code> return `mismatch`.
+1. For each <var>serviceData</var> in
+    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}</code>,
     if <var>device</var> hasn't advertised <a>service data</a> with a UUID whose
-    128-bit form is |uuid| and with data that <a
-    for="BluetoothDataFilterInit">matches</a>
-    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}[|uuid|]</code>,
-    return `mismatch`.
+    128-bit form is <code>|serviceData|.{{BluetoothServiceDataFilterInit/service}}</code> and
+    with data that <a for="BluetoothDataFilterInit">matches</a>
+    <code>|serviceData|</code> return `mismatch`.
 1. Return `match`.
 
 </div>
@@ -1400,51 +1431,42 @@ returned from the following steps:
         <code><var>filter</var>.namePrefix</code>.
 1. Set <code>|canonicalizedFilter|.manufacturerData</code> to `{}`.
 1. If <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}</code> is
-    present, do the following sub-steps for each |key| in
-    <code>|filter|.manufacturerData.{{Object/[[OwnPropertyKeys]]}}()</code>. If
-    there are no such keys, throw a {{TypeError}} and abort these steps.
-    1. Let |manufacturerId| be <a
-        abstract-op>CanonicalNumericIndexString</a>(|key|).
-    1. If |manufacturerId| is `undefined` or `-0`, or <a
-        abstract-op>IsInteger</a>(|manufacturerId|) is `false`, or
-        |manufacturerId| is outside the range from 0–65535 inclusive, throw a
-        {{TypeError}} and abort these steps.
-    1. Let |dataFilter| be
-        <code>|filter|.manufacturerData[|key|]</code>, <a>converted
-        to an IDL value</a> of type {{BluetoothDataFilterInit}}. If this
-        conversion throws an exception, propagate it and abort these steps.
-    1. Let |canonicalizedDataFilter| be the result of <a
-        for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
+    present and 
+    <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}.length === 0</code>,
+    throw a {{TypeError}} and abort these steps.
+1. For each |manufacturerData| in
+    <code>|filter|.{{BluetoothLEScanFilterInit/manufacturerData}}</code>, do the following sub-steps:
+    1. If <code>|manufacturerData|.{{BluetoothManufacturerDataFilterInit/companyIdentifier}}</code>
+        is present in |canonicalizedFilter|.manufacturerData,
+        throw a {{TypeError}} and abort these steps.
+    1. Let |canonicalizedManufacturerDataFilter| be the result of <a
+        for="BluetoothDataFilterInit">canonicalizing</a> |manufacturerData|,
         <a>converted to an ECMAScript value</a>. If this throws an exception,
         propagate that exception and abort these steps.
     1. Call <a abstract-op>CreateDataProperty</a>
-        (|canonicalizedFilter|.manufacturerData, |key|,
-        |canonicalizedDataFilter|).
+        (|canonicalizedFilter|.manufacturerData,
+        <code>|manufacturerData|.{{BluetoothManufacturerDataFilterInit/companyIdentifier}}</code>,
+        |canonicalizedManufacturerDataFilter|).
 1. Set <code>|canonicalizedFilter|.serviceData</code> to `{}`.
 1. If <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}</code> is
-    present, do the following sub-steps for each |key| in
-    <code>|filter|.serviceData.{{Object/[[OwnPropertyKeys]]}}()</code>. If there
-    are no such keys, throw a {{TypeError}} and abort these steps.
-    1. Let |serviceName| be <a
-        abstract-op>CanonicalNumericIndexString</a>(|key|).
-    1. If |serviceName| is `undefined`, set |serviceName| to |key|.
+    present and 
+    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}.length === 0</code>,
+    throw a {{TypeError}} and abort these steps.
+1. For each |serviceData| in
+    <code>|filter|.{{BluetoothLEScanFilterInit/serviceData}}</code>, do the following sub-steps:
     1. Let |service| be
-        <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|serviceName|)</code>.
-    1. If the previous step threw an exception, throw that exception and abort
-        these steps.
+        <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|serviceData|.{{BluetoothServiceDataFilterInit/service}})</code>.
+        If this throws an exception, propagate that exception and abort these
+        steps.
     1. If |service| is <a>blocklisted</a>, throw a {{SecurityError}} and abort
         these steps.
-    1. Let |dataFilter| be <code>|filter|.serviceData[|key|]</code>,
-        <a>converted to an IDL value</a> of type {{BluetoothDataFilterInit}}.
-        If this conversion throws an exception, propagate it and abort these
-        steps.
-    1. Let |canonicalizedDataFilter| be the result of <a
-        for="BluetoothDataFilterInit">canonicalizing</a> |dataFilter|,
+    1. Let |canonicalizedServiceDataFilter| be the result of <a
+        for="BluetoothDataFilterInit">canonicalizing</a> |serviceData|,
         <a>converted to an ECMAScript value</a>. If this throws an exception,
         propagate that exception and abort these steps.
     1. Call <a
         abstract-op>CreateDataProperty</a>(|canonicalizedFilter|.serviceData,
-        |service|, |canonicalizedDataFilter|).
+        |service|, |canonicalizedServiceDataFilter|).
 1. Return |canonicalizedFilter|.
 
 </div>
