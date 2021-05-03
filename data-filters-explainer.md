@@ -8,7 +8,7 @@ specification changes that happened after the [TAG review].
 
 Filtering by device name or prefix may not work for some hardware developers as
 their users rename their devices. In addition, most of their advertised services
-are custom, thus needings 128-bit UUIDs. Advertising 128-bit UUIDs will occupy
+are custom, thus needing 128-bit UUIDs. Advertising 128-bit UUIDs will occupy
 space for important data they want to advertise. Hence, being able to filter on
 manufacturer specific data such as the company identifier will help.
 
