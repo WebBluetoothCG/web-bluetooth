@@ -8,7 +8,7 @@ specification changes that happened after the [TAG review].
 
 Filtering by device name or prefix may not work for some hardware developers as
 their users rename their devices. In addition, most of their advertised services
-are custom, thus needing 128-bit UUID. Advertising 128-bit UUIDs will occupy
+are custom, thus needings 128-bit UUIDs. Advertising 128-bit UUIDs will occupy
 space for important data they want to advertise. Hence, being able to filter on
 manufacturer specific data such as the company identifier will help.
 
@@ -33,7 +33,7 @@ let serviceData = [{ service: "battery_service" }];
 navigator.bluetooth.requestDevice({ filters: [{ serviceData }] });
 ```
 
-Developers can also provide some data prefix that will filter manufacturer data
+Developers can also provide a data prefix that will filter manufacturer data
 and service data from devices that start with it.
 Examples below show you how to filter Bluetooth devices from Google company with
 manufacturer data bytes that start with `[0x01, 0x02]`.
@@ -46,8 +46,8 @@ let manufacturerData = [{
 navigator.bluetooth.requestDevice({ filters: [{ manufacturerData }] });
 ```
 
-A mask can also be used with data prefix to match some patterns in manufacturer
-data and service data.
+A mask can also be used with a data prefix to match some patterns in
+manufacturer data and service data.
 
 ```js
 let manufacturerData = [{
