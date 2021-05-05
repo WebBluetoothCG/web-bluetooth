@@ -20,7 +20,7 @@ Try it out
 * [Implementation Status](implementation-status.md) describes various browser support on platforms, hardware compatibility, polyfills.
 * [Android BLE Peripheral App](https://github.com/WebBluetoothCG/ble-test-peripheral-android) Simulates BLE peripherals easing experiments with the Web Bluetooth API by providing another device to connect to.
 * [Samples](https://googlechrome.github.io/samples/web-bluetooth/index.html)
-* [Code Labs](https://github.com/googlecodelabs?query=bluetooth)
+* [Code Labs](https://github.com/googlecodelabs?q=bluetooth)
 * [Demos](https://github.com/WebBluetoothCG/demos)
 
 Communication
