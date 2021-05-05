@@ -13,6 +13,8 @@ Work is in progress:
 * Root [Issue 419413: Web Bluetooth](https://code.google.com/p/chromium/issues/detail?id=419413) and blocking issues are most authorative on status.
 * Some Bluetooth GATT operations can't be run in parallel yet. See [#188
   (comment)](https://github.com/WebBluetoothCG/web-bluetooth/issues/188#issuecomment-255121220)
+* The [manufacturer data filter](https://github.com/WebBluetoothCG/web-bluetooth/blob/main/data-filters-explainer.md) is behind the
+  `chrome://flags/#enable-experimental-web-platform-features` 🚩 flag.
 * The `getDevices()` and `watchAdvertisements()` APIs are behind the
   `chrome://flags/#enable-experimental-web-platform-features` 🚩 flag.
 * The Persistent Device Permissions feature is behind the
@@ -27,7 +29,8 @@ Referring Device (Physical Web) |     |         |     |       |         |
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Service list            | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
-└ Manufacturer/Service data |         |         |     |       |         |
+└ Manufacturer Data       | 92 🚩     |  92 🚩  | 92 🚩 | 92 🚩 | 92 🚩 |
+└ Service Data            |           |         |     |       |        |
 └ acceptAllDevices        | ✓         | ✓       | ✓   | ✓     | ✓      |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 permissions.request()     |           |         |     |       |         |
