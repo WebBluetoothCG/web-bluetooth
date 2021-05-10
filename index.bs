@@ -1481,13 +1481,13 @@ The result of <dfn for="BluetoothDataFilterInit" export>canonicalizing</dfn> the
 {{BluetoothDataFilterInit}} |filter|, is the {{BluetoothDataFilterInit}}
 returned from the following steps:
 
-1. If <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code> is present and
-    <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}.length === 0</code>,
-    throw a {{TypeError}} and abort these steps.
-1. If <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code> is present,
-    let |dataPrefix| be <a>a copy of the bytes held</a> by
-    <code>|filter|.dataPrefix</code>. Otherwise, let |dataPrefix| be an empty
-    sequence of bytes.
+1. If <code>|filter|.{{BluetoothDataFilterInit/dataPrefix}}</code> is not
+    present, let |dataPrefix| be an empty sequence of bytes. Otherwise,
+    do the following sub-steps:
+    1. Let |dataPrefix| be <a>a copy of the bytes held</a> by
+        <code>|filter|.dataPrefix</code>.
+    1. If <code>|dataPrefix|.length === 0</code>, throw a {{TypeError}} and
+        abort these steps.
 1. If <code>|filter|.{{BluetoothDataFilterInit/mask}}</code> is present, let
     |mask| be <a>a copy of the bytes held</a> by <code>|filter|.mask</code>.
     Otherwise, let |mask| be a sequence of `0xFF` bytes the same length as
