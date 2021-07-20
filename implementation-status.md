@@ -58,6 +58,7 @@ TypeError for bad UUIDs   | ✓         | ✓       | ✓   | ✓     | ✓     
 Invalidate GATT attributes upon disconnect | ✓ | ✓   | ✓   | ✓     | ✓     |
 GATT Blocklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
 Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
+On-demand device pairing  |           | ✓       | ✓   |        |         |
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 
