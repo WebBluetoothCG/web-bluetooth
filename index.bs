@@ -35,24 +35,6 @@ Markup Shorthands: css no, markdown yes
     "status": "Living Standard",
     "publisher": "Bluetooth SIG"
   },
-  "BLUETOOTH-ASSIGNED-SERVICES": {
-    "href": "https://developer.bluetooth.org/gatt/services/Pages/ServicesHome.aspx",
-    "title": "Bluetooth GATT Specifications > Services",
-    "status": "Living Standard",
-    "publisher": "Bluetooth SIG"
-  },
-  "BLUETOOTH-ASSIGNED-CHARACTERISTICS": {
-    "href": "https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicsHome.aspx",
-    "title": "Bluetooth GATT Specifications > Characteristics",
-    "status": "Living Standard",
-    "publisher": "Bluetooth SIG"
-  },
-  "BLUETOOTH-ASSIGNED-DESCRIPTORS": {
-    "href": "https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorsHomePage.aspx",
-    "title": "Bluetooth GATT Specifications > Descriptors",
-    "status": "Living Standard",
-    "publisher": "Bluetooth SIG"
-  },
   "BLUETOOTH-SUPPLEMENT6": {
     "href": "https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735",
     "title": "Supplement to the Bluetooth Core Specification Version 6",
@@ -66,17 +48,7 @@ Markup Shorthands: css no, markdown yes
 spec: BLUETOOTH-ASSIGNED
     type: enum; urlPrefix: https://developer.bluetooth.org/gatt/
         urlPrefix: characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.
-            text: org.bluetooth.characteristic.body_sensor_location; url: body_sensor_location.xml#
             text: org.bluetooth.characteristic.gap.appearance; url: gap.appearance.xml#
-            text: org.bluetooth.characteristic.heart_rate_control_point; url: heart_rate_control_point.xml#
-            text: org.bluetooth.characteristic.heart_rate_measurement; url: heart_rate_measurement.xml#
-            text: org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list; url: ieee_11073-20601_regulatory_certification_data_list.xml#
-        urlPrefix: descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.
-            text: org.bluetooth.descriptor.gatt.characteristic_presentation_format; url: gatt.characteristic_presentation_format.xml#
-            text: org.bluetooth.descriptor.gatt.client_characteristic_configuration; url: gatt.client_characteristic_configuration.xml#
-        urlPrefix: services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.
-            text: org.bluetooth.service.cycling_power; url: cycling_power.xml#
-            text: org.bluetooth.service.heart_rate; url: heart_rate.xml#
     type: dfn
         text: Shortened Local Name; url: https://www.bluetooth.org/en-us/specification/assigned-numbers/generic-access-profile#
 
@@ -233,17 +205,17 @@ a website would use code like the following:
 
   navigator.bluetooth.<a idl for="Bluetooth" lt="requestDevice()">requestDevice</a>({
     filters: [{
-      services: ['heart_rate'],
+      services: [0x180D /* Heart Rate */],
     }]
   }).then(device => device.gatt.<a for="BluetoothRemoteGATTServer">connect()</a>)
   .then(server => server.<a idl for="BluetoothRemoteGATTServer" lt="getPrimaryService()"
-    >getPrimaryService</a>(<a idl lt="org.bluetooth.service.heart_rate">'heart_rate'</a>))
+    >getPrimaryService</a>(0x180D /* Heart Rate */))
   .then(service => {
     chosenHeartRateService = service;
     return Promise.all([
-      service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.body_sensor_location">'body_sensor_location'</a>)
+      service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(0x2A38 /* Body Sensor Location */)
         .then(handleBodySensorLocationCharacteristic),
-      service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">'heart_rate_measurement'</a>)
+      service.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(0x2A37 /* Heart Rate Measurement */)
         .then(handleHeartRateMeasurementCharacteristic),
     ]);
   });
@@ -284,8 +256,7 @@ a website would use code like the following:
 </pre>
 
 <code>parseHeartRate()</code> would be defined using the
-<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
-<code>heart_rate_measurement</code> documentation</a>
+standardized Heart Rate Measurement documentation
 to read the {{DataView}} stored in a {{BluetoothRemoteGATTCharacteristic}}'s
 {{BluetoothRemoteGATTCharacteristic/value}} field.
 
@@ -336,15 +307,14 @@ to read the {{DataView}} stored in a {{BluetoothRemoteGATTCharacteristic}}'s
 
 If the heart rate sensor reports the <code>energyExpended</code> field, the web
 application can reset its value to <code>0</code> by writing to the
-{{org.bluetooth.characteristic.heart_rate_control_point|heart_rate_control_point}}
-characteristic:
+standardized Heart Rate Control Point characteristic:
 
 <pre highlight="js">
   function resetEnergyExpended() {
     if (!chosenHeartRateService) {
       return Promise.reject(new Error('No heart rate sensor selected yet.'));
     }
-    return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(<a idl lt="org.bluetooth.characteristic.heart_rate_control_point">'heart_rate_control_point'</a>)
+    return chosenHeartRateService.<a idl for="BluetoothRemoteGATTService" lt="getCharacteristic()">getCharacteristic</a>(0x2A39 /* Heart Rate Control Point */)
     .then(controlPoint => {
       const resetEnergyExpended = new Uint8Array([1]);
       return controlPoint.<a idl for="BluetoothRemoteGATTCharacteristic" lt="writeValue()">writeValue</a>(resetEnergyExpended);
@@ -3071,8 +3041,8 @@ BluetoothRemoteGATTService includes ServiceEventHandlers;
 that the GATT service belongs to.
 
 <dfn>uuid</dfn> is the UUID of the service, e.g.
-<code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the <a idl
-lt="org.bluetooth.service.heart_rate">Heart Rate</a> service.
+<code>'0000180d-0000-1000-8000-00805f9b34fb'</code> for the standardized Heart
+Rate service.
 
 <dfn>isPrimary</dfn> indicates whether the type of this service is primary or
 secondary.
@@ -3204,8 +3174,7 @@ peripheral's service.
 
 <dfn>uuid</dfn> is the UUID of the characteristic, e.g.
 <code>'00002a37-0000-1000-8000-00805f9b34fb'</code> for the
-<a idl lt="org.bluetooth.characteristic.heart_rate_measurement">
-Heart Rate Measurement</a> characteristic.
+standardized Heart Rate Measurement characteristic.
 
 <dfn>properties</dfn> holds the properties of this characteristic.
 
@@ -3646,8 +3615,7 @@ interface BluetoothRemoteGATTDescriptor {
 
 <dfn>uuid</dfn> is the UUID of the characteristic descriptor, e.g.
 <code>'00002902-0000-1000-8000-00805f9b34fb'</code> for the
-<a idl lt="org.bluetooth.descriptor.gatt.client_characteristic_configuration">
-Client Characteristic Configuration</a> descriptor.
+standardized Client Characteristic Configuration descriptor.
 
 <dfn>value</dfn> is the currently cached descriptor value. This value gets
 updated when the value of the descriptor is read.
@@ -4329,9 +4297,7 @@ promise rejected with</a> a <code>TypeError</code> and abort its other steps.
 ## Standardized UUIDs ## {#standardized-uuids}
 
 The Bluetooth SIG maintains a registry at [[BLUETOOTH-ASSIGNED]] of UUIDs that
-identify services, characteristics, descriptors, and other entities. This
-section provides a way for script to look up those UUIDs by name so they don't
-need to be replicated in each application.
+identify services, characteristics, descriptors, and other entities.
 
 <xmp class="idl">
   [Exposed=Window]
@@ -4362,70 +4328,54 @@ canonicalUUID(<var>alias</var>)</dfn></code> method, when invoked, MUST return
 
 <div class="note">
   <dfn typedef>BluetoothServiceUUID</dfn> represents 16- and 32-bit UUID
-  aliases, <a>valid UUID</a>s, and names defined in
-  [[BLUETOOTH-ASSIGNED-SERVICES]], or, equivalently, the values for which
+  aliases, and <a>valid UUID</a>s, or, equivalently, the values for which
   {{BluetoothUUID/getService()|BluetoothUUID.getService()}} does not throw an
   exception.
 
   <dfn typedef>BluetoothCharacteristicUUID</dfn> represents 16- and 32-bit UUID
-  aliases, <a>valid UUID</a>s, and names defined in
-  [[BLUETOOTH-ASSIGNED-CHARACTERISTICS]], or, equivalently, the values for which
+  aliases, <a>valid UUID</a>s, or, equivalently, the values for which
   {{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic()}} does
   not throw an exception.
 
   <dfn typedef>BluetoothDescriptorUUID</dfn> represents 16- and 32-bit UUID
-  aliases, <a>valid UUID</a>s, and names defined in
-  [[BLUETOOTH-ASSIGNED-DESCRIPTORS]], or, equivalently, the values for which
+  aliases, <a>valid UUID</a>s, or, equivalently, the values for which
   {{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor()}} does not throw
   an exception.
 </div>
 
 <div algorithm="resolve UUID name">
-To <dfn>ResolveUUIDName</dfn>(<var>name</var>, <var>assigned numbers
-table</var>, <var>prefix</var>), the UA MUST perform the following steps:
+To <dfn>ResolveUUIDName</dfn>(<var>name</var>), the UA MUST perform the following steps:
 
 1. If <var>name</var> is an <code>unsigned long</code>, return
     {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)</code>
     and abort these steps.
 1. If <var>name</var> is a <a>valid UUID</a>, return <var>name</var> and abort
     these steps.
-1. If the string <code><var>prefix</var> + "." + <var>name</var></code> appears
-    in <var>assigned numbers table</var>, let <var>alias</var> be its assigned
-    number, and return
-    {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(<var>alias</var>)</code>.
 1. Otherwise, throw a {{TypeError}}.
 
 </div>
 
 The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">
 getService(<var>name</var>)</dfn></code> method, when invoked, MUST return
-<a>ResolveUUIDName</a>(<code><var>name</var></code>,
-[[!BLUETOOTH-ASSIGNED-SERVICES]], "org.bluetooth.service").
+<a>ResolveUUIDName</a>(<code><var>name</var></code>).
 
 The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">
 getCharacteristic(<var>name</var>)</dfn></code> method, when invoked, MUST
-return <a>ResolveUUIDName</a>(<code><var>name</var></code>,
-[[!BLUETOOTH-ASSIGNED-CHARACTERISTICS]], "org.bluetooth.characteristic").
+return <a>ResolveUUIDName</a>(<code><var>name</var></code>).
 
 The static <code>BluetoothUUID.<dfn method for="BluetoothUUID">
 getDescriptor(<var>name</var>)</dfn></code> method, when invoked, MUST return
-<a>ResolveUUIDName</a>(<code><var>name</var></code>,
-[[!BLUETOOTH-ASSIGNED-DESCRIPTORS]], "org.bluetooth.descriptor").
+<a>ResolveUUIDName</a>(<code><var>name</var></code>).
 
 <div class="example">
-<code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}("<a idl lt="org.bluetooth.service.cycling_power"> cycling_power</a>")</code>
-returns <code>"00001818-0000-1000-8000-00805f9b34fb"</code>.
+
+<code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(0x1801)</code> returns
+<code>"00001801-0000-1000-8000-00805f9b34fb"</code>.
 
 <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}("00001801-0000-1000-8000-00805f9b34fb")</code> returns
 <code>"00001801-0000-1000-8000-00805f9b34fb"</code>.
 
 <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}("unknown-service")</code> throws a {{TypeError}}.
-
-<code>{{BluetoothUUID/getCharacteristic()|BluetoothUUID.getCharacteristic}}("{{org.bluetooth.characteristic.ieee_11073-20601_regulatory_certification_data_list|ieee_11073-20601_regulatory_certification_data_list}}")</code>
-returns <code>"00002a2a-0000-1000-8000-00805f9b34fb"</code>.
-
-<code>{{BluetoothUUID/getDescriptor()|BluetoothUUID.getDescriptor}}("{{org.bluetooth.descriptor.gatt.characteristic_presentation_format|gatt.characteristic_presentation_format}}")</code>
-returns <code>"00002904-0000-1000-8000-00805f9b34fb"</code>.
 </div>
 
 # The GATT Blocklist # {#the-gatt-blocklist}
