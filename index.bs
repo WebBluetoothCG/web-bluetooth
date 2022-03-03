@@ -1589,6 +1589,21 @@ UA MUST run the following steps:
 </div>
 
 <div class="unstable">
+
+To <dfn data-lt="remove device from storage">remove an allowed <a>Bluetooth
+device</a></dfn> |device|, given a {{BluetoothPermissionStorage}} |storage|,
+the UA MUST run the following steps:
+
+1. Search for an element |allowedDevice| in
+    <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code> where
+    |device| is equal to <code>|allowedDevice|@{{[[device]]}}</code>. If no such
+    element exists, abort these steps.
+1. Remove |allowedDevice| from
+    <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>.
+
+</div>
+
+<div class="unstable">
 ## Permission API Integration ## {#permission-api-integration}
 
 The [[permissions]] API provides a uniform way for websites to query which
@@ -1940,6 +1955,7 @@ or {{Bluetooth}} instance).
     readonly attribute DOMString? name;
     readonly attribute BluetoothRemoteGATTServer? gatt;
 
+    Promise<undefined> forget();
     Promise<undefined> watchAdvertisements(
         optional WatchAdvertisementsOptions options = {});
     readonly attribute boolean watchingAdvertisements;
@@ -1964,6 +1980,9 @@ fact to script</a>.
 
 {{BluetoothDevice/gatt}} provides a way to interact with this device's GATT
 server if the site has permission to do so.
+
+{{BluetoothDevice/forget()}} enables the page to revoke access to the device
+that the user has granted access to.
 
 <dfn>watchingAdvertisements</dfn> is true if the UA is currently scanning for
 advertisements from this device and firing events for them.
@@ -2087,6 +2106,18 @@ attribute MUST perform the following steps:
     <code>|allowedDevice|.{{AllowedBluetoothDevice/mayUseGATT}}</code> equal to
     `true`, return <code>this.{{[[gatt]]}}</code>.
 1. Otherwise, return `null`.
+
+</div>
+
+<div algorithm="forget invocation">
+The <code><dfn method for="BluetoothDevice">forget()</dfn></code> method, when
+invoked, MUST return <a>a new promise</a> |promise| and run the following steps:
+
+1. Let |device| be the target {{BluetoothDevice}} object.
+1. Let |storage| be the {{BluetoothPermissionStorage}} object in the current
+    script execution environment.
+1. <a>Remove |device| from storage</a> with |storage|.
+1. <a>Resolve</a> |promise|.
 
 </div>
 
