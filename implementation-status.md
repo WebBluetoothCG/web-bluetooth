@@ -101,6 +101,8 @@ Available behind a flag `opera://flags/#enable-web-bluetooth`.
 https://szeged.github.io/servo/
 
 # Firefox
+- https://mozilla.github.io/standards-positions/#web-bluetooth
+- https://github.com/mozilla/standards-positions/issues/95#issuecomment-644962468
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
 - https://bugzilla.mozilla.org/buglist.cgi?quicksearch=%5Bweb-bluetooth%5D
 
@@ -108,7 +110,8 @@ https://szeged.github.io/servo/
 https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
 
 # Safari
-https://bugs.webkit.org/show_bug.cgi?id=101034
+- https://webkit.org/tracking-prevention/#anti-fingerprinting
+- https://bugs.webkit.org/show_bug.cgi?id=101034
 
 # Node.js
 Node.js ports are available:
