@@ -417,6 +417,10 @@ several approaches to make such attacks more difficult:
     injection attacks</a>. Unfortunately, this only works over encrypted links,
     which not all BLE devices are required to support.
 
+* The integration with [[#permissions-policy]] provides protection against unwanted
+    access to Bluetooth capabilities, which requires the top-level document to
+    explicitly allow a cross-origin iframe to use the API's methods.
+
 UAs can also take further steps to protect their users:
 
 * A web service may collect lists of malicious websites and vulnerable devices.
@@ -1214,6 +1218,10 @@ To <code><dfn method for="Bluetooth">getDevices()</dfn></code> method, when
 invoked and given a {{BluetoothPermissionStorage}} |storage|, MUST return
 [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
+1. If [=this=]'s [=relevant global object=]'s [=associated Document=] is not
+    [=allowed to use=] the [=policy-controlled feature=] named 
+    "[=policy-controlled feature/bluetooth=]", <a>reject</a> |promise| with a
+    {{SecurityError}} and abort these steps.
 1. Let |devices| be a new empty {{Array}}.
 1. For each |allowedDevice| in
     <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>, add
@@ -1283,6 +1291,10 @@ all devices can match, a sequence of {{BluetoothServiceUUID}}s,
   devices, but for now it only ever returns a single one.
 </div>
 
+1. If [=this=]'s [=relevant global object=]'s [=associated Document=] is not
+    [=allowed to use=] the [=policy-controlled feature=] named 
+    "[=policy-controlled feature/bluetooth=]", throw a {{SecurityError}} and
+    abort these steps.
 1. <p id="requestDevice-user-gesture">Check that the algorithm is triggered
     while its [=relevant global object=] has a
     <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
@@ -1813,6 +1825,10 @@ The <code><dfn method for="Bluetooth">getAvailability()</dfn></code> method,
 when invoked, MUST return <a>a new promise</a> |promise| and run the following
 steps <a>in parallel</a>:
 
+1. If [=this=]'s [=relevant global object=]'s [=associated Document=] is not
+    [=allowed to use=] the [=policy-controlled feature=] named 
+    "[=policy-controlled feature/bluetooth=]", <a>queue a task</a> to
+    <a>resolve</a> |promise| with `false`, and abort these steps.
 1. <p id="override-availability">If the user has configured the UA to return a
     particular answer from this function for the current origin, <a>queue a
     task</a> to <a>resolve</a> |promise| with the configured answer, and abort
@@ -4570,6 +4586,17 @@ blocklist</a>.
     readonly attribute Bluetooth bluetooth;
   };
 </xmp>
+
+# Integrations # {#integrations}
+
+## Permissions Policy ## {#permissions-policy}
+
+This specification defines a <a>policy-controlled feature</a>, identified by
+the token "<dfn data-dfn-for="policy-controlled feature"><code>bluetooth</code></dfn>",
+that controls whether the methods exposed by the {{Navigator/bluetooth}}
+attribute on the {{Navigator}} object may be used.
+
+The <a>default allowlist</a> for this feature is <code>["self"]</code>.
 
 # Terminology and Conventions # {#terminology}
 
