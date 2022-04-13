@@ -8,7 +8,7 @@
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
   <meta content="Bikeshed version fb1e763a4, updated Tue Mar 1 13:13:50 2022 -0800" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
-  <meta content="f9ee525ad980b348b065441b449afc1bc1960b36" name="document-revision">
+  <meta content="851ff7ed809e9094815323241bccae67cafe2385" name="document-revision">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
   /* Show self-links for various elements. This is incompatible with nearby floats. */
@@ -694,7 +694,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-04-11">11 April 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-04-13">13 April 2022</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -827,7 +827,12 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
      </ol>
     <li><a href="#the-gatt-blocklist"><span class="secno">8</span> <span class="content">The GATT Blocklist</span></a>
     <li><a href="#navigator-extensions"><span class="secno">9</span> <span class="content">Extensions to the Navigator Interface</span></a>
-    <li><a href="#terminology"><span class="secno">10</span> <span class="content">Terminology and Conventions</span></a>
+    <li>
+     <a href="#integrations"><span class="secno">10</span> <span class="content">Integrations</span></a>
+     <ol class="toc">
+      <li><a href="#permissions-policy"><span class="secno">10.1</span> <span class="content">Permissions Policy</span></a>
+     </ol>
+    <li><a href="#terminology"><span class="secno">11</span> <span class="content">Terminology and Conventions</span></a>
     <li>
      <a href="#w3c-conformance"><span class="secno"></span> <span class="content">Conformance</span></a>
      <ol class="toc">
@@ -1047,6 +1052,10 @@ difficult for a website to predict the bits that will be sent over the
 radio, which blocks <a href="https://www.usenix.org/legacy/events/woot11/tech/final_files/Goodspeed.pdf">packet-in-packet
 injection attacks</a>. Unfortunately, this only works over encrypted links,
 which not all BLE devices are required to support.</p>
+    <li data-md>
+     <p>The integration with <a href="#permissions-policy">§ 10.1 Permissions Policy</a> provides protection against unwanted
+access to Bluetooth capabilities, which requires the top-level document to
+explicitly allow a cross-origin iframe to use the API’s methods.</p>
    </ul>
    <p>UAs can also take further steps to protect their users:</p>
    <ul>
@@ -1689,6 +1698,9 @@ to the corresponding bit in <var>expectedPrefix</var>, return <code>mismatch</co
 invoked and given a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissionstorage" id="ref-for-dictdef-bluetoothpermissionstorage">BluetoothPermissionStorage</a></code> <var>storage</var>, MUST return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>: 
     <ol>
      <li data-md>
+      <p>If <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window">associated Document</a> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use" id="ref-for-allowed-to-use">allowed to use</a> the <a data-link-type="dfn" href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature" id="ref-for-policy-controlled-feature">policy-controlled feature</a> named 
+"<a data-link-type="dfn" href="#policy-controlled-feature-bluetooth" id="ref-for-policy-controlled-feature-bluetooth">bluetooth</a>", <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror">SecurityError</a></code> and abort these steps.</p>
+     <li data-md>
       <p>Let <var>devices</var> be a new empty <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array-objects" id="ref-for-sec-array-objects">Array</a></code>.</p>
      <li data-md>
       <p>For each <var>allowedDevice</var> in <code><var>storage</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissionstorage-alloweddevices" id="ref-for-dom-bluetoothpermissionstorage-alloweddevices">allowedDevices</a></code></code>, add
@@ -1724,17 +1736,17 @@ the <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-fo
      <li data-md>
       <p>If <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters③">filters</a></code></code> is present and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices⑤">acceptAllDevices</a></code></code> is <code>true</code>,
 or if <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters④">filters</a></code></code> is not present
-and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices⑥">acceptAllDevices</a></code></code> is <code>false</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror①">TypeError</a></code> and abort these steps.</p>
+and <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices⑥">acceptAllDevices</a></code></code> is <code>false</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror①">TypeError</a></code> and abort these steps.</p>
       <div class="note" role="note"> Note: This enforces that exactly one of <code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters⑤">filters</a></code> or <code><code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices⑦">acceptAllDevices</a></code>:true</code> is present. </div>
      <li data-md>
       <p><a data-link-type="dfn" href="#request-bluetooth-devices" id="ref-for-request-bluetooth-devices">Request Bluetooth devices</a>, passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-filters" id="ref-for-dom-requestdeviceoptions-filters⑥">filters</a></code></code> if <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-acceptalldevices" id="ref-for-dom-requestdeviceoptions-acceptalldevices⑧">acceptAllDevices</a></code></code> is <code>false</code> or <code>null</code> otherwise, passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalservices" id="ref-for-dom-requestdeviceoptions-optionalservices③">optionalServices</a></code></code>, and
 passing <code><var>options</var>.<code class="idl"><a data-link-type="idl" href="#dom-requestdeviceoptions-optionalmanufacturerdata" id="ref-for-dom-requestdeviceoptions-optionalmanufacturerdata①">optionalManufacturerData</a></code></code>,
 and let <var>devices</var> be the result.</p>
      <li data-md>
-      <p>If the previous step threw an exception, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with that
+      <p>If the previous step threw an exception, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②">reject</a> <var>promise</var> with that
 exception and abort these steps.</p>
      <li data-md>
-      <p>If <var>devices</var> is an empty sequence, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notfounderror" id="ref-for-notfounderror">NotFoundError</a></code> and abort these steps.</p>
+      <p>If <var>devices</var> is an empty sequence, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notfounderror" id="ref-for-notfounderror">NotFoundError</a></code> and abort these steps.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①">Resolve</a> <var>promise</var> with <code><var>devices</var>[0]</code>.</p>
     </ol>
@@ -1748,9 +1760,13 @@ all devices can match, a sequence of <code class="idl"><a data-link-type="idl" h
   devices, but for now it only ever returns a single one. </div>
     <ol>
      <li data-md>
+      <p>If <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this①">this</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window①">associated Document</a> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use" id="ref-for-allowed-to-use①">allowed to use</a> the <a data-link-type="dfn" href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature" id="ref-for-policy-controlled-feature①">policy-controlled feature</a> named 
+"<a data-link-type="dfn" href="#policy-controlled-feature-bluetooth" id="ref-for-policy-controlled-feature-bluetooth①">bluetooth</a>", throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①">SecurityError</a></code> and
+abort these steps.</p>
+     <li data-md>
       <p id="requestDevice-user-gesture">Check that the algorithm is triggered
-while its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a> has a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
-activation</a>, otherwise throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror">SecurityError</a></code> and abort these
+while its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global②">relevant global object</a> has a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+activation</a>, otherwise throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror②">SecurityError</a></code> and abort these
 steps.</p>
      <li data-md>
       <p>In order to convert the arguments from service names and aliases to just <a data-link-type="dfn" href="#uuid" id="ref-for-uuid">UUID</a>s, do the following sub-steps:</p>
@@ -1827,7 +1843,7 @@ associated with <var>descriptor</var>, and let <var>device</var> be the result. 
      <li data-md>
       <p>The UA MAY <a data-link-type="dfn" href="#populate-the-bluetooth-cache" id="ref-for-populate-the-bluetooth-cache">populate the Bluetooth cache</a> with all Services inside <var>device</var>. Ignore any errors from this step.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="#get-the-bluetoothdevice-representing" id="ref-for-get-the-bluetoothdevice-representing①">Get the <code>BluetoothDevice</code> representing</a> <var>device</var> inside <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>, propagating any exception, and let <var>deviceObj</var> be the result.</p>
+      <p><a data-link-type="dfn" href="#get-the-bluetoothdevice-representing" id="ref-for-get-the-bluetoothdevice-representing①">Get the <code>BluetoothDevice</code> representing</a> <var>device</var> inside <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this②">this</a>, propagating any exception, and let <var>deviceObj</var> be the result.</p>
      <li data-md>
       <p>Return <code>[<var>deviceObj</var>]</code>.</p>
     </ol>
@@ -1851,7 +1867,7 @@ present, do the following sub-steps:</p>
        <li data-md>
         <p>If any of the <code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice③">BluetoothUUID.getService()</a></code> calls threw an exception, throw that exception and abort these steps.</p>
        <li data-md>
-        <p>If any service in <var>services</var> is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted①">blocklisted</a>, throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①">SecurityError</a></code> and abort these steps.</p>
+        <p>If any service in <var>services</var> is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted①">blocklisted</a>, throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror③">SecurityError</a></code> and abort these steps.</p>
        <li data-md>
         <p>Set <code><var>canonicalizedFilter</var>.services</code> to <var>services</var>.</p>
       </ol>
@@ -1914,7 +1930,7 @@ do the following sub-steps:</p>
 If this throws an exception, propagate that exception and abort these
 steps.</p>
        <li data-md>
-        <p>If <var>service</var> is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted②">blocklisted</a>, throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror②">SecurityError</a></code> and abort
+        <p>If <var>service</var> is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted②">blocklisted</a>, throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror④">SecurityError</a></code> and abort
 these steps.</p>
        <li data-md>
         <p>Let <var>canonicalizedServiceDataFilter</var> be the result of <a data-link-type="dfn" href="#bluetoothdatafilterinit-canonicalizing" id="ref-for-bluetoothdatafilterinit-canonicalizing②">canonicalizing</a> <var>serviceData</var>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-convert-idl-to-ecmascript-value" id="ref-for-dfn-convert-idl-to-ecmascript-value①">converted to an ECMAScript value</a>. If this throws an exception,
@@ -2144,7 +2160,7 @@ permission-related algorithms and types are defined as follows:</p>
        To <dfn data-dfn-type="dfn" data-export id="query-the-bluetooth-permission">query the "bluetooth" permission<a class="self-link" href="#query-the-bluetooth-permission"></a></dfn> with a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissiondescriptor" id="ref-for-dictdef-bluetoothpermissiondescriptor">BluetoothPermissionDescriptor</a></code> <var>desc</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothpermissionresult" id="ref-for-bluetoothpermissionresult">BluetoothPermissionResult</a></code> <var>status</var>, the UA must: 
       <ol>
        <li data-md>
-        <p>Let <var>global</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a> for <var>status</var>.</p>
+        <p>Let <var>global</var> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global③">relevant global object</a> for <var>status</var>.</p>
        <li data-md>
         <p>Set <code><var>status</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state">state</a></code></code> to <var>desc</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-state" id="ref-for-dfn-state①">permission state</a>.</p>
        <li data-md>
@@ -2252,18 +2268,21 @@ when invoked, MUST return <a data-link-type="dfn" href="https://webidl.spec.what
 steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel③">in parallel</a>: 
     <ol>
      <li data-md>
+      <p>If <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this③">this</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global④">relevant global object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window②">associated Document</a> is not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use" id="ref-for-allowed-to-use②">allowed to use</a> the <a data-link-type="dfn" href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature" id="ref-for-policy-controlled-feature②">policy-controlled feature</a> named 
+"<a data-link-type="dfn" href="#policy-controlled-feature-bluetooth" id="ref-for-policy-controlled-feature-bluetooth②">bluetooth</a>", <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②">resolve</a> <var>promise</var> with <code>false</code>, and abort these steps.</p>
+     <li data-md>
       <p id="override-availability">If the user has configured the UA to return a
-particular answer from this function for the current origin, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task">queue a
-task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②">resolve</a> <var>promise</var> with the configured answer, and abort
+particular answer from this function for the current origin, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①">queue a
+task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve③">resolve</a> <var>promise</var> with the configured answer, and abort
 these steps.</p>
       <div class="note" role="note"> Note: If the Web Bluetooth permission has been blocked by the user, the UA
-  may <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve③">resolve</a> <var>promise</var> with <code>false</code>. </div>
+  may <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve④">resolve</a> <var>promise</var> with <code>false</code>. </div>
      <li data-md>
-      <p>If the UA is running on a system that has a Bluetooth radio <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①">queue a
-task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve④">resolve</a> <var>promise</var> with <code>true</code> regardless of the powered
+      <p>If the UA is running on a system that has a Bluetooth radio <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task②">queue a
+task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑤">resolve</a> <var>promise</var> with <code>true</code> regardless of the powered
 state of the Bluetooth radio.</p>
      <li data-md>
-      <p>Otherwise, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task②">queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑤">resolve</a> <var>promise</var> with <code>false</code>.</p>
+      <p>Otherwise, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task③">queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑥">resolve</a> <var>promise</var> with <code>false</code>.</p>
       <div class="note" role="note"> Note: The promise is resolved <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel④">in parallel</a> to let the UA call out to
   other systems to determine whether Bluetooth is available. </div>
     </ol>
@@ -2290,7 +2309,7 @@ navigator<c- p>.</c->permissions<c- p>.</c-><a data-link-type="idl" href="https:
    </div>
    <div class="unstable algorithm" data-algorithm="availabilitychanged" id="availability-changed-algorithm">
      If the UA becomes able or unable to use Bluetooth, for example because a radio
-was physically attached or detached, or the user has changed their <a href="#override-availability">configuration</a> for the answer returned from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑥">getAvailability()</a></code>, the UA must <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task③">queue a task</a> on each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object">global
+was physically attached or detached, or the user has changed their <a href="#override-availability">configuration</a> for the answer returned from <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-getavailability" id="ref-for-dom-bluetooth-getavailability⑥">getAvailability()</a></code>, the UA must <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task④">queue a task</a> on each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#global-object" id="ref-for-global-object">global
 object</a> <var>global</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop">responsible event loop</a> to run the following steps: 
     <ol>
      <li data-md>
@@ -2502,7 +2521,7 @@ advertisements from this device and firing events for them.</p>
      <li data-md>
       <p>Let <var>storage</var>, a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothpermissionstorage" id="ref-for-dictdef-bluetoothpermissionstorage⑦">BluetoothPermissionStorage</a></code>, be <a class="idl-code" data-link-type="permission" href="#permissiondef-bluetooth" id="ref-for-permissiondef-bluetooth④">"bluetooth"</a>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-extra-permission-data" id="ref-for-dfn-extra-permission-data④">extra permission data</a> for the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object③">current settings object</a>.</p>
      <li data-md>
-      <p>Find the <var>allowedDevice</var> in <code><var>storage</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissionstorage-alloweddevices" id="ref-for-dom-bluetoothpermissionstorage-alloweddevices⑦">allowedDevices</a></code></code> with <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot⑦">[[device]]</a></code></code> the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device①">same device</a> as <var>device</var>. If there is no such object, throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror③">SecurityError</a></code> and abort these steps.</p>
+      <p>Find the <var>allowedDevice</var> in <code><var>storage</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothpermissionstorage-alloweddevices" id="ref-for-dom-bluetoothpermissionstorage-alloweddevices⑦">allowedDevices</a></code></code> with <code><var>allowedDevice</var>.<code class="idl"><a data-link-type="idl" href="#dom-allowedbluetoothdevice-device-slot" id="ref-for-dom-allowedbluetoothdevice-device-slot⑦">[[device]]</a></code></code> the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device①">same device</a> as <var>device</var>. If there is no such object, throw a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑤">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>If there is no key in <var>context</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-deviceinstancemap-slot" id="ref-for-dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a></code> that is the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device②">same device</a> as <var>device</var>, run the following
 sub-steps:</p>
@@ -2568,7 +2587,7 @@ script execution environment.</p>
      <li data-md>
       <p><a data-link-type="dfn" href="#remove-device-from-storage" id="ref-for-remove-device-from-storage">Remove <var>device</var> from storage</a> with <var>storage</var>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑥">Resolve</a> <var>promise</var>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑦">Resolve</a> <var>promise</var>.</p>
     </ol>
    </div>
    <p>A user agent has an associated <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="watch-advertisements-manager">watch advertisements manager</dfn> which is
@@ -2589,7 +2608,7 @@ the following sub-steps:</p>
          <li data-md>
           <p><a data-link-type="dfn" href="#abort-watchadvertisements" id="ref-for-abort-watchadvertisements①">Abort watchAdvertisements</a> with <code>this</code>.</p>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③">Reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror">AbortError</a></code></p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject④">Reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror">AbortError</a></code></p>
         </ol>
       </ol>
      <li data-md>
@@ -2609,13 +2628,13 @@ the following sub-steps:</p>
   advertisements. The UA SHOULD NOT filter out "duplicate"
   advertisements for the same device.</p>
            <li data-md>
-            <p>If the UA fails to enable scanning, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task④">queue a task</a> to
+            <p>If the UA fails to enable scanning, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑤">queue a task</a> to
   perform the following steps, and abort these steps:</p>
             <ol>
              <li data-md>
               <p>Set <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchadvertisementsstate-slot" id="ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot③">[[watchAdvertisementsState]]</a></code></code> to <code>'not-watching'</code>.</p>
              <li data-md>
-              <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject④">Reject</a> <var>promise</var> with one of the following errors:</p>
+              <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑤">Reject</a> <var>promise</var> with one of the following errors:</p>
               <dl class="switch">
                <dt data-md>The UA doesn’t support scanning for advertisements
                <dd data-md>
@@ -2629,7 +2648,7 @@ the following sub-steps:</p>
               </dl>
             </ol>
            <li data-md>
-            <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑤">Queue a task</a> to perform the following steps, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when">abort
+            <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑥">Queue a task</a> to perform the following steps, but <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#abort-when" id="ref-for-abort-when">abort
   when</a> <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchadvertisementsstate-slot" id="ref-for-dom-bluetoothdevice-watchadvertisementsstate-slot④">[[watchAdvertisementsState]]</a></code></code> becomes <code>not-watching</code>:</p>
             <ol>
              <li data-md>
@@ -2637,7 +2656,7 @@ the following sub-steps:</p>
              <li data-md>
               <p>Set <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-watchingadvertisements" id="ref-for-dom-bluetoothdevice-watchingadvertisements①">watchingAdvertisements</a></code></code> to <code>true</code>.</p>
              <li data-md>
-              <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑦">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
+              <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑧">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
             </ol>
           </ol>
         </ol>
@@ -2645,17 +2664,17 @@ the following sub-steps:</p>
        <dd data-md>
         <ol>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑤">Reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror①">InvalidStateError</a></code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑥">Reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror①">InvalidStateError</a></code>.</p>
         </ol>
        <dt data-md><code>'watching'</code>
        <dd data-md>
         <ol>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑧">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑨">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
         </ol>
       </dl>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#if-aborted" id="ref-for-if-aborted">If aborted</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑥">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror①">AbortError</a></code>.</p>
+      <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#if-aborted" id="ref-for-if-aborted">If aborted</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑦">reject</a> <var>promise</var> with <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror①">AbortError</a></code>.</p>
     </ol>
     <p class="note" role="note"><span>Note:</span> Scanning costs power, so websites should avoid watching for advertisements
 unnecessarily, and should use their <code class="idl"><a data-link-type="idl" href="https://dom.spec.whatwg.org/#abortcontroller" id="ref-for-abortcontroller">AbortController</a></code> to stop using power
@@ -2698,12 +2717,12 @@ following steps:</p>
 aborted.</p>
     <div class="algorithm" data-algorithm="handle visibility change">
       When the user agent determines that the <a data-link-type="dfn" href="https://www.w3.org/TR/page-visibility-2/#dom-visibilitystate" id="ref-for-dom-visibilitystate①">visibility
-state</a> of the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window">associated <code>Document</code></a> of the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object④">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global②">relevant global object</a> changes, it must run
+state</a> of the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window③">associated <code>Document</code></a> of the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object④">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global⑤">relevant global object</a> changes, it must run
 these steps: 
      <ol>
       <li data-md>
-       <p>Let <code><var>document</var></code> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window①">associated <code>Document</code></a> of
-the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object⑤">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global③">relevant global object</a>.</p>
+       <p>Let <code><var>document</var></code> be the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window④">associated <code>Document</code></a> of
+the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object⑤">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global⑥">relevant global object</a>.</p>
       <li data-md>
        <p>If <code><var>document</var></code>’s <a data-link-type="dfn" href="https://www.w3.org/TR/page-visibility-2/#dom-visibilitystate" id="ref-for-dom-visibilitystate②">visibility state</a> is not <code>"visible"</code>, then <a data-link-type="dfn" href="#abort-all-active-watchadvertisements" id="ref-for-abort-all-active-watchadvertisements">abort all active watchAdvertisements</a> operations.</p>
      </ol>
@@ -2715,8 +2734,8 @@ the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappa
 active</a> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document②">document</a>. When <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active①">full activity</a> is lost, scanning
 operations for that <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document③">document</a> need to be aborted.</p>
     <div class="algorithm" data-algorithm="handle full activity loss">
-      When the user agent determines that a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window②">associated <code>Document</code></a> of
-the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object⑥">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global④">relevant global object</a> is no longer <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active②">fully active</a>, it must run these steps: 
+      When the user agent determines that a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window⑤">associated <code>Document</code></a> of
+the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object⑥">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global⑦">relevant global object</a> is no longer <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active②">fully active</a>, it must run these steps: 
      <ol>
       <li data-md>
        <p>Run <a data-link-type="dfn" href="#abort-all-active-watchadvertisements" id="ref-for-abort-all-active-watchadvertisements①">abort all active watchAdvertisements</a> operations.</p>
@@ -2823,7 +2842,7 @@ packet and an optional scan response), it MUST run the following steps:
        <p>Let <var>device</var> be the <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device①⑥">Bluetooth device</a> that sent the
 advertising event.</p>
       <li data-md>
-       <p>For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice②⑨">BluetoothDevice</a></code> <var>deviceObj</var> in the UA such that <var>device</var> is the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device⑤">same device</a> as <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot④">[[representedDevice]]</a></code></code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑥">queue a
+       <p>For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice②⑨">BluetoothDevice</a></code> <var>deviceObj</var> in the UA such that <var>device</var> is the <a data-link-type="dfn" href="#same-bluetooth-device" id="ref-for-same-bluetooth-device⑤">same device</a> as <code><var>deviceObj</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot④">[[representedDevice]]</a></code></code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑦">queue a
 task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object①">relevant settings object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop①">responsible event loop</a> to do the following sub-steps:</p>
        <ol>
         <li data-md>
@@ -3033,7 +3052,7 @@ parallel</a>:
      <li data-md>
       <p><a data-link-type="dfn" href="#populate-the-bluetooth-cache" id="ref-for-populate-the-bluetooth-cache②">Populate the Bluetooth cache</a> with entries matching the description.</p>
      <li data-md>
-      <p>If the previous step returns an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑦">reject</a> <var>promise</var> with
+      <p>If the previous step returns an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑧">reject</a> <var>promise</var> with
 that error and abort these steps.</p>
      <li data-md>
       <p>Let <var>entries</var> be the sequence of known-present cache entries
@@ -3052,7 +3071,7 @@ Characteristic, or Descriptor, and add a mapping from <var>entry</var> to the re
         <p>Append to <var>result</var> the <code>Promise&lt;BluetoothGATT*></code> instance associated with <var>entry</var> in <var>context</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-attributeinstancemap-slot" id="ref-for-dom-bluetooth-attributeinstancemap-slot②">[[attributeInstanceMap]]</a></code>.</p>
       </ol>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve⑨">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#wait-for-all" id="ref-for-wait-for-all">waiting for all</a> elements of <var>result</var>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⓪">Resolve</a> <var>promise</var> with the result of <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#wait-for-all" id="ref-for-wait-for-all">waiting for all</a> elements of <var>result</var>.</p>
     </ol>
    </div>
    <div class="algorithm" data-algorithm="represented properties">
@@ -3078,7 +3097,7 @@ the type of <var>obj</var>:
 rejected with</a> that exception and abort these steps.</p>
      <li data-md>
       <p>If <var>uuid</var> is present and is <a data-link-type="dfn" href="#blocklisted" id="ref-for-blocklisted③">blocklisted</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①">a promise
-rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror④">SecurityError</a></code> and abort these steps.</p>
+rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑥">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Let <var>deviceObj</var> be, depending on the type of <var>attribute</var>:</p>
       <dl class="switch">
@@ -3266,10 +3285,10 @@ slots</a> described in the following table:</p>
      <li data-md>
       <p>Let <var>promise</var> be <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise⑥">a new promise</a>.</p>
      <li data-md>
-      <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑥">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑦">queue a
-task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑧">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①">NetworkError</a></code>, return <var>promise</var>, and abort these steps.</p>
+      <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑥">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑧">queue a
+task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①">NetworkError</a></code>, return <var>promise</var>, and abort these steps.</p>
      <li data-md>
-      <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑧">queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②">NetworkError</a></code>, return <var>promise</var>, and
+      <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑨">queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⓪">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②">NetworkError</a></code>, return <var>promise</var>, and
 abort these steps.</p>
       <p class="issue" id="issue-f363405f"><a class="self-link" href="#issue-f363405f"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror③">NetworkError</a></code>,
 but for now sites need to serialize their use of this API
@@ -3289,9 +3308,9 @@ Bearer</a>, do the following sub-steps:</p>
   if a connectable advertisement isn’t received.
   The website should call <code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-disconnect" id="ref-for-dom-bluetoothremotegattserver-disconnect④">disconnect()</a></code> if it no longer wants to connect. </div>
          <li data-md>
-          <p>If this attempt was aborted because <var>promise</var> was removed from <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot②">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⓪">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror②">AbortError</a></code> and abort these steps.</p>
+          <p>If this attempt was aborted because <var>promise</var> was removed from <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot②">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①①">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror②">AbortError</a></code> and abort these steps.</p>
          <li data-md>
-          <p>If this attempt failed for another reason, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror④">NetworkError</a></code> and abort these steps.</p>
+          <p>If this attempt failed for another reason, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror④">NetworkError</a></code> and abort these steps.</p>
          <li data-md>
           <p>Use the <a data-link-type="dfn" href="#exchange-mtu" id="ref-for-exchange-mtu">Exchange MTU</a> procedure to negotiate the largest
 supported MTU. Ignore any errors from this step.</p>
@@ -3308,18 +3327,18 @@ pairing dialog to appear when a connection is created, instead of
 when a restricted characteristic is accessed.</p>
         </ol>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task⑨">Queue a task</a> to perform the following sub-steps:</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⓪">Queue a task</a> to perform the following sub-steps:</p>
         <ol>
          <li data-md>
-          <p>If <var>promise</var> is not in <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot③">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①②">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror③">AbortError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑧">[[representedDevice]]</a></code></code>, and abort these steps.</p>
+          <p>If <var>promise</var> is not in <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot③">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①③">reject</a> <var>promise</var> with an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#aborterror" id="ref-for-aborterror③">AbortError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑧">[[representedDevice]]</a></code></code>, and abort these steps.</p>
          <li data-md>
           <p>Remove <var>promise</var> from <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot④">[[activeAlgorithms]]</a></code></code>.</p>
          <li data-md>
-          <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑨">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①③">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror⑤">NetworkError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection①">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot①⓪">[[representedDevice]]</a></code></code>, and abort these steps.</p>
+          <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot⑨">[[representedDevice]]</a></code></code> is <code>null</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①④">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror⑤">NetworkError</a></code>, <a data-link-type="dfn" href="#garbage-collect-the-connection" id="ref-for-garbage-collect-the-connection①">garbage-collect the connection</a> of <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-representeddevice-slot" id="ref-for-dom-bluetoothdevice-representeddevice-slot①⓪">[[representedDevice]]</a></code></code>, and abort these steps.</p>
          <li data-md>
           <p>Set <code>this.connected</code> to <code>true</code>.</p>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⓪">Resolve</a> <var>promise</var> with <code>this</code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①①">Resolve</a> <var>promise</var> with <code>this</code>.</p>
         </ol>
       </ol>
     </ol>
@@ -3434,7 +3453,7 @@ they finish. We wrap the returned <code class="idl"><a data-link-type="idl" href
      The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export id="dom-bluetoothremotegattserver-getprimaryservice"><code>getPrimaryService(<var>service</var>)</code></dfn></code> method, when invoked, MUST perform the following steps: 
     <ol>
      <li data-md>
-      <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot④">[[allowedServices]]</a></code></code> is not <code>"all"</code> and <var>service</var> is not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑤">[[allowedServices]]</a></code></code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with④">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑤">SecurityError</a></code> and abort these steps.</p>
+      <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot④">[[allowedServices]]</a></code></code> is not <code>"all"</code> and <var>service</var> is not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑤">[[allowedServices]]</a></code></code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with④">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑦">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br> <i>single</i>=true,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice⑦">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑥">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span></p>
     </ol>
@@ -3459,7 +3478,7 @@ they finish. We wrap the returned <code class="idl"><a data-link-type="idl" href
      The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTServer" data-dfn-type="method" data-export data-lt="getPrimaryServices(service)|getPrimaryServices()" id="dom-bluetoothremotegattserver-getprimaryservices"><code>getPrimaryServices(<var>service</var>)</code></dfn></code> method, when invoked, MUST perform the following steps: 
     <ol>
      <li data-md>
-      <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑦">[[allowedServices]]</a></code></code> is not <code>"all"</code>, and <var>service</var> is present and not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑧">[[allowedServices]]</a></code></code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑤">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑥">SecurityError</a></code> and abort these steps.</p>
+      <p>If <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑦">[[allowedServices]]</a></code></code> is not <code>"all"</code>, and <var>service</var> is present and not in <code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑧">[[allowedServices]]</a></code></code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑤">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑧">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Return <a data-link-type="dfn" href="#getgattchildren" id="ref-for-getgattchildren①">GetGATTChildren</a>(<span class="argument-list"><i>attribute</i>=<code>this.device</code>,<br> <i>single</i>=false,<br> <i>uuidCanonicalizer</i>=<code class="idl"><a data-link-type="idl" href="#dom-bluetoothuuid-getservice" id="ref-for-dom-bluetoothuuid-getservice⑧">BluetoothUUID.getService</a></code>,<br> <i>uuid</i>=<code><var>service</var></code>,<br> <i>allowedUuids</i>=<code>this.device.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothdevice-allowedservices-slot" id="ref-for-dom-bluetoothdevice-allowedservices-slot⑨">[[allowedServices]]</a></code></code>,<br> <i>child type</i>="GATT Primary Service")</span></p>
     </ol>
@@ -3581,7 +3600,7 @@ Service <var>service</var>, the UA must return <a data-link-type="dfn" href="htt
      <li data-md>
       <p><a data-link-type="dfn" href="#get-the-bluetoothdevice-representing" id="ref-for-get-the-bluetoothdevice-representing③">Get the <code>BluetoothDevice</code> representing</a> the device in which <var>service</var> appears, and let <var>device</var> be the result.</p>
      <li data-md>
-      <p>If the previous step threw an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①④">reject</a> <var>promise</var> with
+      <p>If the previous step threw an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑤">reject</a> <var>promise</var> with
 that error and abort these steps.</p>
      <li data-md>
       <p>Initialize <code><var>result</var>.device</code> from <var>device</var>.</p>
@@ -3590,7 +3609,7 @@ that error and abort these steps.</p>
      <li data-md>
       <p>If <var>service</var> is a Primary Service, initialize <code><var>result</var>.isPrimary</code> to true. Otherwise initialize <code><var>result</var>.isPrimary</code> to false.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①①">Resolve</a> <var>promise</var> with <var>result</var>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①②">Resolve</a> <var>promise</var> with <var>result</var>.</p>
     </ol>
    </div>
    <div class="mdn-anno wrapped">
@@ -3792,14 +3811,14 @@ Characteristic</a> <var>characteristic</var>, and let <var>propertiesPromise</va
      <li data-md>
       <p>Wait for <var>propertiesPromise</var> to settle.</p>
      <li data-md>
-      <p>If <var>propertiesPromise</var> was rejected, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①②">resolve</a> <var>promise</var> with <var>propertiesPromise</var> and abort these steps.</p>
+      <p>If <var>propertiesPromise</var> was rejected, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①③">resolve</a> <var>promise</var> with <var>propertiesPromise</var> and abort these steps.</p>
      <li data-md>
       <p>Initialize <code><var>result</var>.properties</code> from the value <var>propertiesPromise</var> was fulfilled with.</p>
      <li data-md>
       <p>Initialize <code><var>result</var>.value</code> to <code>null</code>. The UA
 MAY initialize <code><var>result</var>.value</code> to a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor⑨">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor②">ArrayBuffer</a></code> containing the most recently read value from <var>characteristic</var> if this value is available.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①③">Resolve</a> <var>promise</var> with <var>result</var>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①④">Resolve</a> <var>promise</var> with <var>result</var>.</p>
     </ol>
    </div>
    <div class="mdn-anno wrapped">
@@ -3867,7 +3886,7 @@ MAY initialize <code><var>result</var>.value</code> to a new <code class="idl"><
     <ol>
      <li data-md>
       <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads">blocklisted for reads</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑥">a promise
-rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑦">SecurityError</a></code> and abort these steps.</p>
+rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑨">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected⑤">connected</a></code> </code> is <code>false</code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑦">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror⑧">NetworkError</a></code> and abort these steps.</p>
      <li data-md>
@@ -3880,9 +3899,9 @@ wrapper</a> around <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/
 following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①①">in parallel</a>:</p>
       <ol>
        <li data-md>
-        <p>If the <code>Read</code> bit is not set in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties">properties</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑤">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and abort these steps.</p>
+        <p>If the <code>Read</code> bit is not set in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties">properties</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑥">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notsupportederror" id="ref-for-notsupportederror①">NotSupportedError</a></code> and abort these steps.</p>
        <li data-md>
-        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑥">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror⑨">NetworkError</a></code> and abort these steps.</p>
+        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑦">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror⑨">NetworkError</a></code> and abort these steps.</p>
         <p class="issue" id="issue-f363405f①"><a class="self-link" href="#issue-f363405f①"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⓪">NetworkError</a></code>,
 but for now sites need to serialize their use of this API and/or give
 the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">[Issue #188]</a></p>
@@ -3891,12 +3910,12 @@ the user a way to retry failed operations. <a href="https://github.com/WebBlueto
 Read</a> procedure to retrieve the value of <var>characteristic</var>.
 Handle errors as described in <a href="#error-handling">§ 6.7 Error handling</a>.</p>
        <li data-md>
-        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑦">reject</a> <var>promise</var> with that error and abort these steps.</p>
+        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑧">reject</a> <var>promise</var> with that error and abort these steps.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⓪">Queue a task</a> to perform the following steps:</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①①">Queue a task</a> to perform the following steps:</p>
         <ol>
          <li data-md>
-          <p>If <var>promise</var> is not in <code> this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①⓪">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑧">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①①">NetworkError</a></code> and abort
+          <p>If <var>promise</var> is not in <code> this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①⓪">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①①">NetworkError</a></code> and abort
 these steps.</p>
          <li data-md>
           <p>Let <var>buffer</var> be an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor③">ArrayBuffer</a></code> holding the retrieved
@@ -3904,7 +3923,7 @@ value, and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.val
          <li data-md>
           <p><a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-event-fire" id="ref-for-concept-event-fire②">Fire an event</a> named <code class="idl"><a data-link-type="idl" href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged" id="ref-for-eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged①">characteristicvaluechanged</a></code> with its <code>bubbles</code> attribute initialized to <code>true</code> at <code>this</code>.</p>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①④">Resolve</a> <var>promise</var> with <code>this.value</code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑤">Resolve</a> <var>promise</var> with <code>this.value</code>.</p>
         </ol>
       </ol>
     </ol>
@@ -3913,7 +3932,7 @@ value, and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.val
      To <dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="writecharacteristicvalue">WriteCharacteristicValue</dfn>(<span class="argument-list"> <var>this</var>: BluetoothRemoteGATTCharacteristic,<br> <var>value</var>: BufferSource,<br> <var>response</var>: string), </span><br> the UA MUST perform the following steps: 
     <ol>
      <li data-md>
-      <p>If <code><var>this</var>.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes">blocklisted for writes</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑨">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑧">SecurityError</a></code> and abort these steps.</p>
+      <p>If <code><var>this</var>.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes">blocklisted for writes</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with⑨">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①⓪">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Let <var>bytes</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy" id="ref-for-dfn-get-buffer-source-copy⑥">a copy of the bytes held</a> by <code><var>value</var></code>.</p>
      <li data-md>
@@ -3932,7 +3951,7 @@ rejected with</a> an <code class="idl"><a data-link-type="idl" href="https://web
        <li data-md>
         <p class="assertion">Assert: <var>response</var> is one of "required", "never", or "optional".</p>
        <li data-md>
-        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①③">NetworkError</a></code> and abort these steps.</p>
+        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⓪">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①③">NetworkError</a></code> and abort these steps.</p>
         <p class="issue" id="issue-f363405f②"><a class="self-link" href="#issue-f363405f②"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①④">NetworkError</a></code>,
 but for now sites need to serialize their use of this API
 and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">[Issue #188]</a></p>
@@ -3950,17 +3969,17 @@ following steps:</p>
         </dl>
          Handle errors as described in <a href="#error-handling">§ 6.7 Error handling</a>. 
        <li data-md>
-        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⓪">reject</a> <var>promise</var> with that error and abort these steps.</p>
+        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②①">reject</a> <var>promise</var> with that error and abort these steps.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①①">Queue a task</a> to perform the following steps:</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①②">Queue a task</a> to perform the following steps:</p>
         <ol>
          <li data-md>
-          <p>If <var>promise</var> is not in <code><var>this</var>.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①①">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑤">NetworkError</a></code> and abort
+          <p>If <var>promise</var> is not in <code><var>this</var>.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①①">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑤">NetworkError</a></code> and abort
 these steps.</p>
          <li data-md>
           <p>Set <code><var>this</var>.value</code> to a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①⓪">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor④">ArrayBuffer</a></code> containing <var>bytes</var>.</p>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑤">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑥">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
         </ol>
       </ol>
     </ol>
@@ -4050,20 +4069,20 @@ promise</a> <var>promise</var> and run the following steps <a data-link-type="df
 See <a href="#notification-events">§ 6.6.4 Responding to Notifications and Indications</a> for details of receiving notifications. 
     <ol>
      <li data-md>
-      <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads①">blocklisted for reads</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror⑨">SecurityError</a></code> and abort these steps.</p>
+      <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads①">blocklisted for reads</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②③">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①①">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
-      <p>If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected⑦">connected</a></code> </code> is <code>false</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②③">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑥">NetworkError</a></code> and abort these steps.</p>
+      <p>If <code>this.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected⑦">connected</a></code> </code> is <code>false</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②④">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑥">NetworkError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Let <var>characteristic</var> be <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot" id="ref-for-dom-bluetoothremotegattcharacteristic-representedcharacteristic-slot④">[[representedCharacteristic]]</a></code></code>.</p>
      <li data-md>
       <p>If <var>characteristic</var> is <code>null</code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①③">a promise rejected with</a> an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidstateerror" id="ref-for-invalidstateerror⑤">InvalidStateError</a></code> and abort these steps.</p>
      <li data-md>
       <p>If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties①">properties</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②④">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notsupportederror" id="ref-for-notsupportederror②">NotSupportedError</a></code> and abort these steps.</p>
+in <var>characteristic</var>’s <a data-link-type="dfn" href="#characteristic-properties" id="ref-for-characteristic-properties①">properties</a>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑤">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notsupportederror" id="ref-for-notsupportederror②">NotSupportedError</a></code> and abort these steps.</p>
      <li data-md>
-      <p>If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth①">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑥">resolve</a> <var>promise</var> with <code>this</code> and abort these steps.</p>
+      <p>If <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set">active notification context set</a> contains <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth①">navigator.bluetooth</a></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑦">resolve</a> <var>promise</var> with <code>this</code> and abort these steps.</p>
      <li data-md>
-      <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑤">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑦">NetworkError</a></code> and abort these steps.</p>
+      <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑥">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑦">NetworkError</a></code> and abort these steps.</p>
       <p class="issue" id="issue-f363405f③"><a class="self-link" href="#issue-f363405f③"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑧">NetworkError</a></code>, but
 for now sites need to serialize their use of this API and/or give the user a
 way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">[Issue #188]</a></p>
@@ -4079,12 +4098,12 @@ bits are set. Handle errors as described in <a href="#error-handling">§ 6.7 E
   tend to send notifications or indications unconditionally, so this
   specification allows applications to simply subscribe to their messages. </div>
      <li data-md>
-      <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑥">reject</a> <var>promise</var> with
+      <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑦">reject</a> <var>promise</var> with
 that error and abort these steps.</p>
      <li data-md>
       <p>Add <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth②">navigator.bluetooth</a></code> to <var>characteristic</var>’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set①">active notification context set</a>.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑦">Resolve</a> <var>promise</var> with <code>this</code>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑧">Resolve</a> <var>promise</var> with <code>this</code>.</p>
     </ol>
     <div class="note" role="note"> Note: After notifications are enabled, the resulting <a href="#notification-events">value-change events</a> won’t be delivered until
 after the current <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#perform-a-microtask-checkpoint" id="ref-for-perform-a-microtask-checkpoint">microtask
@@ -4124,7 +4143,7 @@ Descriptors</a> procedures to clear the <code>Notification</code> and <code>Indi
 Characteristic Configuration</a> descriptor. </p>
      <p></p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①②">Queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑧">resolve</a> <var>promise</var> with <code>this</code>.</p>
+      <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①③">Queue a task</a> to <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑨">resolve</a> <var>promise</var> with <code>this</code>.</p>
     </ol>
     <div class="note" role="note"> Note: Queuing a task to resolve the promise ensures that no <a href="#notification-events">value change events</a> due to notifications
 arrive after the promise resolves. </div>
@@ -4319,7 +4338,7 @@ Handle errors as described in <a href="#error-handling">§ 6.7 Error handling<
 the extended properties are immutable for a given Characteristic.
 If they are, the UA should be allowed to cache them.</p>
        <li data-md>
-        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑦">reject</a> <var>promise</var> with that error and abort these steps.</p>
+        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑧">reject</a> <var>promise</var> with that error and abort these steps.</p>
        <li data-md>
         <p>Initialize <code><var>propertiesObj</var>.reliableWrite</code> from the
 Reliable Write bit of <var>extendedProperties</var>.</p>
@@ -4328,7 +4347,7 @@ Reliable Write bit of <var>extendedProperties</var>.</p>
 the Writable Auxiliaries bit of <var>extendedProperties</var>.</p>
       </ol>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve①⑨">Resolve</a> <var>promise</var> with <var>propertiesObj</var>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②⓪">Resolve</a> <var>promise</var> with <var>propertiesObj</var>.</p>
     </ol>
    </div>
    <h3 class="heading settled" data-level="6.5" id="bluetoothgattdescriptor-interface"><span class="secno">6.5. </span><span class="content">BluetoothRemoteGATTDescriptor</span><a class="self-link" href="#bluetoothgattdescriptor-interface"></a></h3>
@@ -4447,7 +4466,7 @@ The UA MAY initialize <code><var>result</var>.value</code> to
 a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①③">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor⑤">ArrayBuffer</a></code> containing
 the most recently read value from <var>descriptor</var> if this value is available.</p>
      <li data-md>
-      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②⓪">Resolve</a> <var>promise</var> with <var>result</var>.</p>
+      <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②①">Resolve</a> <var>promise</var> with <var>result</var>.</p>
     </ol>
    </div>
    <div class="mdn-anno wrapped">
@@ -4470,7 +4489,7 @@ the most recently read value from <var>descriptor</var> if this value is availab
      The <code><dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothRemoteGATTDescriptor" data-dfn-type="method" data-export data-lt="readValue()" id="dom-bluetoothremotegattdescriptor-readvalue"><code> readValue()</code></dfn></code> method, when invoked, MUST run the following steps: 
     <ol>
      <li data-md>
-      <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads②">blocklisted for reads</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①⑤">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①⓪">SecurityError</a></code> and abort these steps.</p>
+      <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-reads" id="ref-for-blocklisted-for-reads②">blocklisted for reads</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①⑤">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①②">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>If <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-connected" id="ref-for-dom-bluetoothremotegattserver-connected⑧">connected</a></code></code> is <code>false</code>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①⑥">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror①⑨">NetworkError</a></code> and
 abort these steps.</p>
@@ -4482,7 +4501,7 @@ abort these steps.</p>
       <p>Return a <code>this.characteristic.service.device.gatt</code>- <a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper③">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise①⑤">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel①⑥">in parallel</a>:</p>
       <ol>
        <li data-md>
-        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑧">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②⓪">NetworkError</a></code> and abort these steps.</p>
+        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑨">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②⓪">NetworkError</a></code> and abort these steps.</p>
         <p class="issue" id="issue-f363405f④"><a class="self-link" href="#issue-f363405f④"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②①">NetworkError</a></code>,
 but for now sites need to serialize their use of this API
 and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">[Issue #188]</a></p>
@@ -4490,18 +4509,18 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
         <p>Use either the <a data-link-type="dfn" href="#read-characteristic-descriptors" id="ref-for-read-characteristic-descriptors①">Read Characteristic Descriptors</a> or the <a data-link-type="dfn" href="#read-long-characteristic-descriptors" id="ref-for-read-long-characteristic-descriptors">Read Long Characteristic Descriptors</a> sub-procedure to retrieve
 the value of <var>descriptor</var>. Handle errors as described in <a href="#error-handling">§ 6.7 Error handling</a>.</p>
        <li data-md>
-        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②⑨">reject</a> <var>promise</var> with that error and abort these steps.</p>
+        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③⓪">reject</a> <var>promise</var> with that error and abort these steps.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①③">Queue a task</a> to perform the following steps:</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①④">Queue a task</a> to perform the following steps:</p>
         <ol>
          <li data-md>
-          <p>If <var>promise</var> is not in <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①②">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③⓪">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②②">NetworkError</a></code> and abort
+          <p>If <var>promise</var> is not in <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①②">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②②">NetworkError</a></code> and abort
 these steps.</p>
          <li data-md>
           <p>Let <var>buffer</var> be an <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor⑥">ArrayBuffer</a></code> holding the retrieved
 value, and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.value</code>.</p>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②①">Resolve</a> <var>promise</var> with <code>this.value</code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②②">Resolve</a> <var>promise</var> with <code>this.value</code>.</p>
         </ol>
       </ol>
     </ol>
@@ -4527,7 +4546,7 @@ value, and assign <code>new DataView(<var>buffer</var>)</code> to <code>this.val
 following steps: 
     <ol>
      <li data-md>
-      <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes①">blocklisted for writes</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①⑧">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①①">SecurityError</a></code> and abort these steps.</p>
+      <p>If <code>this.uuid</code> is <a data-link-type="dfn" href="#blocklisted-for-writes" id="ref-for-blocklisted-for-writes①">blocklisted for writes</a>, return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-promise-rejected-with" id="ref-for-a-promise-rejected-with①⑧">a promise rejected with</a> a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①③">SecurityError</a></code> and abort these steps.</p>
      <li data-md>
       <p>Let <var>bytes</var> be <a data-link-type="dfn" href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy" id="ref-for-dfn-get-buffer-source-copy⑦">a copy of the bytes held</a> by <code><var>value</var></code>.</p>
      <li data-md>
@@ -4545,7 +4564,7 @@ abort these steps.</p>
       <p>Return a <code>this.characteristic.service.device.gatt</code>- <a data-link-type="dfn" href="#connection-checking-wrapper" id="ref-for-connection-checking-wrapper④">connection-checking wrapper</a> around <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise①⑥">a new promise</a> <var>promise</var> and run the following steps in parallel.</p>
       <ol>
        <li data-md>
-        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②④">NetworkError</a></code> and abort these steps.</p>
+        <p>If the UA is currently using the Bluetooth system, it MAY <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②④">NetworkError</a></code> and abort these steps.</p>
         <p class="issue" id="issue-f363405f⑤"><a class="self-link" href="#issue-f363405f⑤"></a> Implementations may be able to avoid this <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②⑤">NetworkError</a></code>,
 but for now sites need to serialize their use of this API
 and/or give the user a way to retry failed operations. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/188">[Issue #188]</a></p>
@@ -4553,17 +4572,17 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
         <p>Use either the <a data-link-type="dfn" href="#write-characteristic-descriptors" id="ref-for-write-characteristic-descriptors">Write Characteristic Descriptors</a> or the <a data-link-type="dfn" href="#write-long-characteristic-descriptors" id="ref-for-write-long-characteristic-descriptors">Write
 Long Characteristic Descriptors</a> sub-procedure to write <var>bytes</var> to <var>descriptor</var>. Handle errors as described in <a href="#error-handling">§ 6.7 Error handling</a>.</p>
        <li data-md>
-        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③②">reject</a> <var>promise</var> with that error and abort these steps.</p>
+        <p>If the previous step returned an error, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③③">reject</a> <var>promise</var> with that error and abort these steps.</p>
        <li data-md>
-        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①④">Queue a task</a> to perform the following steps:</p>
+        <p><a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑤">Queue a task</a> to perform the following steps:</p>
         <ol>
          <li data-md>
-          <p>If <var>promise</var> is not in <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①③">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③③">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②⑥">NetworkError</a></code> and abort
+          <p>If <var>promise</var> is not in <code>this.characteristic.service.device.gatt.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothremotegattserver-activealgorithms-slot" id="ref-for-dom-bluetoothremotegattserver-activealgorithms-slot①③">[[activeAlgorithms]]</a></code></code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③④">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#networkerror" id="ref-for-networkerror②⑥">NetworkError</a></code> and abort
 these steps.</p>
          <li data-md>
           <p>Set <code>this.value</code> to a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-dataview-constructor" id="ref-for-sec-dataview-constructor①④">DataView</a></code> wrapping a new <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-arraybuffer-constructor" id="ref-for-sec-arraybuffer-constructor⑦">ArrayBuffer</a></code> containing <var>bytes</var>.</p>
          <li data-md>
-          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②②">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
+          <p><a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#resolve" id="ref-for-resolve②③">Resolve</a> <var>promise</var> with <code>undefined</code>.</p>
         </ol>
       </ol>
     </ol>
@@ -4638,7 +4657,7 @@ the order returned by the <a data-link-type="dfn" href="#discover-all-characteri
      When a <a data-link-type="dfn" href="#bluetooth-device" id="ref-for-bluetooth-device①⑦">Bluetooth device</a> <var>device</var>’s <a data-link-type="dfn" href="#att-bearer" id="ref-for-att-bearer⑦">ATT Bearer</a> is lost
 (e.g. because the remote device moved out of range or the user used a platform
 feature to disconnect it), for each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice④④">BluetoothDevice</a></code> <var>deviceObj</var> the
-UA MUST <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑤">queue a task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object③">relevant settings
+UA MUST <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑥">queue a task</a> on <var>deviceObj</var>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object" id="ref-for-relevant-settings-object③">relevant settings
 object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop②">responsible event loop</a> to perform the following steps: 
     <ol>
      <li data-md>
@@ -4691,7 +4710,7 @@ it must perform the following steps:
     <ol>
      <li data-md>
       <p>For each <var>bluetoothGlobal</var> in the Characteristic’s <a data-link-type="dfn" href="#active-notification-context-set" id="ref-for-active-notification-context-set⑤">active
-notification context set</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑥">queue a task</a> on the event loop of the
+notification context set</a>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑦">queue a task</a> on the event loop of the
 script settings object of <var>bluetoothGlobal</var> to do the following
 sub-steps:</p>
       <ol>
@@ -4796,7 +4815,7 @@ from both.</p>
       <li data-md>
        <p>Let <var>invalidatedAttributes</var> be the attributes in <var>removedAttributes</var> but not <var>addedAttributes</var>.</p>
       <li data-md>
-       <p>For each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a> <var>settings</var> in the UA, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑦">queue a
+       <p>For each <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#environment-settings-object" id="ref-for-environment-settings-object">environment settings object</a> <var>settings</var> in the UA, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑧">queue a
 task</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop③">responsible event loop</a> to do the following sub-steps:</p>
        <ol>
         <li data-md>
@@ -4830,7 +4849,7 @@ had existed at the time of the call, the UA MAY remove the <a data-link-type="df
 contain any <a data-link-type="dfn" href="#service" id="ref-for-service①⑦">Service</a> in <var>removedAttributes</var>, <var>addedAttributes</var>, and <var>changedServices</var>.</p>
       <li data-md>
        <p>For each <code class="idl"><a data-link-type="idl" href="#bluetoothdevice" id="ref-for-bluetoothdevice④⑤">BluetoothDevice</a></code> <var>deviceObj</var> that is connected to a
-device in <var>changedDevices</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑧">queue a task</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global⑤">relevant
+device in <var>changedDevices</var>, <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task" id="ref-for-queue-a-task①⑨">queue a task</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global⑧">relevant
 global object</a>’s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop" id="ref-for-responsible-event-loop④">responsible event loop</a> to do the following steps:</p>
        <ol>
         <li data-md>
@@ -4922,10 +4941,10 @@ Fundamentals</a>) is absent or terminated for any reason, return a <code class="
        <dt><code>Insufficient Encryption Key Size</code>
        <dd> The UA SHOULD attempt to increase the security level of the connection.
     If this attempt fails or the UA doesn’t support any higher security,
-    Return a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①②">SecurityError</a></code> from the step.
+    Return a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①④">SecurityError</a></code> from the step.
     Otherwise, retry the step at the new higher security level. 
        <dt><code>Insufficient Authorization</code>
-       <dd> Return a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①③">SecurityError</a></code> from the step. 
+       <dd> Return a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror①⑤">SecurityError</a></code> from the step. 
        <dt><code>Application Error</code>
        <dd> If the GATT procedure was a Write,
     return an <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#invalidmodificationerror" id="ref-for-invalidmodificationerror④">InvalidModificationError</a></code> from the step.
@@ -5135,7 +5154,13 @@ blocklist</a>.</p>
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#bluetooth" id="ref-for-bluetooth①②"><c- n>Bluetooth</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="Navigator" data-dfn-type="attribute" data-export data-readonly data-type="Bluetooth" id="dom-navigator-bluetooth"><code><c- g>bluetooth</c-></code></dfn>;
 };
 </pre>
-   <h2 class="heading settled" data-level="10" id="terminology"><span class="secno">10. </span><span class="content">Terminology and Conventions</span><a class="self-link" href="#terminology"></a></h2>
+   <h2 class="heading settled" data-level="10" id="integrations"><span class="secno">10. </span><span class="content">Integrations</span><a class="self-link" href="#integrations"></a></h2>
+   <h3 class="heading settled" data-level="10.1" id="permissions-policy"><span class="secno">10.1. </span><span class="content">Permissions Policy</span><a class="self-link" href="#permissions-policy"></a></h3>
+   <p>This specification defines a <a data-link-type="dfn" href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature" id="ref-for-policy-controlled-feature③">policy-controlled feature</a>, identified by
+the token "<dfn class="dfn-paneled" data-dfn-for="policy-controlled feature" data-dfn-type="dfn" data-noexport id="policy-controlled-feature-bluetooth"><code>bluetooth</code></dfn>",
+that controls whether the methods exposed by the <code class="idl"><a data-link-type="idl" href="#dom-navigator-bluetooth" id="ref-for-dom-navigator-bluetooth⑦">bluetooth</a></code> attribute on the <code class="idl"><a data-link-type="idl" href="https://html.spec.whatwg.org/multipage/system-state.html#navigator" id="ref-for-navigator①">Navigator</a></code> object may be used.</p>
+   <p>The <a data-link-type="dfn" href="https://w3c.github.io/webappsec-permissions-policy/#default-allowlist" id="ref-for-default-allowlist">default allowlist</a> for this feature is <code>["self"]</code>.</p>
+   <h2 class="heading settled" data-level="11" id="terminology"><span class="secno">11. </span><span class="content">Terminology and Conventions</span><a class="self-link" href="#terminology"></a></h2>
    <p>This specification uses a few conventions and several terms from other
   specifications. This section lists those and links to their primary
   definitions.</p>
@@ -5576,30 +5601,30 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#dom-bluetoothremotegattserver-activealgorithms-slot">[[activeAlgorithms]]</a><span>, in § 6.2</span>
    <li><a href="#active-notification-context-set">active notification context set</a><span>, in § 6.4</span>
    <li><a href="#add-device-to-storage">add device to storage</a><span>, in § 4</span>
-   <li><a href="#ad-structure">AD structure</a><span>, in § 10</span>
+   <li><a href="#ad-structure">AD structure</a><span>, in § 11</span>
    <li><a href="#eventdef-bluetoothdevice-advertisementreceived">advertisementreceived</a><span>, in § 6.6.2</span>
-   <li><a href="#advertising-data">Advertising Data</a><span>, in § 10</span>
-   <li><a href="#advertising-event">advertising event</a><span>, in § 10</span>
-   <li><a href="#advertising-event">advertising events</a><span>, in § 10</span>
+   <li><a href="#advertising-data">Advertising Data</a><span>, in § 11</span>
+   <li><a href="#advertising-event">advertising event</a><span>, in § 11</span>
+   <li><a href="#advertising-event">advertising events</a><span>, in § 11</span>
    <li><a href="#dictdef-allowedbluetoothdevice">AllowedBluetoothDevice</a><span>, in § 4.1</span>
    <li><a href="#dom-bluetoothpermissionstorage-alloweddevices">allowedDevices</a><span>, in § 4.1</span>
    <li><a href="#dom-bluetoothdevice-allowedmanufacturerdata-slot">[[allowedManufacturerData]]</a><span>, in § 5.2</span>
    <li><a href="#dom-allowedbluetoothdevice-allowedmanufacturerdata">allowedManufacturerData</a><span>, in § 4.1</span>
    <li><a href="#dom-bluetoothdevice-allowedservices-slot">[[allowedServices]]</a><span>, in § 5.2</span>
    <li><a href="#dom-allowedbluetoothdevice-allowedservices">allowedServices</a><span>, in § 4.1</span>
-   <li><a href="#appearance">Appearance</a><span>, in § 10</span>
+   <li><a href="#appearance">Appearance</a><span>, in § 11</span>
    <li>
     appearance
     <ul>
      <li><a href="#dom-bluetoothadvertisingevent-appearance">attribute for BluetoothAdvertisingEvent</a><span>, in § 5.2.3</span>
      <li><a href="#dom-bluetoothadvertisingeventinit-appearance">dict-member for BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
     </ul>
-   <li><a href="#att-bearer">ATT Bearer</a><span>, in § 10</span>
+   <li><a href="#att-bearer">ATT Bearer</a><span>, in § 11</span>
    <li><a href="#attribute">Attribute</a><span>, in § 6.1</span>
-   <li><a href="#attribute-caching">Attribute Caching</a><span>, in § 10</span>
-   <li><a href="#attribute-handle">Attribute Handle</a><span>, in § 10</span>
+   <li><a href="#attribute-caching">Attribute Caching</a><span>, in § 11</span>
+   <li><a href="#attribute-handle">Attribute Handle</a><span>, in § 11</span>
    <li><a href="#dom-bluetooth-attributeinstancemap-slot">[[attributeInstanceMap]]</a><span>, in § 4</span>
-   <li><a href="#attribute-type">Attribute Type</a><span>, in § 10</span>
+   <li><a href="#attribute-type">Attribute Type</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-authenticatedsignedwrites">authenticatedSignedWrites</a><span>, in § 6.4.1</span>
    <li><a href="#eventdef-bluetooth-availabilitychanged">availabilitychanged</a><span>, in § 6.6.2</span>
    <li>
@@ -5608,13 +5633,18 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothmanufacturerdatamap-backingmap-slot">attribute for BluetoothManufacturerDataMap</a><span>, in § 5.2.3.1</span>
      <li><a href="#dom-bluetoothservicedatamap-backingmap-slot">attribute for BluetoothServiceDataMap</a><span>, in § 5.2.3.2</span>
     </ul>
-   <li><a href="#bd_addr">BD_ADDR</a><span>, in § 10</span>
+   <li><a href="#bd_addr">BD_ADDR</a><span>, in § 11</span>
    <li><a href="#blocklisted">blocklisted</a><span>, in § 8</span>
    <li><a href="#blocklisted-for-reads">blocklisted for reads</a><span>, in § 8</span>
    <li><a href="#blocklisted-for-writes">blocklisted for writes</a><span>, in § 8</span>
    <li><a href="#permissiondef-bluetooth">"bluetooth"</a><span>, in § 4.1</span>
    <li><a href="#bluetooth">Bluetooth</a><span>, in § 4</span>
-   <li><a href="#dom-navigator-bluetooth">bluetooth</a><span>, in § 9</span>
+   <li>
+    bluetooth
+    <ul>
+     <li><a href="#dom-navigator-bluetooth">attribute for Navigator</a><span>, in § 9</span>
+     <li><a href="#policy-controlled-feature-bluetooth">dfn for policy-controlled feature</a><span>, in § 10.1</span>
+    </ul>
    <li><a href="#bluetoothadvertisingevent">BluetoothAdvertisingEvent</a><span>, in § 5.2.3</span>
    <li><a href="#dictdef-bluetoothadvertisingeventinit">BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
    <li><a href="#dom-bluetoothadvertisingevent-bluetoothadvertisingevent">BluetoothAdvertisingEvent(type, init)</a><span>, in § 5.2.3</span>
@@ -5626,7 +5656,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#bluetooth-device">Bluetooth device</a><span>, in § 5.1</span>
    <li><a href="#bluetoothdevice">BluetoothDevice</a><span>, in § 5.2</span>
    <li><a href="#bluetoothdeviceeventhandlers">BluetoothDeviceEventHandlers</a><span>, in § 6.6.6</span>
-   <li><a href="#bluetooth-device-name">Bluetooth Device Name</a><span>, in § 10</span>
+   <li><a href="#bluetooth-device-name">Bluetooth Device Name</a><span>, in § 11</span>
    <li><a href="#dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</a><span>, in § 4</span>
    <li><a href="#dictdef-bluetoothmanufacturerdatafilterinit">BluetoothManufacturerDataFilterInit</a><span>, in § 4</span>
    <li><a href="#bluetoothmanufacturerdatamap">BluetoothManufacturerDataMap</a><span>, in § 5.2.3</span>
@@ -5642,10 +5672,10 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#typedefdef-bluetoothserviceuuid">BluetoothServiceUUID</a><span>, in § 7.1</span>
    <li><a href="#bluetooth-tree-bluetooth-tree">Bluetooth tree</a><span>, in § 6.6.1</span>
    <li><a href="#bluetoothuuid">BluetoothUUID</a><span>, in § 7.1</span>
-   <li><a href="#bond">bond</a><span>, in § 10</span>
-   <li><a href="#br-edr-bonding-procedure">BR/EDR Bonding Procedure</a><span>, in § 10</span>
+   <li><a href="#bond">bond</a><span>, in § 11</span>
+   <li><a href="#br-edr-bonding-procedure">BR/EDR Bonding Procedure</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-broadcast">broadcast</a><span>, in § 6.4.1</span>
-   <li><a href="#broadcaster">Broadcaster</a><span>, in § 10</span>
+   <li><a href="#broadcaster">Broadcaster</a><span>, in § 11</span>
    <li>
     canonicalizing
     <ul>
@@ -5653,22 +5683,22 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#bluetoothlescanfilterinit-canonicalizing">dfn for BluetoothLEScanFilterInit</a><span>, in § 4</span>
     </ul>
    <li><a href="#dom-bluetoothuuid-canonicaluuid">canonicalUUID(alias)</a><span>, in § 7.1</span>
-   <li><a href="#central">Central</a><span>, in § 10</span>
-   <li><a href="#characteristic">Characteristic</a><span>, in § 10</span>
+   <li><a href="#central">Central</a><span>, in § 11</span>
+   <li><a href="#characteristic">Characteristic</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothremotegattdescriptor-characteristic">characteristic</a><span>, in § 6.5</span>
-   <li><a href="#characteristic-descriptor-discovery">Characteristic Descriptor Discovery</a><span>, in § 10</span>
-   <li><a href="#characteristic-descriptors">Characteristic Descriptors</a><span>, in § 10</span>
-   <li><a href="#characteristic-discovery">Characteristic Discovery</a><span>, in § 10</span>
+   <li><a href="#characteristic-descriptor-discovery">Characteristic Descriptor Discovery</a><span>, in § 11</span>
+   <li><a href="#characteristic-descriptors">Characteristic Descriptors</a><span>, in § 11</span>
+   <li><a href="#characteristic-discovery">Characteristic Discovery</a><span>, in § 11</span>
    <li><a href="#characteristiceventhandlers">CharacteristicEventHandlers</a><span>, in § 6.6.6</span>
-   <li><a href="#characteristic-extended-properties">Characteristic Extended Properties</a><span>, in § 10</span>
-   <li><a href="#characteristic-properties">Characteristic Properties</a><span>, in § 10</span>
+   <li><a href="#characteristic-extended-properties">Characteristic Extended Properties</a><span>, in § 11</span>
+   <li><a href="#characteristic-properties">Characteristic Properties</a><span>, in § 11</span>
    <li><a href="#eventdef-bluetoothremotegattcharacteristic-characteristicvaluechanged">characteristicvaluechanged</a><span>, in § 6.6.2</span>
-   <li><a href="#characteristic-value-indications">Characteristic Value Indications</a><span>, in § 10</span>
-   <li><a href="#characteristic-value-notification">Characteristic Value Notification</a><span>, in § 10</span>
-   <li><a href="#characteristic-value-read">Characteristic Value Read</a><span>, in § 10</span>
-   <li><a href="#characteristic-value-write">Characteristic Value Write</a><span>, in § 10</span>
+   <li><a href="#characteristic-value-indications">Characteristic Value Indications</a><span>, in § 11</span>
+   <li><a href="#characteristic-value-notification">Characteristic Value Notification</a><span>, in § 11</span>
+   <li><a href="#characteristic-value-read">Characteristic Value Read</a><span>, in § 11</span>
+   <li><a href="#characteristic-value-write">Characteristic Value Write</a><span>, in § 11</span>
    <li><a href="#clean-up-the-disconnected-device">clean up the disconnected device</a><span>, in § 6.6.3</span>
-   <li><a href="#client-characteristic-configuration">Client Characteristic Configuration</a><span>, in § 10</span>
+   <li><a href="#client-characteristic-configuration">Client Characteristic Configuration</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothmanufacturerdatafilterinit-companyidentifier">companyIdentifier</a><span>, in § 4</span>
    <li><a href="#dom-bluetoothremotegattserver-connect">connect()</a><span>, in § 6.2</span>
    <li><a href="#dom-bluetoothremotegattserver-connected">connected</a><span>, in § 6.2</span>
@@ -5682,8 +5712,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#create-a-bluetoothremotegattdescriptor-representing">create a BluetoothRemoteGATTDescriptor representing</a><span>, in § 6.5</span>
    <li><a href="#create-a-bluetoothremotegattservice-representing">create a BluetoothRemoteGATTService representing</a><span>, in § 6.3</span>
    <li><a href="#dom-bluetoothdatafilterinit-dataprefix">dataPrefix</a><span>, in § 4</span>
-   <li><a href="#definition-of-keys-and-values">Definition of Keys and Values</a><span>, in § 10</span>
-   <li><a href="#descriptor">Descriptor</a><span>, in § 10</span>
+   <li><a href="#definition-of-keys-and-values">Definition of Keys and Values</a><span>, in § 11</span>
+   <li><a href="#descriptor">Descriptor</a><span>, in § 11</span>
    <li><a href="#dom-allowedbluetoothdevice-device-slot">[[device]]</a><span>, in § 4.1</span>
    <li>
     device
@@ -5693,7 +5723,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothremotegattservice-device">attribute for BluetoothRemoteGATTService</a><span>, in § 6.3</span>
      <li><a href="#dom-bluetoothadvertisingeventinit-device">dict-member for BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
     </ul>
-   <li><a href="#device-discovery-procedure">Device Discovery Procedure</a><span>, in § 10</span>
+   <li><a href="#device-discovery-procedure">Device Discovery Procedure</a><span>, in § 11</span>
    <li>
     deviceId
     <ul>
@@ -5703,13 +5733,13 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#dom-bluetooth-deviceinstancemap-slot">[[deviceInstanceMap]]</a><span>, in § 4</span>
    <li><a href="#dom-bluetoothpermissionresult-devices">devices</a><span>, in § 4.1</span>
    <li><a href="#dom-bluetoothremotegattserver-disconnect">disconnect()</a><span>, in § 6.2</span>
-   <li><a href="#discoverable-mode">Discoverable Mode</a><span>, in § 10</span>
-   <li><a href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a><span>, in § 10</span>
-   <li><a href="#discover-characteristics-by-uuid">Discover Characteristics by UUID</a><span>, in § 10</span>
-   <li><a href="#discover-primary-service-by-service-uuid">Discover Primary Service by Service UUID</a><span>, in § 10</span>
-   <li><a href="#error-response">Error Response</a><span>, in § 10</span>
-   <li><a href="#exchange-mtu">Exchange MTU</a><span>, in § 10</span>
-   <li><a href="#extended-inquiry-response">Extended Inquiry Response</a><span>, in § 10</span>
+   <li><a href="#discoverable-mode">Discoverable Mode</a><span>, in § 11</span>
+   <li><a href="#discover-all-characteristic-descriptors">Discover All Characteristic Descriptors</a><span>, in § 11</span>
+   <li><a href="#discover-characteristics-by-uuid">Discover Characteristics by UUID</a><span>, in § 11</span>
+   <li><a href="#discover-primary-service-by-service-uuid">Discover Primary Service by Service UUID</a><span>, in § 11</span>
+   <li><a href="#error-response">Error Response</a><span>, in § 11</span>
+   <li><a href="#exchange-mtu">Exchange MTU</a><span>, in § 11</span>
+   <li><a href="#extended-inquiry-response">Extended Inquiry Response</a><span>, in § 11</span>
    <li>
     filters
     <ul>
@@ -5717,25 +5747,25 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-requestdeviceoptions-filters">dict-member for RequestDeviceOptions</a><span>, in § 4</span>
     </ul>
    <li><a href="#fire-an-advertisementreceived-event">fire an advertisementreceived event</a><span>, in § 5.2.3</span>
-   <li><a href="#flags-data-type">Flags Data Type</a><span>, in § 10</span>
+   <li><a href="#flags-data-type">Flags Data Type</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothdevice-forget">forget()</a><span>, in § 5.2</span>
-   <li><a href="#gap-interoperability-requirements">GAP Interoperability Requirements</a><span>, in § 10</span>
+   <li><a href="#gap-interoperability-requirements">GAP Interoperability Requirements</a><span>, in § 11</span>
    <li><a href="#garbage-collect-the-connection">garbage-collect the connection</a><span>, in § 6.2</span>
    <li><a href="#dom-bluetoothdevice-gatt-slot">[[gatt]]</a><span>, in § 5.2</span>
-   <li><a href="#generic-attribute-profile">GATT</a><span>, in § 10</span>
+   <li><a href="#generic-attribute-profile">GATT</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothdevice-gatt">gatt</a><span>, in § 5.2</span>
    <li><a href="#gatt-assigned-characteristics">GATT assigned characteristics</a><span>, in § 7.2</span>
    <li><a href="#gatt-assigned-descriptors">GATT assigned descriptors</a><span>, in § 7.2</span>
    <li><a href="#gatt-assigned-services">GATT assigned services</a><span>, in § 7.2</span>
    <li><a href="#gatt-blocklist">GATT blocklist</a><span>, in § 8</span>
-   <li><a href="#gatt-client">GATT Client</a><span>, in § 10</span>
-   <li><a href="#gatt-procedure">GATT procedure</a><span>, in § 10</span>
-   <li><a href="#gatt-procedure">GATT procedures</a><span>, in § 10</span>
-   <li><a href="#gatt-profile-hierarchy">GATT Profile Hierarchy</a><span>, in § 10</span>
-   <li><a href="#gatt-server">GATT Server</a><span>, in § 10</span>
+   <li><a href="#gatt-client">GATT Client</a><span>, in § 11</span>
+   <li><a href="#gatt-procedure">GATT procedure</a><span>, in § 11</span>
+   <li><a href="#gatt-procedure">GATT procedures</a><span>, in § 11</span>
+   <li><a href="#gatt-profile-hierarchy">GATT Profile Hierarchy</a><span>, in § 11</span>
+   <li><a href="#gatt-server">GATT Server</a><span>, in § 11</span>
    <li><a href="#eventdef-bluetoothdevice-gattserverdisconnected">gattserverdisconnected</a><span>, in § 6.6.2</span>
-   <li><a href="#general-discovery-procedure">General Discovery Procedure</a><span>, in § 10</span>
-   <li><a href="#generic-attribute-profile">Generic Attribute Profile</a><span>, in § 10</span>
+   <li><a href="#general-discovery-procedure">General Discovery Procedure</a><span>, in § 11</span>
+   <li><a href="#generic-attribute-profile">Generic Attribute Profile</a><span>, in § 11</span>
    <li><a href="#dom-bluetooth-getavailability">getAvailability()</a><span>, in § 4.2</span>
    <li><a href="#dom-bluetoothremotegattservice-getcharacteristic">getCharacteristic(characteristic)</a><span>, in § 6.3</span>
    <li><a href="#dom-bluetoothuuid-getcharacteristic">getCharacteristic(name)</a><span>, in § 7.1</span>
@@ -5756,14 +5786,14 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#dom-bluetoothuuid-getservice">getService(name)</a><span>, in § 7.1</span>
    <li><a href="#get-the-bluetoothdevice-representing">get the BluetoothDevice representing</a><span>, in § 5.2</span>
    <li><a href="#dom-bluetoothdevice-id">id</a><span>, in § 5.2</span>
-   <li><a href="#identity-resolving-key">Identity Resolving Key</a><span>, in § 10</span>
-   <li><a href="#included-service">Included Service</a><span>, in § 10</span>
+   <li><a href="#identity-resolving-key">Identity Resolving Key</a><span>, in § 11</span>
+   <li><a href="#included-service">Included Service</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-indicate">indicate</a><span>, in § 6.4.1</span>
-   <li><a href="#identity-resolving-key">IRK</a><span>, in § 10</span>
+   <li><a href="#identity-resolving-key">IRK</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothremotegattservice-isprimary">isPrimary</a><span>, in § 6.3</span>
-   <li><a href="#le-bonding-procedure">LE Bonding Procedure</a><span>, in § 10</span>
-   <li><a href="#local-name-data-type">Local Name Data Type</a><span>, in § 10</span>
-   <li><a href="#long-attribute-values">Long Attribute Values</a><span>, in § 10</span>
+   <li><a href="#le-bonding-procedure">LE Bonding Procedure</a><span>, in § 11</span>
+   <li><a href="#local-name-data-type">Local Name Data Type</a><span>, in § 11</span>
+   <li><a href="#long-attribute-values">Long Attribute Values</a><span>, in § 11</span>
    <li>
     manufacturerData
     <ul>
@@ -5771,7 +5801,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothadvertisingeventinit-manufacturerdata">dict-member for BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
      <li><a href="#dom-bluetoothlescanfilterinit-manufacturerdata">dict-member for BluetoothLEScanFilterInit</a><span>, in § 4</span>
     </ul>
-   <li><a href="#manufacturer-specific-data">Manufacturer Specific Data</a><span>, in § 10</span>
+   <li><a href="#manufacturer-specific-data">Manufacturer Specific Data</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothdatafilterinit-mask">mask</a><span>, in § 4</span>
    <li><a href="#matches-a-filter">match a filter</a><span>, in § 4</span>
    <li><a href="#bluetoothdatafilterinit-matches">matches</a><span>, in § 4</span>
@@ -5786,11 +5816,11 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothadvertisingeventinit-name">dict-member for BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
      <li><a href="#dom-bluetoothlescanfilterinit-name">dict-member for BluetoothLEScanFilterInit</a><span>, in § 4</span>
     </ul>
-   <li><a href="#name-discovery-procedure">Name Discovery Procedure</a><span>, in § 10</span>
+   <li><a href="#name-discovery-procedure">Name Discovery Procedure</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothlescanfilterinit-nameprefix">namePrefix</a><span>, in § 4</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-notify">notify</a><span>, in § 6.4.1</span>
-   <li><a href="#observation-procedure">Observation Procedure</a><span>, in § 10</span>
-   <li><a href="#observer">Observer</a><span>, in § 10</span>
+   <li><a href="#observation-procedure">Observation Procedure</a><span>, in § 11</span>
+   <li><a href="#observer">Observer</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothdeviceeventhandlers-onadvertisementreceived">onadvertisementreceived</a><span>, in § 6.6.6</span>
    <li><a href="#dom-bluetooth-onavailabilitychanged">onavailabilitychanged</a><span>, in § 4</span>
    <li><a href="#dom-characteristiceventhandlers-oncharacteristicvaluechanged">oncharacteristicvaluechanged</a><span>, in § 6.6.6</span>
@@ -5812,35 +5842,35 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     </ul>
    <li><a href="#parsing-the-blocklist">parsing the blocklist</a><span>, in § 8</span>
    <li><a href="#parsing-the-gatt-assigned-numbers">parsing the GATT assigned numbers</a><span>, in § 7.2</span>
-   <li><a href="#passive-scanning">Passive Scanning</a><span>, in § 10</span>
-   <li><a href="#peripheral">Peripheral</a><span>, in § 10</span>
+   <li><a href="#passive-scanning">Passive Scanning</a><span>, in § 11</span>
+   <li><a href="#peripheral">Peripheral</a><span>, in § 11</span>
    <li><a href="#populate-the-bluetooth-cache">populate the Bluetooth cache</a><span>, in § 6.1.2</span>
-   <li><a href="#primary-service-discovery">Primary Service Discovery</a><span>, in § 10</span>
-   <li><a href="#privacy-feature">Privacy Feature</a><span>, in § 10</span>
-   <li><a href="#private-address">Private address</a><span>, in § 10</span>
-   <li><a href="#procedure-timeouts">Procedure Timeouts</a><span>, in § 10</span>
-   <li><a href="#procedure-timeouts">procedure times out</a><span>, in § 10</span>
-   <li><a href="#profile-fundamentals">Profile Fundamentals</a><span>, in § 10</span>
+   <li><a href="#primary-service-discovery">Primary Service Discovery</a><span>, in § 11</span>
+   <li><a href="#privacy-feature">Privacy Feature</a><span>, in § 11</span>
+   <li><a href="#private-address">Private address</a><span>, in § 11</span>
+   <li><a href="#procedure-timeouts">Procedure Timeouts</a><span>, in § 11</span>
+   <li><a href="#procedure-timeouts">procedure times out</a><span>, in § 11</span>
+   <li><a href="#profile-fundamentals">Profile Fundamentals</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothremotegattcharacteristic-properties">properties</a><span>, in § 6.4</span>
-   <li><a href="#public-bluetooth-address">Public Bluetooth Address</a><span>, in § 10</span>
-   <li><a href="#public-device-address">Public Device Address</a><span>, in § 10</span>
+   <li><a href="#public-bluetooth-address">Public Bluetooth Address</a><span>, in § 11</span>
+   <li><a href="#public-device-address">Public Device Address</a><span>, in § 11</span>
    <li><a href="#query-the-bluetooth-cache">query the Bluetooth cache</a><span>, in § 6.1.2</span>
    <li><a href="#query-the-bluetooth-permission">query the "bluetooth" permission</a><span>, in § 4.1</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-read">read</a><span>, in § 6.4.1</span>
-   <li><a href="#read-bd_addr-command">Read BD_ADDR Command</a><span>, in § 10</span>
-   <li><a href="#read-characteristic-descriptors">Read Characteristic Descriptors</a><span>, in § 10</span>
-   <li><a href="#read-long-characteristic-descriptors">Read Long Characteristic Descriptors</a><span>, in § 10</span>
-   <li><a href="#read-only-arraybuffer">read only ArrayBuffer</a><span>, in § 10</span>
+   <li><a href="#read-bd_addr-command">Read BD_ADDR Command</a><span>, in § 11</span>
+   <li><a href="#read-characteristic-descriptors">Read Characteristic Descriptors</a><span>, in § 11</span>
+   <li><a href="#read-long-characteristic-descriptors">Read Long Characteristic Descriptors</a><span>, in § 11</span>
+   <li><a href="#read-only-arraybuffer">read only ArrayBuffer</a><span>, in § 11</span>
    <li>
     readValue()
     <ul>
      <li><a href="#dom-bluetoothremotegattcharacteristic-readvalue">method for BluetoothRemoteGATTCharacteristic</a><span>, in § 6.4</span>
      <li><a href="#dom-bluetoothremotegattdescriptor-readvalue">method for BluetoothRemoteGATTDescriptor</a><span>, in § 6.5</span>
     </ul>
-   <li><a href="#rssi">Received Signal Strength</a><span>, in § 10</span>
+   <li><a href="#rssi">Received Signal Strength</a><span>, in § 11</span>
    <li><a href="#dom-bluetooth-referringdevice-slot">[[referringDevice]]</a><span>, in § 4</span>
    <li><a href="#dom-bluetooth-referringdevice">referringDevice</a><span>, in § 4</span>
-   <li><a href="#relationship-discovery">Relationship Discovery</a><span>, in § 10</span>
+   <li><a href="#relationship-discovery">Relationship Discovery</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-reliablewrite">reliableWrite</a><span>, in § 6.4.1</span>
    <li><a href="#remove-device-from-storage">remove device from storage</a><span>, in § 4</span>
    <li><a href="#represented">Represented</a><span>, in § 6.1.2</span>
@@ -5852,10 +5882,10 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#dom-bluetooth-requestdevice">requestDevice()</a><span>, in § 4</span>
    <li><a href="#dom-bluetooth-requestdevice">requestDevice(options)</a><span>, in § 4</span>
    <li><a href="#dictdef-requestdeviceoptions">RequestDeviceOptions</a><span>, in § 4</span>
-   <li><a href="#resolvable-private-address-resolution-procedure">Resolvable Private Address Resolution Procedure</a><span>, in § 10</span>
+   <li><a href="#resolvable-private-address-resolution-procedure">Resolvable Private Address Resolution Procedure</a><span>, in § 11</span>
    <li><a href="#resolveuuidname">ResolveUUIDName</a><span>, in § 7.1</span>
    <li><a href="#revoke-bluetooth-access">revoke Bluetooth access</a><span>, in § 4.1</span>
-   <li><a href="#rssi">RSSI</a><span>, in § 10</span>
+   <li><a href="#rssi">RSSI</a><span>, in § 11</span>
    <li>
     rssi
     <ul>
@@ -5866,8 +5896,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#same-bluetooth-device">same Bluetooth device</a><span>, in § 5.1</span>
    <li><a href="#same-bluetooth-device">same device</a><span>, in § 5.1</span>
    <li><a href="#scan-for-devices">scan for devices</a><span>, in § 4</span>
-   <li><a href="#searching-for-services">Searching for Services</a><span>, in § 10</span>
-   <li><a href="#service">Service</a><span>, in § 10</span>
+   <li><a href="#searching-for-services">Searching for Services</a><span>, in § 11</span>
+   <li><a href="#service">Service</a><span>, in § 11</span>
    <li>
     service
     <ul>
@@ -5875,9 +5905,9 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothservicedatafilterinit-service">dict-member for BluetoothServiceDataFilterInit</a><span>, in § 4</span>
     </ul>
    <li><a href="#eventdef-bluetoothremotegattservice-serviceadded">serviceadded</a><span>, in § 6.6.2</span>
-   <li><a href="#service-changed">Service Changed</a><span>, in § 10</span>
+   <li><a href="#service-changed">Service Changed</a><span>, in § 11</span>
    <li><a href="#eventdef-bluetoothremotegattservice-servicechanged">servicechanged</a><span>, in § 6.6.2</span>
-   <li><a href="#service-data">Service Data</a><span>, in § 10</span>
+   <li><a href="#service-data">Service Data</a><span>, in § 11</span>
    <li>
     serviceData
     <ul>
@@ -5885,32 +5915,32 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothadvertisingeventinit-servicedata">dict-member for BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
      <li><a href="#dom-bluetoothlescanfilterinit-servicedata">dict-member for BluetoothLEScanFilterInit</a><span>, in § 4</span>
     </ul>
-   <li><a href="#service-definition">Service Definition</a><span>, in § 10</span>
+   <li><a href="#service-definition">Service Definition</a><span>, in § 11</span>
    <li><a href="#serviceeventhandlers">ServiceEventHandlers</a><span>, in § 6.6.6</span>
-   <li><a href="#service-interoperability-requirements">Service Interoperability Requirements</a><span>, in § 10</span>
+   <li><a href="#service-interoperability-requirements">Service Interoperability Requirements</a><span>, in § 11</span>
    <li><a href="#eventdef-bluetoothremotegattservice-serviceremoved">serviceremoved</a><span>, in § 6.6.2</span>
    <li><a href="#dom-bluetoothlescanfilterinit-services">services</a><span>, in § 4</span>
-   <li><a href="#service-uuid-data-type">Service UUID Data Type</a><span>, in § 10</span>
-   <li><a href="#service-uuid-data-type">Service UUIDs</a><span>, in § 10</span>
+   <li><a href="#service-uuid-data-type">Service UUID Data Type</a><span>, in § 11</span>
+   <li><a href="#service-uuid-data-type">Service UUIDs</a><span>, in § 11</span>
    <li><a href="#dom-watchadvertisementsoptions-signal">signal</a><span>, in § 5.2</span>
    <li><a href="#dom-bluetoothremotegattcharacteristic-startnotifications">startNotifications()</a><span>, in § 6.4</span>
-   <li><a href="#static-address">Static Address</a><span>, in § 10</span>
-   <li><a href="#static-device-address">Static Device Address</a><span>, in § 10</span>
+   <li><a href="#static-address">Static Address</a><span>, in § 11</span>
+   <li><a href="#static-device-address">Static Device Address</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothremotegattcharacteristic-stopnotifications">stopNotifications()</a><span>, in § 6.4</span>
    <li><a href="#supported-physical-transports">supported physical transports</a><span>, in § 5.1</span>
-   <li><a href="#the-128-bit-uuid-represented">the 128-bit UUID represented</a><span>, in § 10</span>
+   <li><a href="#the-128-bit-uuid-represented">the 128-bit UUID represented</a><span>, in § 11</span>
    <li>
     txPower
     <ul>
      <li><a href="#dom-bluetoothadvertisingevent-txpower">attribute for BluetoothAdvertisingEvent</a><span>, in § 5.2.3</span>
      <li><a href="#dom-bluetoothadvertisingeventinit-txpower">dict-member for BluetoothAdvertisingEventInit</a><span>, in § 5.2.3</span>
     </ul>
-   <li><a href="#tx-power-level">TX Power Level</a><span>, in § 10</span>
+   <li><a href="#tx-power-level">TX Power Level</a><span>, in § 11</span>
    <li>
     UUID
     <ul>
      <li><a href="#typedefdef-uuid">(typedef)</a><span>, in § 7</span>
-     <li><a href="#uuid">definition of</a><span>, in § 10</span>
+     <li><a href="#uuid">definition of</a><span>, in § 11</span>
     </ul>
    <li>
     uuid
@@ -5919,7 +5949,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><a href="#dom-bluetoothremotegattdescriptor-uuid">attribute for BluetoothRemoteGATTDescriptor</a><span>, in § 6.5</span>
      <li><a href="#dom-bluetoothremotegattservice-uuid">attribute for BluetoothRemoteGATTService</a><span>, in § 6.3</span>
     </ul>
-   <li><a href="#uuid-alias">UUID alias</a><span>, in § 10</span>
+   <li><a href="#uuid-alias">UUID alias</a><span>, in § 11</span>
    <li>
     uuids
     <ul>
@@ -5948,10 +5978,10 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <li><a href="#dom-bluetoothdevice-watchingadvertisements">watchingAdvertisements</a><span>, in § 5.2</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-writableauxiliaries">writableAuxiliaries</a><span>, in § 6.4.1</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-write">write</a><span>, in § 6.4.1</span>
-   <li><a href="#write-characteristic-descriptors">Write Characteristic Descriptors</a><span>, in § 10</span>
-   <li><a href="#write-characteristic-value">Write Characteristic Value</a><span>, in § 10</span>
+   <li><a href="#write-characteristic-descriptors">Write Characteristic Descriptors</a><span>, in § 11</span>
+   <li><a href="#write-characteristic-value">Write Characteristic Value</a><span>, in § 11</span>
    <li><a href="#writecharacteristicvalue">WriteCharacteristicValue</a><span>, in § 6.4</span>
-   <li><a href="#write-long-characteristic-descriptors">Write Long Characteristic Descriptors</a><span>, in § 10</span>
+   <li><a href="#write-long-characteristic-descriptors">Write Long Characteristic Descriptors</a><span>, in § 11</span>
    <li>
     writeValue(value)
     <ul>
@@ -5960,7 +5990,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     </ul>
    <li><a href="#dom-bluetoothremotegattcharacteristic-writevaluewithoutresponse">writeValueWithoutResponse(value)</a><span>, in § 6.4</span>
    <li><a href="#dom-bluetoothremotegattcharacteristic-writevaluewithresponse">writeValueWithResponse(value)</a><span>, in § 6.4</span>
-   <li><a href="#write-without-response">Write Without Response</a><span>, in § 10</span>
+   <li><a href="#write-without-response">Write Without Response</a><span>, in § 11</span>
    <li><a href="#dom-bluetoothcharacteristicproperties-writewithoutresponse">writeWithoutResponse</a><span>, in § 6.4.1</span>
   </ul>
   <aside class="dfn-panel" data-for="term-for-:~:text=body_sensor_location">
@@ -6125,7 +6155,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">https://tc39.github.io/ecma262/#sec-array.prototype.map</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sec-array.prototype.map">4. Device Discovery</a> <a href="#ref-for-sec-array.prototype.map①">(2)</a>
-    <li><a href="#ref-for-sec-array.prototype.map②">10. Terminology and Conventions</a> <a href="#ref-for-sec-array.prototype.map③">(2)</a>
+    <li><a href="#ref-for-sec-array.prototype.map②">11. Terminology and Conventions</a> <a href="#ref-for-sec-array.prototype.map③">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sec-arraybuffer-constructor">
@@ -6135,7 +6165,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-sec-arraybuffer-constructor②">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-arraybuffer-constructor③">(2)</a> <a href="#ref-for-sec-arraybuffer-constructor④">(3)</a>
     <li><a href="#ref-for-sec-arraybuffer-constructor⑤">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-arraybuffer-constructor⑥">(2)</a> <a href="#ref-for-sec-arraybuffer-constructor⑦">(3)</a>
     <li><a href="#ref-for-sec-arraybuffer-constructor⑧">6.6.4. Responding to Notifications and Indications</a>
-    <li><a href="#ref-for-sec-arraybuffer-constructor⑨">10. Terminology and Conventions</a> <a href="#ref-for-sec-arraybuffer-constructor①⓪">(2)</a>
+    <li><a href="#ref-for-sec-arraybuffer-constructor⑨">11. Terminology and Conventions</a> <a href="#ref-for-sec-arraybuffer-constructor①⓪">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sec-dataview-constructor">
@@ -6148,7 +6178,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-sec-dataview-constructor⑦">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-sec-dataview-constructor⑧">(2)</a> <a href="#ref-for-sec-dataview-constructor⑨">(3)</a> <a href="#ref-for-sec-dataview-constructor①⓪">(4)</a>
     <li><a href="#ref-for-sec-dataview-constructor①①">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-sec-dataview-constructor①②">(2)</a> <a href="#ref-for-sec-dataview-constructor①③">(3)</a> <a href="#ref-for-sec-dataview-constructor①④">(4)</a>
     <li><a href="#ref-for-sec-dataview-constructor①⑤">6.6.4. Responding to Notifications and Indications</a>
-    <li><a href="#ref-for-sec-dataview-constructor①⑥">10. Terminology and Conventions</a>
+    <li><a href="#ref-for-sec-dataview-constructor①⑥">11. Terminology and Conventions</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-sec-promise-objects">
@@ -6178,7 +6208,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-sec-typedarray-constructors">
    <a href="https://tc39.github.io/ecma262/#sec-typedarray-constructors">https://tc39.github.io/ecma262/#sec-typedarray-constructors</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-sec-typedarray-constructors">10. Terminology and Conventions</a>
+    <li><a href="#ref-for-sec-typedarray-constructors">11. Terminology and Conventions</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-current-realm">
@@ -6240,13 +6270,23 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <a href="https://html.spec.whatwg.org/multipage/system-state.html#navigator">https://html.spec.whatwg.org/multipage/system-state.html#navigator</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-navigator">9. Extensions to the Navigator Interface</a>
+    <li><a href="#ref-for-navigator①">10.1. Permissions Policy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-allowed-to-use">
+   <a href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use">https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-allowed-to-use">4. Device Discovery</a> <a href="#ref-for-allowed-to-use①">(2)</a>
+    <li><a href="#ref-for-allowed-to-use②">4.2. Overall Bluetooth availability</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-document-window">
    <a href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window">https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-document-window">5.2.1. Handling Visibility Change</a> <a href="#ref-for-concept-document-window①">(2)</a>
-    <li><a href="#ref-for-concept-document-window②">5.2.2. Handling Document Loss of Full Activity</a>
+    <li><a href="#ref-for-concept-document-window">4. Device Discovery</a> <a href="#ref-for-concept-document-window①">(2)</a>
+    <li><a href="#ref-for-concept-document-window②">4.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-concept-document-window③">5.2.1. Handling Visibility Change</a> <a href="#ref-for-concept-document-window④">(2)</a>
+    <li><a href="#ref-for-concept-document-window⑤">5.2.2. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-browsing-context">
@@ -6336,25 +6376,26 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-queue-a-task">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-queue-a-task">4.2. Overall Bluetooth availability</a> <a href="#ref-for-queue-a-task①">(2)</a> <a href="#ref-for-queue-a-task②">(3)</a> <a href="#ref-for-queue-a-task③">(4)</a>
-    <li><a href="#ref-for-queue-a-task④">5.2. BluetoothDevice</a> <a href="#ref-for-queue-a-task⑤">(2)</a>
-    <li><a href="#ref-for-queue-a-task⑥">5.2.3. Responding to Advertising Events</a>
-    <li><a href="#ref-for-queue-a-task⑦">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-queue-a-task⑧">(2)</a> <a href="#ref-for-queue-a-task⑨">(3)</a>
-    <li><a href="#ref-for-queue-a-task①⓪">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-queue-a-task①①">(2)</a> <a href="#ref-for-queue-a-task①②">(3)</a>
-    <li><a href="#ref-for-queue-a-task①③">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-queue-a-task①④">(2)</a>
-    <li><a href="#ref-for-queue-a-task①⑤">6.6.3. Responding to Disconnection</a>
-    <li><a href="#ref-for-queue-a-task①⑥">6.6.4. Responding to Notifications and Indications</a>
-    <li><a href="#ref-for-queue-a-task①⑦">6.6.5. Responding to Service Changes</a> <a href="#ref-for-queue-a-task①⑧">(2)</a>
+    <li><a href="#ref-for-queue-a-task">4.2. Overall Bluetooth availability</a> <a href="#ref-for-queue-a-task①">(2)</a> <a href="#ref-for-queue-a-task②">(3)</a> <a href="#ref-for-queue-a-task③">(4)</a> <a href="#ref-for-queue-a-task④">(5)</a>
+    <li><a href="#ref-for-queue-a-task⑤">5.2. BluetoothDevice</a> <a href="#ref-for-queue-a-task⑥">(2)</a>
+    <li><a href="#ref-for-queue-a-task⑦">5.2.3. Responding to Advertising Events</a>
+    <li><a href="#ref-for-queue-a-task⑧">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-queue-a-task⑨">(2)</a> <a href="#ref-for-queue-a-task①⓪">(3)</a>
+    <li><a href="#ref-for-queue-a-task①①">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-queue-a-task①②">(2)</a> <a href="#ref-for-queue-a-task①③">(3)</a>
+    <li><a href="#ref-for-queue-a-task①④">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-queue-a-task①⑤">(2)</a>
+    <li><a href="#ref-for-queue-a-task①⑥">6.6.3. Responding to Disconnection</a>
+    <li><a href="#ref-for-queue-a-task①⑦">6.6.4. Responding to Notifications and Indications</a>
+    <li><a href="#ref-for-queue-a-task①⑧">6.6.5. Responding to Service Changes</a> <a href="#ref-for-queue-a-task①⑨">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-concept-relevant-global">
    <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-concept-relevant-global">4. Device Discovery</a>
-    <li><a href="#ref-for-concept-relevant-global①">4.1. Permission API Integration</a>
-    <li><a href="#ref-for-concept-relevant-global②">5.2.1. Handling Visibility Change</a> <a href="#ref-for-concept-relevant-global③">(2)</a>
-    <li><a href="#ref-for-concept-relevant-global④">5.2.2. Handling Document Loss of Full Activity</a>
-    <li><a href="#ref-for-concept-relevant-global⑤">6.6.5. Responding to Service Changes</a>
+    <li><a href="#ref-for-concept-relevant-global">4. Device Discovery</a> <a href="#ref-for-concept-relevant-global①">(2)</a> <a href="#ref-for-concept-relevant-global②">(3)</a>
+    <li><a href="#ref-for-concept-relevant-global③">4.1. Permission API Integration</a>
+    <li><a href="#ref-for-concept-relevant-global④">4.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-concept-relevant-global⑤">5.2.1. Handling Visibility Change</a> <a href="#ref-for-concept-relevant-global⑥">(2)</a>
+    <li><a href="#ref-for-concept-relevant-global⑦">5.2.2. Handling Document Loss of Full Activity</a>
+    <li><a href="#ref-for-concept-relevant-global⑧">6.6.5. Responding to Service Changes</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
@@ -6514,6 +6555,20 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <li><a href="#ref-for-dom-permissionstatus-state">4.1. Permission API Integration</a> <a href="#ref-for-dom-permissionstatus-state①">(2)</a>
    </ul>
   </aside>
+  <aside class="dfn-panel" data-for="term-for-default-allowlist">
+   <a href="https://w3c.github.io/webappsec-permissions-policy/#default-allowlist">https://w3c.github.io/webappsec-permissions-policy/#default-allowlist</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-default-allowlist">10.1. Permissions Policy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="term-for-policy-controlled-feature">
+   <a href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature">https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-policy-controlled-feature">4. Device Discovery</a> <a href="#ref-for-policy-controlled-feature①">(2)</a>
+    <li><a href="#ref-for-policy-controlled-feature②">4.2. Overall Bluetooth availability</a>
+    <li><a href="#ref-for-policy-controlled-feature③">10.1. Permissions Policy</a>
+   </ul>
+  </aside>
   <aside class="dfn-panel" data-for="term-for-aborterror">
    <a href="https://webidl.spec.whatwg.org/#aborterror">https://webidl.spec.whatwg.org/#aborterror</a><b>Referenced in:</b>
    <ul>
@@ -6576,7 +6631,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <ul>
     <li><a href="#ref-for-idl-frozen-array">4.1. Permission API Integration</a> <a href="#ref-for-idl-frozen-array①">(2)</a> <a href="#ref-for-idl-frozen-array②">(3)</a>
     <li><a href="#ref-for-idl-frozen-array③">5.2.3. Responding to Advertising Events</a> <a href="#ref-for-idl-frozen-array④">(2)</a> <a href="#ref-for-idl-frozen-array⑤">(3)</a>
-    <li><a href="#ref-for-idl-frozen-array⑥">10. Terminology and Conventions</a> <a href="#ref-for-idl-frozen-array⑦">(2)</a>
+    <li><a href="#ref-for-idl-frozen-array⑥">11. Terminology and Conventions</a> <a href="#ref-for-idl-frozen-array⑦">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-invalidmodificationerror">
@@ -6665,13 +6720,13 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-securityerror">
    <a href="https://webidl.spec.whatwg.org/#securityerror">https://webidl.spec.whatwg.org/#securityerror</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-securityerror">4. Device Discovery</a> <a href="#ref-for-securityerror①">(2)</a> <a href="#ref-for-securityerror②">(3)</a>
-    <li><a href="#ref-for-securityerror③">5.2. BluetoothDevice</a>
-    <li><a href="#ref-for-securityerror④">6.1.3. Navigating the Bluetooth Hierarchy</a>
-    <li><a href="#ref-for-securityerror⑤">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-securityerror⑥">(2)</a>
-    <li><a href="#ref-for-securityerror⑦">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-securityerror⑧">(2)</a> <a href="#ref-for-securityerror⑨">(3)</a>
-    <li><a href="#ref-for-securityerror①⓪">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-securityerror①①">(2)</a>
-    <li><a href="#ref-for-securityerror①②">6.7. Error handling</a> <a href="#ref-for-securityerror①③">(2)</a>
+    <li><a href="#ref-for-securityerror">4. Device Discovery</a> <a href="#ref-for-securityerror①">(2)</a> <a href="#ref-for-securityerror②">(3)</a> <a href="#ref-for-securityerror③">(4)</a> <a href="#ref-for-securityerror④">(5)</a>
+    <li><a href="#ref-for-securityerror⑤">5.2. BluetoothDevice</a>
+    <li><a href="#ref-for-securityerror⑥">6.1.3. Navigating the Bluetooth Hierarchy</a>
+    <li><a href="#ref-for-securityerror⑦">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-securityerror⑧">(2)</a>
+    <li><a href="#ref-for-securityerror⑨">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-securityerror①⓪">(2)</a> <a href="#ref-for-securityerror①①">(3)</a>
+    <li><a href="#ref-for-securityerror①②">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-securityerror①③">(2)</a>
+    <li><a href="#ref-for-securityerror①④">6.7. Error handling</a> <a href="#ref-for-securityerror①⑤">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-unknownerror">
@@ -6758,28 +6813,28 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-reject">
    <a href="https://webidl.spec.whatwg.org/#reject">https://webidl.spec.whatwg.org/#reject</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-reject">4. Device Discovery</a> <a href="#ref-for-reject①">(2)</a> <a href="#ref-for-reject②">(3)</a>
-    <li><a href="#ref-for-reject③">5.2. BluetoothDevice</a> <a href="#ref-for-reject④">(2)</a> <a href="#ref-for-reject⑤">(3)</a> <a href="#ref-for-reject⑥">(4)</a>
-    <li><a href="#ref-for-reject⑦">6.1.2. The Bluetooth cache</a>
-    <li><a href="#ref-for-reject⑧">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-reject⑨">(2)</a> <a href="#ref-for-reject①⓪">(3)</a> <a href="#ref-for-reject①①">(4)</a> <a href="#ref-for-reject①②">(5)</a> <a href="#ref-for-reject①③">(6)</a>
-    <li><a href="#ref-for-reject①④">6.3. BluetoothRemoteGATTService</a>
-    <li><a href="#ref-for-reject①⑤">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-reject①⑥">(2)</a> <a href="#ref-for-reject①⑦">(3)</a> <a href="#ref-for-reject①⑧">(4)</a> <a href="#ref-for-reject①⑨">(5)</a> <a href="#ref-for-reject②⓪">(6)</a> <a href="#ref-for-reject②①">(7)</a> <a href="#ref-for-reject②②">(8)</a> <a href="#ref-for-reject②③">(9)</a> <a href="#ref-for-reject②④">(10)</a> <a href="#ref-for-reject②⑤">(11)</a> <a href="#ref-for-reject②⑥">(12)</a>
-    <li><a href="#ref-for-reject②⑦">6.4.1. BluetoothCharacteristicProperties</a>
-    <li><a href="#ref-for-reject②⑧">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-reject②⑨">(2)</a> <a href="#ref-for-reject③⓪">(3)</a> <a href="#ref-for-reject③①">(4)</a> <a href="#ref-for-reject③②">(5)</a> <a href="#ref-for-reject③③">(6)</a>
+    <li><a href="#ref-for-reject">4. Device Discovery</a> <a href="#ref-for-reject①">(2)</a> <a href="#ref-for-reject②">(3)</a> <a href="#ref-for-reject③">(4)</a>
+    <li><a href="#ref-for-reject④">5.2. BluetoothDevice</a> <a href="#ref-for-reject⑤">(2)</a> <a href="#ref-for-reject⑥">(3)</a> <a href="#ref-for-reject⑦">(4)</a>
+    <li><a href="#ref-for-reject⑧">6.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-reject⑨">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-reject①⓪">(2)</a> <a href="#ref-for-reject①①">(3)</a> <a href="#ref-for-reject①②">(4)</a> <a href="#ref-for-reject①③">(5)</a> <a href="#ref-for-reject①④">(6)</a>
+    <li><a href="#ref-for-reject①⑤">6.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-reject①⑥">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-reject①⑦">(2)</a> <a href="#ref-for-reject①⑧">(3)</a> <a href="#ref-for-reject①⑨">(4)</a> <a href="#ref-for-reject②⓪">(5)</a> <a href="#ref-for-reject②①">(6)</a> <a href="#ref-for-reject②②">(7)</a> <a href="#ref-for-reject②③">(8)</a> <a href="#ref-for-reject②④">(9)</a> <a href="#ref-for-reject②⑤">(10)</a> <a href="#ref-for-reject②⑥">(11)</a> <a href="#ref-for-reject②⑦">(12)</a>
+    <li><a href="#ref-for-reject②⑧">6.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-reject②⑨">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-reject③⓪">(2)</a> <a href="#ref-for-reject③①">(3)</a> <a href="#ref-for-reject③②">(4)</a> <a href="#ref-for-reject③③">(5)</a> <a href="#ref-for-reject③④">(6)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-resolve">
    <a href="https://webidl.spec.whatwg.org/#resolve">https://webidl.spec.whatwg.org/#resolve</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-resolve">4. Device Discovery</a> <a href="#ref-for-resolve①">(2)</a>
-    <li><a href="#ref-for-resolve②">4.2. Overall Bluetooth availability</a> <a href="#ref-for-resolve③">(2)</a> <a href="#ref-for-resolve④">(3)</a> <a href="#ref-for-resolve⑤">(4)</a>
-    <li><a href="#ref-for-resolve⑥">5.2. BluetoothDevice</a> <a href="#ref-for-resolve⑦">(2)</a> <a href="#ref-for-resolve⑧">(3)</a>
-    <li><a href="#ref-for-resolve⑨">6.1.2. The Bluetooth cache</a>
-    <li><a href="#ref-for-resolve①⓪">6.2. BluetoothRemoteGATTServer</a>
-    <li><a href="#ref-for-resolve①①">6.3. BluetoothRemoteGATTService</a>
-    <li><a href="#ref-for-resolve①②">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-resolve①③">(2)</a> <a href="#ref-for-resolve①④">(3)</a> <a href="#ref-for-resolve①⑤">(4)</a> <a href="#ref-for-resolve①⑥">(5)</a> <a href="#ref-for-resolve①⑦">(6)</a> <a href="#ref-for-resolve①⑧">(7)</a>
-    <li><a href="#ref-for-resolve①⑨">6.4.1. BluetoothCharacteristicProperties</a>
-    <li><a href="#ref-for-resolve②⓪">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-resolve②①">(2)</a> <a href="#ref-for-resolve②②">(3)</a>
+    <li><a href="#ref-for-resolve②">4.2. Overall Bluetooth availability</a> <a href="#ref-for-resolve③">(2)</a> <a href="#ref-for-resolve④">(3)</a> <a href="#ref-for-resolve⑤">(4)</a> <a href="#ref-for-resolve⑥">(5)</a>
+    <li><a href="#ref-for-resolve⑦">5.2. BluetoothDevice</a> <a href="#ref-for-resolve⑧">(2)</a> <a href="#ref-for-resolve⑨">(3)</a>
+    <li><a href="#ref-for-resolve①⓪">6.1.2. The Bluetooth cache</a>
+    <li><a href="#ref-for-resolve①①">6.2. BluetoothRemoteGATTServer</a>
+    <li><a href="#ref-for-resolve①②">6.3. BluetoothRemoteGATTService</a>
+    <li><a href="#ref-for-resolve①③">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-resolve①④">(2)</a> <a href="#ref-for-resolve①⑤">(3)</a> <a href="#ref-for-resolve①⑥">(4)</a> <a href="#ref-for-resolve①⑦">(5)</a> <a href="#ref-for-resolve①⑧">(6)</a> <a href="#ref-for-resolve①⑨">(7)</a>
+    <li><a href="#ref-for-resolve②⓪">6.4.1. BluetoothCharacteristicProperties</a>
+    <li><a href="#ref-for-resolve②①">6.5. BluetoothRemoteGATTDescriptor</a> <a href="#ref-for-resolve②②">(2)</a> <a href="#ref-for-resolve②③">(3)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-sequence">
@@ -6796,7 +6851,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
   <aside class="dfn-panel" data-for="term-for-this">
    <a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-this">4. Device Discovery</a>
+    <li><a href="#ref-for-this">4. Device Discovery</a> <a href="#ref-for-this①">(2)</a> <a href="#ref-for-this②">(3)</a>
+    <li><a href="#ref-for-this③">4.2. Overall Bluetooth availability</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="term-for-idl-undefined">
@@ -6903,6 +6959,7 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
     <ul>
      <li><span class="dfn-paneled" id="term-for-eventhandler">EventHandler</span>
      <li><span class="dfn-paneled" id="term-for-navigator">Navigator</span>
+     <li><span class="dfn-paneled" id="term-for-allowed-to-use">allowed to use</span>
      <li><span class="dfn-paneled" id="term-for-concept-document-window">associated document</span>
      <li><span class="dfn-paneled" id="term-for-browsing-context">browsing context</span>
      <li><span class="dfn-paneled" id="term-for-current-settings-object">current settings object</span>
@@ -6954,6 +7011,12 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="term-for-dfn-prompt-the-user-to-choose">prompt the user to choose</span>
      <li><span class="dfn-paneled" id="term-for-dom-permissions-query">query()</span>
      <li><span class="dfn-paneled" id="term-for-dom-permissionstatus-state">state</span>
+    </ul>
+   <li>
+    <a data-link-type="biblio">[permissions-policy-1]</a> defines the following terms:
+    <ul>
+     <li><span class="dfn-paneled" id="term-for-default-allowlist">default allowlist</span>
+     <li><span class="dfn-paneled" id="term-for-policy-controlled-feature">policy-controlled feature</span>
     </ul>
    <li>
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
@@ -7020,6 +7083,8 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
    <dd>Jatinder Mann; Arvind Jain. <a href="https://www.w3.org/TR/page-visibility/"><cite>Page Visibility (Second Edition)</cite></a>. 29 October 2013. REC. URL: <a href="https://www.w3.org/TR/page-visibility/">https://www.w3.org/TR/page-visibility/</a>
    <dt id="biblio-permissions">[PERMISSIONS]
    <dd>Marcos Caceres; Mike Taylor. <a href="https://www.w3.org/TR/permissions/"><cite>Permissions</cite></a>. 11 March 2022. WD. URL: <a href="https://www.w3.org/TR/permissions/">https://www.w3.org/TR/permissions/</a>
+   <dt id="biblio-permissions-policy-1">[PERMISSIONS-POLICY-1]
+   <dd>Ian Clelland. <a href="https://www.w3.org/TR/permissions-policy-1/"><cite>Permissions Policy</cite></a>. 16 July 2020. WD. URL: <a href="https://www.w3.org/TR/permissions-policy-1/">https://www.w3.org/TR/permissions-policy-1/</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-rfc4122">[RFC4122]
@@ -7492,7 +7557,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
     <li><a href="#ref-for-dom-bluetooth-requestdevice①">3.1. Device access is powerful</a>
     <li><a href="#ref-for-dom-bluetooth-requestdevice②">4. Device Discovery</a> <a href="#ref-for-dom-bluetooth-requestdevice③">(2)</a>
     <li><a href="#ref-for-dom-bluetooth-requestdevice④">4.2. Overall Bluetooth availability</a>
-    <li><a href="#ref-for-dom-bluetooth-requestdevice⑤">10. Terminology and Conventions</a>
+    <li><a href="#ref-for-dom-bluetooth-requestdevice⑤">11. Terminology and Conventions</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="request-bluetooth-devices">
@@ -8548,7 +8613,7 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
     <li><a href="#ref-for-dom-bluetoothuuid-getservice⑦">6.2. BluetoothRemoteGATTServer</a> <a href="#ref-for-dom-bluetoothuuid-getservice⑧">(2)</a>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice⑨">6.3. BluetoothRemoteGATTService</a> <a href="#ref-for-dom-bluetoothuuid-getservice①⓪">(2)</a>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice①①">7.1. Standardized UUIDs</a> <a href="#ref-for-dom-bluetoothuuid-getservice①②">(2)</a> <a href="#ref-for-dom-bluetoothuuid-getservice①③">(3)</a> <a href="#ref-for-dom-bluetoothuuid-getservice①④">(4)</a> <a href="#ref-for-dom-bluetoothuuid-getservice①⑤">(5)</a>
-    <li><a href="#ref-for-dom-bluetoothuuid-getservice①⑥">10. Terminology and Conventions</a> <a href="#ref-for-dom-bluetoothuuid-getservice①⑦">(2)</a>
+    <li><a href="#ref-for-dom-bluetoothuuid-getservice①⑥">11. Terminology and Conventions</a> <a href="#ref-for-dom-bluetoothuuid-getservice①⑦">(2)</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="dom-bluetoothuuid-getcharacteristic">
@@ -8628,6 +8693,14 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
    <ul>
     <li><a href="#ref-for-dom-navigator-bluetooth">6.4. BluetoothRemoteGATTCharacteristic</a> <a href="#ref-for-dom-navigator-bluetooth①">(2)</a> <a href="#ref-for-dom-navigator-bluetooth②">(3)</a> <a href="#ref-for-dom-navigator-bluetooth③">(4)</a>
     <li><a href="#ref-for-dom-navigator-bluetooth④">6.6.1. Bluetooth Tree</a> <a href="#ref-for-dom-navigator-bluetooth⑤">(2)</a> <a href="#ref-for-dom-navigator-bluetooth⑥">(3)</a>
+    <li><a href="#ref-for-dom-navigator-bluetooth⑦">10.1. Permissions Policy</a>
+   </ul>
+  </aside>
+  <aside class="dfn-panel" data-for="policy-controlled-feature-bluetooth">
+   <b><a href="#policy-controlled-feature-bluetooth">#policy-controlled-feature-bluetooth</a></b><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-policy-controlled-feature-bluetooth">4. Device Discovery</a> <a href="#ref-for-policy-controlled-feature-bluetooth①">(2)</a>
+    <li><a href="#ref-for-policy-controlled-feature-bluetooth②">4.2. Overall Bluetooth availability</a>
    </ul>
   </aside>
   <aside class="dfn-panel" data-for="read-only-arraybuffer">
