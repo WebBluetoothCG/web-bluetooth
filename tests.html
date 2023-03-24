@@ -6,16 +6,15 @@
   <meta content="CG-DRAFT" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
-  <meta content="Bikeshed version 37b7e7e68, updated Fri May 27 15:08:11 2022 -0700" name="generator">
+  <meta content="Bikeshed version d9bd89757, updated Thu Mar 23 10:06:53 2023 -0700" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/tests" rel="canonical">
-  <meta content="696bb7ae3738f6e4bbf23f02139df04225979585" name="document-revision">
+  <meta content="4cb56840b7032fbd5d09ce772c55974ac3c16b09" name="document-revision">
 <style>
 .atrisk::before {
   content: '\25C0    May depend on implementation details';
 }
 </style>
 <style>/* style-autolinks */
-
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
     font-size: inherit;
@@ -75,7 +74,8 @@ pre .property::before, pre .property::after {
 
 [data-link-type=biblio] {
     white-space: pre;
-}</style>
+}
+</style>
 <style>/* style-colors */
 
 /* Any --*-text not paired with a --*-bg is assumed to have a transparent bg */
@@ -184,9 +184,9 @@ pre .property::before, pre .property::after {
     --outdated-shadow: red;
 
     --editedrec-bg: darkorange;
-}</style>
+}
+</style>
 <style>/* style-counters */
-
 body {
     counter-reset: example figure issue;
 }
@@ -213,9 +213,9 @@ figcaption {
 }
 figcaption:not(.no-marker)::before {
     content: "Figure " counter(figure) " ";
-}</style>
+}
+</style>
 <style>/* style-dfn-panel */
-
 :root {
     --dfnpanel-bg: #ddd;
     --dfnpanel-text: var(--text);
@@ -223,10 +223,10 @@ figcaption:not(.no-marker)::before {
 .dfn-panel {
     position: absolute;
     z-index: 35;
-    height: auto;
-    width: -webkit-fit-content;
-    width: fit-content;
+    width: 20em;
+    min-width: min-content;
     max-width: 300px;
+    height: auto;
     max-height: 500px;
     overflow: auto;
     padding: 0.5em 0.75em;
@@ -234,6 +234,7 @@ figcaption:not(.no-marker)::before {
     background: var(--dfnpanel-bg);
     color: var(--dfnpanel-text);
     border: outset 0.2em;
+    white-space: normal; /* in case it's moved into a pre */
 }
 .dfn-panel:not(.on) { display: none; }
 .dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
@@ -256,7 +257,6 @@ figcaption:not(.no-marker)::before {
 .dfn-paneled { cursor: pointer; }
 </style>
 <style>/* style-issues */
-
 a[href].issue-return {
     float: right;
     float: inline-end;
@@ -266,7 +266,6 @@ a[href].issue-return {
 }
 </style>
 <style>/* style-md-lists */
-
 /* This is a weird hack for me not yet following the commonmark spec
    regarding paragraph and lists. */
 [data-md] > :first-child {
@@ -274,7 +273,8 @@ a[href].issue-return {
 }
 [data-md] > :last-child {
     margin-bottom: 0;
-}</style>
+}
+</style>
 <style>/* style-selflinks */
 
 :root {
@@ -301,6 +301,14 @@ a.self-link:hover {
 }
 .heading > a.self-link {
     font-size: 83%;
+}
+.example > a.self-link,
+.note > a.self-link,
+.issue > a.self-link {
+    /* These blocks are overflow:auto, so positioning outside
+       doesn't work. */
+    left: auto;
+    right: 0;
 }
 li > a.self-link {
     left: calc(-1 * (3.5rem - 26px) - 2em);
@@ -503,6 +511,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
        which is quite common in practice... */
     img { background: white; }
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --selflink-text: black;
@@ -517,6 +526,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
         --dfnpanel-text: var(--text);
     }
 }
+
 @media (prefers-color-scheme: dark) {
     .highlight:not(.idl) { background: rgba(255, 255, 255, .05); }
 
@@ -584,7 +594,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Testing Web Bluetooth</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-06-09">9 June 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-24">24 March 2023</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -600,7 +610,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </div>
    </details>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2022 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2023 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -693,7 +703,7 @@ repository</a>.</p>
    <p>These functions MUST NOT be exposed to web content. Only trusted testing
 code may access them.</p>
    <h2 class="heading settled" data-level="4" id="test-interfaces"><span class="secno">4. </span><span class="content">Testing interfaces</span><a class="self-link" href="#test-interfaces"></a></h2>
-<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/window-object.html#window" id="ref-for-window"><c- g>Window</c-></a> {
+<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#window" id="ref-for-window"><c- g>Window</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#testrunner" id="ref-for-testrunner"><c- n>TestRunner</c-></a> <dfn class="idl-code" data-dfn-for="Window" data-dfn-type="attribute" data-export data-readonly data-type="TestRunner" id="dom-window-testrunner"><code><c- g>testRunner</c-></code><a class="self-link" href="#dom-window-testrunner"></a></dfn>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#eventsender" id="ref-for-eventsender"><c- n>EventSender</c-></a> <dfn class="idl-code" data-dfn-for="Window" data-dfn-type="attribute" data-export data-readonly data-type="EventSender" id="dom-window-eventsender"><code><c- g>eventSender</c-></code><a class="self-link" href="#dom-window-eventsender"></a></dfn>;
 };
@@ -725,7 +735,7 @@ respond depending on the <code class="idl"><a data-link-type="idl" href="#dom-te
     <dt data-md><code class="atrisk">"ScanFilterCheckingAdapter"</code>
     <dd data-md>
      <p>The UA may fail the test unless the test asks the adapter to start a
-Bluetooth scan filtered to the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#" id="termref-for-">org.bluetooth.service.glucose</a></code>, <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#" id="termref-for-①">org.bluetooth.service.heart_rate</a></code>, and <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#" id="termref-for-②">org.bluetooth.service.battery_service</a></code> Service UUIDs. The adapter
+Bluetooth scan filtered to the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#" id="ref-for-58c0cc0c46f2c1d120e8e51c74c18a3b">org.bluetooth.service.glucose</a></code>, <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#" id="ref-for-6404bfac2ce9c4aae4a96b3eebb9d5f2">org.bluetooth.service.heart_rate</a></code>, and <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#" id="ref-for-fe0f1183741fa0f0f36954ddcdf75cbf">org.bluetooth.service.battery_service</a></code> Service UUIDs. The adapter
 discovers a <a data-link-type="dfn" href="#batterydevice" id="ref-for-batterydevice">BatteryDevice</a>.</p>
     <dt data-md><code>"EmptyAdapter"</code>
     <dd data-md>
@@ -762,31 +772,31 @@ discovers a <a data-link-type="dfn" href="#heartratedevice" id="ref-for-heartrat
    </dl>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.1" data-lt="BatteryDevice" data-noexport id="batterydevice"><span class="secno">5.1.1. </span><span class="content">BatteryDevice</span><a class="self-link" href="#batterydevice" id="ref-for-batterydevice①"></a></h4>
    <p>Has a MAC address of <code>00:00:00:00:00:01</code>, the name <code>"Battery Device"</code>, and
-advertises <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#" id="termref-for-③">org.bluetooth.service.battery_service</a></code>.</p>
+advertises <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#" id="ref-for-fe0f1183741fa0f0f36954ddcdf75cbf①">org.bluetooth.service.battery_service</a></code>.</p>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.2" data-lt="GlucoseDevice" data-noexport id="glucosedevice"><span class="secno">5.1.2. </span><span class="content">GlucoseDevice</span><a class="self-link" href="#glucosedevice" id="ref-for-glucosedevice①"></a></h4>
    <p>Has a MAC address of <code>00:00:00:00:00:02</code>, the name <code>"Glucose Device"</code>, and
-advertises <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#" id="termref-for-④">org.bluetooth.service.glucose</a></code>.</p>
+advertises <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#" id="ref-for-58c0cc0c46f2c1d120e8e51c74c18a3b①">org.bluetooth.service.glucose</a></code>.</p>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.3" data-lt="HeartRateDevice" data-noexport id="heartratedevice"><span class="secno">5.1.3. </span><span class="content">HeartRateDevice</span><a class="self-link" href="#heartratedevice" id="ref-for-heartratedevice②"></a></h4>
    <p>Has a MAC address of <code>00:00:00:00:00:03</code>, the name <code>"Heart Rate Device"</code>, and
-advertises <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#" id="termref-for-⑤">org.bluetooth.service.heart_rate</a></code>.</p>
+advertises <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#" id="ref-for-6404bfac2ce9c4aae4a96b3eebb9d5f2①">org.bluetooth.service.heart_rate</a></code>.</p>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.4" data-lt="MissingServiceGenericAccessDevice" data-noexport id="missingservicegenericaccessdevice"><span class="secno">5.1.4. </span><span class="content">MissingServiceGenericAccessDevice</span><a class="self-link" href="#missingservicegenericaccessdevice" id="ref-for-missingservicegenericaccessdevice②"></a></h4>
    <p>Has a MAC address of <code>00:00:00:00:00:00</code>, the name <code>"Generic Access
 Device"</code>, and accepts GATT connections. Its GATT Server is empty.</p>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.5" data-lt="MissingCharacteristicGenericAccessDevice" data-noexport id="missingcharacteristicgenericaccessdevice"><span class="secno">5.1.5. </span><span class="content">MissingCharacteristicGenericAccessDevice</span><a class="self-link" href="#missingcharacteristicgenericaccessdevice" id="ref-for-missingcharacteristicgenericaccessdevice②"></a></h4>
    <p>In addition to the properties of a <a data-link-type="dfn" href="#missingservicegenericaccessdevice" id="ref-for-missingservicegenericaccessdevice①">MissingServiceGenericAccessDevice</a>, its
-GATT Server contains a primary <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#" id="termref-for-⑥">org.bluetooth.service.generic_access</a></code> service.
+GATT Server contains a primary <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#" id="ref-for-023604c2c1e142e76e7fe1036df2da64">org.bluetooth.service.generic_access</a></code> service.
 This service contains no characteristics.</p>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.6" data-lt="MissingDescriptorGenericAccessDevice" data-noexport id="missingdescriptorgenericaccessdevice"><span class="secno">5.1.6. </span><span class="content">MissingDescriptorGenericAccessDevice</span><a class="self-link" href="#missingdescriptorgenericaccessdevice" id="ref-for-missingdescriptorgenericaccessdevice②"></a></h4>
-   <p>In addition to the properties of a <a data-link-type="dfn" href="#missingcharacteristicgenericaccessdevice" id="ref-for-missingcharacteristicgenericaccessdevice①">MissingCharacteristicGenericAccessDevice</a>, its <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#" id="termref-for-⑦">org.bluetooth.service.generic_access</a></code> service contains the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#" id="termref-for-⑧">org.bluetooth.characteristic.gap.device_name</a></code> characteristic. This
+   <p>In addition to the properties of a <a data-link-type="dfn" href="#missingcharacteristicgenericaccessdevice" id="ref-for-missingcharacteristicgenericaccessdevice①">MissingCharacteristicGenericAccessDevice</a>, its <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#" id="ref-for-023604c2c1e142e76e7fe1036df2da64①">org.bluetooth.service.generic_access</a></code> service contains the <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#" id="ref-for-2ea8e9ae0e9518b617c846346a6eb445">org.bluetooth.characteristic.gap.device_name</a></code> characteristic. This
 characteristic returns <code>"GenericAccessDevice"</code> when read, and
 responds that writes have succeeded (without changing the value read).</p>
    <h4 class="heading settled dfn-paneled" data-dfn-type="dfn" data-level="5.1.7" data-lt="GenericAccessDevice" data-noexport id="genericaccessdevice"><span class="secno">5.1.7. </span><span class="content">GenericAccessDevice</span><a class="self-link" href="#genericaccessdevice" id="ref-for-genericaccessdevice①"></a></h4>
-   <p>In addition to the properties of a <a data-link-type="dfn" href="#missingdescriptorgenericaccessdevice" id="ref-for-missingdescriptorgenericaccessdevice①">MissingDescriptorGenericAccessDevice</a>, its <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#" id="termref-for-⑨">org.bluetooth.characteristic.gap.device_name</a></code> characteristic contains the following descriptors:</p>
+   <p>In addition to the properties of a <a data-link-type="dfn" href="#missingdescriptorgenericaccessdevice" id="ref-for-missingdescriptorgenericaccessdevice①">MissingDescriptorGenericAccessDevice</a>, its <code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#" id="ref-for-2ea8e9ae0e9518b617c846346a6eb445①">org.bluetooth.characteristic.gap.device_name</a></code> characteristic contains the following descriptors:</p>
    <dl>
-    <dt data-md><code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_extended_properties.xml#" id="termref-for-①⓪">org.bluetooth.descriptor.gatt.characteristic_extended_properties</a></code>
+    <dt data-md><code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_extended_properties.xml#" id="ref-for-56b900973c2355081e2249ba8a9e84c7">org.bluetooth.descriptor.gatt.characteristic_extended_properties</a></code>
     <dd data-md>
      <p>Has the Writable Auxiliaries bit set.</p>
-    <dt data-md><code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_user_description.xml#" id="termref-for-①①">org.bluetooth.descriptor.gatt.characteristic_user_description</a></code>
+    <dt data-md><code class="idl"><a data-link-type="idl" href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_user_description.xml#" id="ref-for-778250209adb0d9c4517d59f675fada3">org.bluetooth.descriptor.gatt.characteristic_user_description</a></code>
     <dd data-md>
      <p>Returns <code>"Device Name"</code> when read, and responds that writes
 have succeeded (without changing the value read).</p>
@@ -798,7 +808,7 @@ as a type 4 (random) UUID.)</p>
 accepts GATT connections. Its GATT Server contains one service with UUID <code><a data-link-type="abstract-op" href="#abstract-opdef-erroruuid" id="ref-for-abstract-opdef-erroruuid">errorUUID</a>(0x100)</code>. This service contains 255 characteristics
 with UUIDs <code><a data-link-type="abstract-op" href="#abstract-opdef-erroruuid" id="ref-for-abstract-opdef-erroruuid①">errorUUID</a>(0x101)</code> through <code><a data-link-type="abstract-op" href="#abstract-opdef-erroruuid" id="ref-for-abstract-opdef-erroruuid②">errorUUID</a>(0x1ff)</code>. When read or written, the characteristic with
 UUID <code><a data-link-type="abstract-op" href="#abstract-opdef-erroruuid" id="ref-for-abstract-opdef-erroruuid③">errorUUID</a>(which)</code> returns an Error Response
-(<a data-link-type="biblio" href="#biblio-bluetooth42">[BLUETOOTH42]</a> 3.F.3.4.1.1) with an error code of <code>which - 0x100</code>.</p>
+(<a data-link-type="biblio" href="#biblio-bluetooth42" title="BLUETOOTH SPECIFICATION Version 4.2">[BLUETOOTH42]</a> 3.F.3.4.1.1) with an error code of <code>which - 0x100</code>.</p>
    <h3 class="heading settled dfn-paneled idl-code" data-dfn-for="TestRunner" data-dfn-type="method" data-export data-level="5.2" data-lt="setBluetoothManualChooser()" id="dom-testrunner-setbluetoothmanualchooser"><span class="secno">5.2. </span><span class="content">setBluetoothManualChooser()</span><a class="self-link" href="#dom-testrunner-setbluetoothmanualchooser" id="ref-for-dom-testrunner-setbluetoothmanualchooser②"></a></h3>
    <p>When invoked, <code class="idl"><a data-link-type="idl" href="#dom-testrunner-setbluetoothmanualchooser" id="ref-for-dom-testrunner-setbluetoothmanualchooser①">setBluetoothManualChooser()</a></code> MUST replace the user
 prompt used in <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice" id="ref-for-dom-bluetooth-requestdevice①">requestDevice()</a></code> with a "<dfn class="dfn-paneled" data-dfn-type="dfn" data-noexport id="manual-chooser">manual chooser</dfn>"
@@ -833,7 +843,7 @@ encoded as string, as follows:</p>
     <dt data-md>A device is added to the user prompt with <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id">id</a></code> <var>device-id</var> and <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name" id="ref-for-dom-bluetoothdevice-name">name</a></code> <var>device-name</var>.
     <dd data-md>
      <p><code>"add-device(<var>device-name</var>)=<var>device-id</var>"</code></p>
-     <p class="note" role="note"><span>Note:</span> The <var>device-id</var> might not be the device’s MAC address. For
+     <p class="note" role="note"><span class="marker">Note:</span> The <var>device-id</var> might not be the device’s MAC address. For
 example, MacOS and iOS generate a random ID when testing against physical
 devices.</p>
     <dt data-md>The UA discovers that a device with <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id" id="ref-for-dom-bluetoothdevice-id①">id</a></code> <var>device-id</var> is no longer nearby.
@@ -874,7 +884,7 @@ action corresponding to the <code class="idl"><a data-link-type="idl" href="#dom
     However, for readability,
     these words do not appear in all uppercase letters in this specification. </p>
    <p>All of the text of this specification is normative
-    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
+    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</a> </p>
    <p>Examples in this specification are introduced with the words “for example”
     or are set apart from the normative text
     with <code>class="example"</code>,
@@ -887,7 +897,7 @@ action corresponding to the <code class="idl"><a data-link-type="idl" href="#dom
     and are set apart from the normative text
     with <code>class="note"</code>,
     like this: </p>
-   <p class="note" role="note">Note, this is an informative note. </p>
+   <p class="note" role="note">Note, this is an informative note.</p>
    <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">Conformant Algorithms</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
    <p>Requirements phrased in the imperative as part of algorithms
     (such as "strip any leading space characters"
@@ -928,138 +938,138 @@ action corresponding to the <code class="idl"><a data-link-type="idl" href="#dom
    <li><a href="#testrunner">TestRunner</a><span>, in § 5</span>
    <li><a href="#dom-window-testrunner">testRunner</a><span>, in § 4</span>
   </ul>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-2ea8e9ae0e9518b617c846346a6eb445" class="dfn-panel" data-for="2ea8e9ae0e9518b617c846346a6eb445" id="infopanel-for-2ea8e9ae0e9518b617c846346a6eb445">
+   <span id="infopaneltitle-for-2ea8e9ae0e9518b617c846346a6eb445" style="display:none">Info about the 'org.bluetooth.characteristic.gap.device_name' external reference.</span><a href="https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#">https://developer.bluetooth.org/gatt/characteristics/Pages/CharacteristicViewer.aspx?u=org.bluetooth.characteristic.gap.device_name.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1.6. MissingDescriptorGenericAccessDevice</a>
-    <li><a href="#termref-for-">5.1.7. GenericAccessDevice</a>
+    <li><a href="#ref-for-2ea8e9ae0e9518b617c846346a6eb445">5.1.6. MissingDescriptorGenericAccessDevice</a>
+    <li><a href="#ref-for-2ea8e9ae0e9518b617c846346a6eb445">5.1.7. GenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_extended_properties.xml#">https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_extended_properties.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-56b900973c2355081e2249ba8a9e84c7" class="dfn-panel" data-for="56b900973c2355081e2249ba8a9e84c7" id="infopanel-for-56b900973c2355081e2249ba8a9e84c7">
+   <span id="infopaneltitle-for-56b900973c2355081e2249ba8a9e84c7" style="display:none">Info about the 'org.bluetooth.descriptor.gatt.characteristic_extended_properties' external reference.</span><a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_extended_properties.xml#">https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_extended_properties.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1.7. GenericAccessDevice</a>
+    <li><a href="#ref-for-56b900973c2355081e2249ba8a9e84c7">5.1.7. GenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_user_description.xml#">https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_user_description.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-778250209adb0d9c4517d59f675fada3" class="dfn-panel" data-for="778250209adb0d9c4517d59f675fada3" id="infopanel-for-778250209adb0d9c4517d59f675fada3">
+   <span id="infopaneltitle-for-778250209adb0d9c4517d59f675fada3" style="display:none">Info about the 'org.bluetooth.descriptor.gatt.characteristic_user_description' external reference.</span><a href="https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_user_description.xml#">https://developer.bluetooth.org/gatt/descriptors/Pages/DescriptorViewer.aspx?u=org.bluetooth.descriptor.gatt.characteristic_user_description.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1.7. GenericAccessDevice</a>
+    <li><a href="#ref-for-778250209adb0d9c4517d59f675fada3">5.1.7. GenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-fe0f1183741fa0f0f36954ddcdf75cbf" class="dfn-panel" data-for="fe0f1183741fa0f0f36954ddcdf75cbf" id="infopanel-for-fe0f1183741fa0f0f36954ddcdf75cbf">
+   <span id="infopaneltitle-for-fe0f1183741fa0f0f36954ddcdf75cbf" style="display:none">Info about the 'org.bluetooth.service.battery_service' external reference.</span><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.battery_service.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1. setBluetoothMockDataSet</a>
-    <li><a href="#termref-for-">5.1.1. BatteryDevice</a>
+    <li><a href="#ref-for-fe0f1183741fa0f0f36954ddcdf75cbf">5.1. setBluetoothMockDataSet</a>
+    <li><a href="#ref-for-fe0f1183741fa0f0f36954ddcdf75cbf">5.1.1. BatteryDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-023604c2c1e142e76e7fe1036df2da64" class="dfn-panel" data-for="023604c2c1e142e76e7fe1036df2da64" id="infopanel-for-023604c2c1e142e76e7fe1036df2da64">
+   <span id="infopaneltitle-for-023604c2c1e142e76e7fe1036df2da64" style="display:none">Info about the 'org.bluetooth.service.generic_access' external reference.</span><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.generic_access.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1.5. MissingCharacteristicGenericAccessDevice</a>
-    <li><a href="#termref-for-">5.1.6. MissingDescriptorGenericAccessDevice</a>
+    <li><a href="#ref-for-023604c2c1e142e76e7fe1036df2da64">5.1.5. MissingCharacteristicGenericAccessDevice</a>
+    <li><a href="#ref-for-023604c2c1e142e76e7fe1036df2da64">5.1.6. MissingDescriptorGenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-58c0cc0c46f2c1d120e8e51c74c18a3b" class="dfn-panel" data-for="58c0cc0c46f2c1d120e8e51c74c18a3b" id="infopanel-for-58c0cc0c46f2c1d120e8e51c74c18a3b">
+   <span id="infopaneltitle-for-58c0cc0c46f2c1d120e8e51c74c18a3b" style="display:none">Info about the 'org.bluetooth.service.glucose' external reference.</span><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.glucose.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1. setBluetoothMockDataSet</a>
-    <li><a href="#termref-for-">5.1.2. GlucoseDevice</a>
+    <li><a href="#ref-for-58c0cc0c46f2c1d120e8e51c74c18a3b">5.1. setBluetoothMockDataSet</a>
+    <li><a href="#ref-for-58c0cc0c46f2c1d120e8e51c74c18a3b">5.1.2. GlucoseDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-">
-   <a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-6404bfac2ce9c4aae4a96b3eebb9d5f2" class="dfn-panel" data-for="6404bfac2ce9c4aae4a96b3eebb9d5f2" id="infopanel-for-6404bfac2ce9c4aae4a96b3eebb9d5f2">
+   <span id="infopaneltitle-for-6404bfac2ce9c4aae4a96b3eebb9d5f2" style="display:none">Info about the 'org.bluetooth.service.heart_rate' external reference.</span><a href="https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#">https://developer.bluetooth.org/gatt/services/Pages/ServiceViewer.aspx?u=org.bluetooth.service.heart_rate.xml#</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#termref-for-">5.1. setBluetoothMockDataSet</a>
-    <li><a href="#termref-for-">5.1.3. HeartRateDevice</a>
+    <li><a href="#ref-for-6404bfac2ce9c4aae4a96b3eebb9d5f2">5.1. setBluetoothMockDataSet</a>
+    <li><a href="#ref-for-6404bfac2ce9c4aae4a96b3eebb9d5f2">5.1.3. HeartRateDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-concept-event-fire">
-   <a href="https://dom.spec.whatwg.org/#concept-event-fire">https://dom.spec.whatwg.org/#concept-event-fire</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-15045c15505e025cd6b6d0f134b7c986" class="dfn-panel" data-for="15045c15505e025cd6b6d0f134b7c986" id="infopanel-for-15045c15505e025cd6b6d0f134b7c986">
+   <span id="infopaneltitle-for-15045c15505e025cd6b6d0f134b7c986" style="display:none">Info about the 'fire an event' external reference.</span><a href="https://dom.spec.whatwg.org/#concept-event-fire">https://dom.spec.whatwg.org/#concept-event-fire</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-event-fire">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-window">
-   <a href="https://html.spec.whatwg.org/multipage/window-object.html#window">https://html.spec.whatwg.org/multipage/window-object.html#window</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-d1f0a86fd49be388d8b0159e241a1172" class="dfn-panel" data-for="d1f0a86fd49be388d8b0159e241a1172" id="infopanel-for-d1f0a86fd49be388d8b0159e241a1172">
+   <span id="infopaneltitle-for-d1f0a86fd49be388d8b0159e241a1172" style="display:none">Info about the 'Window' external reference.</span><a href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#window">https://html.spec.whatwg.org/multipage/nav-history-apis.html#window</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-window">4. Testing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-the-body-element-2">
-   <a href="https://html.spec.whatwg.org/multipage/dom.html#the-body-element-2">https://html.spec.whatwg.org/multipage/dom.html#the-body-element-2</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-677c279517b8014f6a4be314e26e6a9e" class="dfn-panel" data-for="677c279517b8014f6a4be314e26e6a9e" id="infopanel-for-677c279517b8014f6a4be314e26e6a9e">
+   <span id="infopaneltitle-for-677c279517b8014f6a4be314e26e6a9e" style="display:none">Info about the 'the body element' external reference.</span><a href="https://html.spec.whatwg.org/multipage/dom.html#the-body-element-2">https://html.spec.whatwg.org/multipage/dom.html#the-body-element-2</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-the-body-element-2">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-widl-KeyboardEvent-key">
-   <a href="https://www.w3.org/TR/uievents/#widl-KeyboardEvent-key">https://www.w3.org/TR/uievents/#widl-KeyboardEvent-key</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-f14a7dcd17be15deaad4b45f6c15b9ee" class="dfn-panel" data-for="f14a7dcd17be15deaad4b45f6c15b9ee" id="infopanel-for-f14a7dcd17be15deaad4b45f6c15b9ee">
+   <span id="infopaneltitle-for-f14a7dcd17be15deaad4b45f6c15b9ee" style="display:none">Info about the 'key' external reference.</span><a href="https://www.w3.org/TR/uievents/#widl-KeyboardEvent-key">https://www.w3.org/TR/uievents/#widl-KeyboardEvent-key</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-widl-KeyboardEvent-key">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-event-type-keypress">
-   <a href="https://www.w3.org/TR/uievents/#event-type-keypress">https://www.w3.org/TR/uievents/#event-type-keypress</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-79ef937ecde86a3a04720c0892d6f08e" class="dfn-panel" data-for="79ef937ecde86a3a04720c0892d6f08e" id="infopanel-for-79ef937ecde86a3a04720c0892d6f08e">
+   <span id="infopaneltitle-for-79ef937ecde86a3a04720c0892d6f08e" style="display:none">Info about the 'keypress' external reference.</span><a href="https://www.w3.org/TR/uievents/#event-type-keypress">https://www.w3.org/TR/uievents/#event-type-keypress</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-event-type-keypress">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothdevice-id">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-e832d4f1964c16fcf8233e73a08cb49a" class="dfn-panel" data-for="e832d4f1964c16fcf8233e73a08cb49a" id="infopanel-for-e832d4f1964c16fcf8233e73a08cb49a">
+   <span id="infopaneltitle-for-e832d4f1964c16fcf8233e73a08cb49a" style="display:none">Info about the 'id' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-id</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-id">5.3. getBluetoothManualChooserEvents(callback)</a> <a href="#ref-for-dom-bluetoothdevice-id①">(2)</a>
     <li><a href="#ref-for-dom-bluetoothdevice-id②">5.4. sendBluetoothManualChooserEvent(event, argument)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothdevice-name">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-13d0d9f3cb2ec4ab92ec2b7bae9058fa" class="dfn-panel" data-for="13d0d9f3cb2ec4ab92ec2b7bae9058fa" id="infopanel-for-13d0d9f3cb2ec4ab92ec2b7bae9058fa">
+   <span id="infopaneltitle-for-13d0d9f3cb2ec4ab92ec2b7bae9058fa" style="display:none">Info about the 'name' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdevice-name</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-name">5.3. getBluetoothManualChooserEvents(callback)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetooth-requestdevice">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-3140b21970edb7ba6d7b17c46edf943c" class="dfn-panel" data-for="3140b21970edb7ba6d7b17c46edf943c" id="infopanel-for-3140b21970edb7ba6d7b17c46edf943c">
+   <span id="infopaneltitle-for-3140b21970edb7ba6d7b17c46edf943c" style="display:none">Info about the 'requestDevice()' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetooth-requestdevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-dom-bluetooth-requestdevice①">5.2. setBluetoothManualChooser()</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-valid-uuid">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#valid-uuid">https://webbluetoothcg.github.io/web-bluetooth/#valid-uuid</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-7e2e06eec01e5390d502cf823f165bec" class="dfn-panel" data-for="7e2e06eec01e5390d502cf823f165bec" id="infopanel-for-7e2e06eec01e5390d502cf823f165bec">
+   <span id="infopaneltitle-for-7e2e06eec01e5390d502cf823f165bec" style="display:none">Info about the 'valid uuid' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#valid-uuid">https://webbluetoothcg.github.io/web-bluetooth/#valid-uuid</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-valid-uuid">5.1.8. FailingGATTOperationsDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-DOMString">
-   <a href="https://webidl.spec.whatwg.org/#idl-DOMString">https://webidl.spec.whatwg.org/#idl-DOMString</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-d0f238a61de9310f1738a214749fab18" class="dfn-panel" data-for="d0f238a61de9310f1738a214749fab18" id="infopanel-for-d0f238a61de9310f1738a214749fab18">
+   <span id="infopaneltitle-for-d0f238a61de9310f1738a214749fab18" style="display:none">Info about the 'DOMString' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-DOMString">https://webidl.spec.whatwg.org/#idl-DOMString</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-DOMString">5. testRunner</a> <a href="#ref-for-idl-DOMString①">(2)</a> <a href="#ref-for-idl-DOMString②">(3)</a> <a href="#ref-for-idl-DOMString③">(4)</a>
     <li><a href="#ref-for-idl-DOMString④">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-Exposed">
-   <a href="https://webidl.spec.whatwg.org/#Exposed">https://webidl.spec.whatwg.org/#Exposed</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dde049eb112f043fc45407ec0d4cb457" class="dfn-panel" data-for="dde049eb112f043fc45407ec0d4cb457" id="infopanel-for-dde049eb112f043fc45407ec0d4cb457">
+   <span id="infopaneltitle-for-dde049eb112f043fc45407ec0d4cb457" style="display:none">Info about the 'Exposed' external reference.</span><a href="https://webidl.spec.whatwg.org/#Exposed">https://webidl.spec.whatwg.org/#Exposed</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-Exposed">5. testRunner</a>
     <li><a href="#ref-for-Exposed①">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-SecureContext">
-   <a href="https://webidl.spec.whatwg.org/#SecureContext">https://webidl.spec.whatwg.org/#SecureContext</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-cdf224ec60dc3b08449a2fbdf3a90406" class="dfn-panel" data-for="cdf224ec60dc3b08449a2fbdf3a90406" id="infopanel-for-cdf224ec60dc3b08449a2fbdf3a90406">
+   <span id="infopaneltitle-for-cdf224ec60dc3b08449a2fbdf3a90406" style="display:none">Info about the 'SecureContext' external reference.</span><a href="https://webidl.spec.whatwg.org/#SecureContext">https://webidl.spec.whatwg.org/#SecureContext</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-SecureContext">5. testRunner</a>
     <li><a href="#ref-for-SecureContext①">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-sequence">
-   <a href="https://webidl.spec.whatwg.org/#idl-sequence">https://webidl.spec.whatwg.org/#idl-sequence</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" class="dfn-panel" data-for="38ab7db52e46bed36993204c29f67202" id="infopanel-for-38ab7db52e46bed36993204c29f67202">
+   <span id="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" style="display:none">Info about the 'sequence' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-sequence">https://webidl.spec.whatwg.org/#idl-sequence</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-sequence">5. testRunner</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-undefined">
-   <a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" class="dfn-panel" data-for="cee863f1f2ec91066cfb7f5d309d59dc" id="infopanel-for-cee863f1f2ec91066cfb7f5d309d59dc">
+   <span id="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" style="display:none">Info about the 'undefined' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-undefined">5. testRunner</a> <a href="#ref-for-idl-undefined①">(2)</a> <a href="#ref-for-idl-undefined②">(3)</a> <a href="#ref-for-idl-undefined③">(4)</a> <a href="#ref-for-idl-undefined④">(5)</a>
     <li><a href="#ref-for-idl-undefined⑤">6. eventSender</a>
@@ -1070,47 +1080,47 @@ action corresponding to the <code class="idl"><a data-link-type="idl" href="#dom
    <li>
     <a data-link-type="biblio">[BLUETOOTH-ASSIGNED]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-">org.bluetooth.characteristic.gap.device_name</span>
-     <li><span class="dfn-paneled" id="term-for-①">org.bluetooth.descriptor.gatt.characteristic_extended_properties</span>
-     <li><span class="dfn-paneled" id="term-for-②">org.bluetooth.descriptor.gatt.characteristic_user_description</span>
-     <li><span class="dfn-paneled" id="term-for-③">org.bluetooth.service.battery_service</span>
-     <li><span class="dfn-paneled" id="term-for-④">org.bluetooth.service.generic_access</span>
-     <li><span class="dfn-paneled" id="term-for-⑤">org.bluetooth.service.glucose</span>
-     <li><span class="dfn-paneled" id="term-for-⑥">org.bluetooth.service.heart_rate</span>
+     <li><span class="dfn-paneled" id="2ea8e9ae0e9518b617c846346a6eb445">org.bluetooth.characteristic.gap.device_name</span>
+     <li><span class="dfn-paneled" id="56b900973c2355081e2249ba8a9e84c7">org.bluetooth.descriptor.gatt.characteristic_extended_properties</span>
+     <li><span class="dfn-paneled" id="778250209adb0d9c4517d59f675fada3">org.bluetooth.descriptor.gatt.characteristic_user_description</span>
+     <li><span class="dfn-paneled" id="fe0f1183741fa0f0f36954ddcdf75cbf">org.bluetooth.service.battery_service</span>
+     <li><span class="dfn-paneled" id="023604c2c1e142e76e7fe1036df2da64">org.bluetooth.service.generic_access</span>
+     <li><span class="dfn-paneled" id="58c0cc0c46f2c1d120e8e51c74c18a3b">org.bluetooth.service.glucose</span>
+     <li><span class="dfn-paneled" id="6404bfac2ce9c4aae4a96b3eebb9d5f2">org.bluetooth.service.heart_rate</span>
     </ul>
    <li>
     <a data-link-type="biblio">[DOM]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-concept-event-fire">fire an event</span>
+     <li><span class="dfn-paneled" id="15045c15505e025cd6b6d0f134b7c986">fire an event</span>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-window">Window</span>
-     <li><span class="dfn-paneled" id="term-for-the-body-element-2">the body element</span>
+     <li><span class="dfn-paneled" id="d1f0a86fd49be388d8b0159e241a1172">Window</span>
+     <li><span class="dfn-paneled" id="677c279517b8014f6a4be314e26e6a9e">the body element</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[uievents]</a> defines the following terms:
+    <a data-link-type="biblio">[UIEVENTS]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-widl-KeyboardEvent-key">key</span>
-     <li><span class="dfn-paneled" id="term-for-event-type-keypress">keypress</span>
+     <li><span class="dfn-paneled" id="f14a7dcd17be15deaad4b45f6c15b9ee">key</span>
+     <li><span class="dfn-paneled" id="79ef937ecde86a3a04720c0892d6f08e">keypress</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[web-bluetooth]</a> defines the following terms:
+    <a data-link-type="biblio">[WEB-BLUETOOTH]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothdevice-id">id</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothdevice-name">name</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetooth-requestdevice">requestDevice()</span>
-     <li><span class="dfn-paneled" id="term-for-valid-uuid">valid uuid</span>
+     <li><span class="dfn-paneled" id="e832d4f1964c16fcf8233e73a08cb49a">id</span>
+     <li><span class="dfn-paneled" id="13d0d9f3cb2ec4ab92ec2b7bae9058fa">name</span>
+     <li><span class="dfn-paneled" id="3140b21970edb7ba6d7b17c46edf943c">requestDevice()</span>
+     <li><span class="dfn-paneled" id="7e2e06eec01e5390d502cf823f165bec">valid uuid</span>
     </ul>
    <li>
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-idl-DOMString">DOMString</span>
-     <li><span class="dfn-paneled" id="term-for-Exposed">Exposed</span>
-     <li><span class="dfn-paneled" id="term-for-SecureContext">SecureContext</span>
-     <li><span class="dfn-paneled" id="term-for-idl-sequence">sequence</span>
-     <li><span class="dfn-paneled" id="term-for-idl-undefined">undefined</span>
+     <li><span class="dfn-paneled" id="d0f238a61de9310f1738a214749fab18">DOMString</span>
+     <li><span class="dfn-paneled" id="dde049eb112f043fc45407ec0d4cb457">Exposed</span>
+     <li><span class="dfn-paneled" id="cdf224ec60dc3b08449a2fbdf3a90406">SecureContext</span>
+     <li><span class="dfn-paneled" id="38ab7db52e46bed36993204c29f67202">sequence</span>
+     <li><span class="dfn-paneled" id="cee863f1f2ec91066cfb7f5d309d59dc">undefined</span>
     </ul>
   </ul>
   <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
@@ -1125,14 +1135,14 @@ action corresponding to the <code class="idl"><a data-link-type="idl" href="#dom
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-uievents">[UIEVENTS]
-   <dd>Gary Kacmarcik; Travis Leithead. <a href="https://www.w3.org/TR/uievents/"><cite>UI Events</cite></a>. 1 June 2022. WD. URL: <a href="https://www.w3.org/TR/uievents/">https://www.w3.org/TR/uievents/</a>
+   <dd>Gary Kacmarcik; Travis Leithead. <a href="https://w3c.github.io/uievents/"><cite>UI Events</cite></a>. URL: <a href="https://w3c.github.io/uievents/">https://w3c.github.io/uievents/</a>
    <dt id="biblio-web-bluetooth">[WEB-BLUETOOTH]
-   <dd>Jeffrey Yasskin. <a href="https://webbluetoothcg.github.io/web-bluetooth/"><cite>Web Bluetooth</cite></a>. Draft Community Group Report. URL: <a href="https://webbluetoothcg.github.io/web-bluetooth/">https://webbluetoothcg.github.io/web-bluetooth/</a>
+   <dd>Jeffrey Yasskin. <a href="https://webbluetoothcg.github.io/web-bluetooth/"><cite>Web Bluetooth</cite></a>. URL: <a href="https://webbluetoothcg.github.io/web-bluetooth/">https://webbluetoothcg.github.io/web-bluetooth/</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
-<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/window-object.html#window"><c- g>Window</c-></a> {
+<pre class="idl highlight def"><c- b>partial</c-> <c- b>interface</c-> <a class="idl-code" data-link-type="interface" href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#window"><c- g>Window</c-></a> {
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#testrunner"><c- n>TestRunner</c-></a> <a data-readonly data-type="TestRunner" href="#dom-window-testrunner"><code><c- g>testRunner</c-></code></a>;
   <c- b>readonly</c-> <c- b>attribute</c-> <a data-link-type="idl-name" href="#eventsender"><c- n>EventSender</c-></a> <a data-readonly data-type="EventSender" href="#dom-window-eventsender"><code><c- g>eventSender</c-></code></a>;
 };
@@ -1162,208 +1172,262 @@ in updating and collaborating on this document when the next tested
 implementation begins development. <a class="issue-return" href="#issue-4d7cfd5e" title="Jump to section">↵</a></div>
    <div class="issue"> See <a href="#privacy">§ 3 Privacy considerations</a> section. <a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/575">[Issue #575]</a> <a class="issue-return" href="#issue-965b39bd" title="Jump to section">↵</a></div>
   </div>
-  <aside class="dfn-panel" data-for="callbackdef-bluetoothmanualchoosereventscallback">
-   <b><a href="#callbackdef-bluetoothmanualchoosereventscallback">#callbackdef-bluetoothmanualchoosereventscallback</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-callbackdef-bluetoothmanualchoosereventscallback" class="dfn-panel" data-for="callbackdef-bluetoothmanualchoosereventscallback" id="infopanel-for-callbackdef-bluetoothmanualchoosereventscallback">
+   <span id="infopaneltitle-for-callbackdef-bluetoothmanualchoosereventscallback" style="display:none">Info about the 'BluetoothManualChooserEventsCallback' definition.</span><b><a href="#callbackdef-bluetoothmanualchoosereventscallback">#callbackdef-bluetoothmanualchoosereventscallback</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-callbackdef-bluetoothmanualchoosereventscallback">5. testRunner</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="testrunner">
-   <b><a href="#testrunner">#testrunner</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-testrunner" class="dfn-panel" data-for="testrunner" id="infopanel-for-testrunner">
+   <span id="infopaneltitle-for-testrunner" style="display:none">Info about the 'TestRunner' definition.</span><b><a href="#testrunner">#testrunner</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-testrunner">4. Testing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">
-   <b><a href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-setbluetoothmockdataset-datasetname-datasetname" class="dfn-panel" data-for="dom-testrunner-setbluetoothmockdataset-datasetname-datasetname" id="infopanel-for-dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">
+   <span id="infopaneltitle-for-dom-testrunner-setbluetoothmockdataset-datasetname-datasetname" style="display:none">Info about the 'dataSetName' definition.</span><b><a href="#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">#dom-testrunner-setbluetoothmockdataset-datasetname-datasetname</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-setbluetoothmockdataset-datasetname-datasetname">5.1. setBluetoothMockDataSet</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">
-   <b><a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event" class="dfn-panel" data-for="dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event" id="infopanel-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">
+   <span id="infopaneltitle-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event" style="display:none">Info about the 'event' definition.</span><b><a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-event">5.4. sendBluetoothManualChooserEvent(event, argument)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">
-   <b><a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument" class="dfn-panel" data-for="dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument" id="infopanel-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">
+   <span id="infopaneltitle-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument" style="display:none">Info about the 'argument' definition.</span><b><a href="#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">#dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-sendbluetoothmanualchooserevent-event-argument-argument">5.4. sendBluetoothManualChooserEvent(event, argument)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-setbluetoothmockdataset">
-   <b><a href="#dom-testrunner-setbluetoothmockdataset">#dom-testrunner-setbluetoothmockdataset</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-setbluetoothmockdataset" class="dfn-panel" data-for="dom-testrunner-setbluetoothmockdataset" id="infopanel-for-dom-testrunner-setbluetoothmockdataset">
+   <span id="infopaneltitle-for-dom-testrunner-setbluetoothmockdataset" style="display:none">Info about the 'setBluetoothMockDataSet(dataSetName)' definition.</span><b><a href="#dom-testrunner-setbluetoothmockdataset">#dom-testrunner-setbluetoothmockdataset</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-setbluetoothmockdataset">5. testRunner</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="batterydevice">
-   <b><a href="#batterydevice">#batterydevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-batterydevice" class="dfn-panel" data-for="batterydevice" id="infopanel-for-batterydevice">
+   <span id="infopaneltitle-for-batterydevice" style="display:none">Info about the '5.1.1. BatteryDevice' definition.</span><b><a href="#batterydevice">#batterydevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-batterydevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-batterydevice">5.1.1. BatteryDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="glucosedevice">
-   <b><a href="#glucosedevice">#glucosedevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-glucosedevice" class="dfn-panel" data-for="glucosedevice" id="infopanel-for-glucosedevice">
+   <span id="infopaneltitle-for-glucosedevice" style="display:none">Info about the '5.1.2. GlucoseDevice' definition.</span><b><a href="#glucosedevice">#glucosedevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-glucosedevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-glucosedevice">5.1.2. GlucoseDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="heartratedevice">
-   <b><a href="#heartratedevice">#heartratedevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-heartratedevice" class="dfn-panel" data-for="heartratedevice" id="infopanel-for-heartratedevice">
+   <span id="infopaneltitle-for-heartratedevice" style="display:none">Info about the '5.1.3. HeartRateDevice' definition.</span><b><a href="#heartratedevice">#heartratedevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-heartratedevice">5.1. setBluetoothMockDataSet</a> <a href="#ref-for-heartratedevice①">(2)</a>
     <li><a href="#ref-for-heartratedevice">5.1.3. HeartRateDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="missingservicegenericaccessdevice">
-   <b><a href="#missingservicegenericaccessdevice">#missingservicegenericaccessdevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-missingservicegenericaccessdevice" class="dfn-panel" data-for="missingservicegenericaccessdevice" id="infopanel-for-missingservicegenericaccessdevice">
+   <span id="infopaneltitle-for-missingservicegenericaccessdevice" style="display:none">Info about the '5.1.4. MissingServiceGenericAccessDevice' definition.</span><b><a href="#missingservicegenericaccessdevice">#missingservicegenericaccessdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-missingservicegenericaccessdevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-missingservicegenericaccessdevice">5.1.4. MissingServiceGenericAccessDevice</a>
     <li><a href="#ref-for-missingservicegenericaccessdevice①">5.1.5. MissingCharacteristicGenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="missingcharacteristicgenericaccessdevice">
-   <b><a href="#missingcharacteristicgenericaccessdevice">#missingcharacteristicgenericaccessdevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-missingcharacteristicgenericaccessdevice" class="dfn-panel" data-for="missingcharacteristicgenericaccessdevice" id="infopanel-for-missingcharacteristicgenericaccessdevice">
+   <span id="infopaneltitle-for-missingcharacteristicgenericaccessdevice" style="display:none">Info about the '5.1.5. MissingCharacteristicGenericAccessDevice' definition.</span><b><a href="#missingcharacteristicgenericaccessdevice">#missingcharacteristicgenericaccessdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-missingcharacteristicgenericaccessdevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-missingcharacteristicgenericaccessdevice">5.1.5. MissingCharacteristicGenericAccessDevice</a>
     <li><a href="#ref-for-missingcharacteristicgenericaccessdevice①">5.1.6. MissingDescriptorGenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="missingdescriptorgenericaccessdevice">
-   <b><a href="#missingdescriptorgenericaccessdevice">#missingdescriptorgenericaccessdevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-missingdescriptorgenericaccessdevice" class="dfn-panel" data-for="missingdescriptorgenericaccessdevice" id="infopanel-for-missingdescriptorgenericaccessdevice">
+   <span id="infopaneltitle-for-missingdescriptorgenericaccessdevice" style="display:none">Info about the '5.1.6. MissingDescriptorGenericAccessDevice' definition.</span><b><a href="#missingdescriptorgenericaccessdevice">#missingdescriptorgenericaccessdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-missingdescriptorgenericaccessdevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-missingdescriptorgenericaccessdevice">5.1.6. MissingDescriptorGenericAccessDevice</a>
     <li><a href="#ref-for-missingdescriptorgenericaccessdevice①">5.1.7. GenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="genericaccessdevice">
-   <b><a href="#genericaccessdevice">#genericaccessdevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-genericaccessdevice" class="dfn-panel" data-for="genericaccessdevice" id="infopanel-for-genericaccessdevice">
+   <span id="infopaneltitle-for-genericaccessdevice" style="display:none">Info about the '5.1.7. GenericAccessDevice' definition.</span><b><a href="#genericaccessdevice">#genericaccessdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-genericaccessdevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-genericaccessdevice">5.1.7. GenericAccessDevice</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="failinggattoperationsdevice">
-   <b><a href="#failinggattoperationsdevice">#failinggattoperationsdevice</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-failinggattoperationsdevice" class="dfn-panel" data-for="failinggattoperationsdevice" id="infopanel-for-failinggattoperationsdevice">
+   <span id="infopaneltitle-for-failinggattoperationsdevice" style="display:none">Info about the '5.1.8. FailingGATTOperationsDevice' definition.</span><b><a href="#failinggattoperationsdevice">#failinggattoperationsdevice</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-failinggattoperationsdevice">5.1. setBluetoothMockDataSet</a>
     <li><a href="#ref-for-failinggattoperationsdevice">5.1.8. FailingGATTOperationsDevice</a> <a href="#ref-for-failinggattoperationsdevice①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="abstract-opdef-erroruuid">
-   <b><a href="#abstract-opdef-erroruuid">#abstract-opdef-erroruuid</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-abstract-opdef-erroruuid" class="dfn-panel" data-for="abstract-opdef-erroruuid" id="infopanel-for-abstract-opdef-erroruuid">
+   <span id="infopaneltitle-for-abstract-opdef-erroruuid" style="display:none">Info about the 'errorUUID' definition.</span><b><a href="#abstract-opdef-erroruuid">#abstract-opdef-erroruuid</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-abstract-opdef-erroruuid">5.1.8. FailingGATTOperationsDevice</a> <a href="#ref-for-abstract-opdef-erroruuid①">(2)</a> <a href="#ref-for-abstract-opdef-erroruuid②">(3)</a> <a href="#ref-for-abstract-opdef-erroruuid③">(4)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-setbluetoothmanualchooser">
-   <b><a href="#dom-testrunner-setbluetoothmanualchooser">#dom-testrunner-setbluetoothmanualchooser</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-setbluetoothmanualchooser" class="dfn-panel" data-for="dom-testrunner-setbluetoothmanualchooser" id="infopanel-for-dom-testrunner-setbluetoothmanualchooser">
+   <span id="infopaneltitle-for-dom-testrunner-setbluetoothmanualchooser" style="display:none">Info about the '5.2. setBluetoothManualChooser()' definition.</span><b><a href="#dom-testrunner-setbluetoothmanualchooser">#dom-testrunner-setbluetoothmanualchooser</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-setbluetoothmanualchooser">5. testRunner</a>
     <li><a href="#ref-for-dom-testrunner-setbluetoothmanualchooser">5.2. setBluetoothManualChooser()</a> <a href="#ref-for-dom-testrunner-setbluetoothmanualchooser①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="manual-chooser">
-   <b><a href="#manual-chooser">#manual-chooser</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-manual-chooser" class="dfn-panel" data-for="manual-chooser" id="infopanel-for-manual-chooser">
+   <span id="infopaneltitle-for-manual-chooser" style="display:none">Info about the 'manual chooser' definition.</span><b><a href="#manual-chooser">#manual-chooser</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-manual-chooser">5.3. getBluetoothManualChooserEvents(callback)</a>
     <li><a href="#ref-for-manual-chooser①">5.4. sendBluetoothManualChooserEvent(event, argument)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-getbluetoothmanualchooserevents">
-   <b><a href="#dom-testrunner-getbluetoothmanualchooserevents">#dom-testrunner-getbluetoothmanualchooserevents</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-getbluetoothmanualchooserevents" class="dfn-panel" data-for="dom-testrunner-getbluetoothmanualchooserevents" id="infopanel-for-dom-testrunner-getbluetoothmanualchooserevents">
+   <span id="infopaneltitle-for-dom-testrunner-getbluetoothmanualchooserevents" style="display:none">Info about the '5.3. getBluetoothManualChooserEvents(callback)' definition.</span><b><a href="#dom-testrunner-getbluetoothmanualchooserevents">#dom-testrunner-getbluetoothmanualchooserevents</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-getbluetoothmanualchooserevents">5. testRunner</a>
     <li><a href="#ref-for-dom-testrunner-getbluetoothmanualchooserevents①">5.2. setBluetoothManualChooser()</a>
     <li><a href="#ref-for-dom-testrunner-getbluetoothmanualchooserevents">5.3. getBluetoothManualChooserEvents(callback)</a> <a href="#ref-for-dom-testrunner-getbluetoothmanualchooserevents②">(2)</a> <a href="#ref-for-dom-testrunner-getbluetoothmanualchooserevents③">(3)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-testrunner-sendbluetoothmanualchooserevent">
-   <b><a href="#dom-testrunner-sendbluetoothmanualchooserevent">#dom-testrunner-sendbluetoothmanualchooserevent</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-testrunner-sendbluetoothmanualchooserevent" class="dfn-panel" data-for="dom-testrunner-sendbluetoothmanualchooserevent" id="infopanel-for-dom-testrunner-sendbluetoothmanualchooserevent">
+   <span id="infopaneltitle-for-dom-testrunner-sendbluetoothmanualchooserevent" style="display:none">Info about the '5.4. sendBluetoothManualChooserEvent(event, argument)' definition.</span><b><a href="#dom-testrunner-sendbluetoothmanualchooserevent">#dom-testrunner-sendbluetoothmanualchooserevent</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-testrunner-sendbluetoothmanualchooserevent">5. testRunner</a>
     <li><a href="#ref-for-dom-testrunner-sendbluetoothmanualchooserevent①">5.2. setBluetoothManualChooser()</a>
     <li><a href="#ref-for-dom-testrunner-sendbluetoothmanualchooserevent">5.4. sendBluetoothManualChooserEvent(event, argument)</a> <a href="#ref-for-dom-testrunner-sendbluetoothmanualchooserevent②">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="eventsender">
-   <b><a href="#eventsender">#eventsender</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-eventsender" class="dfn-panel" data-for="eventsender" id="infopanel-for-eventsender">
+   <span id="infopaneltitle-for-eventsender" style="display:none">Info about the 'EventSender' definition.</span><b><a href="#eventsender">#eventsender</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-eventsender">4. Testing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-eventsender-keydown-code-code">
-   <b><a href="#dom-eventsender-keydown-code-code">#dom-eventsender-keydown-code-code</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-eventsender-keydown-code-code" class="dfn-panel" data-for="dom-eventsender-keydown-code-code" id="infopanel-for-dom-eventsender-keydown-code-code">
+   <span id="infopaneltitle-for-dom-eventsender-keydown-code-code" style="display:none">Info about the 'code' definition.</span><b><a href="#dom-eventsender-keydown-code-code">#dom-eventsender-keydown-code-code</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-eventsender-keydown-code-code">6. eventSender</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-eventsender-keydown">
-   <b><a href="#dom-eventsender-keydown">#dom-eventsender-keydown</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-eventsender-keydown" class="dfn-panel" data-for="dom-eventsender-keydown" id="infopanel-for-dom-eventsender-keydown">
+   <span id="infopaneltitle-for-dom-eventsender-keydown" style="display:none">Info about the 'keyDown(code)' definition.</span><b><a href="#dom-eventsender-keydown">#dom-eventsender-keydown</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-eventsender-keydown">6. eventSender</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
-
-document.body.addEventListener("click", function(e) {
-    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
-    // Find the dfn element or panel, if any, that was clicked on.
-    var el = e.target;
-    var target;
-    var hitALink = false;
-    while(el.parentElement) {
-        if(el.tagName == "A") {
-            // Clicking on a link in a <dfn> shouldn't summon the panel
-            hitALink = true;
-        }
-        if(el.classList.contains("dfn-paneled")) {
-            target = "dfn";
-            break;
-        }
-        if(el.classList.contains("dfn-panel")) {
-            target = "dfn-panel";
-            break;
-        }
-        el = el.parentElement;
+"use strict";
+{
+    function queryAll(sel) {
+        return [].slice.call(document.querySelectorAll(sel));
     }
-    if(target != "dfn-panel") {
+
+    // Add popup behavior to all dfns to show the corresponding dfn-panel.
+    var dfns = document.querySelectorAll('.dfn-paneled');
+    for (let dfn of dfns) { insertDfnPopupAction(dfn); }
+
+    document.body.addEventListener("click", (e) => {
+        // If not handled already, just hide all dfn panels.
+        hideAllDfnPanels();
+    });
+
+    function hideAllDfnPanels() {
         // Turn off any currently "on" or "activated" panels.
-        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
-            el.classList.remove("on");
-            el.classList.remove("activated");
-        });
-    }
-    if(target == "dfn" && !hitALink) {
-        // open the panel
-        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
-        if(dfnPanel) {
-            dfnPanel.classList.add("on");
-            var rect = el.getBoundingClientRect();
-            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
-            dfnPanel.style.top = window.scrollY + rect.top + "px";
-            var panelRect = dfnPanel.getBoundingClientRect();
-            var panelWidth = panelRect.right - panelRect.left;
-            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
-                // Reposition, because the panel is overflowing
-                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
-            }
-        } else {
-            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
-        }
-    } else if(target == "dfn-panel") {
-        // Switch it to "activated" state, which pins it.
-        el.classList.add("activated");
-        el.style.left = null;
-        el.style.top = null;
+        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(el=>hideDfnPanel(el));
     }
 
-});
+    function showDfnPanel(dfnPanel, dfn) {
+        hideAllDfnPanels(); // Only display one at this time.
+        dfn.setAttribute("aria-expanded", "true");
+        dfnPanel.classList.add("on");
+        dfnPanel.style.left = "5px";
+        dfnPanel.style.top = "0px";
+        const panelRect = dfnPanel.getBoundingClientRect();
+        const panelWidth = panelRect.right - panelRect.left;
+        if (panelRect.right > document.body.scrollWidth) {
+            // Panel's overflowing the screen.
+            // Just drop it below the dfn and flip it rightward instead.
+            // This still wont' fix things if the screen is *really* wide,
+            // but fixing that's a lot harder without 'anchor()'.
+            dfnPanel.style.top = "1.5em";
+            dfnPanel.style.left = "auto";
+            dfnPanel.style.right = "0px";
+        }
+    }
+
+    function pinDfnPanel(dfnPanel) {
+        // Switch it to "activated" state, which pins it.
+        dfnPanel.classList.add("activated");
+        dfnPanel.style.left = null;
+        dfnPanel.style.top = null;
+    }
+
+    function hideDfnPanel(dfnPanel, dfn) {
+        if(!dfn) {
+            dfn = document.getElementById(dfnPanel.getAttribute("data-for"));
+        }
+        dfn.setAttribute("aria-expanded", "false")
+        dfnPanel.classList.remove("on");
+        dfnPanel.classList.remove("activated");
+    }
+
+    function toggleDfnPanel(dfnPanel, dfn) {
+        if(dfnPanel.classList.contains("on")) {
+            hideDfnPanel(dfnPanel, dfn);
+        } else {
+            showDfnPanel(dfnPanel, dfn);
+        }
+    }
+
+    function insertDfnPopupAction(dfn) {
+        // Find dfn panel
+        const dfnPanel = document.querySelector(`.dfn-panel[data-for='${dfn.id}']`);
+        if (dfnPanel) {
+            const panelWrapper = document.createElement('span');
+            panelWrapper.appendChild(dfnPanel);
+            panelWrapper.style.position = "relative";
+            panelWrapper.style.height = "0px";
+            dfn.insertAdjacentElement("afterend", panelWrapper);
+            dfn.setAttribute('role', 'button');
+            dfn.setAttribute('aria-expanded', 'false')
+            dfn.tabIndex = 0;
+            dfn.classList.add('has-dfn-panel');
+            dfn.addEventListener('click', (event) => {
+                showDfnPanel(dfnPanel, dfn);
+                event.stopPropagation();
+            });
+            dfn.addEventListener('keypress', (event) => {
+                const kc = event.keyCode;
+                // 32->Space, 13->Enter
+                if(kc == 32 || kc == 13) {
+                    toggleDfnPanel(dfnPanel, dfn);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            });
+
+            dfnPanel.addEventListener('click', (event) => {
+                pinDfnPanel(dfnPanel);
+                event.stopPropagation();
+            });
+
+            dfnPanel.addEventListener('keydown', (event) => {
+                if(event.keyCode == 27) { // Escape key
+                    hideDfnPanel(dfnPanel, dfn);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            })
+
+        } else {
+            console.log("Couldn't find .dfn-panel[data-for='" + dfn.id + "']");
+        }
+    }
+}
 </script>
