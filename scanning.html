@@ -6,16 +6,15 @@
   <meta content="CG-DRAFT" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <link href="https://www.w3.org/2008/site/images/favicon.ico" rel="icon">
-  <meta content="Bikeshed version 37b7e7e68, updated Fri May 27 15:08:11 2022 -0700" name="generator">
+  <meta content="Bikeshed version d9bd89757, updated Thu Mar 23 10:06:53 2023 -0700" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/scanning.html" rel="canonical">
-  <meta content="696bb7ae3738f6e4bbf23f02139df04225979585" name="document-revision">
+  <meta content="4cb56840b7032fbd5d09ce772c55974ac3c16b09" name="document-revision">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
   /* Show self-links for various elements. This is incompatible with nearby floats. */
   .note, .why, .example, .issue { overflow: inherit; }
 </style>
 <style>/* style-autolinks */
-
 .css.css, .property.property, .descriptor.descriptor {
     color: var(--a-normal-text);
     font-size: inherit;
@@ -75,7 +74,8 @@ pre .property::before, pre .property::after {
 
 [data-link-type=biblio] {
     white-space: pre;
-}</style>
+}
+</style>
 <style>/* style-colors */
 
 /* Any --*-text not paired with a --*-bg is assumed to have a transparent bg */
@@ -184,9 +184,9 @@ pre .property::before, pre .property::after {
     --outdated-shadow: red;
 
     --editedrec-bg: darkorange;
-}</style>
+}
+</style>
 <style>/* style-counters */
-
 body {
     counter-reset: example figure issue;
 }
@@ -213,9 +213,9 @@ figcaption {
 }
 figcaption:not(.no-marker)::before {
     content: "Figure " counter(figure) " ";
-}</style>
+}
+</style>
 <style>/* style-dfn-panel */
-
 :root {
     --dfnpanel-bg: #ddd;
     --dfnpanel-text: var(--text);
@@ -223,10 +223,10 @@ figcaption:not(.no-marker)::before {
 .dfn-panel {
     position: absolute;
     z-index: 35;
-    height: auto;
-    width: -webkit-fit-content;
-    width: fit-content;
+    width: 20em;
+    min-width: min-content;
     max-width: 300px;
+    height: auto;
     max-height: 500px;
     overflow: auto;
     padding: 0.5em 0.75em;
@@ -234,6 +234,7 @@ figcaption:not(.no-marker)::before {
     background: var(--dfnpanel-bg);
     color: var(--dfnpanel-text);
     border: outset 0.2em;
+    white-space: normal; /* in case it's moved into a pre */
 }
 .dfn-panel:not(.on) { display: none; }
 .dfn-panel * { margin: 0; padding: 0; text-indent: 0; }
@@ -256,7 +257,6 @@ figcaption:not(.no-marker)::before {
 .dfn-paneled { cursor: pointer; }
 </style>
 <style>/* style-issues */
-
 a[href].issue-return {
     float: right;
     float: inline-end;
@@ -266,7 +266,6 @@ a[href].issue-return {
 }
 </style>
 <style>/* style-md-lists */
-
 /* This is a weird hack for me not yet following the commonmark spec
    regarding paragraph and lists. */
 [data-md] > :first-child {
@@ -274,7 +273,8 @@ a[href].issue-return {
 }
 [data-md] > :last-child {
     margin-bottom: 0;
-}</style>
+}
+</style>
 <style>/* style-selflinks */
 
 :root {
@@ -301,6 +301,14 @@ a.self-link:hover {
 }
 .heading > a.self-link {
     font-size: 83%;
+}
+.example > a.self-link,
+.note > a.self-link,
+.issue > a.self-link {
+    /* These blocks are overflow:auto, so positioning outside
+       doesn't work. */
+    left: auto;
+    right: 0;
 }
 li > a.self-link {
     left: calc(-1 * (3.5rem - 26px) - 2em);
@@ -514,6 +522,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
        which is quite common in practice... */
     img { background: white; }
 }
+
 @media (prefers-color-scheme: dark) {
     :root {
         --selflink-text: black;
@@ -528,6 +537,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
         --dfnpanel-text: var(--text);
     }
 }
+
 @media (prefers-color-scheme: dark) {
     .highlight:not(.idl) { background: rgba(255, 255, 255, .05); }
 
@@ -595,7 +605,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth Scanning</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2022-06-09">9 June 2022</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2023-03-24">24 March 2023</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -616,7 +626,7 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     </div>
    </details>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2022 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="http://www.w3.org/Consortium/Legal/ipr-notice#Copyright">Copyright</a> © 2023 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available. </p>
    <hr title="Separator for header">
   </div>
@@ -689,11 +699,11 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
     <p><em>This section is non-normative.</em></p>
     <p> <a href="https://www.bluetooth.com/what-is-bluetooth-technology/bluetooth-technology-basics/low-energy">Bluetooth Low Energy (BLE)</a> allows devices to broadcast advertisements to nearby <a data-link-type="dfn" href="#observer" id="ref-for-observer">observers</a>.
     These advertisements can contain small amounts of data
-    of a variety of types defined in <a data-link-type="biblio" href="#biblio-bluetooth-supplement6">[BLUETOOTH-SUPPLEMENT6]</a>. </p>
+    of a variety of types defined in <a data-link-type="biblio" href="#biblio-bluetooth-supplement6" title="Supplement to the Bluetooth Core Specification Version 6">[BLUETOOTH-SUPPLEMENT6]</a>. </p>
     <p> For example, a beacon might announce that it’s next to a particular museum exhibit
     and is advertising with 1mW of power,
     which would let nearby observers know their approximate distance to that exhibit. </p>
-    <p> This specification extends <a data-link-type="biblio" href="#biblio-web-bluetooth">[web-bluetooth]</a> to allow websites to
+    <p> This specification extends <a data-link-type="biblio" href="#biblio-web-bluetooth" title="Web Bluetooth">[web-bluetooth]</a> to allow websites to
     receive these advertisements from nearby BLE devices,
     with the user’s permission. </p>
     <section>
@@ -710,7 +720,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   <c- p>])}}}],</c->
   keepRepeatedDevices<c- o>:</c-> <c- kc>true</c->
 <c- p>}).</c->then<c- p>(()</c-> <c- p>=></c-> <c- p>{</c->
-  navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c-><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived" id="ref-for-eventdef-bluetoothdevice-advertisementreceived"><c- t>advertisementreceived</c-></a><c- t>'</c-><c- p>,</c-> event <c- p>=></c-> <c- p>{</c->
+  navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c-><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdeviceeventhandlers-advertisementreceived" id="ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived"><c- t>advertisementreceived</c-></a><c- t>'</c-><c- p>,</c-> event <c- p>=></c-> <c- p>{</c->
     <c- a>let</c-> appleData <c- o>=</c-> event<c- p>.</c->manufacturerData<c- p>.</c->get<c- p>(</c-><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><c- mh>0x004C</c-></a><c- p>);</c->
     <c- k>if</c-> <c- p>(</c->appleData<c- p>.</c->byteLength <c- o>!=</c-> <c- mf>23</c-><c- p>)</c-> <c- p>{</c->
       <c- c1>// Isn’t an iBeacon.</c->
@@ -750,7 +760,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
     <p> If a user has already given a site permission to know their location,
     it might be ok to implicitly grant access to BLE advertisements.
     However, BLE advertisements give away
-    strictly less location information than full <a data-link-type="biblio" href="#biblio-geolocation-api">[geolocation-api]</a> access,
+    strictly less location information than full <a data-link-type="biblio" href="#biblio-geolocation-api" title="Geolocation API Specification 2nd Edition">[geolocation-api]</a> access,
     so UAs should allow users to grant that intermediate level of access. </p>
     <p> BLE advertisements are usually fully public,
     since they’re broadcast unencrypted on 2.4GHz radio waves.
@@ -788,7 +798,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      <p> Because this could show a prompt, it requires a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context" id="ref-for-secure-context">secure context</a>.
       Additionally, UAs are likely to require a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
       user activation</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global">relevant global object</a> when <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan④">requestLEScan</a></code> is called. </p>
-     <p> Advertising events that <a data-link-type="dfn" href="#bluetoothlescanfilter-match" id="ref-for-bluetoothlescanfilter-match">match</a> a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanfilter" id="ref-for-bluetoothlescanfilter">BluetoothLEScanFilter</a></code> in an active <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan①">BluetoothLEScan</a></code> cause <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived" id="ref-for-eventdef-bluetoothdevice-advertisementreceived①">advertisementreceived</a></code> events to be dispatched
+     <p> Advertising events that <a data-link-type="dfn" href="#bluetoothlescanfilter-match" id="ref-for-bluetoothlescanfilter-match">match</a> a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanfilter" id="ref-for-bluetoothlescanfilter">BluetoothLEScanFilter</a></code> in an active <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan①">BluetoothLEScan</a></code> cause <code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdeviceeventhandlers-advertisementreceived" id="ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived①">advertisementreceived</a></code> events to be dispatched
       to the sending <code class="idl"><a data-link-type="idl" href="index.html#bluetoothdevice" id="ref-for-bluetoothdevice">BluetoothDevice</a></code>.
       A filter matches if the advertisement includes data equal to each present member.
       Usually, you’ll only include one member in each filter. </p>
@@ -806,16 +816,16 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      <p> The <code><dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth" data-dfn-type="method" data-export data-lt="requestLEScan(options)|requestLEScan()" id="dom-bluetooth-requestlescan"><code>requestLEScan(<var>options</var>)</code></dfn></code> method,
       when invoked, MUST return <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#a-new-promise" id="ref-for-a-new-promise">a new promise</a> <var>promise</var> and run the following steps <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel" id="ref-for-in-parallel">in parallel</a>: </p>
      <ol class="algorithm">
-      <li> If <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window">associated Document</a> is 
+      <li> If <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#this" id="ref-for-this">this</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global①">relevant global object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#concept-document-window" id="ref-for-concept-document-window">associated Document</a> is 
         not <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use" id="ref-for-allowed-to-use">allowed to use</a> the <a data-link-type="dfn" href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature" id="ref-for-policy-controlled-feature">policy-controlled feature</a> named <code>"bluetooth"</code>, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#securityerror" id="ref-for-securityerror">SecurityError</a></code> and abort these steps. 
       <li>
         If <code><var>options</var>.acceptAllAdvertisements</code> is <code>true</code>,
         and <code><var>options</var>.filters</code> is present, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject①">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror">TypeError</a></code> and abort these steps. 
-       <p class="note" role="note"><span>Note:</span> There’s no need to include filters if all advertisements are being accepted.</p>
+       <p class="note" role="note"><span class="marker">Note:</span> There’s no need to include filters if all advertisements are being accepted.</p>
       <li>
         If <code><var>options</var>.acceptAllAdvertisements</code> is <code>false</code>,
         and <code><var>options</var>.filters</code> is either absent or empty, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject②">reject</a> <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror①">TypeError</a></code> and abort these steps. 
-       <p class="note" role="note"><span>Note:</span> An empty set of filters wouldn’t return any advertisements.</p>
+       <p class="note" role="note"><span class="marker">Note:</span> An empty set of filters wouldn’t return any advertisements.</p>
       <li> Let <var>filters</var> be <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map" id="ref-for-sec-array.prototype.map">Array.prototype.map</a></code>.call(<var>options</var>.filters,
           filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter">BluetoothLEScanFilter</a></code>(filter))</code> if <code><var>options</var>.filters</code> is present, or an empty <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-frozen-array" id="ref-for-idl-frozen-array">FrozenArray</a></code> otherwise.
         If this throws an exception, <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#reject" id="ref-for-reject③">reject</a> <var>promise</var> with that exception and abort these steps. 
@@ -828,9 +838,9 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   acceptAllAdvertisements<c- o>:</c-> <var>options</var><c- p>.</c->acceptAllAdvertisements<c- p>,</c->
 <c- p>}</c->
 </pre>
-       <p class="note" role="note"><span>Note:</span> This may require that this algorithm has a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+       <p class="note" role="note"><span class="marker">Note:</span> This may require that this algorithm has a <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
         activation</a> on its <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global②">relevant global object</a> when triggered.</p>
-      <li> If the result is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied" id="ref-for-dom-permissionstate-denied">"denied"</a></code>,
+      <li> If the result is "<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied" id="ref-for-dom-permissionstate-denied">denied</a></code>",
         reject <var>promise</var> with a <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#notallowederror" id="ref-for-notallowederror">NotAllowedError</a></code> and abort these steps. 
       <li>
         Let <var>scan</var> be a new <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan②">BluetoothLEScan</a></code> instance
@@ -930,7 +940,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
        <li> Initialize all nullable fields to <code>null</code>. 
        <li>
          If no member of <var>init</var> is present, throw a <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror" id="ref-for-sec-native-error-types-used-in-this-standard-typeerror②">TypeError</a></code>. 
-        <p class="note" role="note"><span>Note:</span> A filter can’t implicitly allow all advertisements.
+        <p class="note" role="note"><span class="marker">Note:</span> A filter can’t implicitly allow all advertisements.
           Use <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanoptions-acceptalladvertisements" id="ref-for-dom-bluetoothlescanoptions-acceptalladvertisements①">acceptAllAdvertisements</a></code> to explicitly do it.</p>
        <li> Initialize <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-manufacturerdata" id="ref-for-dom-bluetoothlescanfilter-manufacturerdata">manufacturerData</a></code></code> as <code>new BluetoothManufacturerDataFilter(<var>init</var>.<code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata" id="ref-for-dom-bluetoothlescanfilterinit-manufacturerdata">manufacturerData</a></code>)</code>. 
        <li> Initialize <code>this.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-servicedata" id="ref-for-dom-bluetoothlescanfilter-servicedata">serviceData</a></code></code> as <code>new BluetoothServiceDataFilter(<var>init</var>.<code class="idl"><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata" id="ref-for-dom-bluetoothlescanfilterinit-servicedata">serviceData</a></code>)</code>. 
@@ -998,12 +1008,12 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
      </div>
     </section>
     <h3 class="heading settled" data-level="4.2" id="handling-full-activity-loss"><span class="secno">4.2. </span><span class="content">Handling Document Loss of Full Activity</span><a class="self-link" href="#handling-full-activity-loss"></a></h3>
-    <p>Operations that initiate a scan for Bluetooth devices may only run in a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active">fully
-active</a> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document">document</a>. When <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active①">full activity</a> is lost, scanning
+    <p>Operations that initiate a scan for Bluetooth devices may only run in a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active">fully
+active</a> <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document">document</a>. When <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active①">full activity</a> is lost, scanning
 operations for that <a data-link-type="dfn" href="https://dom.spec.whatwg.org/#concept-document" id="ref-for-concept-document①">document</a> need to be aborted.</p>
     <div class="algorithm" data-algorithm="handle full activity loss">
-      When the user agent determines that a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window" id="ref-for-concept-document-window①">associated <code>Document</code></a> of
-the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global③">relevant global object</a> is no longer <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active" id="ref-for-fully-active②">fully active</a>, it must run these steps: 
+      When the user agent determines that a <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#concept-document-window" id="ref-for-concept-document-window①">associated <code>Document</code></a> of
+the <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object" id="ref-for-current-settings-object">current settings object</a>'s <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global" id="ref-for-concept-relevant-global③">relevant global object</a> is no longer <a data-link-type="dfn" href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active" id="ref-for-fully-active②">fully active</a>, it must run these steps: 
      <ol>
       <li data-md>
        <p><a data-link-type="dfn" href="https://infra.spec.whatwg.org/#map-iterate" id="ref-for-map-iterate">For each</a> <var>activeScan</var> in <code> navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-activescans-slot" id="ref-for-dom-bluetooth-activescans-slot⑤">[[activeScans]]</a></code></code>, perform the following
@@ -1040,8 +1050,8 @@ steps:</p>
       <dd class="algorithm" data-algorithm="permission-query">
        <p> Given a <code class="idl"><a data-link-type="idl" href="#dictdef-bluetoothlescanpermissiondescriptor" id="ref-for-dictdef-bluetoothlescanpermissiondescriptor">BluetoothLEScanPermissionDescriptor</a></code> <var>descriptor</var> and a <code class="idl"><a data-link-type="idl" href="#bluetoothlescanpermissionresult" id="ref-for-bluetoothlescanpermissionresult">BluetoothLEScanPermissionResult</a></code> <var>result</var>: </p>
        <ol class="algorithm">
-        <li> Update <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state">state</a></code></code> to <var>descriptor</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-state" id="ref-for-dfn-state">permission state</a>. 
-        <li> If <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state①">state</a></code></code> is <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied" id="ref-for-dom-permissionstate-denied①">"denied"</a></code>,
+        <li> Update <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state">state</a></code></code> to <var>descriptor</var>’s <a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-permission-state" id="ref-for-dfn-permission-state">permission state</a>. 
+        <li> If <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstatus-state" id="ref-for-dom-permissionstatus-state①">state</a></code></code> is "<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-denied" id="ref-for-dom-permissionstate-denied①">denied</a></code>",
             set <code><var>result</var>.scans</code> to an empty <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-frozen-array" id="ref-for-idl-frozen-array⑤">FrozenArray</a></code> and abort these steps. 
         <li>
           Update <code><var>result</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanpermissionresult-scans" id="ref-for-dom-bluetoothlescanpermissionresult-scans">scans</a></code></code> to
@@ -1057,14 +1067,14 @@ steps:</p>
           For each <var>activeScan</var> in <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-activescans-slot" id="ref-for-dom-bluetooth-activescans-slot⑦">[[activeScans]]</a></code></code>: 
          <ol>
           <li>
-            If the <a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-state" id="ref-for-dfn-state①">permission state</a> of 
+            If the <a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-permission-state" id="ref-for-dfn-permission-state①">permission state</a> of 
 <pre class="highlight"><c- p>{</c->
   name<c- o>:</c-> <c- u>"bluetooth-le-scan"</c-><c- p>,</c->
   filters<c- o>:</c-> <var>activeScan</var><c- p>.</c->filters<c- p>,</c->
   keepRepeatedDevices<c- o>:</c-> <var>activeScan</var><c- p>.</c->keepRepeatedDevices
 <c- p>}</c->
 </pre>
-           <p>is not <code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-granted" id="ref-for-dom-permissionstate-granted">"granted"</a></code>,
+           <p>is not "<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-granted" id="ref-for-dom-permissionstate-granted">granted</a></code>",
                 call <code><var>activeScan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop③">stop()</a></code></code>.</p>
          </ol>
        </ol>
@@ -1113,7 +1123,7 @@ steps:</p>
       <ul>
        <li>
          If <code><var>filter</var>.name</code> is non-<code>null</code>, <var>event</var> has a <a data-link-type="dfn" href="#local-name" id="ref-for-local-name">Local Name</a> equal to <code><var>filter</var>.name</code>. 
-        <p class="note" role="note"><span>Note:</span> A <a data-link-type="dfn" href="#shortened-local-name" id="ref-for-shortened-local-name">Shortened Local Name</a> can match a <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-name" id="ref-for-dom-bluetoothlescanfilter-name">name</a></code> filter.</p>
+        <p class="note" role="note"><span class="marker">Note:</span> A <a data-link-type="dfn" href="#shortened-local-name" id="ref-for-shortened-local-name">Shortened Local Name</a> can match a <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-name" id="ref-for-dom-bluetoothlescanfilter-name">name</a></code> filter.</p>
        <li> If <code><var>filter</var>.namePrefix</code> is non-<code>null</code>, <var>event</var> has a <a data-link-type="dfn" href="#local-name" id="ref-for-local-name①">Local Name</a>,
           and <code><var>filter</var>.namePrefix</code> is a prefix of it. 
        <li> For each <var>uuid</var> in <code><var>filter</var>.services</code>,
@@ -1166,10 +1176,10 @@ steps:</p>
     ignoring any changes that have been made to the name in the current execution environment.
     For example, when the <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan⑤">requestLEScan()</a></code> algorithm says to call <code><code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map" id="ref-for-sec-array.prototype.map②">Array.prototype.map</a></code>.call(<var>options</var>.filters,
       filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter②">BluetoothLEScanFilter</a></code>(filter))</code>,
-    this MUST apply the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map" id="ref-for-sec-array.prototype.map③">Array.prototype.map</a></code> algorithm defined in <a data-link-type="biblio" href="#biblio-ecmascript">[ECMAScript]</a> with <code><var>options</var>.filters</code> as its <code>this</code> parameter and <code>filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter③">BluetoothLEScanFilter</a></code>(filter)</code> as its <code>callbackfn</code> parameter, regardless of any modifications that have
+    this MUST apply the <code class="idl"><a data-link-type="idl" href="https://tc39.github.io/ecma262/#sec-array.prototype.map" id="ref-for-sec-array.prototype.map③">Array.prototype.map</a></code> algorithm defined in <a data-link-type="biblio" href="#biblio-ecmascript" title="ECMAScript Language Specification">[ECMAScript]</a> with <code><var>options</var>.filters</code> as its <code>this</code> parameter and <code>filter=>new <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescanfilter-bluetoothlescanfilter" id="ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter③">BluetoothLEScanFilter</a></code>(filter)</code> as its <code>callbackfn</code> parameter, regardless of any modifications that have
     been made to <code>window</code>, <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>, <code>Function</code>, <code>Function.prototype</code>, <code>BluetoothLEScanFilter</code>, or other objects. </p>
     <dl>
-     <dt><a data-link-type="biblio" href="#biblio-bluetooth42">[BLUETOOTH42]</a>
+     <dt><a data-link-type="biblio" href="#biblio-bluetooth42" title="BLUETOOTH SPECIFICATION Version 4.2">[BLUETOOTH42]</a>
      <dd>
       <ol>
        <li value="1">
@@ -1256,7 +1266,7 @@ steps:</p>
           </ol>
         </ol>
       </ol>
-     <dt><a data-link-type="biblio" href="#biblio-bluetooth-supplement6">[BLUETOOTH-SUPPLEMENT6]</a>
+     <dt><a data-link-type="biblio" href="#biblio-bluetooth-supplement6" title="Supplement to the Bluetooth Core Specification Version 6">[BLUETOOTH-SUPPLEMENT6]</a>
      <dd>
       <ol type="A">
        <li value="1">
@@ -1287,7 +1297,7 @@ steps:</p>
     However, for readability,
     these words do not appear in all uppercase letters in this specification. </p>
    <p>All of the text of this specification is normative
-    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119">[RFC2119]</a> </p>
+    except sections explicitly marked as non-normative, examples, and notes. <a data-link-type="biblio" href="#biblio-rfc2119" title="Key words for use in RFCs to Indicate Requirement Levels">[RFC2119]</a> </p>
    <p>Examples in this specification are introduced with the words “for example”
     or are set apart from the normative text
     with <code>class="example"</code>,
@@ -1300,7 +1310,7 @@ steps:</p>
     and are set apart from the normative text
     with <code>class="note"</code>,
     like this: </p>
-   <p class="note" role="note">Note, this is an informative note. </p>
+   <p class="note" role="note">Note, this is an informative note.</p>
    <h3 class="no-ref no-num heading settled" id="w3c-conformant-algorithms"><span class="content">Conformant Algorithms</span><a class="self-link" href="#w3c-conformant-algorithms"></a></h3>
    <p>Requirements phrased in the imperative as part of algorithms
     (such as "strip any leading space characters"
@@ -1408,456 +1418,462 @@ steps:</p>
    <li><a href="#shortened-local-name">Shortened Local Name</a><span>, in § 7</span>
    <li><a href="#dom-bluetoothlescan-stop">stop()</a><span>, in § 4.1</span>
   </ul>
-  <aside class="dfn-panel" data-for="term-for-concept-document">
-   <a href="https://dom.spec.whatwg.org/#concept-document">https://dom.spec.whatwg.org/#concept-document</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-985c42e2af63b3e74bd3b70d55668fd4" class="dfn-panel" data-for="985c42e2af63b3e74bd3b70d55668fd4" id="infopanel-for-985c42e2af63b3e74bd3b70d55668fd4">
+   <span id="infopaneltitle-for-985c42e2af63b3e74bd3b70d55668fd4" style="display:none">Info about the 'document' external reference.</span><a href="https://dom.spec.whatwg.org/#concept-document">https://dom.spec.whatwg.org/#concept-document</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-document">4.2. Handling Document Loss of Full Activity</a> <a href="#ref-for-concept-document①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-sec-array.prototype.map">
-   <a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">https://tc39.github.io/ecma262/#sec-array.prototype.map</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-d2676cfdaf532afac42c596aa081c298" class="dfn-panel" data-for="d2676cfdaf532afac42c596aa081c298" id="infopanel-for-d2676cfdaf532afac42c596aa081c298">
+   <span id="infopaneltitle-for-d2676cfdaf532afac42c596aa081c298" style="display:none">Info about the 'Array.prototype.map' external reference.</span><a href="https://tc39.github.io/ecma262/#sec-array.prototype.map">https://tc39.github.io/ecma262/#sec-array.prototype.map</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sec-array.prototype.map">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-sec-array.prototype.map①">4.1. Controlling a BLE scan</a>
     <li><a href="#ref-for-sec-array.prototype.map②">7. Terminology and conventions</a> <a href="#ref-for-sec-array.prototype.map③">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-sec-native-error-types-used-in-this-standard-typeerror">
-   <a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-28f48920b78e327d90225af978074155" class="dfn-panel" data-for="28f48920b78e327d90225af978074155" id="infopanel-for-28f48920b78e327d90225af978074155">
+   <span id="infopaneltitle-for-28f48920b78e327d90225af978074155" style="display:none">Info about the 'TypeError' external reference.</span><a href="https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror">https://tc39.github.io/ecma262/#sec-native-error-types-used-in-this-standard-typeerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror">4. Scanning for BLE advertisements</a> <a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror①">(2)</a>
     <li><a href="#ref-for-sec-native-error-types-used-in-this-standard-typeerror②">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">
-   <a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-651a6e52737d1580218dadd6e02d41b2" class="dfn-panel" data-for="651a6e52737d1580218dadd6e02d41b2" id="infopanel-for-651a6e52737d1580218dadd6e02d41b2">
+   <span id="infopaneltitle-for-651a6e52737d1580218dadd6e02d41b2" style="display:none">Info about the '[[OwnPropertyKeys]]' external reference.</span><a href="https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">https://tc39.github.io/ecma262/#sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">4.1. Controlling a BLE scan</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys①">(2)</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys②">(3)</a> <a href="#ref-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys③">(4)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-allowed-to-use">
-   <a href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use">https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-3dc9eee4a6a1d169f561b6d87bd08573" class="dfn-panel" data-for="3dc9eee4a6a1d169f561b6d87bd08573" id="infopanel-for-3dc9eee4a6a1d169f561b6d87bd08573">
+   <span id="infopaneltitle-for-3dc9eee4a6a1d169f561b6d87bd08573" style="display:none">Info about the 'allowed to use' external reference.</span><a href="https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use">https://html.spec.whatwg.org/multipage/iframe-embed-object.html#allowed-to-use</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-allowed-to-use">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-concept-document-window">
-   <a href="https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window">https://html.spec.whatwg.org/multipage/window-object.html#concept-document-window</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-04e6c32034490f45e4757ead7871de18" class="dfn-panel" data-for="04e6c32034490f45e4757ead7871de18" id="infopanel-for-04e6c32034490f45e4757ead7871de18">
+   <span id="infopaneltitle-for-04e6c32034490f45e4757ead7871de18" style="display:none">Info about the 'associated document' external reference.</span><a href="https://html.spec.whatwg.org/multipage/nav-history-apis.html#concept-document-window">https://html.spec.whatwg.org/multipage/nav-history-apis.html#concept-document-window</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-document-window">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-concept-document-window①">4.2. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-current-settings-object">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-28eba21e7a3f0ed638ca9e61f2824175" class="dfn-panel" data-for="28eba21e7a3f0ed638ca9e61f2824175" id="infopanel-for-28eba21e7a3f0ed638ca9e61f2824175">
+   <span id="infopaneltitle-for-28eba21e7a3f0ed638ca9e61f2824175" style="display:none">Info about the 'current settings object' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#current-settings-object</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-current-settings-object">4.2. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-fully-active">
-   <a href="https://html.spec.whatwg.org/multipage/browsers.html#fully-active">https://html.spec.whatwg.org/multipage/browsers.html#fully-active</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-7594a09aa0c77c9e24726559a3a6da9d" class="dfn-panel" data-for="7594a09aa0c77c9e24726559a3a6da9d" id="infopanel-for-7594a09aa0c77c9e24726559a3a6da9d">
+   <span id="infopaneltitle-for-7594a09aa0c77c9e24726559a3a6da9d" style="display:none">Info about the 'fully active' external reference.</span><a href="https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active">https://html.spec.whatwg.org/multipage/document-sequences.html#fully-active</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-fully-active">4.2. Handling Document Loss of Full Activity</a> <a href="#ref-for-fully-active①">(2)</a> <a href="#ref-for-fully-active②">(3)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-in-parallel">
-   <a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-3a2763fcaa6bc82693554cf36780c0dd" class="dfn-panel" data-for="3a2763fcaa6bc82693554cf36780c0dd" id="infopanel-for-3a2763fcaa6bc82693554cf36780c0dd">
+   <span id="infopaneltitle-for-3a2763fcaa6bc82693554cf36780c0dd" style="display:none">Info about the 'in parallel' external reference.</span><a href="https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel">https://html.spec.whatwg.org/multipage/infrastructure.html#in-parallel</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-in-parallel">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-queue-a-task">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-da7ed5f190c4eedd375552d6f7876301" class="dfn-panel" data-for="da7ed5f190c4eedd375552d6f7876301" id="infopanel-for-da7ed5f190c4eedd375552d6f7876301">
+   <span id="infopaneltitle-for-da7ed5f190c4eedd375552d6f7876301" style="display:none">Info about the 'queue a task' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task">https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-queue-a-task">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-concept-relevant-global">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-2233058c8f0998915af8393ee2abbc1d" class="dfn-panel" data-for="2233058c8f0998915af8393ee2abbc1d" id="infopanel-for-2233058c8f0998915af8393ee2abbc1d">
+   <span id="infopaneltitle-for-2233058c8f0998915af8393ee2abbc1d" style="display:none">Info about the 'relevant global object' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global">https://html.spec.whatwg.org/multipage/webappapis.html#concept-relevant-global</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-concept-relevant-global">4. Scanning for BLE advertisements</a> <a href="#ref-for-concept-relevant-global①">(2)</a> <a href="#ref-for-concept-relevant-global②">(3)</a>
     <li><a href="#ref-for-concept-relevant-global③">4.2. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-relevant-settings-object">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bfb9cb6617f81a424ab20212af73bae3" class="dfn-panel" data-for="bfb9cb6617f81a424ab20212af73bae3" id="infopanel-for-bfb9cb6617f81a424ab20212af73bae3">
+   <span id="infopaneltitle-for-bfb9cb6617f81a424ab20212af73bae3" style="display:none">Info about the 'relevant settings object' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object">https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-relevant-settings-object">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-responsible-event-loop">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-9975dcbf6edcaa4e4545626d4ec14e5c" class="dfn-panel" data-for="9975dcbf6edcaa4e4545626d4ec14e5c" id="infopanel-for-9975dcbf6edcaa4e4545626d4ec14e5c">
+   <span id="infopaneltitle-for-9975dcbf6edcaa4e4545626d4ec14e5c" style="display:none">Info about the 'responsible event loop' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop">https://html.spec.whatwg.org/multipage/webappapis.html#responsible-event-loop</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-responsible-event-loop">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-secure-context">
-   <a href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context">https://html.spec.whatwg.org/multipage/webappapis.html#secure-context</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-613400696de3e8f8a5001430db03abe8" class="dfn-panel" data-for="613400696de3e8f8a5001430db03abe8" id="infopanel-for-613400696de3e8f8a5001430db03abe8">
+   <span id="infopaneltitle-for-613400696de3e8f8a5001430db03abe8" style="display:none">Info about the 'secure context' external reference.</span><a href="https://html.spec.whatwg.org/multipage/webappapis.html#secure-context">https://html.spec.whatwg.org/multipage/webappapis.html#secure-context</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-secure-context">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-map-iterate">
-   <a href="https://infra.spec.whatwg.org/#map-iterate">https://infra.spec.whatwg.org/#map-iterate</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-fa396dfe2ff99ebb3815418bc73c40fb" class="dfn-panel" data-for="fa396dfe2ff99ebb3815418bc73c40fb" id="infopanel-for-fa396dfe2ff99ebb3815418bc73c40fb">
+   <span id="infopaneltitle-for-fa396dfe2ff99ebb3815418bc73c40fb" style="display:none">Info about the 'for each' external reference.</span><a href="https://infra.spec.whatwg.org/#map-iterate">https://infra.spec.whatwg.org/#map-iterate</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-map-iterate">4.2. Handling Document Loss of Full Activity</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-permissiondescriptor">
-   <a href="https://w3c.github.io/permissions/#dom-permissiondescriptor">https://w3c.github.io/permissions/#dom-permissiondescriptor</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-43348714678be2dd068b6e59f237b20f" class="dfn-panel" data-for="43348714678be2dd068b6e59f237b20f" id="infopanel-for-43348714678be2dd068b6e59f237b20f">
+   <span id="infopaneltitle-for-43348714678be2dd068b6e59f237b20f" style="display:none">Info about the 'PermissionDescriptor' external reference.</span><a href="https://w3c.github.io/permissions/#dom-permissiondescriptor">https://w3c.github.io/permissions/#dom-permissiondescriptor</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-permissiondescriptor">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-permissionstatus">
-   <a href="https://w3c.github.io/permissions/#dom-permissionstatus">https://w3c.github.io/permissions/#dom-permissionstatus</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-765630ad06480a49b1773153409b6085" class="dfn-panel" data-for="765630ad06480a49b1773153409b6085" id="infopanel-for-765630ad06480a49b1773153409b6085">
+   <span id="infopaneltitle-for-765630ad06480a49b1773153409b6085" style="display:none">Info about the 'PermissionStatus' external reference.</span><a href="https://w3c.github.io/permissions/#dom-permissionstatus">https://w3c.github.io/permissions/#dom-permissionstatus</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-permissionstatus">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-permissionstate-denied">
-   <a href="https://w3c.github.io/permissions/#dom-permissionstate-denied">https://w3c.github.io/permissions/#dom-permissionstate-denied</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-e0774c44301354d17a379b02016bbc62" class="dfn-panel" data-for="e0774c44301354d17a379b02016bbc62" id="infopanel-for-e0774c44301354d17a379b02016bbc62">
+   <span id="infopaneltitle-for-e0774c44301354d17a379b02016bbc62" style="display:none">Info about the 'denied' external reference.</span><a href="https://w3c.github.io/permissions/#dom-permissionstate-denied">https://w3c.github.io/permissions/#dom-permissionstate-denied</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-permissionstate-denied">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-permissionstate-denied①">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-extra-permission-data">
-   <a href="https://w3c.github.io/permissions/#dfn-extra-permission-data">https://w3c.github.io/permissions/#dfn-extra-permission-data</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-51cff69cfdab970890708e29c3ad497c" class="dfn-panel" data-for="51cff69cfdab970890708e29c3ad497c" id="infopanel-for-51cff69cfdab970890708e29c3ad497c">
+   <span id="infopaneltitle-for-51cff69cfdab970890708e29c3ad497c" style="display:none">Info about the 'extra permission data' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-extra-permission-data">https://w3c.github.io/permissions/#dfn-extra-permission-data</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-extra-permission-data">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-permissionstate-granted">
-   <a href="https://w3c.github.io/permissions/#dom-permissionstate-granted">https://w3c.github.io/permissions/#dom-permissionstate-granted</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-180d5479814a4ae3b599e6a1c4e11751" class="dfn-panel" data-for="180d5479814a4ae3b599e6a1c4e11751" id="infopanel-for-180d5479814a4ae3b599e6a1c4e11751">
+   <span id="infopaneltitle-for-180d5479814a4ae3b599e6a1c4e11751" style="display:none">Info about the 'granted' external reference.</span><a href="https://w3c.github.io/permissions/#dom-permissionstate-granted">https://w3c.github.io/permissions/#dom-permissionstate-granted</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-permissionstate-granted">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-permission-descriptor-type">
-   <a href="https://w3c.github.io/permissions/#dfn-permission-descriptor-type">https://w3c.github.io/permissions/#dfn-permission-descriptor-type</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-a7b12fdfd0e5a14a6609967ea1b77b6f" class="dfn-panel" data-for="a7b12fdfd0e5a14a6609967ea1b77b6f" id="infopanel-for-a7b12fdfd0e5a14a6609967ea1b77b6f">
+   <span id="infopaneltitle-for-a7b12fdfd0e5a14a6609967ea1b77b6f" style="display:none">Info about the 'permission descriptor type' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-permission-descriptor-type">https://w3c.github.io/permissions/#dfn-permission-descriptor-type</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-permission-descriptor-type">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-permission-query-algorithm">
-   <a href="https://w3c.github.io/permissions/#dfn-permission-query-algorithm">https://w3c.github.io/permissions/#dfn-permission-query-algorithm</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-45e4be68c2e45dae228854bea2090403" class="dfn-panel" data-for="45e4be68c2e45dae228854bea2090403" id="infopanel-for-45e4be68c2e45dae228854bea2090403">
+   <span id="infopaneltitle-for-45e4be68c2e45dae228854bea2090403" style="display:none">Info about the 'permission query algorithm' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-permission-query-algorithm">https://w3c.github.io/permissions/#dfn-permission-query-algorithm</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-permission-query-algorithm">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-permission-result-type">
-   <a href="https://w3c.github.io/permissions/#dfn-permission-result-type">https://w3c.github.io/permissions/#dfn-permission-result-type</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-18df519fb27854ac490e00630fc07f36" class="dfn-panel" data-for="18df519fb27854ac490e00630fc07f36" id="infopanel-for-18df519fb27854ac490e00630fc07f36">
+   <span id="infopaneltitle-for-18df519fb27854ac490e00630fc07f36" style="display:none">Info about the 'permission result type' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-permission-result-type">https://w3c.github.io/permissions/#dfn-permission-result-type</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-permission-result-type">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-permission-revocation-algorithm">
-   <a href="https://w3c.github.io/permissions/#dfn-permission-revocation-algorithm">https://w3c.github.io/permissions/#dfn-permission-revocation-algorithm</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-307cea1a9f6101451337bfc8f929b164" class="dfn-panel" data-for="307cea1a9f6101451337bfc8f929b164" id="infopanel-for-307cea1a9f6101451337bfc8f929b164">
+   <span id="infopaneltitle-for-307cea1a9f6101451337bfc8f929b164" style="display:none">Info about the 'permission revocation algorithm' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-permission-revocation-algorithm">https://w3c.github.io/permissions/#dfn-permission-revocation-algorithm</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-permission-revocation-algorithm">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-state">
-   <a href="https://w3c.github.io/permissions/#dfn-state">https://w3c.github.io/permissions/#dfn-state</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-7e061092254567e08202b79a0f3450e7" class="dfn-panel" data-for="7e061092254567e08202b79a0f3450e7" id="infopanel-for-7e061092254567e08202b79a0f3450e7">
+   <span id="infopaneltitle-for-7e061092254567e08202b79a0f3450e7" style="display:none">Info about the 'permission state' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-permission-state">https://w3c.github.io/permissions/#dfn-permission-state</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-dfn-state">4.3. Permission to scan</a> <a href="#ref-for-dfn-state①">(2)</a>
+    <li><a href="#ref-for-dfn-permission-state">4.3. Permission to scan</a> <a href="#ref-for-dfn-permission-state①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-powerful-feature">
-   <a href="https://w3c.github.io/permissions/#dfn-powerful-feature">https://w3c.github.io/permissions/#dfn-powerful-feature</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-502996c42f30b37f182905ef22fb89c0" class="dfn-panel" data-for="502996c42f30b37f182905ef22fb89c0" id="infopanel-for-502996c42f30b37f182905ef22fb89c0">
+   <span id="infopaneltitle-for-502996c42f30b37f182905ef22fb89c0" style="display:none">Info about the 'powerful feature' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-powerful-feature">https://w3c.github.io/permissions/#dfn-powerful-feature</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-powerful-feature">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-request-permission-to-use">
-   <a href="https://w3c.github.io/permissions/#dfn-request-permission-to-use">https://w3c.github.io/permissions/#dfn-request-permission-to-use</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-d043d7b7a730e84f11e7c740ee946288" class="dfn-panel" data-for="d043d7b7a730e84f11e7c740ee946288" id="infopanel-for-d043d7b7a730e84f11e7c740ee946288">
+   <span id="infopaneltitle-for-d043d7b7a730e84f11e7c740ee946288" style="display:none">Info about the 'request permission to use' external reference.</span><a href="https://w3c.github.io/permissions/#dfn-request-permission-to-use">https://w3c.github.io/permissions/#dfn-request-permission-to-use</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-request-permission-to-use">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-permissionstatus-state">
-   <a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">https://w3c.github.io/permissions/#dom-permissionstatus-state</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-b0d9608d74c0d38907af88ef8f961dbb" class="dfn-panel" data-for="b0d9608d74c0d38907af88ef8f961dbb" id="infopanel-for-b0d9608d74c0d38907af88ef8f961dbb">
+   <span id="infopaneltitle-for-b0d9608d74c0d38907af88ef8f961dbb" style="display:none">Info about the 'state' external reference.</span><a href="https://w3c.github.io/permissions/#dom-permissionstatus-state">https://w3c.github.io/permissions/#dom-permissionstatus-state</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-permissionstatus-state">4.3. Permission to scan</a> <a href="#ref-for-dom-permissionstatus-state①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-policy-controlled-feature">
-   <a href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature">https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-cbc4165961071efad91900c4c7b2fe8b" class="dfn-panel" data-for="cbc4165961071efad91900c4c7b2fe8b" id="infopanel-for-cbc4165961071efad91900c4c7b2fe8b">
+   <span id="infopaneltitle-for-cbc4165961071efad91900c4c7b2fe8b" style="display:none">Info about the 'policy-controlled feature' external reference.</span><a href="https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature">https://w3c.github.io/webappsec-permissions-policy/#policy-controlled-feature</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-policy-controlled-feature">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-permissiondef-bluetooth">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#permissiondef-bluetooth">https://webbluetoothcg.github.io/web-bluetooth/#permissiondef-bluetooth</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-1a7af5f422d566ce7a6b3ed6540e0c2f" class="dfn-panel" data-for="1a7af5f422d566ce7a6b3ed6540e0c2f" id="infopanel-for-1a7af5f422d566ce7a6b3ed6540e0c2f">
+   <span id="infopaneltitle-for-1a7af5f422d566ce7a6b3ed6540e0c2f" style="display:none">Info about the '"bluetooth"' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#permissiondef-bluetooth">https://webbluetoothcg.github.io/web-bluetooth/#permissiondef-bluetooth</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-permissiondef-bluetooth">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-bluetooth">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">https://webbluetoothcg.github.io/web-bluetooth/#bluetooth</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-3143bf7a4d3cd8dab4f6c1897600250e" class="dfn-panel" data-for="3143bf7a4d3cd8dab4f6c1897600250e" id="infopanel-for-3143bf7a4d3cd8dab4f6c1897600250e">
+   <span id="infopaneltitle-for-3143bf7a4d3cd8dab4f6c1897600250e" style="display:none">Info about the 'Bluetooth' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth">https://webbluetoothcg.github.io/web-bluetooth/#bluetooth</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetooth">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-bluetooth①">5.1. Responding to advertising events</a>
     <li><a href="#ref-for-bluetooth②">6. Changes to existing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dictdef-bluetoothdatafilterinit">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit">https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-7f434accac4ffc4549c6336064f49a14" class="dfn-panel" data-for="7f434accac4ffc4549c6336064f49a14" id="infopanel-for-7f434accac4ffc4549c6336064f49a14">
+   <span id="infopaneltitle-for-7f434accac4ffc4549c6336064f49a14" style="display:none">Info about the 'BluetoothDataFilterInit' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit">https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-bluetoothdatafilterinit">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-bluetoothdevice">
-   <a href="index.html#bluetoothdevice">index.html#bluetoothdevice</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-2d6bd38154eeaac254077c9a522b2fa2" class="dfn-panel" data-for="2d6bd38154eeaac254077c9a522b2fa2" id="infopanel-for-2d6bd38154eeaac254077c9a522b2fa2">
+   <span id="infopaneltitle-for-2d6bd38154eeaac254077c9a522b2fa2" style="display:none">Info about the 'BluetoothDevice' external reference.</span><a href="index.html#bluetoothdevice">index.html#bluetoothdevice</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothdevice">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-bluetoothdevice①">5.1. Responding to advertising events</a>
     <li><a href="#ref-for-bluetoothdevice②">6. Changes to existing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dictdef-bluetoothlescanfilterinit">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit">https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-603ef35d3a33fa652113a6342ed3f1f6" class="dfn-panel" data-for="603ef35d3a33fa652113a6342ed3f1f6" id="infopanel-for-603ef35d3a33fa652113a6342ed3f1f6">
+   <span id="infopaneltitle-for-603ef35d3a33fa652113a6342ed3f1f6" style="display:none">Info about the 'BluetoothLEScanFilterInit' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit">https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit①">4.1. Controlling a BLE scan</a>
     <li><a href="#ref-for-dictdef-bluetoothlescanfilterinit②">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-typedefdef-uuid">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-77d01cb2f351e4c631922e87a2df84f8" class="dfn-panel" data-for="77d01cb2f351e4c631922e87a2df84f8" id="infopanel-for-77d01cb2f351e4c631922e87a2df84f8">
+   <span id="infopaneltitle-for-77d01cb2f351e4c631922e87a2df84f8" style="display:none">Info about the 'UUID' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid">https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-typedefdef-uuid">4.1. Controlling a BLE scan</a> <a href="#ref-for-typedefdef-uuid①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-eventdef-bluetoothdevice-advertisementreceived">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived">https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdevice-advertisementreceived</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-9c11a473167d9513c66fedd9b09a7430" class="dfn-panel" data-for="9c11a473167d9513c66fedd9b09a7430" id="infopanel-for-9c11a473167d9513c66fedd9b09a7430">
+   <span id="infopaneltitle-for-9c11a473167d9513c66fedd9b09a7430" style="display:none">Info about the 'advertisementreceived' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdeviceeventhandlers-advertisementreceived">https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdeviceeventhandlers-advertisementreceived</a><b>Referenced in:</b>
    <ul>
-    <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived">1.1. Examples</a>
-    <li><a href="#ref-for-eventdef-bluetoothdevice-advertisementreceived①">4. Scanning for BLE advertisements</a>
+    <li><a href="#ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived">1.1. Examples</a>
+    <li><a href="#ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived①">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-bluetooth-device">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device">https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-29345d4f73354a1ba1a9ebafca951062" class="dfn-panel" data-for="29345d4f73354a1ba1a9ebafca951062" id="infopanel-for-29345d4f73354a1ba1a9ebafca951062">
+   <span id="infopaneltitle-for-29345d4f73354a1ba1a9ebafca951062" style="display:none">Info about the 'bluetooth device' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device">https://webbluetoothcg.github.io/web-bluetooth/#bluetooth-device</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetooth-device">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-bluetoothlescanfilterinit-canonicalizing">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-b320261ad4a865b8724cd383f83b8523" class="dfn-panel" data-for="b320261ad4a865b8724cd383f83b8523" id="infopanel-for-b320261ad4a865b8724cd383f83b8523">
+   <span id="infopaneltitle-for-b320261ad4a865b8724cd383f83b8523" style="display:none">Info about the 'canonicalizing (for BluetoothDataFilterInit)' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-canonicalizing">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-canonicalizing</a><b>Referenced in:</b>
+   <ul>
+    <li><a href="#ref-for-bluetoothdatafilterinit-canonicalizing">4.1. Controlling a BLE scan</a>
+   </ul>
+  </aside>
+  <aside aria-labelledby="infopaneltitle-for-eef8e3d251645f014764123a79386aa5" class="dfn-panel" data-for="eef8e3d251645f014764123a79386aa5" id="infopanel-for-eef8e3d251645f014764123a79386aa5">
+   <span id="infopaneltitle-for-eef8e3d251645f014764123a79386aa5" style="display:none">Info about the 'canonicalizing (for BluetoothLEScanFilterInit)' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothlescanfilterinit-canonicalizing</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescanfilterinit-canonicalizing">4.1. Controlling a BLE scan</a> <a href="#ref-for-bluetoothlescanfilterinit-canonicalizing①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothdatafilterinit-dataprefix">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-c8875d5ecba98eb71144505b80847847" class="dfn-panel" data-for="c8875d5ecba98eb71144505b80847847" id="infopanel-for-c8875d5ecba98eb71144505b80847847">
+   <span id="infopaneltitle-for-c8875d5ecba98eb71144505b80847847" style="display:none">Info about the 'dataPrefix' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-dataprefix</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdatafilterinit-dataprefix">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-fire-an-advertisementreceived-event">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event">https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-f093e6614d5d8fc422bb2b9bf65960db" class="dfn-panel" data-for="f093e6614d5d8fc422bb2b9bf65960db" id="infopanel-for-f093e6614d5d8fc422bb2b9bf65960db">
+   <span id="infopaneltitle-for-f093e6614d5d8fc422bb2b9bf65960db" style="display:none">Info about the 'fire an advertisementreceived event' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event">https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-fire-an-advertisementreceived-event">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-get-the-bluetoothdevice-representing">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing">https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-5531e9c221f9f6958e63a41b668ec9e2" class="dfn-panel" data-for="5531e9c221f9f6958e63a41b668ec9e2" id="infopanel-for-5531e9c221f9f6958e63a41b668ec9e2">
+   <span id="infopaneltitle-for-5531e9c221f9f6958e63a41b668ec9e2" style="display:none">Info about the 'get the bluetoothdevice representing' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing">https://webbluetoothcg.github.io/web-bluetooth/#get-the-bluetoothdevice-representing</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-get-the-bluetoothdevice-representing">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothuuid-getservice">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-9a8e6bd31128107595414791c322b775" class="dfn-panel" data-for="9a8e6bd31128107595414791c322b775" id="infopanel-for-9a8e6bd31128107595414791c322b775">
+   <span id="infopaneltitle-for-9a8e6bd31128107595414791c322b775" style="display:none">Info about the 'getService(name)' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothuuid-getservice</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothuuid-getservice">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothlescanfilterinit-manufacturerdata">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-66e30a8e9126b2bc305c430ab9b2051e" class="dfn-panel" data-for="66e30a8e9126b2bc305c430ab9b2051e" id="infopanel-for-66e30a8e9126b2bc305c430ab9b2051e">
+   <span id="infopaneltitle-for-66e30a8e9126b2bc305c430ab9b2051e" style="display:none">Info about the 'manufacturerData' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-manufacturerdata</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilterinit-manufacturerdata">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothdatafilterinit-mask">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-5d51443d50775a1aed67b3d121bef9f5" class="dfn-panel" data-for="5d51443d50775a1aed67b3d121bef9f5" id="infopanel-for-5d51443d50775a1aed67b3d121bef9f5">
+   <span id="infopaneltitle-for-5d51443d50775a1aed67b3d121bef9f5" style="display:none">Info about the 'mask' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothdatafilterinit-mask</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdatafilterinit-mask">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-bluetoothdatafilterinit-matches">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-afdaa9b131408055145b5fa6adced09e" class="dfn-panel" data-for="afdaa9b131408055145b5fa6adced09e" id="infopanel-for-afdaa9b131408055145b5fa6adced09e">
+   <span id="infopaneltitle-for-afdaa9b131408055145b5fa6adced09e" style="display:none">Info about the 'matches' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches">https://webbluetoothcg.github.io/web-bluetooth/#bluetoothdatafilterinit-matches</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothdatafilterinit-matches">5.1. Responding to advertising events</a> <a href="#ref-for-bluetoothdatafilterinit-matches①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-allowedbluetoothdevice-mayusegatt">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt">https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-e4e58d4c9430f506515d770c026933d6" class="dfn-panel" data-for="e4e58d4c9430f506515d770c026933d6" id="infopanel-for-e4e58d4c9430f506515d770c026933d6">
+   <span id="infopaneltitle-for-e4e58d4c9430f506515d770c026933d6" style="display:none">Info about the 'mayUseGATT' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt">https://webbluetoothcg.github.io/web-bluetooth/#dom-allowedbluetoothdevice-mayusegatt</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-allowedbluetoothdevice-mayusegatt">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-read-only-arraybuffer">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-645b3888ad521d0a27d325c6e807e96c" class="dfn-panel" data-for="645b3888ad521d0a27d325c6e807e96c" id="infopanel-for-645b3888ad521d0a27d325c6e807e96c">
+   <span id="infopaneltitle-for-645b3888ad521d0a27d325c6e807e96c" style="display:none">Info about the 'read only arraybuffer' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer">https://webbluetoothcg.github.io/web-bluetooth/#read-only-arraybuffer</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-read-only-arraybuffer">4.1. Controlling a BLE scan</a> <a href="#ref-for-read-only-arraybuffer①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-same-bluetooth-device">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device">https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-c7b9927a239e40e368ab26d96ac514f5" class="dfn-panel" data-for="c7b9927a239e40e368ab26d96ac514f5" id="infopanel-for-c7b9927a239e40e368ab26d96ac514f5">
+   <span id="infopaneltitle-for-c7b9927a239e40e368ab26d96ac514f5" style="display:none">Info about the 'same bluetooth device' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device">https://webbluetoothcg.github.io/web-bluetooth/#same-bluetooth-device</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-same-bluetooth-device">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothlescanfilterinit-servicedata">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-85428ba0ab85f4b582ef00b39be56843" class="dfn-panel" data-for="85428ba0ab85f4b582ef00b39be56843" id="infopanel-for-85428ba0ab85f4b582ef00b39be56843">
+   <span id="infopaneltitle-for-85428ba0ab85f4b582ef00b39be56843" style="display:none">Info about the 'serviceData' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-servicedata</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilterinit-servicedata">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dom-bluetoothlescanfilterinit-services">
-   <a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-a7ddfde1dc40dfa95a86d6bfd54d93cc" class="dfn-panel" data-for="a7ddfde1dc40dfa95a86d6bfd54d93cc" id="infopanel-for-a7ddfde1dc40dfa95a86d6bfd54d93cc">
+   <span id="infopaneltitle-for-a7ddfde1dc40dfa95a86d6bfd54d93cc" style="display:none">Info about the 'services' external reference.</span><a href="https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services">https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetoothlescanfilterinit-services</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilterinit-services">4.1. Controlling a BLE scan</a> <a href="#ref-for-dom-bluetoothlescanfilterinit-services①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-ArrayBuffer">
-   <a href="https://webidl.spec.whatwg.org/#idl-ArrayBuffer">https://webidl.spec.whatwg.org/#idl-ArrayBuffer</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-8e4f03edcfe9224009a4032bac512ab6" class="dfn-panel" data-for="8e4f03edcfe9224009a4032bac512ab6" id="infopanel-for-8e4f03edcfe9224009a4032bac512ab6">
+   <span id="infopaneltitle-for-8e4f03edcfe9224009a4032bac512ab6" style="display:none">Info about the 'ArrayBuffer' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-ArrayBuffer">https://webidl.spec.whatwg.org/#idl-ArrayBuffer</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-ArrayBuffer">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-ArrayBuffer①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-DOMString">
-   <a href="https://webidl.spec.whatwg.org/#idl-DOMString">https://webidl.spec.whatwg.org/#idl-DOMString</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-d0f238a61de9310f1738a214749fab18" class="dfn-panel" data-for="d0f238a61de9310f1738a214749fab18" id="infopanel-for-d0f238a61de9310f1738a214749fab18">
+   <span id="infopaneltitle-for-d0f238a61de9310f1738a214749fab18" style="display:none">Info about the 'DOMString' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-DOMString">https://webidl.spec.whatwg.org/#idl-DOMString</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-DOMString">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-DOMString①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-Exposed">
-   <a href="https://webidl.spec.whatwg.org/#Exposed">https://webidl.spec.whatwg.org/#Exposed</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dde049eb112f043fc45407ec0d4cb457" class="dfn-panel" data-for="dde049eb112f043fc45407ec0d4cb457" id="infopanel-for-dde049eb112f043fc45407ec0d4cb457">
+   <span id="infopaneltitle-for-dde049eb112f043fc45407ec0d4cb457" style="display:none">Info about the 'Exposed' external reference.</span><a href="https://webidl.spec.whatwg.org/#Exposed">https://webidl.spec.whatwg.org/#Exposed</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-Exposed">4.1. Controlling a BLE scan</a> <a href="#ref-for-Exposed①">(2)</a> <a href="#ref-for-Exposed②">(3)</a> <a href="#ref-for-Exposed③">(4)</a> <a href="#ref-for-Exposed④">(5)</a>
     <li><a href="#ref-for-Exposed⑤">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-frozen-array">
-   <a href="https://webidl.spec.whatwg.org/#idl-frozen-array">https://webidl.spec.whatwg.org/#idl-frozen-array</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-30e8367dc9a547b9096d98ba691987d9" class="dfn-panel" data-for="30e8367dc9a547b9096d98ba691987d9" id="infopanel-for-30e8367dc9a547b9096d98ba691987d9">
+   <span id="infopaneltitle-for-30e8367dc9a547b9096d98ba691987d9" style="display:none">Info about the 'FrozenArray' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-frozen-array">https://webidl.spec.whatwg.org/#idl-frozen-array</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-frozen-array">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-idl-frozen-array①">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-frozen-array②">(2)</a> <a href="#ref-for-idl-frozen-array③">(3)</a>
     <li><a href="#ref-for-idl-frozen-array④">4.3. Permission to scan</a> <a href="#ref-for-idl-frozen-array⑤">(2)</a> <a href="#ref-for-idl-frozen-array⑥">(3)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-invalidstateerror">
-   <a href="https://webidl.spec.whatwg.org/#invalidstateerror">https://webidl.spec.whatwg.org/#invalidstateerror</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" class="dfn-panel" data-for="e2a06375a2fb70c61a8b4cd0abe9d4f1" id="infopanel-for-e2a06375a2fb70c61a8b4cd0abe9d4f1">
+   <span id="infopaneltitle-for-e2a06375a2fb70c61a8b4cd0abe9d4f1" style="display:none">Info about the 'InvalidStateError' external reference.</span><a href="https://webidl.spec.whatwg.org/#invalidstateerror">https://webidl.spec.whatwg.org/#invalidstateerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-invalidstateerror">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-notallowederror">
-   <a href="https://webidl.spec.whatwg.org/#notallowederror">https://webidl.spec.whatwg.org/#notallowederror</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-aa43258e2b51dc6ebe6268a36e6fd733" class="dfn-panel" data-for="aa43258e2b51dc6ebe6268a36e6fd733" id="infopanel-for-aa43258e2b51dc6ebe6268a36e6fd733">
+   <span id="infopaneltitle-for-aa43258e2b51dc6ebe6268a36e6fd733" style="display:none">Info about the 'NotAllowedError' external reference.</span><a href="https://webidl.spec.whatwg.org/#notallowederror">https://webidl.spec.whatwg.org/#notallowederror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-notallowederror">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-notsupportederror">
-   <a href="https://webidl.spec.whatwg.org/#notsupportederror">https://webidl.spec.whatwg.org/#notsupportederror</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-c0194e44e6b2e643055f42ba786d0a3a" class="dfn-panel" data-for="c0194e44e6b2e643055f42ba786d0a3a" id="infopanel-for-c0194e44e6b2e643055f42ba786d0a3a">
+   <span id="infopaneltitle-for-c0194e44e6b2e643055f42ba786d0a3a" style="display:none">Info about the 'NotSupportedError' external reference.</span><a href="https://webidl.spec.whatwg.org/#notsupportederror">https://webidl.spec.whatwg.org/#notsupportederror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-notsupportederror">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-promise">
-   <a href="https://webidl.spec.whatwg.org/#idl-promise">https://webidl.spec.whatwg.org/#idl-promise</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" class="dfn-panel" data-for="93669c631ec1ef8e696b4c083bdbe12c" id="infopanel-for-93669c631ec1ef8e696b4c083bdbe12c">
+   <span id="infopaneltitle-for-93669c631ec1ef8e696b4c083bdbe12c" style="display:none">Info about the 'Promise' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-promise">https://webidl.spec.whatwg.org/#idl-promise</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-promise">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-SecureContext">
-   <a href="https://webidl.spec.whatwg.org/#SecureContext">https://webidl.spec.whatwg.org/#SecureContext</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-cdf224ec60dc3b08449a2fbdf3a90406" class="dfn-panel" data-for="cdf224ec60dc3b08449a2fbdf3a90406" id="infopanel-for-cdf224ec60dc3b08449a2fbdf3a90406">
+   <span id="infopaneltitle-for-cdf224ec60dc3b08449a2fbdf3a90406" style="display:none">Info about the 'SecureContext' external reference.</span><a href="https://webidl.spec.whatwg.org/#SecureContext">https://webidl.spec.whatwg.org/#SecureContext</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-SecureContext">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-SecureContext①">4.1. Controlling a BLE scan</a> <a href="#ref-for-SecureContext②">(2)</a> <a href="#ref-for-SecureContext③">(3)</a> <a href="#ref-for-SecureContext④">(4)</a> <a href="#ref-for-SecureContext⑤">(5)</a>
     <li><a href="#ref-for-SecureContext⑥">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-securityerror">
-   <a href="https://webidl.spec.whatwg.org/#securityerror">https://webidl.spec.whatwg.org/#securityerror</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bfd589348b877ef78380edc0886321f0" class="dfn-panel" data-for="bfd589348b877ef78380edc0886321f0" id="infopanel-for-bfd589348b877ef78380edc0886321f0">
+   <span id="infopaneltitle-for-bfd589348b877ef78380edc0886321f0" style="display:none">Info about the 'SecurityError' external reference.</span><a href="https://webidl.spec.whatwg.org/#securityerror">https://webidl.spec.whatwg.org/#securityerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-securityerror">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-unknownerror">
-   <a href="https://webidl.spec.whatwg.org/#unknownerror">https://webidl.spec.whatwg.org/#unknownerror</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-7451f6933516d80f8b562e59981dbe79" class="dfn-panel" data-for="7451f6933516d80f8b562e59981dbe79" id="infopanel-for-7451f6933516d80f8b562e59981dbe79">
+   <span id="infopaneltitle-for-7451f6933516d80f8b562e59981dbe79" style="display:none">Info about the 'UnknownError' external reference.</span><a href="https://webidl.spec.whatwg.org/#unknownerror">https://webidl.spec.whatwg.org/#unknownerror</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-unknownerror">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-get-buffer-source-copy">
-   <a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">https://heycam.github.io/webidl/#dfn-get-buffer-source-copy</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-6ffbd8faae9be84f70eb6a6e91f2141f" class="dfn-panel" data-for="6ffbd8faae9be84f70eb6a6e91f2141f" id="infopanel-for-6ffbd8faae9be84f70eb6a6e91f2141f">
+   <span id="infopaneltitle-for-6ffbd8faae9be84f70eb6a6e91f2141f" style="display:none">Info about the 'a copy of the bytes held' external reference.</span><a href="https://heycam.github.io/webidl/#dfn-get-buffer-source-copy">https://heycam.github.io/webidl/#dfn-get-buffer-source-copy</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-get-buffer-source-copy">4.1. Controlling a BLE scan</a> <a href="#ref-for-dfn-get-buffer-source-copy①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-a-new-promise">
-   <a href="https://webidl.spec.whatwg.org/#a-new-promise">https://webidl.spec.whatwg.org/#a-new-promise</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" class="dfn-panel" data-for="bbe33fc7ac016834e4aaddbfd1b084a1" id="infopanel-for-bbe33fc7ac016834e4aaddbfd1b084a1">
+   <span id="infopaneltitle-for-bbe33fc7ac016834e4aaddbfd1b084a1" style="display:none">Info about the 'a new promise' external reference.</span><a href="https://webidl.spec.whatwg.org/#a-new-promise">https://webidl.spec.whatwg.org/#a-new-promise</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-a-new-promise">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-boolean">
-   <a href="https://webidl.spec.whatwg.org/#idl-boolean">https://webidl.spec.whatwg.org/#idl-boolean</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-f8062b07e25ed0281f5cbfb9a54070b4" class="dfn-panel" data-for="f8062b07e25ed0281f5cbfb9a54070b4" id="infopanel-for-f8062b07e25ed0281f5cbfb9a54070b4">
+   <span id="infopaneltitle-for-f8062b07e25ed0281f5cbfb9a54070b4" style="display:none">Info about the 'boolean' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-boolean">https://webidl.spec.whatwg.org/#idl-boolean</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-boolean">4. Scanning for BLE advertisements</a> <a href="#ref-for-idl-boolean①">(2)</a>
     <li><a href="#ref-for-idl-boolean②">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-boolean③">(2)</a> <a href="#ref-for-idl-boolean④">(3)</a>
     <li><a href="#ref-for-idl-boolean⑤">4.3. Permission to scan</a> <a href="#ref-for-idl-boolean⑥">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-dfn-map-entries">
-   <a href="https://webidl.spec.whatwg.org/#dfn-map-entries">https://webidl.spec.whatwg.org/#dfn-map-entries</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-72d957ec5625550a0ba93648e8c8d032" class="dfn-panel" data-for="72d957ec5625550a0ba93648e8c8d032" id="infopanel-for-72d957ec5625550a0ba93648e8c8d032">
+   <span id="infopaneltitle-for-72d957ec5625550a0ba93648e8c8d032" style="display:none">Info about the 'map entries' external reference.</span><a href="https://webidl.spec.whatwg.org/#dfn-map-entries">https://webidl.spec.whatwg.org/#dfn-map-entries</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dfn-map-entries">4.1. Controlling a BLE scan</a> <a href="#ref-for-dfn-map-entries①">(2)</a> <a href="#ref-for-dfn-map-entries②">(3)</a> <a href="#ref-for-dfn-map-entries③">(4)</a>
     <li><a href="#ref-for-dfn-map-entries④">5.1. Responding to advertising events</a> <a href="#ref-for-dfn-map-entries⑤">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-object">
-   <a href="https://webidl.spec.whatwg.org/#idl-object">https://webidl.spec.whatwg.org/#idl-object</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-5039223412f0d0a24ee17570f82d3d59" class="dfn-panel" data-for="5039223412f0d0a24ee17570f82d3d59" id="infopanel-for-5039223412f0d0a24ee17570f82d3d59">
+   <span id="infopaneltitle-for-5039223412f0d0a24ee17570f82d3d59" style="display:none">Info about the 'object' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-object">https://webidl.spec.whatwg.org/#idl-object</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-object">4.1. Controlling a BLE scan</a> <a href="#ref-for-idl-object①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-reject">
-   <a href="https://webidl.spec.whatwg.org/#reject">https://webidl.spec.whatwg.org/#reject</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" class="dfn-panel" data-for="f7204c0306e7ffcb24c31adf6e629e1d" id="infopanel-for-f7204c0306e7ffcb24c31adf6e629e1d">
+   <span id="infopaneltitle-for-f7204c0306e7ffcb24c31adf6e629e1d" style="display:none">Info about the 'reject' external reference.</span><a href="https://webidl.spec.whatwg.org/#reject">https://webidl.spec.whatwg.org/#reject</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-reject">4. Scanning for BLE advertisements</a> <a href="#ref-for-reject①">(2)</a> <a href="#ref-for-reject②">(3)</a> <a href="#ref-for-reject③">(4)</a> <a href="#ref-for-reject④">(5)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-resolve">
-   <a href="https://webidl.spec.whatwg.org/#resolve">https://webidl.spec.whatwg.org/#resolve</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-f4f973f92274819781816b033aea1f11" class="dfn-panel" data-for="f4f973f92274819781816b033aea1f11" id="infopanel-for-f4f973f92274819781816b033aea1f11">
+   <span id="infopaneltitle-for-f4f973f92274819781816b033aea1f11" style="display:none">Info about the 'resolve' external reference.</span><a href="https://webidl.spec.whatwg.org/#resolve">https://webidl.spec.whatwg.org/#resolve</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-resolve">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-sequence">
-   <a href="https://webidl.spec.whatwg.org/#idl-sequence">https://webidl.spec.whatwg.org/#idl-sequence</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" class="dfn-panel" data-for="38ab7db52e46bed36993204c29f67202" id="infopanel-for-38ab7db52e46bed36993204c29f67202">
+   <span id="infopaneltitle-for-38ab7db52e46bed36993204c29f67202" style="display:none">Info about the 'sequence' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-sequence">https://webidl.spec.whatwg.org/#idl-sequence</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-sequence">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-idl-sequence①">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-this">
-   <a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" class="dfn-panel" data-for="be0933df03cd63338f98de217c4158c7" id="infopanel-for-be0933df03cd63338f98de217c4158c7">
+   <span id="infopaneltitle-for-be0933df03cd63338f98de217c4158c7" style="display:none">Info about the 'this' external reference.</span><a href="https://webidl.spec.whatwg.org/#this">https://webidl.spec.whatwg.org/#this</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-this">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-undefined">
-   <a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" class="dfn-panel" data-for="cee863f1f2ec91066cfb7f5d309d59dc" id="infopanel-for-cee863f1f2ec91066cfb7f5d309d59dc">
+   <span id="infopaneltitle-for-cee863f1f2ec91066cfb7f5d309d59dc" style="display:none">Info about the 'undefined' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-undefined">https://webidl.spec.whatwg.org/#idl-undefined</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-undefined">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="term-for-idl-unsigned-short">
-   <a href="https://webidl.spec.whatwg.org/#idl-unsigned-short">https://webidl.spec.whatwg.org/#idl-unsigned-short</a><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-85ad66f191d72a7d6508e0bab70044dc" class="dfn-panel" data-for="85ad66f191d72a7d6508e0bab70044dc" id="infopanel-for-85ad66f191d72a7d6508e0bab70044dc">
+   <span id="infopaneltitle-for-85ad66f191d72a7d6508e0bab70044dc" style="display:none">Info about the 'unsigned short' external reference.</span><a href="https://webidl.spec.whatwg.org/#idl-unsigned-short">https://webidl.spec.whatwg.org/#idl-unsigned-short</a><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-idl-unsigned-short">4.1. Controlling a BLE scan</a>
    </ul>
@@ -1867,106 +1883,107 @@ steps:</p>
    <li>
     <a data-link-type="biblio">[DOM]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-concept-document">document</span>
+     <li><span class="dfn-paneled" id="985c42e2af63b3e74bd3b70d55668fd4">document</span>
     </ul>
    <li>
     <a data-link-type="biblio">[ECMAScript]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-sec-array.prototype.map">Array.prototype.map</span>
-     <li><span class="dfn-paneled" id="term-for-sec-native-error-types-used-in-this-standard-typeerror">TypeError</span>
-     <li><span class="dfn-paneled" id="term-for-sec-ordinary-object-internal-methods-and-internal-slots-ownpropertykeys">[[OwnPropertyKeys]]</span>
+     <li><span class="dfn-paneled" id="d2676cfdaf532afac42c596aa081c298">Array.prototype.map</span>
+     <li><span class="dfn-paneled" id="28f48920b78e327d90225af978074155">TypeError</span>
+     <li><span class="dfn-paneled" id="651a6e52737d1580218dadd6e02d41b2">[[OwnPropertyKeys]]</span>
     </ul>
    <li>
     <a data-link-type="biblio">[HTML]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-allowed-to-use">allowed to use</span>
-     <li><span class="dfn-paneled" id="term-for-concept-document-window">associated document</span>
-     <li><span class="dfn-paneled" id="term-for-current-settings-object">current settings object</span>
-     <li><span class="dfn-paneled" id="term-for-fully-active">fully active</span>
-     <li><span class="dfn-paneled" id="term-for-in-parallel">in parallel</span>
-     <li><span class="dfn-paneled" id="term-for-queue-a-task">queue a task</span>
-     <li><span class="dfn-paneled" id="term-for-concept-relevant-global">relevant global object</span>
-     <li><span class="dfn-paneled" id="term-for-relevant-settings-object">relevant settings object</span>
-     <li><span class="dfn-paneled" id="term-for-responsible-event-loop">responsible event loop</span>
-     <li><span class="dfn-paneled" id="term-for-secure-context">secure context</span>
+     <li><span class="dfn-paneled" id="3dc9eee4a6a1d169f561b6d87bd08573">allowed to use</span>
+     <li><span class="dfn-paneled" id="04e6c32034490f45e4757ead7871de18">associated document</span>
+     <li><span class="dfn-paneled" id="28eba21e7a3f0ed638ca9e61f2824175">current settings object</span>
+     <li><span class="dfn-paneled" id="7594a09aa0c77c9e24726559a3a6da9d">fully active</span>
+     <li><span class="dfn-paneled" id="3a2763fcaa6bc82693554cf36780c0dd">in parallel</span>
+     <li><span class="dfn-paneled" id="da7ed5f190c4eedd375552d6f7876301">queue a task</span>
+     <li><span class="dfn-paneled" id="2233058c8f0998915af8393ee2abbc1d">relevant global object</span>
+     <li><span class="dfn-paneled" id="bfb9cb6617f81a424ab20212af73bae3">relevant settings object</span>
+     <li><span class="dfn-paneled" id="9975dcbf6edcaa4e4545626d4ec14e5c">responsible event loop</span>
+     <li><span class="dfn-paneled" id="613400696de3e8f8a5001430db03abe8">secure context</span>
     </ul>
    <li>
     <a data-link-type="biblio">[INFRA]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-map-iterate">for each</span>
+     <li><span class="dfn-paneled" id="fa396dfe2ff99ebb3815418bc73c40fb">for each</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[permissions]</a> defines the following terms:
+    <a data-link-type="biblio">[PERMISSIONS]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-dom-permissiondescriptor">PermissionDescriptor</span>
-     <li><span class="dfn-paneled" id="term-for-dom-permissionstatus">PermissionStatus</span>
-     <li><span class="dfn-paneled" id="term-for-dom-permissionstate-denied">denied</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-extra-permission-data">extra permission data</span>
-     <li><span class="dfn-paneled" id="term-for-dom-permissionstate-granted">granted</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-permission-descriptor-type">permission descriptor type</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-permission-query-algorithm">permission query algorithm</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-permission-result-type">permission result type</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-permission-revocation-algorithm">permission revocation algorithm</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-state">permission state</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-powerful-feature">powerful feature</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-request-permission-to-use">request permission to use</span>
-     <li><span class="dfn-paneled" id="term-for-dom-permissionstatus-state">state</span>
+     <li><span class="dfn-paneled" id="43348714678be2dd068b6e59f237b20f">PermissionDescriptor</span>
+     <li><span class="dfn-paneled" id="765630ad06480a49b1773153409b6085">PermissionStatus</span>
+     <li><span class="dfn-paneled" id="e0774c44301354d17a379b02016bbc62">denied</span>
+     <li><span class="dfn-paneled" id="51cff69cfdab970890708e29c3ad497c">extra permission data</span>
+     <li><span class="dfn-paneled" id="180d5479814a4ae3b599e6a1c4e11751">granted</span>
+     <li><span class="dfn-paneled" id="a7b12fdfd0e5a14a6609967ea1b77b6f">permission descriptor type</span>
+     <li><span class="dfn-paneled" id="45e4be68c2e45dae228854bea2090403">permission query algorithm</span>
+     <li><span class="dfn-paneled" id="18df519fb27854ac490e00630fc07f36">permission result type</span>
+     <li><span class="dfn-paneled" id="307cea1a9f6101451337bfc8f929b164">permission revocation algorithm</span>
+     <li><span class="dfn-paneled" id="7e061092254567e08202b79a0f3450e7">permission state</span>
+     <li><span class="dfn-paneled" id="502996c42f30b37f182905ef22fb89c0">powerful feature</span>
+     <li><span class="dfn-paneled" id="d043d7b7a730e84f11e7c740ee946288">request permission to use</span>
+     <li><span class="dfn-paneled" id="b0d9608d74c0d38907af88ef8f961dbb">state</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[permissions-policy-1]</a> defines the following terms:
+    <a data-link-type="biblio">[PERMISSIONS-POLICY-1]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-policy-controlled-feature">policy-controlled feature</span>
+     <li><span class="dfn-paneled" id="cbc4165961071efad91900c4c7b2fe8b">policy-controlled feature</span>
     </ul>
    <li>
-    <a data-link-type="biblio">[web-bluetooth]</a> defines the following terms:
+    <a data-link-type="biblio">[WEB-BLUETOOTH]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-permissiondef-bluetooth">"bluetooth"</span>
-     <li><span class="dfn-paneled" id="term-for-bluetooth">Bluetooth</span>
-     <li><span class="dfn-paneled" id="term-for-dictdef-bluetoothdatafilterinit">BluetoothDataFilterInit</span>
-     <li><span class="dfn-paneled" id="term-for-bluetoothdevice">BluetoothDevice</span>
-     <li><span class="dfn-paneled" id="term-for-dictdef-bluetoothlescanfilterinit">BluetoothLEScanFilterInit</span>
-     <li><span class="dfn-paneled" id="term-for-typedefdef-uuid">UUID</span>
-     <li><span class="dfn-paneled" id="term-for-eventdef-bluetoothdevice-advertisementreceived">advertisementreceived</span>
-     <li><span class="dfn-paneled" id="term-for-bluetooth-device">bluetooth device</span>
-     <li><span class="dfn-paneled" id="term-for-bluetoothlescanfilterinit-canonicalizing">canonicalizing <small>(for BluetoothLEScanFilterInit)</small></span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothdatafilterinit-dataprefix">dataPrefix</span>
-     <li><span class="dfn-paneled" id="term-for-fire-an-advertisementreceived-event">fire an advertisementreceived event</span>
-     <li><span class="dfn-paneled" id="term-for-get-the-bluetoothdevice-representing">get the bluetoothdevice representing</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothuuid-getservice">getService(name)</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothlescanfilterinit-manufacturerdata">manufacturerData</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothdatafilterinit-mask">mask</span>
-     <li><span class="dfn-paneled" id="term-for-bluetoothdatafilterinit-matches">matches</span>
-     <li><span class="dfn-paneled" id="term-for-dom-allowedbluetoothdevice-mayusegatt">mayUseGATT</span>
-     <li><span class="dfn-paneled" id="term-for-read-only-arraybuffer">read only arraybuffer</span>
-     <li><span class="dfn-paneled" id="term-for-same-bluetooth-device">same bluetooth device</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothlescanfilterinit-servicedata">serviceData</span>
-     <li><span class="dfn-paneled" id="term-for-dom-bluetoothlescanfilterinit-services">services</span>
+     <li><span class="dfn-paneled" id="1a7af5f422d566ce7a6b3ed6540e0c2f">"bluetooth"</span>
+     <li><span class="dfn-paneled" id="3143bf7a4d3cd8dab4f6c1897600250e">Bluetooth</span>
+     <li><span class="dfn-paneled" id="7f434accac4ffc4549c6336064f49a14">BluetoothDataFilterInit</span>
+     <li><span class="dfn-paneled" id="2d6bd38154eeaac254077c9a522b2fa2">BluetoothDevice</span>
+     <li><span class="dfn-paneled" id="603ef35d3a33fa652113a6342ed3f1f6">BluetoothLEScanFilterInit</span>
+     <li><span class="dfn-paneled" id="77d01cb2f351e4c631922e87a2df84f8">UUID</span>
+     <li><span class="dfn-paneled" id="9c11a473167d9513c66fedd9b09a7430">advertisementreceived</span>
+     <li><span class="dfn-paneled" id="29345d4f73354a1ba1a9ebafca951062">bluetooth device</span>
+     <li><span class="dfn-paneled" id="b320261ad4a865b8724cd383f83b8523">canonicalizing <small>(for BluetoothDataFilterInit)</small></span>
+     <li><span class="dfn-paneled" id="eef8e3d251645f014764123a79386aa5">canonicalizing <small>(for BluetoothLEScanFilterInit)</small></span>
+     <li><span class="dfn-paneled" id="c8875d5ecba98eb71144505b80847847">dataPrefix</span>
+     <li><span class="dfn-paneled" id="f093e6614d5d8fc422bb2b9bf65960db">fire an advertisementreceived event</span>
+     <li><span class="dfn-paneled" id="5531e9c221f9f6958e63a41b668ec9e2">get the bluetoothdevice representing</span>
+     <li><span class="dfn-paneled" id="9a8e6bd31128107595414791c322b775">getService(name)</span>
+     <li><span class="dfn-paneled" id="66e30a8e9126b2bc305c430ab9b2051e">manufacturerData</span>
+     <li><span class="dfn-paneled" id="5d51443d50775a1aed67b3d121bef9f5">mask</span>
+     <li><span class="dfn-paneled" id="afdaa9b131408055145b5fa6adced09e">matches</span>
+     <li><span class="dfn-paneled" id="e4e58d4c9430f506515d770c026933d6">mayUseGATT</span>
+     <li><span class="dfn-paneled" id="645b3888ad521d0a27d325c6e807e96c">read only arraybuffer</span>
+     <li><span class="dfn-paneled" id="c7b9927a239e40e368ab26d96ac514f5">same bluetooth device</span>
+     <li><span class="dfn-paneled" id="85428ba0ab85f4b582ef00b39be56843">serviceData</span>
+     <li><span class="dfn-paneled" id="a7ddfde1dc40dfa95a86d6bfd54d93cc">services</span>
     </ul>
    <li>
     <a data-link-type="biblio">[WEBIDL]</a> defines the following terms:
     <ul>
-     <li><span class="dfn-paneled" id="term-for-idl-ArrayBuffer">ArrayBuffer</span>
-     <li><span class="dfn-paneled" id="term-for-idl-DOMString">DOMString</span>
-     <li><span class="dfn-paneled" id="term-for-Exposed">Exposed</span>
-     <li><span class="dfn-paneled" id="term-for-idl-frozen-array">FrozenArray</span>
-     <li><span class="dfn-paneled" id="term-for-invalidstateerror">InvalidStateError</span>
-     <li><span class="dfn-paneled" id="term-for-notallowederror">NotAllowedError</span>
-     <li><span class="dfn-paneled" id="term-for-notsupportederror">NotSupportedError</span>
-     <li><span class="dfn-paneled" id="term-for-idl-promise">Promise</span>
-     <li><span class="dfn-paneled" id="term-for-SecureContext">SecureContext</span>
-     <li><span class="dfn-paneled" id="term-for-securityerror">SecurityError</span>
-     <li><span class="dfn-paneled" id="term-for-unknownerror">UnknownError</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-get-buffer-source-copy">a copy of the bytes held</span>
-     <li><span class="dfn-paneled" id="term-for-a-new-promise">a new promise</span>
-     <li><span class="dfn-paneled" id="term-for-idl-boolean">boolean</span>
-     <li><span class="dfn-paneled" id="term-for-dfn-map-entries">map entries</span>
-     <li><span class="dfn-paneled" id="term-for-idl-object">object</span>
-     <li><span class="dfn-paneled" id="term-for-reject">reject</span>
-     <li><span class="dfn-paneled" id="term-for-resolve">resolve</span>
-     <li><span class="dfn-paneled" id="term-for-idl-sequence">sequence</span>
-     <li><span class="dfn-paneled" id="term-for-this">this</span>
-     <li><span class="dfn-paneled" id="term-for-idl-undefined">undefined</span>
-     <li><span class="dfn-paneled" id="term-for-idl-unsigned-short">unsigned short</span>
+     <li><span class="dfn-paneled" id="8e4f03edcfe9224009a4032bac512ab6">ArrayBuffer</span>
+     <li><span class="dfn-paneled" id="d0f238a61de9310f1738a214749fab18">DOMString</span>
+     <li><span class="dfn-paneled" id="dde049eb112f043fc45407ec0d4cb457">Exposed</span>
+     <li><span class="dfn-paneled" id="30e8367dc9a547b9096d98ba691987d9">FrozenArray</span>
+     <li><span class="dfn-paneled" id="e2a06375a2fb70c61a8b4cd0abe9d4f1">InvalidStateError</span>
+     <li><span class="dfn-paneled" id="aa43258e2b51dc6ebe6268a36e6fd733">NotAllowedError</span>
+     <li><span class="dfn-paneled" id="c0194e44e6b2e643055f42ba786d0a3a">NotSupportedError</span>
+     <li><span class="dfn-paneled" id="93669c631ec1ef8e696b4c083bdbe12c">Promise</span>
+     <li><span class="dfn-paneled" id="cdf224ec60dc3b08449a2fbdf3a90406">SecureContext</span>
+     <li><span class="dfn-paneled" id="bfd589348b877ef78380edc0886321f0">SecurityError</span>
+     <li><span class="dfn-paneled" id="7451f6933516d80f8b562e59981dbe79">UnknownError</span>
+     <li><span class="dfn-paneled" id="6ffbd8faae9be84f70eb6a6e91f2141f">a copy of the bytes held</span>
+     <li><span class="dfn-paneled" id="bbe33fc7ac016834e4aaddbfd1b084a1">a new promise</span>
+     <li><span class="dfn-paneled" id="f8062b07e25ed0281f5cbfb9a54070b4">boolean</span>
+     <li><span class="dfn-paneled" id="72d957ec5625550a0ba93648e8c8d032">map entries</span>
+     <li><span class="dfn-paneled" id="5039223412f0d0a24ee17570f82d3d59">object</span>
+     <li><span class="dfn-paneled" id="f7204c0306e7ffcb24c31adf6e629e1d">reject</span>
+     <li><span class="dfn-paneled" id="f4f973f92274819781816b033aea1f11">resolve</span>
+     <li><span class="dfn-paneled" id="38ab7db52e46bed36993204c29f67202">sequence</span>
+     <li><span class="dfn-paneled" id="be0933df03cd63338f98de217c4158c7">this</span>
+     <li><span class="dfn-paneled" id="cee863f1f2ec91066cfb7f5d309d59dc">undefined</span>
+     <li><span class="dfn-paneled" id="85ad66f191d72a7d6508e0bab70044dc">unsigned short</span>
     </ul>
   </ul>
   <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
@@ -1985,20 +2002,20 @@ steps:</p>
    <dt id="biblio-infra">[INFRA]
    <dd>Anne van Kesteren; Domenic Denicola. <a href="https://infra.spec.whatwg.org/"><cite>Infra Standard</cite></a>. Living Standard. URL: <a href="https://infra.spec.whatwg.org/">https://infra.spec.whatwg.org/</a>
    <dt id="biblio-permissions">[PERMISSIONS]
-   <dd>Marcos Caceres; Mike Taylor. <a href="https://www.w3.org/TR/permissions/"><cite>Permissions</cite></a>. 27 May 2022. WD. URL: <a href="https://www.w3.org/TR/permissions/">https://www.w3.org/TR/permissions/</a>
+   <dd>Marcos Caceres; Mike Taylor. <a href="https://w3c.github.io/permissions/"><cite>Permissions</cite></a>. URL: <a href="https://w3c.github.io/permissions/">https://w3c.github.io/permissions/</a>
    <dt id="biblio-permissions-policy-1">[PERMISSIONS-POLICY-1]
-   <dd>Ian Clelland. <a href="https://www.w3.org/TR/permissions-policy-1/"><cite>Permissions Policy</cite></a>. 16 July 2020. WD. URL: <a href="https://www.w3.org/TR/permissions-policy-1/">https://www.w3.org/TR/permissions-policy-1/</a>
+   <dd>Ian Clelland. <a href="https://w3c.github.io/webappsec-permissions-policy/"><cite>Permissions Policy</cite></a>. URL: <a href="https://w3c.github.io/webappsec-permissions-policy/">https://w3c.github.io/webappsec-permissions-policy/</a>
    <dt id="biblio-rfc2119">[RFC2119]
    <dd>S. Bradner. <a href="https://datatracker.ietf.org/doc/html/rfc2119"><cite>Key words for use in RFCs to Indicate Requirement Levels</cite></a>. March 1997. Best Current Practice. URL: <a href="https://datatracker.ietf.org/doc/html/rfc2119">https://datatracker.ietf.org/doc/html/rfc2119</a>
    <dt id="biblio-web-bluetooth">[WEB-BLUETOOTH]
-   <dd>Jeffrey Yasskin. <a href="https://webbluetoothcg.github.io/web-bluetooth/"><cite>Web Bluetooth</cite></a>. Draft Community Group Report. URL: <a href="https://webbluetoothcg.github.io/web-bluetooth/">https://webbluetoothcg.github.io/web-bluetooth/</a>
+   <dd>Jeffrey Yasskin. <a href="https://webbluetoothcg.github.io/web-bluetooth/"><cite>Web Bluetooth</cite></a>. URL: <a href="https://webbluetoothcg.github.io/web-bluetooth/">https://webbluetoothcg.github.io/web-bluetooth/</a>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
   </dl>
   <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
   <dl>
    <dt id="biblio-geolocation-api">[GEOLOCATION-API]
-   <dd>Andrei Popescu. <a href="https://www.w3.org/TR/geolocation-API/"><cite>Geolocation API Specification 2nd Edition</cite></a>. 8 November 2016. REC. URL: <a href="https://www.w3.org/TR/geolocation-API/">https://www.w3.org/TR/geolocation-API/</a>
+   <dd>Andrei Popescu. <a href="https://w3c.github.io/geolocation-api/"><cite>Geolocation API Specification 2nd Edition</cite></a>. URL: <a href="https://w3c.github.io/geolocation-api/">https://w3c.github.io/geolocation-api/</a>
   </dl>
   <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
 <pre class="idl highlight def"><c- b>dictionary</c-> <a href="#dictdef-bluetoothlescanoptions"><code><c- g>BluetoothLEScanOptions</c-></code></a> {
@@ -2072,98 +2089,98 @@ steps:</p>
    <div class="issue"> Consider filtering the result to active scans that
               match the fields of the descriptor. <a class="issue-return" href="#issue-should-query-filter" title="Jump to section">↵</a></div>
   </div>
-  <aside class="dfn-panel" data-for="dictdef-bluetoothlescanoptions">
-   <b><a href="#dictdef-bluetoothlescanoptions">#dictdef-bluetoothlescanoptions</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dictdef-bluetoothlescanoptions" class="dfn-panel" data-for="dictdef-bluetoothlescanoptions" id="infopanel-for-dictdef-bluetoothlescanoptions">
+   <span id="infopaneltitle-for-dictdef-bluetoothlescanoptions" style="display:none">Info about the 'BluetoothLEScanOptions' definition.</span><b><a href="#dictdef-bluetoothlescanoptions">#dictdef-bluetoothlescanoptions</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-bluetoothlescanoptions">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanoptions-keeprepeateddevices">
-   <b><a href="#dom-bluetoothlescanoptions-keeprepeateddevices">#dom-bluetoothlescanoptions-keeprepeateddevices</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanoptions-keeprepeateddevices" class="dfn-panel" data-for="dom-bluetoothlescanoptions-keeprepeateddevices" id="infopanel-for-dom-bluetoothlescanoptions-keeprepeateddevices">
+   <span id="infopaneltitle-for-dom-bluetoothlescanoptions-keeprepeateddevices" style="display:none">Info about the 'keepRepeatedDevices' definition.</span><b><a href="#dom-bluetoothlescanoptions-keeprepeateddevices">#dom-bluetoothlescanoptions-keeprepeateddevices</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanoptions-keeprepeateddevices">4. Scanning for BLE advertisements</a> <a href="#ref-for-dom-bluetoothlescanoptions-keeprepeateddevices①">(2)</a>
     <li><a href="#ref-for-dom-bluetoothlescanoptions-keeprepeateddevices②">6. Changes to existing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanoptions-acceptalladvertisements">
-   <b><a href="#dom-bluetoothlescanoptions-acceptalladvertisements">#dom-bluetoothlescanoptions-acceptalladvertisements</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanoptions-acceptalladvertisements" class="dfn-panel" data-for="dom-bluetoothlescanoptions-acceptalladvertisements" id="infopanel-for-dom-bluetoothlescanoptions-acceptalladvertisements">
+   <span id="infopaneltitle-for-dom-bluetoothlescanoptions-acceptalladvertisements" style="display:none">Info about the 'acceptAllAdvertisements' definition.</span><b><a href="#dom-bluetoothlescanoptions-acceptalladvertisements">#dom-bluetoothlescanoptions-acceptalladvertisements</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanoptions-acceptalladvertisements">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-bluetoothlescanoptions-acceptalladvertisements①">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetooth-requestlescan">
-   <b><a href="#dom-bluetooth-requestlescan">#dom-bluetooth-requestlescan</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetooth-requestlescan" class="dfn-panel" data-for="dom-bluetooth-requestlescan" id="infopanel-for-dom-bluetooth-requestlescan">
+   <span id="infopaneltitle-for-dom-bluetooth-requestlescan" style="display:none">Info about the 'requestLEScan(options)' definition.</span><b><a href="#dom-bluetooth-requestlescan">#dom-bluetooth-requestlescan</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetooth-requestlescan">1.1. Examples</a>
     <li><a href="#ref-for-dom-bluetooth-requestlescan①">4. Scanning for BLE advertisements</a> <a href="#ref-for-dom-bluetooth-requestlescan②">(2)</a> <a href="#ref-for-dom-bluetooth-requestlescan③">(3)</a> <a href="#ref-for-dom-bluetooth-requestlescan④">(4)</a>
     <li><a href="#ref-for-dom-bluetooth-requestlescan⑤">7. Terminology and conventions</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothdatafilter">
-   <b><a href="#bluetoothdatafilter">#bluetoothdatafilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothdatafilter" class="dfn-panel" data-for="bluetoothdatafilter" id="infopanel-for-bluetoothdatafilter">
+   <span id="infopaneltitle-for-bluetoothdatafilter" style="display:none">Info about the 'BluetoothDataFilter' definition.</span><b><a href="#bluetoothdatafilter">#bluetoothdatafilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothdatafilter">4.1. Controlling a BLE scan</a> <a href="#ref-for-bluetoothdatafilter①">(2)</a> <a href="#ref-for-bluetoothdatafilter②">(3)</a> <a href="#ref-for-bluetoothdatafilter③">(4)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothdatafilter-dataprefix">
-   <b><a href="#dom-bluetoothdatafilter-dataprefix">#dom-bluetoothdatafilter-dataprefix</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothdatafilter-dataprefix" class="dfn-panel" data-for="dom-bluetoothdatafilter-dataprefix" id="infopanel-for-dom-bluetoothdatafilter-dataprefix">
+   <span id="infopaneltitle-for-dom-bluetoothdatafilter-dataprefix" style="display:none">Info about the 'dataPrefix' definition.</span><b><a href="#dom-bluetoothdatafilter-dataprefix">#dom-bluetoothdatafilter-dataprefix</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdatafilter-dataprefix">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothdatafilter-mask">
-   <b><a href="#dom-bluetoothdatafilter-mask">#dom-bluetoothdatafilter-mask</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothdatafilter-mask" class="dfn-panel" data-for="dom-bluetoothdatafilter-mask" id="infopanel-for-dom-bluetoothdatafilter-mask">
+   <span id="infopaneltitle-for-dom-bluetoothdatafilter-mask" style="display:none">Info about the 'mask' definition.</span><b><a href="#dom-bluetoothdatafilter-mask">#dom-bluetoothdatafilter-mask</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdatafilter-mask">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothmanufacturerdatafilter">
-   <b><a href="#bluetoothmanufacturerdatafilter">#bluetoothmanufacturerdatafilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothmanufacturerdatafilter" class="dfn-panel" data-for="bluetoothmanufacturerdatafilter" id="infopanel-for-bluetoothmanufacturerdatafilter">
+   <span id="infopaneltitle-for-bluetoothmanufacturerdatafilter" style="display:none">Info about the 'BluetoothManufacturerDataFilter' definition.</span><b><a href="#bluetoothmanufacturerdatafilter">#bluetoothmanufacturerdatafilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothmanufacturerdatafilter">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothservicedatafilter">
-   <b><a href="#bluetoothservicedatafilter">#bluetoothservicedatafilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothservicedatafilter" class="dfn-panel" data-for="bluetoothservicedatafilter" id="infopanel-for-bluetoothservicedatafilter">
+   <span id="infopaneltitle-for-bluetoothservicedatafilter" style="display:none">Info about the 'BluetoothServiceDataFilter' definition.</span><b><a href="#bluetoothservicedatafilter">#bluetoothservicedatafilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothservicedatafilter">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothlescanfilter">
-   <b><a href="#bluetoothlescanfilter">#bluetoothlescanfilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothlescanfilter" class="dfn-panel" data-for="bluetoothlescanfilter" id="infopanel-for-bluetoothlescanfilter">
+   <span id="infopaneltitle-for-bluetoothlescanfilter" style="display:none">Info about the 'BluetoothLEScanFilter' definition.</span><b><a href="#bluetoothlescanfilter">#bluetoothlescanfilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescanfilter">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-bluetoothlescanfilter①">4.1. Controlling a BLE scan</a>
     <li><a href="#ref-for-bluetoothlescanfilter②">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-name">
-   <b><a href="#dom-bluetoothlescanfilter-name">#dom-bluetoothlescanfilter-name</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanfilter-name" class="dfn-panel" data-for="dom-bluetoothlescanfilter-name" id="infopanel-for-dom-bluetoothlescanfilter-name">
+   <span id="infopaneltitle-for-dom-bluetoothlescanfilter-name" style="display:none">Info about the 'name' definition.</span><b><a href="#dom-bluetoothlescanfilter-name">#dom-bluetoothlescanfilter-name</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-name">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-services">
-   <b><a href="#dom-bluetoothlescanfilter-services">#dom-bluetoothlescanfilter-services</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanfilter-services" class="dfn-panel" data-for="dom-bluetoothlescanfilter-services" id="infopanel-for-dom-bluetoothlescanfilter-services">
+   <span id="infopaneltitle-for-dom-bluetoothlescanfilter-services" style="display:none">Info about the 'services' definition.</span><b><a href="#dom-bluetoothlescanfilter-services">#dom-bluetoothlescanfilter-services</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-services">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-manufacturerdata">
-   <b><a href="#dom-bluetoothlescanfilter-manufacturerdata">#dom-bluetoothlescanfilter-manufacturerdata</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanfilter-manufacturerdata" class="dfn-panel" data-for="dom-bluetoothlescanfilter-manufacturerdata" id="infopanel-for-dom-bluetoothlescanfilter-manufacturerdata">
+   <span id="infopaneltitle-for-dom-bluetoothlescanfilter-manufacturerdata" style="display:none">Info about the 'manufacturerData' definition.</span><b><a href="#dom-bluetoothlescanfilter-manufacturerdata">#dom-bluetoothlescanfilter-manufacturerdata</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-manufacturerdata">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-servicedata">
-   <b><a href="#dom-bluetoothlescanfilter-servicedata">#dom-bluetoothlescanfilter-servicedata</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanfilter-servicedata" class="dfn-panel" data-for="dom-bluetoothlescanfilter-servicedata" id="infopanel-for-dom-bluetoothlescanfilter-servicedata">
+   <span id="infopaneltitle-for-dom-bluetoothlescanfilter-servicedata" style="display:none">Info about the 'serviceData' definition.</span><b><a href="#dom-bluetoothlescanfilter-servicedata">#dom-bluetoothlescanfilter-servicedata</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-servicedata">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothlescan">
-   <b><a href="#bluetoothlescan">#bluetoothlescan</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothlescan" class="dfn-panel" data-for="bluetoothlescan" id="infopanel-for-bluetoothlescan">
+   <span id="infopaneltitle-for-bluetoothlescan" style="display:none">Info about the 'BluetoothLEScan' definition.</span><b><a href="#bluetoothlescan">#bluetoothlescan</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescan">4. Scanning for BLE advertisements</a> <a href="#ref-for-bluetoothlescan①">(2)</a> <a href="#ref-for-bluetoothlescan②">(3)</a>
     <li><a href="#ref-for-bluetoothlescan③">4.1. Controlling a BLE scan</a>
@@ -2172,109 +2189,109 @@ steps:</p>
     <li><a href="#ref-for-bluetoothlescan⑧">6. Changes to existing interfaces</a> <a href="#ref-for-bluetoothlescan⑨">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescan-filters">
-   <b><a href="#dom-bluetoothlescan-filters">#dom-bluetoothlescan-filters</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescan-filters" class="dfn-panel" data-for="dom-bluetoothlescan-filters" id="infopanel-for-dom-bluetoothlescan-filters">
+   <span id="infopaneltitle-for-dom-bluetoothlescan-filters" style="display:none">Info about the 'filters' definition.</span><b><a href="#dom-bluetoothlescan-filters">#dom-bluetoothlescan-filters</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-filters">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-bluetoothlescan-filters①">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescan-keeprepeateddevices">
-   <b><a href="#dom-bluetoothlescan-keeprepeateddevices">#dom-bluetoothlescan-keeprepeateddevices</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescan-keeprepeateddevices" class="dfn-panel" data-for="dom-bluetoothlescan-keeprepeateddevices" id="infopanel-for-dom-bluetoothlescan-keeprepeateddevices">
+   <span id="infopaneltitle-for-dom-bluetoothlescan-keeprepeateddevices" style="display:none">Info about the 'keepRepeatedDevices' definition.</span><b><a href="#dom-bluetoothlescan-keeprepeateddevices">#dom-bluetoothlescan-keeprepeateddevices</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-keeprepeateddevices">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-bluetoothlescan-keeprepeateddevices①">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescan-acceptalladvertisements">
-   <b><a href="#dom-bluetoothlescan-acceptalladvertisements">#dom-bluetoothlescan-acceptalladvertisements</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescan-acceptalladvertisements" class="dfn-panel" data-for="dom-bluetoothlescan-acceptalladvertisements" id="infopanel-for-dom-bluetoothlescan-acceptalladvertisements">
+   <span id="infopaneltitle-for-dom-bluetoothlescan-acceptalladvertisements" style="display:none">Info about the 'acceptAllAdvertisements' definition.</span><b><a href="#dom-bluetoothlescan-acceptalladvertisements">#dom-bluetoothlescan-acceptalladvertisements</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-acceptalladvertisements">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescan-active">
-   <b><a href="#dom-bluetoothlescan-active">#dom-bluetoothlescan-active</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescan-active" class="dfn-panel" data-for="dom-bluetoothlescan-active" id="infopanel-for-dom-bluetoothlescan-active">
+   <span id="infopaneltitle-for-dom-bluetoothlescan-active" style="display:none">Info about the 'active' definition.</span><b><a href="#dom-bluetoothlescan-active">#dom-bluetoothlescan-active</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-active">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-bluetoothlescan-active①">4.1. Controlling a BLE scan</a>
     <li><a href="#ref-for-dom-bluetoothlescan-active②">6. Changes to existing interfaces</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanfilter-bluetoothlescanfilter">
-   <b><a href="#dom-bluetoothlescanfilter-bluetoothlescanfilter">#dom-bluetoothlescanfilter-bluetoothlescanfilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanfilter-bluetoothlescanfilter" class="dfn-panel" data-for="dom-bluetoothlescanfilter-bluetoothlescanfilter" id="infopanel-for-dom-bluetoothlescanfilter-bluetoothlescanfilter">
+   <span id="infopaneltitle-for-dom-bluetoothlescanfilter-bluetoothlescanfilter" style="display:none">Info about the 'BluetoothLEScanFilter(init)' definition.</span><b><a href="#dom-bluetoothlescanfilter-bluetoothlescanfilter">#dom-bluetoothlescanfilter-bluetoothlescanfilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter①">4.1. Controlling a BLE scan</a>
     <li><a href="#ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter②">7. Terminology and conventions</a> <a href="#ref-for-dom-bluetoothlescanfilter-bluetoothlescanfilter③">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescan-stop">
-   <b><a href="#dom-bluetoothlescan-stop">#dom-bluetoothlescan-stop</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescan-stop" class="dfn-panel" data-for="dom-bluetoothlescan-stop" id="infopanel-for-dom-bluetoothlescan-stop">
+   <span id="infopaneltitle-for-dom-bluetoothlescan-stop" style="display:none">Info about the 'stop()' definition.</span><b><a href="#dom-bluetoothlescan-stop">#dom-bluetoothlescan-stop</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescan-stop">4.1. Controlling a BLE scan</a> <a href="#ref-for-dom-bluetoothlescan-stop①">(2)</a>
     <li><a href="#ref-for-dom-bluetoothlescan-stop②">4.2. Handling Document Loss of Full Activity</a>
     <li><a href="#ref-for-dom-bluetoothlescan-stop③">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">
-   <b><a href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter" class="dfn-panel" data-for="dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter" id="infopanel-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">
+   <span id="infopaneltitle-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter" style="display:none">Info about the 'BluetoothManufacturerDataFilter(init)' definition.</span><b><a href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothservicedatafilter-bluetoothservicedatafilter">
-   <b><a href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter">#dom-bluetoothservicedatafilter-bluetoothservicedatafilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter" class="dfn-panel" data-for="dom-bluetoothservicedatafilter-bluetoothservicedatafilter" id="infopanel-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter">
+   <span id="infopaneltitle-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter" style="display:none">Info about the 'BluetoothServiceDataFilter(init)' definition.</span><b><a href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter">#dom-bluetoothservicedatafilter-bluetoothservicedatafilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothdatafilter-bluetoothdatafilter">
-   <b><a href="#dom-bluetoothdatafilter-bluetoothdatafilter">#dom-bluetoothdatafilter-bluetoothdatafilter</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothdatafilter-bluetoothdatafilter" class="dfn-panel" data-for="dom-bluetoothdatafilter-bluetoothdatafilter" id="infopanel-for-dom-bluetoothdatafilter-bluetoothdatafilter">
+   <span id="infopaneltitle-for-dom-bluetoothdatafilter-bluetoothdatafilter" style="display:none">Info about the 'BluetoothDataFilter(init)' definition.</span><b><a href="#dom-bluetoothdatafilter-bluetoothdatafilter">#dom-bluetoothdatafilter-bluetoothdatafilter</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdatafilter-bluetoothdatafilter">4.1. Controlling a BLE scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-permissionname-bluetooth-le-scan">
-   <b><a href="#dom-permissionname-bluetooth-le-scan">#dom-permissionname-bluetooth-le-scan</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-permissionname-bluetooth-le-scan" class="dfn-panel" data-for="dom-permissionname-bluetooth-le-scan" id="infopanel-for-dom-permissionname-bluetooth-le-scan">
+   <span id="infopaneltitle-for-dom-permissionname-bluetooth-le-scan" style="display:none">Info about the '"bluetooth-le-scan"' definition.</span><b><a href="#dom-permissionname-bluetooth-le-scan">#dom-permissionname-bluetooth-le-scan</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-permissionname-bluetooth-le-scan">4. Scanning for BLE advertisements</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dictdef-bluetoothlescanpermissiondescriptor">
-   <b><a href="#dictdef-bluetoothlescanpermissiondescriptor">#dictdef-bluetoothlescanpermissiondescriptor</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dictdef-bluetoothlescanpermissiondescriptor" class="dfn-panel" data-for="dictdef-bluetoothlescanpermissiondescriptor" id="infopanel-for-dictdef-bluetoothlescanpermissiondescriptor">
+   <span id="infopaneltitle-for-dictdef-bluetoothlescanpermissiondescriptor" style="display:none">Info about the 'BluetoothLEScanPermissionDescriptor' definition.</span><b><a href="#dictdef-bluetoothlescanpermissiondescriptor">#dictdef-bluetoothlescanpermissiondescriptor</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dictdef-bluetoothlescanpermissiondescriptor">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothlescanpermissionresult">
-   <b><a href="#bluetoothlescanpermissionresult">#bluetoothlescanpermissionresult</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothlescanpermissionresult" class="dfn-panel" data-for="bluetoothlescanpermissionresult" id="infopanel-for-bluetoothlescanpermissionresult">
+   <span id="infopaneltitle-for-bluetoothlescanpermissionresult" style="display:none">Info about the 'BluetoothLEScanPermissionResult' definition.</span><b><a href="#bluetoothlescanpermissionresult">#bluetoothlescanpermissionresult</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescanpermissionresult">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothlescanpermissionresult-scans">
-   <b><a href="#dom-bluetoothlescanpermissionresult-scans">#dom-bluetoothlescanpermissionresult-scans</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothlescanpermissionresult-scans" class="dfn-panel" data-for="dom-bluetoothlescanpermissionresult-scans" id="infopanel-for-dom-bluetoothlescanpermissionresult-scans">
+   <span id="infopaneltitle-for-dom-bluetoothlescanpermissionresult-scans" style="display:none">Info about the 'scans' definition.</span><b><a href="#dom-bluetoothlescanpermissionresult-scans">#dom-bluetoothlescanpermissionresult-scans</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothlescanpermissionresult-scans">4.3. Permission to scan</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothlescan-match">
-   <b><a href="#bluetoothlescan-match">#bluetoothlescan-match</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothlescan-match" class="dfn-panel" data-for="bluetoothlescan-match" id="infopanel-for-bluetoothlescan-match">
+   <span id="infopaneltitle-for-bluetoothlescan-match" style="display:none">Info about the 'matches' definition.</span><b><a href="#bluetoothlescan-match">#bluetoothlescan-match</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescan-match">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-bluetoothlescan-match①">4.1. Controlling a BLE scan</a>
     <li><a href="#ref-for-bluetoothlescan-match②">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="bluetoothlescanfilter-match">
-   <b><a href="#bluetoothlescanfilter-match">#bluetoothlescanfilter-match</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-bluetoothlescanfilter-match" class="dfn-panel" data-for="bluetoothlescanfilter-match" id="infopanel-for-bluetoothlescanfilter-match">
+   <span id="infopaneltitle-for-bluetoothlescanfilter-match" style="display:none">Info about the 'matches' definition.</span><b><a href="#bluetoothlescanfilter-match">#bluetoothlescanfilter-match</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-bluetoothlescanfilter-match">4. Scanning for BLE advertisements</a>
     <li><a href="#ref-for-bluetoothlescanfilter-match①">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetooth-activescans-slot">
-   <b><a href="#dom-bluetooth-activescans-slot">#dom-bluetooth-activescans-slot</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetooth-activescans-slot" class="dfn-panel" data-for="dom-bluetooth-activescans-slot" id="infopanel-for-dom-bluetooth-activescans-slot">
+   <span id="infopaneltitle-for-dom-bluetooth-activescans-slot" style="display:none">Info about the '[[activeScans]]' definition.</span><b><a href="#dom-bluetooth-activescans-slot">#dom-bluetooth-activescans-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetooth-activescans-slot">4. Scanning for BLE advertisements</a> <a href="#ref-for-dom-bluetooth-activescans-slot①">(2)</a> <a href="#ref-for-dom-bluetooth-activescans-slot②">(3)</a>
     <li><a href="#ref-for-dom-bluetooth-activescans-slot③">4.1. Controlling a BLE scan</a> <a href="#ref-for-dom-bluetooth-activescans-slot④">(2)</a>
@@ -2283,148 +2300,203 @@ steps:</p>
     <li><a href="#ref-for-dom-bluetooth-activescans-slot⑧">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="dom-bluetoothdevice-returnedfromscans-slot">
-   <b><a href="#dom-bluetoothdevice-returnedfromscans-slot">#dom-bluetoothdevice-returnedfromscans-slot</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-dom-bluetoothdevice-returnedfromscans-slot" class="dfn-panel" data-for="dom-bluetoothdevice-returnedfromscans-slot" id="infopanel-for-dom-bluetoothdevice-returnedfromscans-slot">
+   <span id="infopaneltitle-for-dom-bluetoothdevice-returnedfromscans-slot" style="display:none">Info about the '[[returnedFromScans]]' definition.</span><b><a href="#dom-bluetoothdevice-returnedfromscans-slot">#dom-bluetoothdevice-returnedfromscans-slot</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-dom-bluetoothdevice-returnedfromscans-slot">5.1. Responding to advertising events</a> <a href="#ref-for-dom-bluetoothdevice-returnedfromscans-slot①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="advertising-event">
-   <b><a href="#advertising-event">#advertising-event</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-advertising-event" class="dfn-panel" data-for="advertising-event" id="infopanel-for-advertising-event">
+   <span id="infopaneltitle-for-advertising-event" style="display:none">Info about the 'advertising events' definition.</span><b><a href="#advertising-event">#advertising-event</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-advertising-event">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="observer">
-   <b><a href="#observer">#observer</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-observer" class="dfn-panel" data-for="observer" id="infopanel-for-observer">
+   <span id="infopaneltitle-for-observer" style="display:none">Info about the 'Observer' definition.</span><b><a href="#observer">#observer</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-observer">1. Introduction</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="privacy-feature">
-   <b><a href="#privacy-feature">#privacy-feature</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-privacy-feature" class="dfn-panel" data-for="privacy-feature" id="infopanel-for-privacy-feature">
+   <span id="infopaneltitle-for-privacy-feature" style="display:none">Info about the 'Privacy Feature' definition.</span><b><a href="#privacy-feature">#privacy-feature</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-privacy-feature">2. Privacy considerations</a> <a href="#ref-for-privacy-feature①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="privacy-feature-in-an-observer">
-   <b><a href="#privacy-feature-in-an-observer">#privacy-feature-in-an-observer</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-privacy-feature-in-an-observer" class="dfn-panel" data-for="privacy-feature-in-an-observer" id="infopanel-for-privacy-feature-in-an-observer">
+   <span id="infopaneltitle-for-privacy-feature-in-an-observer" style="display:none">Info about the 'Privacy Feature in an Observer' definition.</span><b><a href="#privacy-feature-in-an-observer">#privacy-feature-in-an-observer</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-privacy-feature-in-an-observer">2. Privacy considerations</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="device-address">
-   <b><a href="#device-address">#device-address</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-device-address" class="dfn-panel" data-for="device-address" id="infopanel-for-device-address">
+   <span id="infopaneltitle-for-device-address" style="display:none">Info about the 'Device Address' definition.</span><b><a href="#device-address">#device-address</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-device-address">2. Privacy considerations</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="passive-scanning">
-   <b><a href="#passive-scanning">#passive-scanning</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-passive-scanning" class="dfn-panel" data-for="passive-scanning" id="infopanel-for-passive-scanning">
+   <span id="infopaneltitle-for-passive-scanning" style="display:none">Info about the 'Passive Scanning' definition.</span><b><a href="#passive-scanning">#passive-scanning</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-passive-scanning">2. Privacy considerations</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="active-scanning">
-   <b><a href="#active-scanning">#active-scanning</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-active-scanning" class="dfn-panel" data-for="active-scanning" id="infopanel-for-active-scanning">
+   <span id="infopaneltitle-for-active-scanning" style="display:none">Info about the 'Active Scanning' definition.</span><b><a href="#active-scanning">#active-scanning</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-active-scanning">2. Privacy considerations</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="service-uuid">
-   <b><a href="#service-uuid">#service-uuid</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-service-uuid" class="dfn-panel" data-for="service-uuid" id="infopanel-for-service-uuid">
+   <span id="infopaneltitle-for-service-uuid" style="display:none">Info about the 'Service UUID' definition.</span><b><a href="#service-uuid">#service-uuid</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-service-uuid">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="local-name">
-   <b><a href="#local-name">#local-name</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-local-name" class="dfn-panel" data-for="local-name" id="infopanel-for-local-name">
+   <span id="infopaneltitle-for-local-name" style="display:none">Info about the 'Local Name' definition.</span><b><a href="#local-name">#local-name</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-local-name">5.1. Responding to advertising events</a> <a href="#ref-for-local-name①">(2)</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="shortened-local-name">
-   <b><a href="#shortened-local-name">#shortened-local-name</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-shortened-local-name" class="dfn-panel" data-for="shortened-local-name" id="infopanel-for-shortened-local-name">
+   <span id="infopaneltitle-for-shortened-local-name" style="display:none">Info about the 'Shortened Local Name' definition.</span><b><a href="#shortened-local-name">#shortened-local-name</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-shortened-local-name">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="manufacturer-specific-data">
-   <b><a href="#manufacturer-specific-data">#manufacturer-specific-data</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-manufacturer-specific-data" class="dfn-panel" data-for="manufacturer-specific-data" id="infopanel-for-manufacturer-specific-data">
+   <span id="infopaneltitle-for-manufacturer-specific-data" style="display:none">Info about the 'Manufacturer Specific Data' definition.</span><b><a href="#manufacturer-specific-data">#manufacturer-specific-data</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-manufacturer-specific-data">5.1. Responding to advertising events</a>
    </ul>
   </aside>
-  <aside class="dfn-panel" data-for="service-data">
-   <b><a href="#service-data">#service-data</a></b><b>Referenced in:</b>
+  <aside aria-labelledby="infopaneltitle-for-service-data" class="dfn-panel" data-for="service-data" id="infopanel-for-service-data">
+   <span id="infopaneltitle-for-service-data" style="display:none">Info about the 'Service Data' definition.</span><b><a href="#service-data">#service-data</a></b><b>Referenced in:</b>
    <ul>
     <li><a href="#ref-for-service-data">5.1. Responding to advertising events</a>
    </ul>
   </aside>
 <script>/* script-dfn-panel */
-
-document.body.addEventListener("click", function(e) {
-    var queryAll = function(sel) { return [].slice.call(document.querySelectorAll(sel)); }
-    // Find the dfn element or panel, if any, that was clicked on.
-    var el = e.target;
-    var target;
-    var hitALink = false;
-    while(el.parentElement) {
-        if(el.tagName == "A") {
-            // Clicking on a link in a <dfn> shouldn't summon the panel
-            hitALink = true;
-        }
-        if(el.classList.contains("dfn-paneled")) {
-            target = "dfn";
-            break;
-        }
-        if(el.classList.contains("dfn-panel")) {
-            target = "dfn-panel";
-            break;
-        }
-        el = el.parentElement;
+"use strict";
+{
+    function queryAll(sel) {
+        return [].slice.call(document.querySelectorAll(sel));
     }
-    if(target != "dfn-panel") {
+
+    // Add popup behavior to all dfns to show the corresponding dfn-panel.
+    var dfns = document.querySelectorAll('.dfn-paneled');
+    for (let dfn of dfns) { insertDfnPopupAction(dfn); }
+
+    document.body.addEventListener("click", (e) => {
+        // If not handled already, just hide all dfn panels.
+        hideAllDfnPanels();
+    });
+
+    function hideAllDfnPanels() {
         // Turn off any currently "on" or "activated" panels.
-        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(function(el){
-            el.classList.remove("on");
-            el.classList.remove("activated");
-        });
-    }
-    if(target == "dfn" && !hitALink) {
-        // open the panel
-        var dfnPanel = document.querySelector(".dfn-panel[data-for='" + el.id + "']");
-        if(dfnPanel) {
-            dfnPanel.classList.add("on");
-            var rect = el.getBoundingClientRect();
-            dfnPanel.style.left = window.scrollX + rect.right + 5 + "px";
-            dfnPanel.style.top = window.scrollY + rect.top + "px";
-            var panelRect = dfnPanel.getBoundingClientRect();
-            var panelWidth = panelRect.right - panelRect.left;
-            if(panelRect.right > document.body.scrollWidth && (rect.left - (panelWidth + 5)) > 0) {
-                // Reposition, because the panel is overflowing
-                dfnPanel.style.left = window.scrollX + rect.left - (panelWidth + 5) + "px";
-            }
-        } else {
-            console.log("Couldn't find .dfn-panel[data-for='" + el.id + "']");
-        }
-    } else if(target == "dfn-panel") {
-        // Switch it to "activated" state, which pins it.
-        el.classList.add("activated");
-        el.style.left = null;
-        el.style.top = null;
+        queryAll(".dfn-panel.on, .dfn-panel.activated").forEach(el=>hideDfnPanel(el));
     }
 
-});
+    function showDfnPanel(dfnPanel, dfn) {
+        hideAllDfnPanels(); // Only display one at this time.
+        dfn.setAttribute("aria-expanded", "true");
+        dfnPanel.classList.add("on");
+        dfnPanel.style.left = "5px";
+        dfnPanel.style.top = "0px";
+        const panelRect = dfnPanel.getBoundingClientRect();
+        const panelWidth = panelRect.right - panelRect.left;
+        if (panelRect.right > document.body.scrollWidth) {
+            // Panel's overflowing the screen.
+            // Just drop it below the dfn and flip it rightward instead.
+            // This still wont' fix things if the screen is *really* wide,
+            // but fixing that's a lot harder without 'anchor()'.
+            dfnPanel.style.top = "1.5em";
+            dfnPanel.style.left = "auto";
+            dfnPanel.style.right = "0px";
+        }
+    }
+
+    function pinDfnPanel(dfnPanel) {
+        // Switch it to "activated" state, which pins it.
+        dfnPanel.classList.add("activated");
+        dfnPanel.style.left = null;
+        dfnPanel.style.top = null;
+    }
+
+    function hideDfnPanel(dfnPanel, dfn) {
+        if(!dfn) {
+            dfn = document.getElementById(dfnPanel.getAttribute("data-for"));
+        }
+        dfn.setAttribute("aria-expanded", "false")
+        dfnPanel.classList.remove("on");
+        dfnPanel.classList.remove("activated");
+    }
+
+    function toggleDfnPanel(dfnPanel, dfn) {
+        if(dfnPanel.classList.contains("on")) {
+            hideDfnPanel(dfnPanel, dfn);
+        } else {
+            showDfnPanel(dfnPanel, dfn);
+        }
+    }
+
+    function insertDfnPopupAction(dfn) {
+        // Find dfn panel
+        const dfnPanel = document.querySelector(`.dfn-panel[data-for='${dfn.id}']`);
+        if (dfnPanel) {
+            const panelWrapper = document.createElement('span');
+            panelWrapper.appendChild(dfnPanel);
+            panelWrapper.style.position = "relative";
+            panelWrapper.style.height = "0px";
+            dfn.insertAdjacentElement("afterend", panelWrapper);
+            dfn.setAttribute('role', 'button');
+            dfn.setAttribute('aria-expanded', 'false')
+            dfn.tabIndex = 0;
+            dfn.classList.add('has-dfn-panel');
+            dfn.addEventListener('click', (event) => {
+                showDfnPanel(dfnPanel, dfn);
+                event.stopPropagation();
+            });
+            dfn.addEventListener('keypress', (event) => {
+                const kc = event.keyCode;
+                // 32->Space, 13->Enter
+                if(kc == 32 || kc == 13) {
+                    toggleDfnPanel(dfnPanel, dfn);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            });
+
+            dfnPanel.addEventListener('click', (event) => {
+                pinDfnPanel(dfnPanel);
+                event.stopPropagation();
+            });
+
+            dfnPanel.addEventListener('keydown', (event) => {
+                if(event.keyCode == 27) { // Escape key
+                    hideDfnPanel(dfnPanel, dfn);
+                    event.stopPropagation();
+                    event.preventDefault();
+                }
+            })
+
+        } else {
+            console.log("Couldn't find .dfn-panel[data-for='" + dfn.id + "']");
+        }
+    }
+}
 </script>
 <script>/* script-var-click-highlighting */
 
-    document.addEventListener("click", e=>{
-        if(e.target.nodeName == "VAR") {
-            highlightSameAlgoVars(e.target);
-        }
-    });
+    "use strict";
     {
+        document.addEventListener("click", e=>{
+            if(e.target.nodeName == "VAR") {
+                highlightSameAlgoVars(e.target);
+            }
+        });
         const indexCounts = new Map();
         const indexNames = new Map();
         function highlightSameAlgoVars(v) {
