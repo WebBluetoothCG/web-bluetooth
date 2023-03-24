@@ -520,6 +520,7 @@ that UAs will choose not to prompt.
 
   dictionary RequestDeviceOptions {
     sequence<BluetoothLEScanFilterInit> filters;
+    sequence<BluetoothLEScanFilterInit> exclusionFilters;
     sequence<BluetoothServiceUUID> optionalServices = [];
     sequence<unsigned short> optionalManufacturerData = [];
     boolean acceptAllDevices = false;
@@ -563,8 +564,9 @@ attaches or detaches an adapter, are reported through the
 
 {{Bluetooth/requestDevice(options)}} asks the user to grant this origin access
 to a device that <a>matches any filter</a> in <code>options.<dfn dict-member
-for="RequestDeviceOptions">filters</dfn></code>. To <a>match a filter</a>, the
-device has to:
+for="RequestDeviceOptions">filters</dfn></code> but does not <a>match any filter</a>
+in <code>options.<dfn dict-member for="RequestDeviceOptions">exclusionFilters</dfn></code>.
+To <a>match a filter</a>, the device has to:
 
 * support <em>all</em> the GATT service UUIDs in the <dfn dict-member
     for="BluetoothLEScanFilterInit">services</dfn> list if that member is
@@ -596,10 +598,10 @@ to include filters for both behaviors.
 In rare cases, a device may not advertise enough distinguishing information to
 let a site filter out uninteresting devices. In those cases, a site can set <dfn
 dict-member for="RequestDeviceOptions">acceptAllDevices</dfn> to `true` and omit
-all {{RequestDeviceOptions/filters}}. This puts the burden of selecting the
-right device entirely on the site's users. If a site uses
-{{RequestDeviceOptions/acceptAllDevices}}, it will only be able to use services
-listed in {{RequestDeviceOptions/optionalServices}}.
+all {{RequestDeviceOptions/filters}} and {{RequestDeviceOptions/exclusionFilters}}.
+This puts the burden of selecting the right device entirely on the site's users.
+If a site uses {{RequestDeviceOptions/acceptAllDevices}}, it will only be able to
+use services listed in {{RequestDeviceOptions/optionalServices}}.
 
 After the user selects a device to pair with this origin, the origin is allowed
 to access any service whose UUID was listed in the
@@ -803,6 +805,60 @@ for several values of <var>filters</var> passed to
     </td>
     <td>D3, D5</td>
     <td></td>
+  </tr>
+</table>
+
+The following table shows which devices the user can select between
+for several values of <var>filters</var> and <var>exclusionFilters</var>
+passed to <code>navigator.bluetooth.requestDevice({filters: <var>filters</var>,
+exclusionFilters: <var>exclusionFilters</var>})</code>.
+
+<table>
+  <tr>
+    <th><var>filters</var></th>
+    <th><var>exclusionFilters</var></th>
+    <th>Devices</th>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{namePrefix: "Device"}]  // D3, D4
+      </pre>
+    </td>
+    <td>
+      <pre highlight="js">
+        [{name: "Device Third"}]   // D3
+      </pre>
+    </td>
+    <td>D4</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{namePrefix: "Device"}]  // D3, D4
+      </pre>
+    </td>
+    <td>
+      <pre highlight="js">
+        [{namePrefix: "Device F"}] // D4
+      </pre>
+    </td>
+    <td>D3</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        [{services: \[C]},         // D1, D3
+          {namePrefix: "Device"}] // D3, D4
+      </pre>
+    </td>
+    <td>
+      <pre highlight="js">
+        [{services: \[A]},          // D1
+          {name: "Device Fourth"}] // D4
+      </pre>
+    </td>
+    <td>D3</td>
   </tr>
 </table>
 </div>
@@ -1028,6 +1084,40 @@ To accept all devices, use {{acceptAllDevices}} instead.
     <td>
       <pre highlight="js">
         requestDevice({
+          exclusionFilters: [...],
+          acceptAllDevices:true
+        })
+      </pre>
+    </td>
+    <td>Invalid: {{acceptAllDevices}} would override any {{exclusionFilters}}.</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          exclusionFilters: [...]
+        })
+      </pre>
+    </td>
+    <td>Invalid: {{exclusionFilters}} require {{filters}}.</td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
+          filters: [...],
+          exclusionFilters: []
+        })
+      </pre>
+    </td>
+    <td>
+      Invalid: {{exclusionFilters}} must be non-empty to exclude devices.
+    </td>
+  </tr>
+  <tr>
+    <td>
+      <pre highlight="js">
+        requestDevice({
           filters: [{namePrefix: ""}]
         })
       </pre>
@@ -1244,6 +1334,9 @@ The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)
 </dfn></code> method, when invoked, MUST return <a>a new promise</a> |promise|
 and run the following steps <a>in parallel</a>:
 
+1. If <code>|options|.{{RequestDeviceOptions/exclusionFilters}}</code> is
+    present and <code>|options|.{{RequestDeviceOptions/filters}}</code> is not present,
+    <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
 1. If <code>|options|.{{RequestDeviceOptions/filters}}</code> is present and
     <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `true`,
     or if <code>|options|.{{RequestDeviceOptions/filters}}</code> is not present
@@ -1258,6 +1351,8 @@ and run the following steps <a>in parallel</a>:
     <code>|options|.{{RequestDeviceOptions/filters}}</code> if
     <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `false`
     or `null` otherwise, passing
+    <code>|options|.{{RequestDeviceOptions/exclusionFilters}}</code> if it
+    exists or `null` otherwise, passing
     <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>, and
     passing
     <code>|options|.{{RequestDeviceOptions/optionalManufacturerData}}</code>,
@@ -1273,10 +1368,12 @@ and run the following steps <a>in parallel</a>:
 <div algorithm="requesting a Bluetooth device">
 To <dfn>request Bluetooth devices</dfn>, given a
 {{BluetoothPermissionStorage}} |storage| and a sequence of
-{{BluetoothLEScanFilterInit}}s, |filters|, which can be `null` to represent that
-all devices can match, a sequence of {{BluetoothServiceUUID}}s,
-|optionalServices|, and a sequence of {{unsigned short}}s
-|optionalManufacturerData|, the UA MUST run the following steps:
+{{BluetoothLEScanFilterInit}}s |filters|, which can be `null` to represent that
+all devices can match, a sequence of {{BluetoothLEScanFilterInit}}s
+|exclusionFilters|, which can be `null` if no exclusion filters have been set,
+a sequence of {{BluetoothServiceUUID}}s |optionalServices|, and a sequence of
+{{unsigned short}}s |optionalManufacturerData|, the UA MUST run the following
+steps:
 
 <div class="note">
   Note: These steps can block, so uses of this algorithm must be <a>in
@@ -1301,7 +1398,10 @@ all devices can match, a sequence of {{BluetoothServiceUUID}}s,
     <a>UUID</a>s, do the following sub-steps:
     1. If <code>|filters| !== null && |filters|.length === 0</code>, throw a
         {{TypeError}} and abort these steps.
-    1. Let <var>uuidFilters</var> be a new {{Array}} and
+    1. If <code>|exclusionFilters| !== null && |exclusionFilters|.length === 0</code>, throw a
+        {{TypeError}} and abort these steps.
+    1. Let <var>uuidFilters</var> be a new {{Array}},
+        <var>uuidExclusionFilters</var> be a new {{Array}}, and
         <var>requiredServiceUUIDs</var> be a new {{Set}}.
     1. If |filters| is `null`, then set |requiredServiceUUIDs| to the set of all
         UUIDs.
@@ -1312,6 +1412,11 @@ all devices can match, a sequence of {{BluetoothServiceUUID}}s,
         1. Append |canonicalFilter| to |uuidFilters|.
         1. Add the contents of <code>|canonicalFilter|.services</code> to
             |requiredServiceUUIDs|.
+    1. If |exclusionFilters| isn't `null`, then for each |exclusionFilter| in
+        |exclusionFilters|, do the following steps:
+        1. Let |canonicalExclusionFilter| be the result of <a
+            for="BluetoothLEScanFilterInit">canonicalizing</a> |exclusionFilter|.
+        1. Append |canonicalExclusionFilter| to |uuidExclusionFilters|.
     1. Let <var>optionalServiceUUIDs</var> be
         <code>{{Array.prototype.map}}.call(|optionalServices|,
         {{BluetoothUUID/getService()|BluetoothUUID.getService}})</code>.
@@ -1342,8 +1447,12 @@ all devices can match, a sequence of {{BluetoothServiceUUID}}s,
     UA MAY return `[]` and abort these steps.
 1. <a>Scan for devices</a> with <var>requiredServiceUUIDs</var> as the <i>set of
     <a>Service</a> UUIDs</i>, and let <var>scanResult</var> be the result.
-1. If |filters| isn't null, remove devices from <var>scanResult</var> if they do
-    not <a>match a filter</a> in <var>uuidFilters</var>.
+1. If |filters| isn't `null`, do the following sub-steps:
+    1. Remove devices from <var>scanResult</var> if they do
+        not <a>match a filter</a> in <var>uuidFilters</var>.
+    1. If |exclusionFilters| isn't `null`, remove devices from
+        <var>scanResult</var> if they <a>match a filter</a> in
+        <var>uuidExclusionFilters</var>.
 1. <p id="requestDevice-prompt">Even if <var>scanResult</var> is empty,
     <a>prompt the user to choose</a> one of the devices in |scanResult|,
     associated with |descriptor|, and let |device| be the result.

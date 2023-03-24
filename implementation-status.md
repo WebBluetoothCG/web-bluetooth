@@ -30,6 +30,7 @@ Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓     
 └ Manufacturer Data       | 92        | 92      | 92  | 92    | 92      |
 └ Service Data            |           |         |     |       |        |
 └ acceptAllDevices        | ✓         | ✓       | ✓   | ✓     | ✓      |
+└ Exclusion filters       |           |         |     |       |         |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 permissions.request()     |           |         |     |       |         |
 permissions.query()       |           |         |     |       |         |
