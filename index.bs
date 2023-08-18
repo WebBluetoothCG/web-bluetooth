@@ -1293,6 +1293,27 @@ a {{BluetoothDataFilterInit}} |filter| if the following steps return `match`.
 
 </div>
 
+<div algorithm="a data filter is a strict subset of another data filter">
+A {{BluetoothDataFilterInit}} |filter1| is a
+<dfn for="BluetoothDataFilterInit" export>strict subset</dfn> of a {{BluetoothDataFilterInit}}
+|filter2| if the following steps return `true`:
+
+1. If the length of |filter1| is less than the length of |filter2|, return `false`.
+1. Let |byteIndex| be `0`.
+1. While |byteIndex| is less than the length of |filter2|, do the following sub-steps:
+    1. If <code>|filter1|.{{BluetoothDataFilterInit/mask}}[|byteIndex|] &
+        |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|]</code>
+        is not equal to |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|], return `false`.
+    1. If <code>|filter1|.{{BluetoothDataFilterInit/dataPrefix}}[|byteIndex|] &
+        |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|]</code>
+        it not equal to <code>|filter2|.{{BluetoothDataFilterInit/dataPrefix}}[|byteIndex|] &
+        |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|]</code>
+        , return `false`.
+    1. Set |byteIndex| to <code>|byteIndex| + 1</code>.
+1. Return `true`.
+
+</div>
+
 <div class="note">
   The list of Service UUIDs that a device advertises might not include all the
   UUIDs the device supports. The advertising data does specify whether this list
@@ -1547,6 +1568,8 @@ returned from the following steps:
 1. For each |manufacturerData| in
     <code>|filter|["{{BluetoothLEScanFilterInit/manufacturerData}}"]</code>,
     do the following sub-steps:
+    1. If |manufacturerData| is a <a>blocklisted manufacturer data filter</a>, throw a
+        {{SecurityError}} and abort these steps.
     1. If there exists an object |existing| in <code>|canonicalizedFilter|["manufacturerData"]</code>
         where <code>|existing|["companyIdentifier"] === |manufacturerData|["{{BluetoothManufacturerDataFilterInit/companyIdentifier}}"]</code>,
         throw a {{TypeError}} and abort these steps.
@@ -2591,6 +2614,7 @@ the UA MUST perform the following steps:
         For each 16-bit Company Identifier Code
         <code>|manufacturerCode|</code>, if it is in
         <code>this.device.{{BluetoothDevice/[[allowedManufacturerData]]}}</code>,
+        and the manufacturer data is not a <a>blocklisted manufacturer data</a>
         then add a mapping of <code>|manufacturerCode|</code> to an
         {{ArrayBuffer}} containing the manufacturer-specific data to
         <code><var>event</var>.manufacturerData</code>.
@@ -4633,15 +4657,88 @@ href="https://github.com/WebBluetoothCG/registries/blob/master/gatt_assigned_des
 https://github.com/WebBluetoothCG/registries/blob/master/gatt_assigned_descriptors.txt</a>.
 The UA should re-fetch this file periodically, but it's unspecified how often.
 
-# The GATT Blocklist # {#the-gatt-blocklist}
+# Advertising Data Prefix # {#advertising-data-prefix}
 
-This specification relies on a blocklist file in the
+An advertising data prefix is a string that represents a set of manufacturer or
+service data.
+
+<div algorithm="converting an advertising data prefix string to a BluetoothDataFilterInit object">
+The result of <dfn>converting an advertising data prefix string to a BluetoothDataFilterInit object</dfn>
+at a string |prefix| is a {{BluetoothDataFilterInit}}, or an error produced by
+the following algorithm:
+
+1. Let |words| be the result of invoking {{String/split(separator, limit)}} on |prefix| with separator
+    `'/'`.
+1. If the length of |words| is not equal to `2`, return an error and
+    abort these steps.
+1. If the length of |words|[0] is not equal to the length of |words|[1], return an error and
+    abort these steps.
+1. Let |prefixData| be |words|[0].
+1. Let |prefixMask| be |words|[1].
+1. Let |dataArray| be an empty {{Uint8Array}}.
+1. Let |maskArray| be an empty {{Uint8Array}}.
+1. Let |prefixIndex| be `0`.
+1. While |prefixIndex| is less than the length of |prefixData|, do the following sub-steps:
+    1. Let |dataStr| be |prefixData|.{{String/substring()}} with
+        |prefixIndex| and `|prefixIndex|  + 2`.
+    1. If |dataStr|[0] is not a lower case hexadecimal or |dataStr|[1] is not a lower case hexadecimal,
+        return an error.
+    1. Let |maskStr| be |prefixMask|.{{String/substring()}} with
+        |prefixIndex| and `|prefixIndex|  + 2`.
+    1. If |maskStr|[0] is not a lower case hexadecimal or |maskStr|[1] is not a lower case hexadecimal,
+        return an error.
+    1. Let |data| be the result of invoking {{Number}}.{{Number/parseInt(string, radix)}}
+        with |dataStr| and `16`, or return an error if a {{TypeError}} is thrown.
+    1. Let |mask| be the result of invoking {{Number}}.{{Number/parseInt(string, radix)}}
+        with |maskStr| and `16`, or return an error if a {{TypeError}} is thrown.
+    1. Invoke |dataArray|.{{Array/push()}} with |data|.
+    1. Invoke |maskArray|.{{Array/push()}} with |mask|.
+    1. Set |prefixIndex| to `|prefixIndex| + 2`.
+1. Return <code>{dataPrefix: new Uint8Array(|dataArray|), mask: new Uint8Array(|maskArray|)}</code>.
+
+</div>
+
+# The Blocklist # {#the-blocklist}
+
+This specification relies on blocklist files in the
 <a href="https://github.com/WebBluetoothCG/registries">
   https://github.com/WebBluetoothCG/registries</a> repository
-to restrict the set of GATT attributes a website can access.
+to restrict the set of GATT attributes and manufacturer data a website can access.
+
+A <dfn>valid company identifier string</dfn> is a group of lowercase hexadecimal digits that has at
+least one but no more than four hexadecimal digits. The official list of company identifies can be found on
+<a href="https://www.bluetooth.com/specifications/assigned-numbers/">Bluetooth Assigned Numbers website</a>.
+
+<div algorithm="parsing the manufacturer data blocklist">
+The result of <dfn>parsing the manufacturer data blocklist</dfn> at a URL <var>url</var> is a map
+from Company Identifier Code to an {{Array}} of {{BluetoothDataFilterInit}}, or an error,
+produced by the following algorithm:
+
+1. Fetch |url|, and let |contents| be its body, decoded as UTF-8.
+1. Let |lines| be the result of invoking {{String/split(separator, limit)}} on |contents| with separator `'\n'`.
+1. Let |result| be an empty map.
+1. For each |line| in |lines|, do the following sub-steps:
+    1. If |line| is empty or its first character is `'#'`, continue to the next line.
+    1. Let |regExp| be a {{RegExp}} constructed with 'manufacturer\ ([0-9a-f]+)\ ([0-9a-f]+\/[0-9a-f]+)'.
+    1. Let |matchResult| be the result of invoking |regExp|.{{RegExp/exec(string)}} on |line|, or return an error
+        if |matchResult| is `null` or the length of |matchResult| is not equal to `3`.
+    1. Let |companyIdentifierStr| be |matchResult|[1] if |matchResult|[1] is a
+        <a>valid company identifier string</a>, otherwise return an error.
+    1. Let |companyIdentifier| be the result of {{Number}}.{{Number/parseInt(string, radix)}} with |companyIdentifierStr|
+        or return an error if a {{TypeError}} is thrown.
+    1. Let |dataPrefixStr| be |matchResult|[2].
+    1. If |companyIdentifier| is not in |result|, set
+        |result|[|companyIdentifier|] to be an empty {{Array}}.
+    1. Let |dataFilter| be the result of
+        <a>converting an advertising data prefix string to a BluetoothDataFilterInit object</a> at
+        |dataPrefixStr| if the result is not an error, otherwise return an error.
+    1. Invoke |result|[|companyIdentifier|].{{Array/push()}} with |dataFilter|.
+1. Return |result|.
+
+</div>
 
 <div algorithm="parsing the GATT blocklist">
-The result of <dfn>parsing the blocklist</dfn> at a URL <var>url</var> is a map
+The result of <dfn>parsing the gatt blocklist</dfn> at a URL <var>url</var> is a map
 from <a>valid UUID</a>s to tokens, or an error, produced by the following
 algorithm:
 
@@ -4667,9 +4764,13 @@ algorithm:
 
 </div>
 
-The <dfn>GATT blocklist</dfn> is the result of <a>parsing the blocklist</a> at
+The <dfn>GATT blocklist</dfn> is the result of <a>parsing the gatt blocklist</a> at
 <a href="https://github.com/WebBluetoothCG/registries/blob/master/gatt_blocklist.txt">
   https://github.com/WebBluetoothCG/registries/blob/master/gatt_blocklist.txt</a>.
+The <dfn>Manufacturer Data blocklist</dfn> is the result of
+<a>parsing the manufacturer data blocklist</a> at
+<a href="https://github.com/WebBluetoothCG/registries/blob/master/manufacturer_data_blocklist.txt">
+  https://github.com/WebBluetoothCG/registries/blob/master/manufacturer_data_blocklist.txt</a>.
 The UA should re-fetch the blocklist periodically, but it's unspecified how often.
 
 A <a>UUID</a> is <dfn>blocklisted</dfn> if either the <a>GATT blocklist</a>'s
@@ -4685,6 +4786,36 @@ A <a>UUID</a> is <dfn>blocklisted for writes</dfn> if either the <a>GATT
 blocklist</a>'s value is an error, or the UUID maps to either
 "<code>exclude</code>" or "<code>exclude-writes</code>" in the <a>GATT
 blocklist</a>.
+
+<div algorithm="blocklisted manufacturer data">
+A manufacturer data |manufacturerData| is a <dfn>blocklisted manufacturer data</dfn> if the following steps
+return `blocked`:
+
+1. If the <a>Manufacturer Data blocklist</a>'s value is an error, return `false`.
+1. Let |manufacturerBlocklist| be the <a>Manufacturer Data blocklist</a>'s value.
+1. Let |companyIdentifier| be the company identifier of |manufacturerData|.
+1. If |companyIdentifier| is not in |manufacturerBlocklist|, return `unblocked`.
+1. For each |dataFilter| in |manufacturerBlocklist|[|companyIdentifier|], do the following sub-steps:
+    1. If the advertising data of |manufacturerData| <a for="BluetoothDataFilterInit">matches</a> |dataFilter|,
+        return `blocked`.
+1. Return `unblocked`.
+
+</div>
+
+<div algorithm="blocklisted manufacturer data filter">
+A manufacturer data filter |manufacturerDataFilter| is a <dfn>blocklisted manufacturer data filter</dfn>
+if the following steps return `blocked`:
+
+1. If the <a>Manufacturer Data blocklist</a>'s value is an error, return `blocked`.
+1. Let |manufacturerBlocklist| be the <a>Manufacturer Data blocklist</a>'s value.
+1. Let |companyIdentifier| be |manufacturerDataFilter|["{{BluetoothManufacturerDataFilterInit/companyIdentifier}}"].
+1. If |companyIdentifier| is not in |manufacturerBlocklist|, return `unblocked`.
+1. For each |dataFilter| in |manufacturerBlocklist|[|companyIdentifier|], do the following sub-steps:
+    1. If |manufacturerDataFilter| is a <a for="BluetoothDataFilterInit">strict subset</a> of |dataFilter|,
+        return `blocked`.
+1. Return `unblocked`.
+
+</div>
 
 # Extensions to the Navigator Interface # {#navigator-extensions}
 
