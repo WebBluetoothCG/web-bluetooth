@@ -1307,8 +1307,7 @@ A {{BluetoothDataFilterInit}} |filter1| is a
     1. If <code>|filter1|.{{BluetoothDataFilterInit/dataPrefix}}[|byteIndex|] &
         |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|]</code>
         it not equal to <code>|filter2|.{{BluetoothDataFilterInit/dataPrefix}}[|byteIndex|] &
-        |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|]</code>
-        , return `false`.
+        |filter2|.{{BluetoothDataFilterInit/mask}}[|byteIndex|]</code>, return `false`.
     1. Set |byteIndex| to <code>|byteIndex| + 1</code>.
 1. Return `true`.
 
@@ -4659,14 +4658,12 @@ The UA should re-fetch this file periodically, but it's unspecified how often.
 
 # Advertising Data Filter # {#advertising-data-filter}
 
-An advertising data filter is a string that represents a set of manufacturer or
-service data.
+An advertising data filter represents a way to match against manufacturer or service data.
 
 <div algorithm="parse an advertising data filter">
 To <dfn>parse an advertising data filter</dfn> from a <a>string</a> |input|, perform the following steps:
 
-1. Let |words| be the result of invoking {{String/split(separator, limit)}} on |input| with separator
-    `'/'`.
+1. Let |words| be |input| <a>strictly split</a> on `/`.
 1. If the length of |words| is not equal to `2`, return an error and
     abort these steps.
 1. If the length of |words|[0] is not equal to the length of |words|[1], return an error and
@@ -4674,18 +4671,20 @@ To <dfn>parse an advertising data filter</dfn> from a <a>string</a> |input|, per
 1. Let |prefixData| be |words|[0].
 1. Let |prefixMask| be |words|[1].
 1. If |prefixData| or |prefixMask| is not a sequence of <a>ascii lower hex digit</a>, return an error.
-1. Let |result| be a new {{BluetoothDataFilterInit}} dictionary.
-1. Set |result|[{{BluetoothDataFilterInit/dataPrefix}}] to an empty {{Uint8Array}}.
-1. Set |result|[{{BluetoothDataFilterInit/mask}}] to an empty {{Uint8Array}}.
 1. Let |prefixIndex| be `0`.
+1. let |dataList| be an empty list.
+1. let |maskList| be an empty list.
 1. While |prefixIndex| is less than the length of |prefixData|, do the following sub-steps:
     1. Let |data| be the result of interpreting the characters at index |prefixIndex| and <code>|prefixIndex|  + 1</code>
         of |prefixData| as a hexadecimal number.
     1. Let |mask| be the result of interpreting the characters at index |prefixIndex| and <code>|prefixIndex|  + 1</code>
         of |prefixMask| as a hexadecimal number.
-    1. Invoke |result|[{{BluetoothDataFilterInit/dataPrefix}}].{{Array/push()}} with |data|.
-    1. Invoke |result|[{{BluetoothDataFilterInit/dataPrefix}}].{{Array/push()}} with |mask|.
+    1. Append |data| to |dataList|.
+    1. Append |mask| to |maskList|.
     1. Set |prefixIndex| to `|prefixIndex| + 2`.
+1. Let |result| be a new {{BluetoothDataFilterInit}} dictionary.
+1. Set |result|[{{BluetoothDataFilterInit/dataPrefix}}] to an {{Uint8Array}} constructed with |dataList|.
+1. Set |result|[{{BluetoothDataFilterInit/mask}}] to an {{Uint8Array}} constructed with |maskList|.
 1. Return |result|.
 
 </div>
@@ -4782,7 +4781,7 @@ blocklist</a>.
 A manufacturer data |manufacturerData| is a <dfn>blocklisted manufacturer data</dfn> if the following steps
 return `blocked`:
 
-1. If the <a>Manufacturer Data blocklist</a>'s value is an error, return `false`.
+1. If the <a>Manufacturer Data blocklist</a>'s value is an error, return `blocked`.
 1. Let |manufacturerBlocklist| be the <a>Manufacturer Data blocklist</a>'s value.
 1. Let |companyIdentifier| be the company identifier of |manufacturerData|.
 1. If |companyIdentifier| is not in |manufacturerBlocklist|, return `unblocked`.
