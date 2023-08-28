@@ -4657,17 +4657,15 @@ href="https://github.com/WebBluetoothCG/registries/blob/master/gatt_assigned_des
 https://github.com/WebBluetoothCG/registries/blob/master/gatt_assigned_descriptors.txt</a>.
 The UA should re-fetch this file periodically, but it's unspecified how often.
 
-# Advertising Data Prefix # {#advertising-data-prefix}
+# Advertising Data Filter # {#advertising-data-filter}
 
-An advertising data prefix is a string that represents a set of manufacturer or
+An advertising data filter is a string that represents a set of manufacturer or
 service data.
 
-<div algorithm="converting an advertising data prefix string to a BluetoothDataFilterInit object">
-The result of <dfn>converting an advertising data prefix string to a BluetoothDataFilterInit object</dfn>
-at a string |prefix| is a {{BluetoothDataFilterInit}}, or an error produced by
-the following algorithm:
+<div algorithm="parse an advertising data filter">
+To <dfn>parse an advertising data filter</dfn> from a <a>string</a> |input|, perform the following steps:
 
-1. Let |words| be the result of invoking {{String/split(separator, limit)}} on |prefix| with separator
+1. Let |words| be the result of invoking {{String/split(separator, limit)}} on |input| with separator
     `'/'`.
 1. If the length of |words| is not equal to `2`, return an error and
     abort these steps.
@@ -4675,26 +4673,20 @@ the following algorithm:
     abort these steps.
 1. Let |prefixData| be |words|[0].
 1. Let |prefixMask| be |words|[1].
-1. Let |dataArray| be an empty {{Uint8Array}}.
-1. Let |maskArray| be an empty {{Uint8Array}}.
+1. If |prefixData| or |prefixMask| is not a sequence of <a>ascii lower hex digit</a>, return an error.
+1. Let |result| be a new {{BluetoothDataFilterInit}} dictionary.
+1. Set |result|[{{BluetoothDataFilterInit/dataPrefix}}] to an empty {{Uint8Array}}.
+1. Set |result|[{{BluetoothDataFilterInit/mask}}] to an empty {{Uint8Array}}.
 1. Let |prefixIndex| be `0`.
 1. While |prefixIndex| is less than the length of |prefixData|, do the following sub-steps:
-    1. Let |dataStr| be |prefixData|.{{String/substring()}} with
-        |prefixIndex| and `|prefixIndex|  + 2`.
-    1. If |dataStr|[0] is not a lower case hexadecimal or |dataStr|[1] is not a lower case hexadecimal,
-        return an error.
-    1. Let |maskStr| be |prefixMask|.{{String/substring()}} with
-        |prefixIndex| and `|prefixIndex|  + 2`.
-    1. If |maskStr|[0] is not a lower case hexadecimal or |maskStr|[1] is not a lower case hexadecimal,
-        return an error.
-    1. Let |data| be the result of invoking {{Number}}.{{Number/parseInt(string, radix)}}
-        with |dataStr| and `16`, or return an error if a {{TypeError}} is thrown.
-    1. Let |mask| be the result of invoking {{Number}}.{{Number/parseInt(string, radix)}}
-        with |maskStr| and `16`, or return an error if a {{TypeError}} is thrown.
-    1. Invoke |dataArray|.{{Array/push()}} with |data|.
-    1. Invoke |maskArray|.{{Array/push()}} with |mask|.
+    1. Let |data| be the result of interpreting the characters at index |prefixIndex| and <code>|prefixIndex|  + 1</code>
+        of |prefixData| as a hexadecimal number.
+    1. Let |mask| be the result of interpreting the characters at index |prefixIndex| and <code>|prefixIndex|  + 1</code>
+        of |prefixMask| as a hexadecimal number.
+    1. Invoke |result|[{{BluetoothDataFilterInit/dataPrefix}}].{{Array/push()}} with |data|.
+    1. Invoke |result|[{{BluetoothDataFilterInit/dataPrefix}}].{{Array/push()}} with |mask|.
     1. Set |prefixIndex| to `|prefixIndex| + 2`.
-1. Return <code>{dataPrefix: new Uint8Array(|dataArray|), mask: new Uint8Array(|maskArray|)}</code>.
+1. Return |result|.
 
 </div>
 
@@ -4705,13 +4697,13 @@ This specification relies on blocklist files in the
   https://github.com/WebBluetoothCG/registries</a> repository
 to restrict the set of GATT attributes and manufacturer data a website can access.
 
-A <dfn>valid company identifier string</dfn> is a group of lowercase hexadecimal digits that has at
-least one but no more than four hexadecimal digits. The official list of company identifies can be found on
+A <dfn>valid company identifier string</dfn> is a seqeunce of <a>ascii lower hex digit</a> that its length
+is bigger than `0` and less than `5`. The official list of company identifies can be found on
 <a href="https://www.bluetooth.com/specifications/assigned-numbers/">Bluetooth Assigned Numbers website</a>.
 
 <div algorithm="parsing the manufacturer data blocklist">
 The result of <dfn>parsing the manufacturer data blocklist</dfn> at a URL <var>url</var> is a map
-from Company Identifier Code to an {{Array}} of {{BluetoothDataFilterInit}}, or an error,
+from Company Identifier Code to a list of {{BluetoothDataFilterInit}}, or an error,
 produced by the following algorithm:
 
 1. Fetch |url|, and let |contents| be its body, decoded as UTF-8.
@@ -4724,15 +4716,14 @@ produced by the following algorithm:
         if |matchResult| is `null` or the length of |matchResult| is not equal to `3`.
     1. Let |companyIdentifierStr| be |matchResult|[1] if |matchResult|[1] is a
         <a>valid company identifier string</a>, otherwise return an error.
-    1. Let |companyIdentifier| be the result of {{Number}}.{{Number/parseInt(string, radix)}} with |companyIdentifierStr|
-        or return an error if a {{TypeError}} is thrown.
+    1. If |companyIdentifierStr| is not a sequence of <a>ascii lower hex digit</a>, return an error.
+    1. Let |companyIdentifier| be the result of interpreting |companyIdentifierStr| as a hexadecimal number.
     1. Let |dataPrefixStr| be |matchResult|[2].
     1. If |companyIdentifier| is not in |result|, set
-        |result|[|companyIdentifier|] to be an empty {{Array}}.
-    1. Let |dataFilter| be the result of
-        <a>converting an advertising data prefix string to a BluetoothDataFilterInit object</a> at
+        |result|[|companyIdentifier|] to be an empty list.
+    1. Let |dataFilter| be the result of <a>parsing an advertising data filter</a> at
         |dataPrefixStr| if the result is not an error, otherwise return an error.
-    1. Invoke |result|[|companyIdentifier|].{{Array/push()}} with |dataFilter|.
+    1. Append |dataFilter| |result|[|companyIdentifier|].
 1. Return |result|.
 
 </div>
