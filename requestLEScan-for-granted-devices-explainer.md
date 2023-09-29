@@ -33,7 +33,7 @@ A new field named **id** will be added to [BluetoothLEScanFilterInit](https://we
 
 ## Usage
 
-To use the new requestLEScan API for granted devices, an app first needs to request permission to access a Bluetooth device using the existing requestDevice API. Once the app has permission, it can call the requestLEScan method with `listenOnlyGrantedDevices` field set to `true` to listen for advertisements from granted devices.
+To use the new requestLEScan API for granted devices, an app first needs to request permission to access a Bluetooth device using the existing [requestDevice](https://webbluetoothcg.github.io/web-bluetooth/#dom-bluetooth-requestdevice) API. Once the app has permission, it can call the requestLEScan method with `listenOnlyGrantedDevices` field set to `true` to listen for advertisements from granted devices.
 The following code snippet shows how to use the new requestLEScan API to listen for advertisements from all granted Bluetooth devices:
 
 ```js
