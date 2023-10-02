@@ -4,7 +4,7 @@
 
 The Bluetooth [requestLEScan](https://webbluetoothcg.github.io/web-bluetooth/scanning.html#dom-bluetooth-requestlescan) API to allows web apps to listen for advertisements from any Bluetooth device. We propose an extension to this API that limits scanning to only devices that the web app has been granted permission to connect to. This is motivated by the following:
 
-* Using watchAdvertisements API to listen to advertisements from multiple granted devices requires writing redundant code, the API is using [AbortController](https://developer.mozilla.org/en-US/docs/Web/API/AbortController) for stopping the scanning activity, which is not recommended, and the API is still in development trials, not yet available to all users.
+* Using the watchAdvertisements API to listen to advertisements from multiple granted devices, which we believe to be the most common scenario, requires complex code to start and manage multiple scanning sessions.
 * The new requestLEScan API for granted devices would allow developers to write clear and concise code for listening to advertisements from granted devices, and it would avoid the confusion of what API to use for listening advertisements from bluetooth devices when requestLEScan for surrounding devices is officially launched in the future.
 
 ## Interface
