@@ -27,7 +27,7 @@ dictionary BluetoothLEScanFilterInit {
 
 ```
 
-A new flag named **listenOnlyGrantedDevices** will be added to [BluetoothLEScanOptions](https://webbluetoothcg.github.io/web-bluetooth/scanning.html#dictdef-bluetoothlescanoptions) to indicate requestLEScan is being used for listening for granted devices when it is set to `true`. This flag is needed to avoid confusion with the current experimental requestLEScan API which is for surrounding devices in the environment (i.e. including both granted and ungranted devices). The default value for listenOnlyGrantedDevices is `false`.
+A new flag named **listenOnlyGrantedDevices** will be added to [BluetoothLEScanOptions](https://webbluetoothcg.github.io/web-bluetooth/scanning.html#dictdef-bluetoothlescanoptions) to indicate requestLEScan is being used for listening for granted devices when it is set to `true`. This flag allows the user agent to only prompt for user consent when the site is requesting information about devices it doesn't already have permission to access. The default value for listenOnlyGrantedDevices is `false`.
 
 A new field named **id** will be added to [BluetoothLEScanFilterInit](https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit) for supporting filtering advertisements based on the Bluetooth device identifier, which can persist between browser sessions.
 
