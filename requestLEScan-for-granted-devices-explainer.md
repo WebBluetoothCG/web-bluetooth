@@ -38,6 +38,7 @@ The following code snippet shows how to use the new requestLEScan API to listen 
 
 ```js
 let scan = await navigator.bluetooth.requestLEScan({
+  acceptAllAdvertisements: true, // This is optional.
   listenOnlyGrantedDevices: true
 });
 
@@ -48,6 +49,8 @@ navigator.bluetooth.addEventListener("advertisementreceived", (event) => {
 // To stop scanning.
 scan.stop();
 ```
+
+The field `acceptAllAdvertisements` is optional when `listenOnlyGrantedDevices` is true. Calling the API with only `listenOnlyGrantedDevices` being true effectively acts like accepting all advertisements from granted devices.
 
 If the app wants to filter for certain manufacturer data, it can be done by using the `filters` parameter. In the example below, it listens to advertisements from all granted devices and filters for the advertisements that match a pattern whose company code is `0xE0` and the first byte of the manufacturer data is `0x1`.
 
