@@ -105,6 +105,12 @@ spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/browsing-the-web.h
 spec: PAGE-VISIBILITY; urlPrefix: https://www.w3.org/TR/page-visibility-2/#
     type: dfn
         text: document visibility state; url: dom-visibilitystate
+
+spec: WEBDRIVER; urlPrefix: https://w3c.github.io/webdriver/
+    type: dfn
+        text: error; url: dfn-errors
+        text: local end; url: dfn-local-ends
+
 </pre>
 <pre class="link-defaults">
 spec:dom
@@ -1476,6 +1482,16 @@ steps:
     1. If |exclusionFilters| isn't `null`, remove devices from
         <var>scanResult</var> if they <a>match a filter</a> in
         <var>uuidExclusionFilters</var>.
+1. Let |browsingContext| be [=this=]'s [=relevant global object=]'s [=browsing context=].
+1. Let |promptId| be a new unique opaque string.
+
+Issue: In practice, the device list is dynamically updated while a
+prompt is open. The spec text currently does not reflect that but this
+event might be emitted multiple times with the same `promptId` and the
+fresh device list. See
+https://github.com/WebBluetoothCG/web-bluetooth/issues/621.
+
+1. [=Trigger a prompt updated event=] given |browsingContext|, |promptId|, and |scanResult|.
 1. <p id="requestDevice-prompt">Even if <var>scanResult</var> is empty,
     <a>prompt the user to choose</a> one of the devices in |scanResult|,
     associated with |descriptor|, and let |device| be the result.
@@ -1490,6 +1506,7 @@ steps:
       to indicate interest and then perform a privacy-disabled scan to retrieve
       the name.
     </div>
+1. [=map/Remove=] [=map of browsing contexts to device prompts=][|browsingContext|'s [=browsing context id=]].
 1. The UA MAY <a>add |device| to |storage|</a>.
 
     <div class="note">
@@ -4826,6 +4843,205 @@ that controls whether the methods exposed by the {{Navigator/bluetooth}}
 attribute on the {{Navigator}} object may be used.
 
 The <a>default allowlist</a> for this feature is <code>["self"]</code>.
+
+# Automated testing # {#automated-testing}
+
+For the purposes of user-agent automation and application testing, this document defines extensions to the [[WebDriver-BiDi]] specification.
+
+Issue: CDDL snippetes use the "text" type instead of
+"browsingContext.BrowsingContext" to allow indepedent programmatic
+processing of CDDL snippets. Currently, other modules cannot be
+referenced.
+
+## The bluetooth module ## {#bluetooth-module}
+
+The bluetooth module contains commands for managing the remote end Bluetooth behavior.
+
+### Types ### {#bidi-types}
+
+#### The bluetooth.RequestDevice Type #### {#bluetooth-requestdevice-type}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.RequestDevice = text
+</pre>
+
+A bluetooth.RequestDevice is an identifier for a single device in a request device prompt.
+
+A <dfn>device prompt</dfn> is a [=tuple=] consisting of a <dfn>device
+prompt id</dfn> (a string) and a <dfn>set of devices</dfn> which is a
+[=/set=] of {{BluetoothDevice}} objects. It represents a prompt which
+allows a user to [=prompt the user to choose|choose=] a [=Bluetooth
+device=].
+
+#### The bluetooth.RequestDeviceInfo Type #### {#bluetooth-requestdeviceinfo-type}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.RequestDeviceInfo = {
+   id: bluetooth.RequestDevice,
+   name: text / null,
+}
+</pre>
+
+A bluetooth.RequestDeviceInfo represents a single device in a request device prompt.
+
+<div algorithm="serialize device">
+To <dfn>serialize a device</dfn> given a {{BluetoothDevice}} |device|:
+
+1. Let |id| be |device|.{{BluetoothDevice/id}}.
+1. Let |name| be |device|.{{BluetoothDevice/name}}.
+1. Return a [=map=] matching the <code>bluetooth.RequestDeviceInfo</code> production, with `"id"` set to |id| and `"name"` set to |name|.
+
+</div>
+
+#### The bluetooth.RequestDevicePrompt Type #### {#bluetooth-requestdeviceprompt-type}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.RequestDevicePrompt = text
+</pre>
+
+A bluetooth.RequestDevicePrompt is an identifier for a single prompt.
+
+A remote end has a <dfn>map of browsing contexts to device prompts</dfn> which is a [=/map=] whose keys are [=browsing context ids=] and values are [=device prompts=].
+
+<div algorithm="get a prompt">
+To <dfn>get a prompt</dfn> given |browsingContextId| and |promptId|:
+
+1. Let |promptMap| be the [=map of browsing contexts to device prompts=].
+1. If |promptMap|[|browsingContextId|] does not [=map/exist=]:
+    1. Return [=error=] with [=error code=] [=no such prompt=].
+1. Let |prompt| be [=map of browsing contexts to device prompts=][|browsingContextId|].
+1. If |prompt|'s [=device prompt id=] is not |promptId|:
+    1. Return [=error=] with [=error code=] [=no such prompt=].
+1. Return [=success=] with data |prompt|.
+
+</div>
+
+<div algorithm="match a device in prompt">
+To <dfn>match a device in prompt</dfn> given [=device prompt=] |prompt| and |deviceId|:
+
+1. For each |device| in |prompt|'s [=set of devices=]:
+    1. If |device|.{{BluetoothDevice/id}} is |deviceId|, return [=success=] with data |device|.
+1. Otherwise:
+    1. Return [=error=] with [=error code=] [=no such device=].
+
+</div>
+
+<div algorithm="serialize prompt devices">
+To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
+
+1. Let |devices| be an empty [=/list=].
+1. For each |device| in |prompt|'s [=set of devices=].
+    1. [=list/Append=] the result of [=serialize a device|serializing=] |device| to |devices|.
+1. Return |devices|.
+
+</div>
+
+### Errors ### {#bidi-errors}
+
+This specification extends the set of [=error codes=] from
+[[WEBDRIVER-BIDI|WebDriver BiDi]] with the following additional codes:
+
+<dl>
+  <dt><dfn>no such device</dfn>
+  <dd>Tried to reference an unknown {{BluetoothDevice}}.
+
+  <dt><dfn>no such prompt</dfn>
+  <dd>Tried to reference an unknown [=device prompt=].
+</dl>
+
+### Commands ### {#bidi-commands}
+
+#### The bluetooth.handleRequestDevicePrompt Command #### {#bluetooth-handlerequestdeviceprompt-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.HandleRequestDevicePrompt = (
+   method: "bluetooth.handleRequestDevicePrompt",
+   params: bluetooth.HandleRequestDevicePromptParameters,
+)
+
+bluetooth.HandleRequestDevicePromptParameters = {
+   context: text,
+   prompt: bluetooth.RequestDevicePrompt,
+   (
+       bluetooth.HandleRequestDevicePromptAcceptParameters //
+       bluetooth.HandleRequestDevicePromptCancelParameters
+   )
+}
+
+bluetooth.HandleRequestDevicePromptAcceptParameters = (
+   accept: true,
+   device: bluetooth.RequestDevice,
+)
+
+bluetooth.HandleRequestDevicePromptCancelParameters = (
+   accept: false,
+)
+</pre>
+
+<div algorithm="remote end steps for bluetooth.handleRequestDevicePrompt">
+The [=remote end steps=] with |command parameters| are:
+
+1. Let |contextId| be |params|[`"context"`].
+1. Let |promptId| be |params|[`"prompt"`].
+1. Let |prompt| be the result of [=trying=] to [=get a prompt=] with |contextId| and |promptId|.
+1. Let |accept| be the value of the <code>accept</code> field of |command parameters|.
+1. If |accept| is true:
+    1. Let |deviceId| be the value of the <code>device</code> field of |command parameters|.
+    1. Let |device| be the result of [=trying=] to [=match a device in prompt=] given |prompt| and |deviceId|.
+    1. Acknowledge |prompt| with |device|.
+1. Otherwise:
+    1. Dismiss |prompt|.
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could dismiss a prompt by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.handleRequestDevicePrompt",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "prompt": "pmt-e0a234b",
+    "accept": true,
+    "device": "dvc-9b3b872"
+  }
+}
+</pre>
+</div>
+
+### Events ### {#bidi-events}
+
+#### The bluetooth.requestDevicePromptUpdated Event #### {#bluetooth-requestdevicepromptupdated-event}
+
+<pre highlight="cddl" class="cddl local-cddl">
+bluetooth.RequestDevicePromptUpdated = (
+   method: "bluetooth.requestDevicePromptUpdated",
+   params: bluetooth.RequestDevicePromptUpdatedParameters
+)
+
+bluetooth.RequestDevicePromptUpdatedParameters = {
+   context: text,
+   prompt: bluetooth.RequestDevicePrompt,
+   devices: [* bluetooth.RequestDeviceInfo],
+}
+</pre>
+
+<div algorithm="remote end event trigger for bluetooth.requestDevicePromptUpdated">
+To <dfn>trigger a prompt updated event</dfn> given a [=browsing context=] |context|, a string |promptId|, and a [=/set=] of [=Bluetooth devices=] |devices|:
+
+1. Let |context id| be |context|'s [=browsing context id=].
+1. Let |prompt| be the [=device prompt=] (|promptId|, |devices|).
+1. Let |serialized devices| be the result of [=serialize prompt devices=] with |prompt|.
+1. Set [=map of browsing contexts to device prompts=][|context id|] to |prompt|.
+1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production  with the <code>context</code> field set to |context id|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
+1. Let |body| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdated</code> production, with the <code>params</code> field set to |params|.
+1. Let |related browsing contexts| be a [=/set=] containing |context|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |related browsing contexts|:
+    1. [=Emit an event=] with |session| and |body|.
+
+</div>
 
 # Terminology and Conventions # {#terminology}
 
