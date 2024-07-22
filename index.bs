@@ -90,9 +90,9 @@ spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/browsing-the-web.h
     type: dfn
         text: initializing the Document object; url: initialise-the-document-object
 
-spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/browsers.html#
+spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/document-sequences.html#
     type: dfn
-        text: browsing context; url: browsing-context
+        text: navigable; url: navigable
 
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
@@ -123,6 +123,7 @@ spec: html
     type: dfn
         text: browsing context; for: /
         text: global object; for: /
+        text: navigable; for: /
 spec: webidl
     type: dfn
         text: resolve
@@ -1414,10 +1415,11 @@ steps:
   devices, but for now it only ever returns a single one.
 </div>
 
-1. If [=this=]'s [=relevant global object=]'s [=associated Document=] is not
-    [=allowed to use=] the [=policy-controlled feature=] named
-    "[=policy-controlled feature/bluetooth=]", throw a {{SecurityError}} and
-    abort these steps.
+1. Let |document| be [=this=]'s [=relevant global object=]'s
+    [=associated Document=].
+1. If |document| is not [=allowed to use=] the [=policy-controlled feature=]
+    named "[=policy-controlled feature/bluetooth=]", throw a {{SecurityError}}
+    and abort these steps.
 1. <p id="requestDevice-user-gesture">Check that the algorithm is triggered
     while its [=relevant global object=] has a
     <a href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
@@ -1482,7 +1484,7 @@ steps:
     1. If |exclusionFilters| isn't `null`, remove devices from
         <var>scanResult</var> if they <a>match a filter</a> in
         <var>uuidExclusionFilters</var>.
-1. Let |browsingContext| be [=this=]'s [=relevant global object=]'s [=browsing context=].
+1. Let |navigable| be |document|'s [=navigable=].
 1. Let |promptId| be a new unique opaque string.
 
 Issue: In practice, the device list is dynamically updated while a
@@ -1491,7 +1493,7 @@ event might be emitted multiple times with the same `promptId` and the
 fresh device list. See
 https://github.com/WebBluetoothCG/web-bluetooth/issues/621.
 
-1. [=Trigger a prompt updated event=] given |browsingContext|, |promptId|, and |scanResult|.
+1. [=Trigger a prompt updated event=] given |navigable|, |promptId|, and |scanResult|.
 1. <p id="requestDevice-prompt">Even if <var>scanResult</var> is empty,
     <a>prompt the user to choose</a> one of the devices in |scanResult|,
     associated with |descriptor|, and let |device| be the result.
@@ -1506,7 +1508,7 @@ https://github.com/WebBluetoothCG/web-bluetooth/issues/621.
       to indicate interest and then perform a privacy-disabled scan to retrieve
       the name.
     </div>
-1. [=map/Remove=] [=map of browsing contexts to device prompts=][|browsingContext|'s [=browsing context id=]].
+1. [=map/Remove=] [=map of navigables to device prompts=][|navigable|'s [=navigable id=]].
 1. The UA MAY <a>add |device| to |storage|</a>.
 
     <div class="note">
@@ -4901,15 +4903,15 @@ bluetooth.RequestDevicePrompt = text
 
 A bluetooth.RequestDevicePrompt is an identifier for a single prompt.
 
-A remote end has a <dfn>map of browsing contexts to device prompts</dfn> which is a [=/map=] whose keys are [=browsing context ids=] and values are [=device prompts=].
+A remote end has a <dfn>map of navigables to device prompts</dfn> which is a [=/map=] whose keys are [=navigable ids=] and values are [=device prompts=].
 
 <div algorithm="get a prompt">
-To <dfn>get a prompt</dfn> given |browsingContextId| and |promptId|:
+To <dfn>get a prompt</dfn> given |navigableId| and |promptId|:
 
-1. Let |promptMap| be the [=map of browsing contexts to device prompts=].
-1. If |promptMap|[|browsingContextId|] does not [=map/exist=]:
+1. Let |promptMap| be the [=map of navigables to device prompts=].
+1. If |promptMap|[|navigableId|] does not [=map/exist=]:
     1. Return [=error=] with [=error code=] [=no such prompt=].
-1. Let |prompt| be [=map of browsing contexts to device prompts=][|browsingContextId|].
+1. Let |prompt| be [=map of navigables to device prompts=][|navigableId|].
 1. If |prompt|'s [=device prompt id=] is not |promptId|:
     1. Return [=error=] with [=error code=] [=no such prompt=].
 1. Return [=success=] with data |prompt|.
@@ -5029,16 +5031,16 @@ bluetooth.RequestDevicePromptUpdatedParameters = {
 </pre>
 
 <div algorithm="remote end event trigger for bluetooth.requestDevicePromptUpdated">
-To <dfn>trigger a prompt updated event</dfn> given a [=browsing context=] |context|, a string |promptId|, and a [=/set=] of [=Bluetooth devices=] |devices|:
+To <dfn>trigger a prompt updated event</dfn> given a [=navigable=] |navigable|, a string |promptId|, and a [=/set=] of [=Bluetooth devices=] |devices|:
 
-1. Let |context id| be |context|'s [=browsing context id=].
+1. Let |navigableId| be |navigable|'s [=navigable id=].
 1. Let |prompt| be the [=device prompt=] (|promptId|, |devices|).
 1. Let |serialized devices| be the result of [=serialize prompt devices=] with |prompt|.
-1. Set [=map of browsing contexts to device prompts=][|context id|] to |prompt|.
-1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production  with the <code>context</code> field set to |context id|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
+1. Set [=map of navigables to device prompts=][|navigableId|] to |prompt|.
+1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production  with the <code>context</code> field set to |navigableId|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
 1. Let |body| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdated</code> production, with the <code>params</code> field set to |params|.
-1. Let |related browsing contexts| be a [=/set=] containing |context|.
-1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |related browsing contexts|:
+1. Let |related navigables| be a [=/set=] containing |navigable|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |related navigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
