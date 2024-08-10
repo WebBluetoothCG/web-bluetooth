@@ -4938,6 +4938,28 @@ To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
 
 </div>
 
+#### The bluetooth.ScanRecord Type #### {#bluetooth-scanrecord-type}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.ScanRecord = {
+  name: text / null,
+  uuids: [] / null,
+  appearance: integer / null,
+  manufacturerData: BluetoothManufacturerDataMap / null,
+}
+</pre>
+
+A bluetooth.ScanRecord represents data of the advertisement packet sent by a Bluetooth device.
+
+<div algorithm="serialize device">
+To <dfn>serialize a device</dfn> given a {{BluetoothDevice}} |device|:
+
+1. Let |name| be |device|.{{BluetoothDevice/name}}.
+1. Return a [=map=] matching the <code>bluetooth.RequestDeviceInfo</code> production, `"name"` set to |name|.
+
+</div>
+
+
 ### Errors ### {#bidi-errors}
 
 This specification extends the set of [=error codes=] from
@@ -5009,6 +5031,93 @@ A [=local end=] could dismiss a prompt by sending the following message:
     "accept": true,
     "device": "dvc-9b3b872"
   }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateCentral Command #### {#bluetooth-simulatecentral-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.simulateCentral = (
+   method: "bluetooth.simulateCentral",
+   state: "absent", "powered-off", or "powered-on"
+)
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateCentral">
+The [=remote end steps=] with |command parameters| are:
+
+1. Let |state| be |params|[`"state"`].
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a central by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateCentral",
+  "state": "powered-on"
+}
+</pre>
+</div>
+
+#### The bluetooth.simulatePreconnectedPeripheral Command #### {#bluetooth-simulateconnectedperipheral-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.simulatePreconnectedPeripheral = (
+   method: "bluetooth.simulatePreconnectedPeripheral",
+   address: string,
+   name: string,
+   manufacturerData: manufacturerData,
+   knownServiceUuids: string[]
+)
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
+The [=remote end steps=] with |command parameters| are:
+
+1. Let |state| be |params|[`"state"`].
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a central by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulatePreconnectedPeripheral",
+  "state": "powered-on"
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateAdvertisement Command #### {#bluetooth-simulateadvertisement-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.simulateAdvertisement = (
+   method: "bluetooth.simulateAdvertisement",
+   entry: ScanEntry[]
+)
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateAdvertisement">
+The [=remote end steps=] with |command parameters| are:
+
+1. Let |entry| be |params|[`"entry"`].
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a central by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateAdvertisement",
+  "entry": {}
 }
 </pre>
 </div>
