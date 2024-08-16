@@ -4951,15 +4951,6 @@ bluetooth.ScanRecord = {
 
 A bluetooth.ScanRecord represents data of the advertisement packet sent by a Bluetooth device.
 
-<div algorithm="serialize device">
-To <dfn>serialize a device</dfn> given a {{BluetoothDevice}} |device|:
-
-1. Let |name| be |device|.{{BluetoothDevice/name}}.
-1. Return a [=map=] matching the <code>bluetooth.RequestDeviceInfo</code> production, `"name"` set to |name|.
-
-</div>
-
-
 ### Errors ### {#bidi-errors}
 
 This specification extends the set of [=error codes=] from
@@ -5040,6 +5031,10 @@ A [=local end=] could dismiss a prompt by sending the following message:
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
 bluetooth.simulateCentral = (
    method: "bluetooth.simulateCentral",
+   params: bluetooth.SimulateCentralParameters,
+)
+
+bluetooth.SimulateCentralParameters = (
    state: "absent", "powered-off", or "powered-on"
 )
 </pre>
@@ -5068,6 +5063,10 @@ A [=local end=] could simulate a central by sending the following message:
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
 bluetooth.simulatePreconnectedPeripheral = (
    method: "bluetooth.simulatePreconnectedPeripheral",
+   params: bluetooth.SimulatePreconnectedPeripheralParameters,
+)
+
+bluetooth.SimulatePreconnectedPeripheralParameters = (
    address: string,
    name: string,
    manufacturerData: manufacturerData,
@@ -5078,18 +5077,26 @@ bluetooth.simulatePreconnectedPeripheral = (
 <div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
 The [=remote end steps=] with |command parameters| are:
 
-1. Let |state| be |params|[`"state"`].
+1. Let |address| be |params|[`"address"`].
+1. Let |name| be |params|[`"name"`].
+1. Let |manufacturerData| be |params|[`"manufacturerData"`].
+1. Let |knownServiceUuids| be |params|[`"knownServiceUuids"`].
 1. Return [=success=] with data `null`.
 
 </div>
 
 <div class="example">
-A [=local end=] could simulate a central by sending the following message:
+A [=local end=] could simulate a preconnected Peripheral by sending the following message:
 
 <pre highlight="json">
 {
   "method": "bluetooth.simulatePreconnectedPeripheral",
-  "state": "powered-on"
+  "address": "09:09:09:09:09:09",
+  "name": "Some Device",
+  "manufacturerData": [{ "companyIdentifier": 17 }],
+  "knownServiceUuids": [
+     "12345678-1234-5678-9abc-def123456789",
+  ]
 }
 </pre>
 </div>
@@ -5099,8 +5106,19 @@ A [=local end=] could simulate a central by sending the following message:
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
 bluetooth.simulateAdvertisement = (
    method: "bluetooth.simulateAdvertisement",
-   entry: ScanEntry[]
+   params: bluetooth.SimulateAdvertisementParameters,
 )
+
+bluetooth.SimulateAdvertisementParameters = (
+   entry: bluetooth.SimulateAdvertisementScanEntryParameters[]
+)
+
+bluetooth.SimulateAdvertisementScanEntryParameters = (
+   deviceAddress: string,
+   rssi: integer,
+   scanRecord: bluetooth.ScanRecord
+)
+
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
@@ -5112,12 +5130,22 @@ The [=remote end steps=] with |command parameters| are:
 </div>
 
 <div class="example">
-A [=local end=] could simulate a central by sending the following message:
+A [=local end=] could simulate a device advertisement by sending the following message:
 
 <pre highlight="json">
 {
   "method": "bluetooth.simulateAdvertisement",
-  "entry": {}
+  "entry": {
+    "deviceAddress": "08:08:08:08:08:08",
+    "rssi": -10,
+    "scanRecord": {
+      "name": "Heart Rate",
+      "uuids": ["0000180d-0000-1000-8000-00805f9b34fb"],
+      "manufacturerData": [{ "companyIdentifier": 17 }],
+      "appearance": 1,
+      "txPower": 1
+    }
+  }
 }
 </pre>
 </div>
