@@ -4942,10 +4942,10 @@ To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
 
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
 bluetooth.ScanRecord = {
-  name: text / null,
-  uuids: [] / null,
-  appearance: integer / null,
-  manufacturerData: BluetoothManufacturerDataMap / null,
+  optional name: text,
+  optional uuids: BluetoothServiceUuid[],
+  optional appearance: integer,
+  optional manufacturerData: BluetoothManufacturerDataMap,
 }
 </pre>
 
@@ -5034,13 +5034,13 @@ bluetooth.simulateCentral = (
    params: bluetooth.SimulateCentralParameters,
 )
 
-bluetooth.SimulateCentralParameters = (
-   state: "absent", "powered-off", or "powered-on"
-)
+bluetooth.SimulateCentralParameters = {
+   state: "absent" / "powered-off" / "powered-on"
+}
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateCentral">
-The [=remote end steps=] with |command parameters| are:
+The [=remote end steps=] with command parameters |params| are:
 
 1. Let |state| be |params|[`"state"`].
 1. Return [=success=] with data `null`.
@@ -5066,16 +5066,16 @@ bluetooth.simulatePreconnectedPeripheral = (
    params: bluetooth.SimulatePreconnectedPeripheralParameters,
 )
 
-bluetooth.SimulatePreconnectedPeripheralParameters = (
+bluetooth.SimulatePreconnectedPeripheralParameters = {
    address: string,
    name: string,
-   manufacturerData: manufacturerData,
+   manufacturerData: BluetoothManufacturerDataMap,
    knownServiceUuids: string[]
-)
+}
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
-The [=remote end steps=] with |command parameters| are:
+The [=remote end steps=] with command parameters |params| are:
 
 1. Let |address| be |params|[`"address"`].
 1. Let |name| be |params|[`"name"`].
@@ -5086,14 +5086,14 @@ The [=remote end steps=] with |command parameters| are:
 </div>
 
 <div class="example">
-A [=local end=] could simulate a preconnected Peripheral by sending the following message:
+A [=local end=] could simulate a preconnected peripheral by sending the following message:
 
 <pre highlight="json">
 {
   "method": "bluetooth.simulatePreconnectedPeripheral",
   "address": "09:09:09:09:09:09",
   "name": "Some Device",
-  "manufacturerData": [{ "companyIdentifier": 17 }],
+  "manufacturerData": { "companyIdentifier": 17 },
   "knownServiceUuids": [
      "12345678-1234-5678-9abc-def123456789",
   ]
@@ -5113,16 +5113,16 @@ bluetooth.SimulateAdvertisementParameters = (
    entry: bluetooth.SimulateAdvertisementScanEntryParameters[]
 )
 
-bluetooth.SimulateAdvertisementScanEntryParameters = (
+bluetooth.SimulateAdvertisementScanEntryParameters = {
    deviceAddress: string,
    rssi: integer,
    scanRecord: bluetooth.ScanRecord
-)
+}
 
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
-The [=remote end steps=] with |command parameters| are:
+The [=remote end steps=] with command parameters |params| are:
 
 1. Let |entry| be |params|[`"entry"`].
 1. Return [=success=] with data `null`.
@@ -5141,7 +5141,7 @@ A [=local end=] could simulate a device advertisement by sending the following m
     "scanRecord": {
       "name": "Heart Rate",
       "uuids": ["0000180d-0000-1000-8000-00805f9b34fb"],
-      "manufacturerData": [{ "companyIdentifier": 17 }],
+      "manufacturerData": { "companyIdentifier": 17 },
       "appearance": 1,
       "txPower": 1
     }
