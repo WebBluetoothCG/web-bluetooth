@@ -5099,9 +5099,20 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |entry| be |params|[`"entry"`].
+1. Let |scanEntry| be |params|[`"scanEntry"`].
+1. Let |virtualAdvertisement| be a new software defined <a>advertising event</a>.
+1. Let <var>device</var> be the virtual <a>Bluetooth device</a> that sent the
+    advertising event.
+1. For each {{BluetoothDevice}} <var>deviceObj</var> in the UA such that
+    <var>device</var> is the <a>same device</a> as
+    <code><var>deviceObj</var>.{{[[representedDevice]]}}</code>, <a>queue a
+    task</a> on <var>deviceObj</var>'s <a>relevant settings object</a>'s
+    <a>responsible event loop</a> to do the following sub-steps:
+    1. If <code><var>deviceObj</var>.{{watchingAdvertisements}}</code> is
+        `false`, abort these sub-steps.
+    1. <a>Fire an `advertisementreceived` event</a> for the advertising event at
+        |deviceObj|.
 1. Return [=success=] with data `null`.
-
 </div>
 
 <div class="example">
