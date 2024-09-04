@@ -4850,6 +4850,8 @@ The <a>default allowlist</a> for this feature is <code>["self"]</code>.
 
 For the purposes of user-agent automation and application testing, this document defines extensions to the [[WebDriver-BiDi]] specification.
 
+The web-bluetooth API and its extension specifications pose a challenge to test authors, as fully exercising those interfaces requires physical hardware devices that respond in predictable ways. To address this challenge this document defines a number of WebDriver-BiDi extension commands that allow defining and controlling virtual peripherals and advertisements that behave like physical device peripherals and their advertisements. These virtual peripherals and advertisements represent devices with particular properties and whose readings can be entirely defined by users.
+
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
 processing of CDDL snippets. Currently, other modules cannot be
@@ -5026,38 +5028,6 @@ A [=local end=] could dismiss a prompt by sending the following message:
 </pre>
 </div>
 
-#### The bluetooth.simulateCentral Command #### {#bluetooth-simulatecentral-command}
-
-<pre highlight="cddl" class="cddl remote-cddl local-cddl">
-bluetooth.simulateCentral = (
-   method: "bluetooth.simulateCentral",
-   params: bluetooth.SimulateCentralParameters,
-)
-
-bluetooth.SimulateCentralParameters = {
-   state: "absent" / "powered-off" / "powered-on"
-}
-</pre>
-
-<div algorithm="remote end steps for bluetooth.simulateCentral">
-The [=remote end steps=] with command parameters |params| are:
-
-1. Let |state| be |params|[`"state"`].
-1. Return [=success=] with data `null`.
-
-</div>
-
-<div class="example">
-A [=local end=] could simulate a central by sending the following message:
-
-<pre highlight="json">
-{
-  "method": "bluetooth.simulateCentral",
-  "state": "powered-on"
-}
-</pre>
-</div>
-
 #### The bluetooth.simulatePreconnectedPeripheral Command #### {#bluetooth-simulateconnectedperipheral-command}
 
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
@@ -5081,8 +5051,13 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |name| be |params|[`"name"`].
 1. Let |manufacturerData| be |params|[`"manufacturerData"`].
 1. Let |knownServiceUuids| be |params|[`"knownServiceUuids"`].
+1. Let |virtualBluetoothDevice| be a new software defined {{BluetoothDevice}}.
+1. Set |virtualBluetoothDevice|'s name be |name|.
+1. Set |virtualBluetoothDevice|'s address be |address|.
+1. Set |virtualBluetoothDevice|'s manufacturer data be |manufacturerData|.
+1. Set |virtualBluetoothDevice|'s known service UUIDs be |knownServiceUuids|.
+1. Add |virtualBluetoothDevice| to <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>.
 1. Return [=success=] with data `null`.
-
 </div>
 
 <div class="example">
