@@ -1658,6 +1658,8 @@ following steps:
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
+1. Let <var>virtualDevices</var> be a set of simulated <a>Bluetooth device</a>s,
+    initially empty.
 1. If the UA supports the LE transport, perform the <a>General Discovery
     Procedure</a>, except that the UA may include devices that have no
     <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
@@ -1677,7 +1679,7 @@ following steps:
     immutable device address.
 1. Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.
 1. For each <a>Bluetooth device</a> <var>device</var> in
-    <var>nearbyDevices</var>, do the following sub-steps:
+    <var>nearbyDevices</var> and <var>virtualDevices</var>, do the following sub-steps:
     1. If <var>device</var>'s <a>supported physical transports</a> include LE
         and its <a>Bluetooth Device Name</a> is partial or absent, the UA SHOULD
         perform the <a>Name Discovery Procedure</a> to acquire a complete name.
@@ -4850,7 +4852,7 @@ The <a>default allowlist</a> for this feature is <code>["self"]</code>.
 
 For the purposes of user-agent automation and application testing, this document defines extensions to the [[WebDriver-BiDi]] specification.
 
-The web-bluetooth API and its extension specifications pose a challenge to test authors, as fully exercising those interfaces requires physical hardware devices that respond in predictable ways. To address this challenge this document defines a number of WebDriver-BiDi extension commands that allow defining and controlling virtual peripherals and advertisements that behave like physical device peripherals and their advertisements. These virtual peripherals and advertisements represent devices with particular properties and whose readings can be entirely defined by users.
+The Web Bluetooth API and its extension specifications pose a challenge to test authors, as fully exercising those interfaces requires physical hardware devices that respond in predictable ways. To address this challenge this document defines a number of WebDriver-BiDi extension commands that allow defining and controlling virtual peripherals and advertisements that behave like physical device peripherals and their advertisements. These virtual peripherals and advertisements represent devices with particular properties and whose readings can be entirely defined by users.
 
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
@@ -4940,7 +4942,7 @@ To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
 
 </div>
 
-#### The bluetooth.ScanRecord Type #### {#bluetooth-scanrecord-type}
+#### The {{bluetooth.ScanRecord}} Type #### {#bluetooth-scanrecord-type}
 
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
 bluetooth.ScanRecord = {
@@ -4951,7 +4953,24 @@ bluetooth.ScanRecord = {
 }
 </pre>
 
-A bluetooth.ScanRecord represents data of the advertisement packet sent by a Bluetooth device.
+A {{bluetooth.ScanRecord}} represents data of the advertisement packet sent by a [=Bluetooth device=].
+
+<div class="note" heading="{{bluetooth.ScanRecord}} attributes"
+  dfn-for="bluetooth.ScanRecord" dfn-type="attribute"
+  link-for-hint="bluetooth.ScanRecord">
+
+<dfn>name</dfn> is {{device}}'s local name, or a prefix of it.
+
+<dfn>uuids</dfn> lists the Service UUIDs that this scan record says
+{{device}}'s GATT server supports.
+
+<dfn>appearance</dfn> is an <a>Appearance</a>, one of the values defined by the
+{{gap.appearance}} characteristic.
+
+<dfn>manufacturerData</dfn> maps <code>unsigned short</code> Company Identifier
+Codes to {{DataView}}s.
+
+</div>
 
 ### Errors ### {#bidi-errors}
 
@@ -5051,13 +5070,14 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |name| be |params|[`"name"`].
 1. Let |manufacturerData| be |params|[`"manufacturerData"`].
 1. Let |knownServiceUuids| be |params|[`"knownServiceUuids"`].
-1. Let |virtualBluetoothDevice| be a new software defined {{BluetoothDevice}}.
+1. Let |virtualBluetoothDevice| be a new simulated [=Bluetooth device=].
 1. Set |virtualBluetoothDevice|'s name be |name|.
 1. Set |virtualBluetoothDevice|'s address be |address|.
 1. Set |virtualBluetoothDevice|'s manufacturer data be |manufacturerData|.
 1. Set |virtualBluetoothDevice|'s known service UUIDs be |knownServiceUuids|.
-1. Add |virtualBluetoothDevice| to <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>.
+1. Add |virtualBluetoothDevice| to <code>virtualDevices</code> under [=scan for devices=].
 1. Return [=success=] with data `null`.
+
 </div>
 
 <div class="example">
@@ -5085,7 +5105,7 @@ bluetooth.SimulateAdvertisement = (
 )
 
 bluetooth.SimulateAdvertisementParameters = {
-   entry: bluetooth.SimulateAdvertisementScanEntryParameters[]
+   scanEntry: bluetooth.SimulateAdvertisementScanEntryParameters
 }
 
 bluetooth.SimulateAdvertisementScanEntryParameters = {
@@ -5112,7 +5132,10 @@ The [=remote end steps=] with command parameters |params| are:
         `false`, abort these sub-steps.
     1. <a>Fire an `advertisementreceived` event</a> for the advertising event at
         |deviceObj|.
+    1. If one or more [=scan for devices=] are in progress, insert
+       <code><var>deviceObj</var></code> into <var>virtualDevices</var> under each.
 1. Return [=success=] with data `null`.
+
 </div>
 
 <div class="example">
