@@ -110,6 +110,7 @@ spec: WEBDRIVER; urlPrefix: https://w3c.github.io/webdriver/
     type: dfn
         text: error; url: dfn-error
         text: local end; url: dfn-local-ends
+        text: remote end steps; url: dfn-remote-end-steps
 
 </pre>
 <pre class="link-defaults">
@@ -1658,8 +1659,12 @@ following steps:
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
-1. Let <var>virtualDevices</var> be a set of simulated <a>Bluetooth device</a>s,
-    initially empty.
+1. Let |topLevelTraversable| be <a for="request">window</a>'s [=Window/navigable=]'s
+    [=navigable/top-level traversable=].
+1. Let |virtualAdapter| be |topLevelTraversable|'s
+    <dfn>simulated Bluetooth adapter</dfn>, initially empty.
+1. Let |virtualDevices| be a list of <dfn>simulated Bluetooth device</dfn>s
+    attached to |virtualAdapter|.
 1. If the UA supports the LE transport, perform the <a>General Discovery
     Procedure</a>, except that the UA may include devices that have no
     <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
@@ -1990,6 +1995,12 @@ steps <a>in parallel</a>:
       Note: If the Web Bluetooth permission has been blocked by the user, the UA
       may <a>resolve</a> |promise| with  `false`.
     </div>
+
+1. If [=this=]'s [=Window/navigable=]'s [=navigable/top-level traversable=] has
+    a <a>simulated Bluetooth adapter</a> set, <a>queue a
+    task</a> to <a>resolve</a> |promise| with `true` regardless of the powered
+    state of the <a>simulated Bluetooth adapter</a>.
+
 1. If the UA is running on a system that has a Bluetooth radio <a>queue a
     task</a> to <a>resolve</a> |promise| with `true` regardless of the powered
     state of the Bluetooth radio.
@@ -4942,7 +4953,7 @@ To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
 
 </div>
 
-#### The {{bluetooth.ScanRecord}} Type #### {#bluetooth-scanrecord-type}
+#### The bluetooth.ScanRecord Type #### {#bluetooth-scanrecord-type}
 
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
 bluetooth.ScanRecord = {
@@ -4953,16 +4964,16 @@ bluetooth.ScanRecord = {
 }
 </pre>
 
-A {{bluetooth.ScanRecord}} represents data of the advertisement packet sent by a [=Bluetooth device=].
+A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [=Bluetooth device=].
 
-<div class="note" heading="{{bluetooth.ScanRecord}} attributes"
+<div class="note" heading="bluetooth.ScanRecord attributes"
   dfn-for="bluetooth.ScanRecord" dfn-type="attribute"
   link-for-hint="bluetooth.ScanRecord">
 
-<dfn>name</dfn> is {{device}}'s local name, or a prefix of it.
+<dfn>name</dfn> is {{BluetoothDevice}}'s local name, or a prefix of it.
 
 <dfn>uuids</dfn> lists the Service UUIDs that this scan record says
-{{device}}'s GATT server supports.
+{{BluetoothDevice}}'s GATT server supports.
 
 <dfn>appearance</dfn> is an <a>Appearance</a>, one of the values defined by the
 {{gap.appearance}} characteristic.
@@ -5047,6 +5058,44 @@ A [=local end=] could dismiss a prompt by sending the following message:
 </pre>
 </div>
 
+#### The bluetooth.simulateCentral Command #### {#bluetooth-simulatecentral-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.simulateCentral = (
+   method: "bluetooth.simulateCentral",
+   params: bluetooth.SimulateCentralParameters,
+)
+
+bluetooth.SimulateCentralParameters = {
+   state: "absent" / "powered-off" / "powered-on"
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateCentral">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |state| be |params|[`"state"`].
+1. Let |virtualBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
+1. Set |virtualBluetoothAdapter|'s state be |state|.
+1. Let |topLevelTraversable| be <a for="request">window</a>'s [=Window/navigable=]'s
+    [=navigable/top-level traversable=].
+1. Set |virtualBluetoothAdapter| be |topLevelTraversable|'s
+    <a>simulated Bluetooth adapter</a>.
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a central by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateCentral",
+  "state": "powered-on"
+}
+</pre>
+</div>
+
 #### The bluetooth.simulatePreconnectedPeripheral Command #### {#bluetooth-simulateconnectedperipheral-command}
 
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
@@ -5070,7 +5119,7 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |name| be |params|[`"name"`].
 1. Let |manufacturerData| be |params|[`"manufacturerData"`].
 1. Let |knownServiceUuids| be |params|[`"knownServiceUuids"`].
-1. Let |virtualBluetoothDevice| be a new simulated [=Bluetooth device=].
+1. Let |virtualBluetoothDevice| be a new [=simulated Bluetooth device=].
 1. Set |virtualBluetoothDevice|'s name be |name|.
 1. Set |virtualBluetoothDevice|'s address be |address|.
 1. Set |virtualBluetoothDevice|'s manufacturer data be |manufacturerData|.
@@ -5120,7 +5169,6 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 The [=remote end steps=] with command parameters |params| are:
 
 1. Let |scanEntry| be |params|[`"scanEntry"`].
-1. Let |virtualAdvertisement| be a new software defined <a>advertising event</a>.
 1. Let <var>device</var> be the virtual <a>Bluetooth device</a> that sent the
     advertising event.
 1. For each {{BluetoothDevice}} <var>deviceObj</var> in the UA such that
@@ -5128,12 +5176,12 @@ The [=remote end steps=] with command parameters |params| are:
     <code><var>deviceObj</var>.{{[[representedDevice]]}}</code>, <a>queue a
     task</a> on <var>deviceObj</var>'s <a>relevant settings object</a>'s
     <a>responsible event loop</a> to do the following sub-steps:
-    1. If <code><var>deviceObj</var>.{{watchingAdvertisements}}</code> is
+    1. If <var>deviceObj</var>.{{watchingAdvertisements}}</code> is
         `false`, abort these sub-steps.
     1. <a>Fire an `advertisementreceived` event</a> for the advertising event at
-        |deviceObj|.
+        |deviceObj|, initialized with |scanEntry|[`"scanRecord"`]</code>.
     1. If one or more [=scan for devices=] are in progress, insert
-       <code><var>deviceObj</var></code> into <var>virtualDevices</var> under each.
+        <var>deviceObj</var> into [=simulated Bluetooth device=]s under each.
 1. Return [=success=] with data `null`.
 
 </div>
