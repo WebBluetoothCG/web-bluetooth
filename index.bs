@@ -110,7 +110,6 @@ spec: WEBDRIVER; urlPrefix: https://w3c.github.io/webdriver/
     type: dfn
         text: error; url: dfn-error
         text: local end; url: dfn-local-ends
-        text: remote end steps; url: dfn-remote-end-steps
 
 </pre>
 <pre class="link-defaults">
@@ -128,6 +127,12 @@ spec: html
 spec: webidl
     type: dfn
         text: resolve
+spec: webdriver
+    type: dfn
+        text: remote end steps
+    type: dfn
+        text: current browsing context
+
 </pre>
 
 <style>
@@ -1663,8 +1668,7 @@ following steps:
     [=navigable/top-level traversable=].
 1. Let |simulatedBluetoothAdapter| be |topLevelTraversable|'s
     <a>simulated Bluetooth adapter</a>, initially empty.
-1. Let |simulatedBluetoothDevices| be a list of <a>simulated Bluetooth device</a>s
-    attached to |simulatedBluetoothAdapter|.
+1. Let |simulatedBluetoothDevices| be a set of |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device</a>s.
 1. If the UA supports the LE transport, perform the <a>General Discovery
     Procedure</a>, except that the UA may include devices that have no
     <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
@@ -4869,9 +4873,9 @@ For the purposes of user-agent automation and application testing, this document
 
 The Web Bluetooth API and its extension specifications pose a challenge to test authors, as fully exercising those interfaces requires physical hardware devices that respond in predictable ways. To address this challenge this document defines a number of WebDriver-BiDi extension commands that allow defining and controlling simulated peripherals and advertisements that behave like physical device peripherals and their advertisements. These simulated peripherals and advertisements represent devices with particular properties and whose readings can be entirely defined by users.
 
- * A <dfn>simulated Bluetooth adapter</dfn> is a software defined Bluetooth adapter that can host a number of <a>simulated Bluetooth device</a>s and can assume roles like <a>Central</a>.
+Each [=navigable/top-level traversable=] may have a <dfn>simulated Bluetooth adapter</dfn>, that is a software defined Bluetooth adapter that has a set of discovered <a>simulated Bluetooth device</a>s and can assume roles like <a>Central</a>.
 
- * A <dfn>simulated Bluetooth device</dfn> is a software defined Bluetooth device that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>.
+A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>.
 
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
@@ -4972,20 +4976,24 @@ bluetooth.ScanRecord = {
 }
 </pre>
 
-A bluetooth.ScanRecord represents data of the advertisement packet sent by a [=Bluetooth device=].
+A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [=Bluetooth device=].
 
-<dl dfn-type=dict-member dfn-for=BluetoothScanRecord>
-    : <dfn>name</dfn>
-    :: Local name of a [=Bluetooth device=], or a prefix of it.
+<dl heading="bluetooth.ScanRecord attributes"
+  dfn-for="bluetooth.ScanRecord" dfn-type="attribute"
+  link-for-hint="bluetooth.ScanRecord">
 
-    : <dfn>uuids</dfn>
-    :: Lists the Service UUIDs that this scan record says [=Bluetooth device=]'s GATT server supports.
-    : <dfn>appearance</dfn>
-    :: Value of <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.
+  <dfn>name</dfn> is {{BluetoothDevice}}'s local name, or a prefix of it.
 
-    : <dfn>manufacturerData</dfn>
-    :: maps <code>unsigned short</code> Company Identifier Codes to {{DataView}}s.
+  <dfn>uuids</dfn> lists the Service UUIDs that this scan record says
+  {{BluetoothDevice}}'s GATT server supports.
+
+  <dfn>appearance</dfn> is an <a>Appearance</a>, one of the values defined by the
+  {{gap.appearance}} characteristic.
+
+  <dfn>manufacturerData</dfn> maps <code>unsigned short</code> Company Identifier
+  Codes to {{DataView}}s.
 </dl>
+
 
 ### Errors ### {#bidi-errors}
 
@@ -5076,15 +5084,14 @@ bluetooth.SimulateAdapterParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
-The [=remote end steps=] with command parameters |params| are:
+The [=remote end steps=] with |session| and command parameters |params| are:
 
 1. Let |state| be |params|[`"state"`].
 1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
-1. Set |simulatedBluetoothAdapter|'s state be |state|.
-1. Let |topLevelTraversable| be <a for="request">window</a>'s [=Window/navigable=]'s
+1. Set |simulatedBluetoothAdapter|'s state to |state|.
+1. Let |topLevelTraversable| be |session|'s [=current browsing context=]'s
     [=navigable/top-level traversable=].
-1. Set |simulatedBluetoothAdapter| be |topLevelTraversable|'s
-    <a>simulated Bluetooth adapter</a>.
+1. Set |topLevelTraversable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
 1. Return [=success=] with data `null`.
 
 </div>
@@ -5117,18 +5124,20 @@ bluetooth.SimulatePreconnectedPeripheralParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
-The [=remote end steps=] with command parameters |params| are:
+The [=remote end steps=] with |session| and command parameters |params| are:
 
 1. Let |address| be |params|[`"address"`].
 1. Let |name| be |params|[`"name"`].
 1. Let |manufacturerData| be |params|[`"manufacturerData"`].
 1. Let |knownServiceUuids| be |params|[`"knownServiceUuids"`].
+1. Let |topLevelTraversable| be |session|'s [=current browsing context=]'s [=navigable/top-level traversable=].
+1. If |topLevelTraversable|'s <a>simulated Bluetooth adapter</a> is empty, return [=error=].
 1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
-1. Set |simulatedBluetoothDevice|'s name be |name|.
-1. Set |simulatedBluetoothDevice|'s address be |address|.
-1. Set |simulatedBluetoothDevice|'s manufacturer data be |manufacturerData|.
-1. Set |simulatedBluetoothDevice|'s known service UUIDs be |knownServiceUuids|.
-1. Add |simulatedBluetoothDevice| to <code>simulatedBluetoothDevices</code> under [=scan for devices=].
+1. Set |simulatedBluetoothDevice|'s name to |name|.
+1. Set |simulatedBluetoothDevice|'s address to |address|.
+1. Set |simulatedBluetoothDevice|'s manufacturer data to |manufacturerData|.
+1. Set |simulatedBluetoothDevice|'s known service UUIDs to |knownServiceUuids|.
+1. Add |simulatedBluetoothDevice| to <a>simulated Bluetooth adapter</a>.
 1. Return [=success=] with data `null`.
 
 </div>
@@ -5175,9 +5184,8 @@ The [=remote end steps=] with |session| and command parameters |params| are:
 1. Let |scanEntry| be |params|[`"scanEntry"`].
 1. Let <var>device</var> be the <a>simulated Bluetooth device</a> that sent the
     advertising event.
-
 1. Let |global| be |session|'s [=current browsing context=]'s [=browsing context/active document=]'s [=relevant global object=].
-1. If |global| is not a {{Window}}, abort these steps.
+1. Assert: |global| is a {{Window}}.
 1. Let |navigator| be |global|'s associated {{Navigator}}.
 1. Let |deviceObjects| be the result of [=map/get the values=] for |navigator|.{{Navigator/bluetooth}}.{{Bluetooth/[[deviceInstanceMap]]}}.
 1. [=list/For each=] |deviceObject| of |deviceObjects|  such that
@@ -5189,8 +5197,9 @@ The [=remote end steps=] with |session| and command parameters |params| are:
         `false`, abort these sub-steps.
     1. <a>Fire an `advertisementreceived` event</a> for the advertising event at
         |deviceObject|, initialized with |scanEntry|[`"scanRecord"`]</code>.
-    1. If one or more [=scan for devices=] are in progress, insert
-        <var>deviceObject</var> into [=simulated Bluetooth device=]s under each.
+    1. If the [=navigable/top-level traversable=] is currently executing a
+        [=scan for devices=], insert <var>deviceObject</var> into
+        [=simulated Bluetooth device=]s.
 1. Return [=success=] with data `null`.
 
 </div>
