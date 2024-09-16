@@ -1668,6 +1668,9 @@ following steps:
         traversable=].
 1. Let |simulatedBluetoothDevices| be an empty [=set=].
 1. If |topLevelTraversable| has a [=simulated Bluetooth adapter=], let |simulatedBluetoothDevices| be its set of [=simulated Bluetooth devices=].
+
+    Issue: Support asynchronous device discovery.
+
 1. If the UA supports the LE transport, perform the <a>General Discovery
     Procedure</a>, except that the UA may include devices that have no
     <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
@@ -4869,9 +4872,9 @@ For the purposes of user-agent automation and application testing, this document
 
 The Web Bluetooth API and its extension specifications pose a challenge to test authors, as fully exercising those interfaces requires physical hardware devices that respond in predictable ways. To address this challenge this document defines a number of WebDriver-BiDi extension commands that allow defining and controlling simulated peripherals and advertisements that behave like physical device peripherals and their advertisements. These simulated peripherals and advertisements represent devices with particular properties and whose readings can be entirely defined by users.
 
-Each [=navigable/top-level traversable=] may have a <dfn>simulated Bluetooth adapter</dfn>, that is a software defined Bluetooth adapter that has a set of discovered <a>simulated Bluetooth device</a>s and can assume roles like <a>Central</a>.
+Each [=navigable/top-level traversable=] may have a <dfn>simulated Bluetooth adapter</dfn>, that is a software defined Bluetooth adapter that has a set of discovered <a>simulated Bluetooth devices</a> and can assume roles like <a>Central</a>.
 
-Each <a>simulated Bluetooth adapter</a> has a <dfn>simulated Bluetooth device mapping</dfn>, which is a map of Bluetooth address to <a>simulated Bluetooth device</a>.
+Each <a>simulated Bluetooth adapter</a> has a <dfn>simulated Bluetooth device mapping</dfn>, which is an <a>ordered map</a> of Bluetooth address to <a>simulated Bluetooth devices</a>.
 
 A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>.
 
@@ -5181,15 +5184,17 @@ The [=remote end steps=] with |session| and command parameters |params| are:
 1. If |simulatedBluetoothAdapter| is empty, return [=error=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
 1. If |deviceMapping| does not have a <a>simulated Bluetooth device</a> with its Bluetooth address equal to |deviceAddress|, create the <a>simulated Bluetooth device</a> with |deviceAddress| and insert it into |deviceMapping|.
-1. Let |deviceObject| be the [=bluetooth device=] in |deviceMapping| where |deviceObject|'s device address is equal to |deviceAddress|.
-1. <a>Queue a task</a> on <var>deviceObject</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
+1. Let |simulatedDevice| be the [=bluetooth device=] in |deviceMapping| where |simulatedDevice|'s device address is equal to |deviceAddress|.
+1. <a>Queue a task</a> on <var>simulatedDevice</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
     1. If the [=navigable/top-level traversable=] is currently executing the
         [=scan for devices=] algorithm, insert <var>simulatedDevice</var> into
         the <em>simulatedBluetoothDevices</em> variable within that algorithm.
-    1. If <var>deviceObject</var>.{{watchingAdvertisements}}</code> is
+
+        Issue: Inserting data into variables from another algorithm could be improved.
+    1. If <var>simulatedDevice</var>.{{watchingAdvertisements}}</code> is
         `false`, abort these sub-steps.
     1. <a>Fire an `advertisementreceived` event</a> for the advertising event at
-        |deviceObject|, initialized with |scanEntry|[`"scanRecord"`]</code>.
+        |simulatedDevice|, initialized with |scanEntry|[`"scanRecord"`]</code>.
 1. Return [=success=] with data `null`.
 
 </div>
