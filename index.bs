@@ -1664,11 +1664,10 @@ following steps:
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
-1. Let |topLevelTraversable| be <a for="request">window</a>'s [=Window/navigable=]'s
-    [=navigable/top-level traversable=].
-1. Let |simulatedBluetoothAdapter| be |topLevelTraversable|'s
-    <a>simulated Bluetooth adapter</a>, initially empty.
-1. Let |simulatedBluetoothDevices| be a set of |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device</a>s.
+1. Let |topLevelTraversable| be |global|'s [=Window/navigable=]'s [=navigable/top-level
+        traversable=].
+1. Let |simulatedBluetoothDevices| be an empty [=set=].
+1. If |topLevelTraversable| has a [=simulated Bluetooth adapter=], let |simulatedBluetoothDevices| be its set of [=simulated Bluetooth devices=].
 1. If the UA supports the LE transport, perform the <a>General Discovery
     Procedure</a>, except that the UA may include devices that have no
     <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
@@ -2002,12 +2001,10 @@ steps <a>in parallel</a>:
 
 1. Let |simulatedBluetoothAdapter| be [=this=]'s [=Window/navigable=]'s
     [=navigable/top-level traversable=] <a>simulated Bluetooth adapter</a>.
-1. If |simulatedBluetoothAdapter| is not empty, and
-    |simulatedBluetoothAdapter|["state"] is equal to "absent", <a>queue a
-    task</a> to <a>resolve</a> |promise| with `false`.
-1. If |simulatedBluetoothAdapter| is not empty, regardless of the powered
-    state of the <a>simulated Bluetooth adapter</a>, <a>queue a
-    task</a> to <a>resolve</a> |promise| with `true`.
+1. If |simulatedBluetoothAdapter| is not empty,
+    1. If |simulatedBluetoothAdapter|["state"] is "absent", [=queue a task=] to [=resolve=] |promise| with `false`.
+    1. Otherwise, [=queue a task=] to [=resolve=] |promise| with `true`.
+    1. Abort these steps.
 
 1. If the UA is running on a system that has a Bluetooth radio <a>queue a
     task</a> to <a>resolve</a> |promise| with `true` regardless of the powered
@@ -4983,7 +4980,7 @@ A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [
   <dd>is {{BluetoothDevice}}'s local name, or a prefix of it.</dd>
 
   <dt><code>uuids</code></dt>
-  <dd>lists the Service UUIDs that this scan record says {{BluetoothDevice}}'s GATT server supports.</dd>
+  <dd>lists the Service UUIDs that this scan record says the [=Bluetooth device=]'s GATT server supports.</dd>
 
   <dt><code>appearance</code></dt>
   <dd>is an <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.</dd>
@@ -5148,7 +5145,7 @@ A [=local end=] could simulate a preconnected peripheral by sending the followin
   "method": "bluetooth.simulatePreconnectedPeripheral",
   "address": "09:09:09:09:09:09",
   "name": "Some Device",
-  "manufacturerData": { "companyIdentifier": 17 },
+  "manufacturerData": { 17: [0, 255, 1, 1, 127] },
   "knownServiceUuids": [
      "12345678-1234-5678-9abc-def123456789",
   ]
