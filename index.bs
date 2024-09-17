@@ -5128,12 +5128,15 @@ The [=remote end steps=] with |session| and command parameters |params| are:
 1. Let |topLevelTraversable| be |session|'s [=current browsing context=]'s [=navigable/top-level traversable=].
 1. Let |simulatedBluetoothAdapter| be |topLevelTraversable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=].
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] exists, return [=error=].
 1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
 1. Set |simulatedBluetoothDevice|'s name to |params|[`"name"`].
 1. Set |simulatedBluetoothDevice|'s address to |params|[`"address"`].
 1. Set |simulatedBluetoothDevice|'s manufacturer data to |params|[`"manufacturerData"`].
 1. Set |simulatedBluetoothDevice|'s known service UUIDs to |params|[`"knownServiceUuids"`].
-1. Add |simulatedBluetoothDevice| to |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. Set |deviceMapping|[|deviceAddress|] to |simulatedBluetoothDevice|.
 1. Return [=success=] with data `null`.
 
 </div>
@@ -5183,18 +5186,19 @@ The [=remote end steps=] with |session| and command parameters |params| are:
 1. Let |simulatedBluetoothAdapter| be |topLevelTraversable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
-1. If |deviceMapping| does not have a <a>simulated Bluetooth device</a> with its Bluetooth address equal to |deviceAddress|, create the <a>simulated Bluetooth device</a> with |deviceAddress| and insert it into |deviceMapping|.
-1. Let |simulatedDevice| be the [=bluetooth device=] in |deviceMapping| where |simulatedDevice|'s device address is equal to |deviceAddress|.
-1. <a>Queue a task</a> on <var>simulatedDevice</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
-    1. If the [=navigable/top-level traversable=] is currently executing the
-        [=scan for devices=] algorithm, insert <var>simulatedDevice</var> into
-        the <em>simulatedBluetoothDevices</em> variable within that algorithm.
+1. If |deviceMapping|[|deviceAddress|] exists, let |simulatedDevice| be |deviceMapping|[|deviceAddress|]. Otherwise, let |simulatedDevice| be a new <a>simulated Bluetooth device</a> with |deviceAddress| and set |deviceMapping|[|deviceAddress|] to |simulatedDevice|.
+1. If the [=navigable/top-level traversable=] is currently executing the
+    [=scan for devices=] algorithm, insert <var>simulatedDevice</var> into
+    the <em>simulatedBluetoothDevices</em> variable within that algorithm.
 
-        Issue: Inserting data into variables from another algorithm could be improved.
-    1. If <var>simulatedDevice</var>.{{watchingAdvertisements}}</code> is
-        `false`, abort these sub-steps.
-    1. <a>Fire an `advertisementreceived` event</a> for the advertising event at
-        |simulatedDevice|, initialized with |scanEntry|[`"scanRecord"`]</code>.
+    Issue: Inserting data into variables from another algorithm could be improved.
+1. Let |simulatedDeviceInstance| be the {{BluetoothDevice}} in `navigable.bluetooth.[[deviceInstanceMap]]` corresponding to |simulatedDevice|.
+
+    Issue: TODO: Improve the method through which the correct frame's `navigable.bluetooth.[[deviceInstanceMap]]` is identified from [=current browsing context=].
+
+1. <a>Queue a task</a> on <var>simulatedDeviceInstance</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
+    1. If <var>simulatedDeviceInstance</var>.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
+    1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
 1. Return [=success=] with data `null`.
 
 </div>
