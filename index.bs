@@ -5192,13 +5192,13 @@ The [=remote end steps=] with |session| and command parameters |params| are:
     the <em>simulatedBluetoothDevices</em> variable within that algorithm.
 
     Issue: Inserting data into variables from another algorithm could be improved.
-1. Let |simulatedDeviceInstance| be the {{BluetoothDevice}} in `navigable.bluetooth.[[deviceInstanceMap]]` corresponding to |simulatedDevice|.
-
-    Issue: TODO: Improve the method through which the correct frame's `navigable.bluetooth.[[deviceInstanceMap]]` is identified from [=current browsing context=].
-
-1. <a>Queue a task</a> on <var>simulatedDeviceInstance</var>'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
-    1. If <var>simulatedDeviceInstance</var>.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
-    1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
+1. Let |navigables| be the <a>inclusive descendant navigables</a> of |topLevelTraversable|'s <a>active document</a>.
+1. For each |navigable| of |navigables|:
+    1. Let |document| be |navigable|'s <a>active document</a>.
+    1. <a>Queue a task</a> on |document|'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
+        1. Let |simulatedDeviceInstance| be the {{BluetoothDevice}} the |document|'s `navigator.bluetooth.[[deviceInstanceMap]]` corresponding to |simulatedDevice|.
+        1. If |simulatedDeviceInstance|.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
+        1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
 1. Return [=success=] with data `null`.
 
 </div>
