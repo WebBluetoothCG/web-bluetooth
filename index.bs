@@ -4847,6 +4847,10 @@ if the following steps return `blocked`:
 
 # Extensions to the Navigator Interface # {#navigator-extensions}
 
+Each {{Window}} has an <dfn>associated `Bluetooth`</dfn>, which is a {{Bluetooth}} object. Upon creation of the {{Window}} object, its <a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object created in the {{Window}} object's [=relevant realm=].
+
+{{Navigator}}'s {{bluetooth}} getter steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
+
 <xmp class="idl">
   [SecureContext]
   partial interface Navigator {
@@ -5196,7 +5200,7 @@ The [=remote end steps=] with |session| and command parameters |params| are:
 1. For each |navigable| of |navigables|:
     1. Let |document| be |navigable|'s <a>active document</a>.
     1. <a>Queue a task</a> on |document|'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
-        1. Let |simulatedDeviceInstance| be the {{BluetoothDevice}} the |document|'s `navigator.bluetooth.[[deviceInstanceMap]]` corresponding to |simulatedDevice|.
+        1. Let |simulatedDeviceInstance| be the {{BluetoothDevice}} the |navigable|'s `navigator.bluetooth.[[deviceInstanceMap]]` corresponding to |simulatedDevice|.
         1. If |simulatedDeviceInstance|.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
         1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
 1. Return [=success=] with data `null`.
