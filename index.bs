@@ -5087,14 +5087,15 @@ bluetooth.SimulateAdapterParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
-The [=remote end steps=] with |session| and command parameters |params| are:
+The [=remote end steps=] with command parameters |params| are:
 
+1. Let contextId be params["context"].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |navigable| is not a [=top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |state| be |params|[`"state"`].
 1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
 1. Set |simulatedBluetoothAdapter|'s state to |state|.
-1. Let |topLevelTraversable| be |session|'s [=current browsing context=]'s
-    [=navigable/top-level traversable=].
-1. Set |topLevelTraversable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
+1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
 1. Return [=success=] with data `null`.
 
 </div>
@@ -5127,10 +5128,12 @@ bluetooth.SimulatePreconnectedPeripheralParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
-The [=remote end steps=] with |session| and command parameters |params| are:
+The [=remote end steps=] with command parameters |params| are:
 
-1. Let |topLevelTraversable| be |session|'s [=current browsing context=]'s [=navigable/top-level traversable=].
-1. Let |simulatedBluetoothAdapter| be |topLevelTraversable|'s <a>simulated Bluetooth adapter</a>.
+1. Let |contextId| be params["context"].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |navigable| is not a [=top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=].
 1. Let |deviceAddress| be |params|[`"address"`].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -5182,12 +5185,14 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
-The [=remote end steps=] with |session| and command parameters |params| are:
+The [=remote end steps=] with command parameters |params| are:
 
+1. Let |contextId| be params["context"].
+1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |topLevelNavigable| is not a [=top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |scanEntry| be |params|[`"scanEntry"`].
 1. Let |deviceAddress| be |scanEntry|[`"deviceAddress"`].
-1. Let |topLevelTraversable| be |session|'s [=current browsing context=]'s [=navigable/top-level traversable=].
-1. Let |simulatedBluetoothAdapter| be |topLevelTraversable|'s <a>simulated Bluetooth adapter</a>.
+1. Let |simulatedBluetoothAdapter| be |topLevelNavigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
 1. If |deviceMapping|[|deviceAddress|] exists, let |simulatedDevice| be |deviceMapping|[|deviceAddress|]. Otherwise, let |simulatedDevice| be a new <a>simulated Bluetooth device</a> with |deviceAddress| and set |deviceMapping|[|deviceAddress|] to |simulatedDevice|.
@@ -5196,7 +5201,7 @@ The [=remote end steps=] with |session| and command parameters |params| are:
     the <em>simulatedBluetoothDevices</em> variable within that algorithm.
 
     Issue: Inserting data into variables from another algorithm could be improved.
-1. Let |navigables| be the <a>inclusive descendant navigables</a> of |topLevelTraversable|'s <a>active document</a>.
+1. Let |navigables| be the <a>inclusive descendant navigables</a> of |topLevelNavigable|'s <a>active document</a>.
 1. For each |navigable| of |navigables|:
     1. Let |document| be |navigable|'s <a>active document</a>.
     1. <a>Queue a task</a> on |document|'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
