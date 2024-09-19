@@ -1421,8 +1421,8 @@ steps:
   devices, but for now it only ever returns a single one.
 </div>
 
-1. Let |document| be [=this=]'s [=relevant global object=]'s
-    [=associated Document=].
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |document| be |global|'s [=associated Document=].
 1. If |document| is not [=allowed to use=] the [=policy-controlled feature=]
     named "[=policy-controlled feature/bluetooth=]", throw a {{SecurityError}}
     and abort these steps.
@@ -1482,7 +1482,7 @@ steps:
     for example because there is no Bluetooth adapter with which to scan, or
     because the filters can't be matched by any possible advertising packet, the
     UA MAY return `[]` and abort these steps.
-1. <a>Scan for devices</a> with <var>requiredServiceUUIDs</var> as the <i>set of
+1. <a>Scan for devices</a> with |global| as the <i>relevant global object</i> and <var>requiredServiceUUIDs</var> as the <i>set of
     <a>Service</a> UUIDs</i>, and let <var>scanResult</var> be the result.
 1. If |filters| isn't `null`, do the following sub-steps:
     1. Remove devices from <var>scanResult</var> if they do
@@ -1653,7 +1653,7 @@ returned from the following steps:
 </div>
 
 <div algorithm="scanning for Bluetooth devices">
-To <dfn>scan for devices</dfn> with an optional <var>set of <a>Service</a>
+To <dfn>scan for devices</dfn> with parameters <var>relevant global object</var> and an optional <var>set of <a>Service</a>
 UUIDs</var>, defaulting to the set of all UUIDs, the UA MUST perform the
 following steps:
 1. If the UA has scanned for devices recently with a set of UUIDs that was a
@@ -1664,10 +1664,11 @@ following steps:
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
-1. Let |topLevelTraversable| be |global|'s [=Window/navigable=]'s [=navigable/top-level
-        traversable=].
+1. Let |topLevelTraversable| be the |relevant global object|'s [=Window/navigable=]'s
+    [=navigable/top-level traversable=].
 1. Let |simulatedBluetoothDevices| be an empty [=set=].
-1. If |topLevelTraversable| has a [=simulated Bluetooth adapter=], let |simulatedBluetoothDevices| be its set of [=simulated Bluetooth devices=].
+1. If |topLevelTraversable| has a [=simulated Bluetooth adapter=], let
+    |simulatedBluetoothDevices| be its set of [=simulated Bluetooth devices=].
 
     Issue: Support asynchronous device discovery.
 
@@ -4855,7 +4856,7 @@ if the following steps return `blocked`:
   };
 </xmp>
 
-Each {{Window}} has an <dfn>associated `Bluetooth`</dfn>, which is a {{Bluetooth}} object. Upon creation of the {{Window}} object, its <a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object created in the {{Window}} object's [=relevant realm=].
+Each {{Navigator}} has an <dfn>associated `Bluetooth`</dfn>, which is a {{Bluetooth}} object. Upon creation of the {{Navigator}} object, its <a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object created in the {{Navigator}} object's [=relevant realm=].
 
 {{Navigator}}'s <dfn for="Navigator">bluetooth</dfn> getter steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
 
@@ -4896,7 +4897,7 @@ referenced.
 
 <pre class="cddl remote-cddl local-cddl">
 bluetooth.BluetoothServiceUuid = text;
-bluetooth.BluetoothManufacturerDataMap = [ * { key: uint, data: tstr } ];
+bluetooth.BluetoothManufacturerData = { key: uint, data: tstr };
 </pre>
 
 ## The bluetooth module ## {#bluetooth-module}
@@ -4990,7 +4991,7 @@ bluetooth.ScanRecord = {
   ? name: text,
   ? uuids: [ * bluetooth.BluetoothServiceUuid ],
   ? appearance: number,
-  ? manufacturerData: bluetooth.BluetoothManufacturerDataMap,
+  ? manufacturerData: [ * bluetooth.BluetoothManufacturerData ],
 }
 </pre>
 
@@ -5139,7 +5140,7 @@ bluetooth.SimulatePreconnectedPeripheralParameters = {
    context: text,
    address: text,
    name: text,
-   manufacturerData: bluetooth.BluetoothManufacturerDataMap,
+   manufacturerData: [ * bluetooth.BluetoothManufacturerData ],
    knownServiceUuids: [ * bluetooth.BluetoothServiceUuid ]
 }
 </pre>
@@ -5175,7 +5176,7 @@ A [=local end=] could simulate a preconnected peripheral by sending the followin
     "context": "cxt-d03fdd81",
     "address": "09:09:09:09:09:09",
     "name": "Some Device",
-    "manufacturerData": { 17: [0, 255, 1, 1, 127] },
+    "manufacturerData": [ { key: 17, data: [0, 255, 1, 1, 127] } ],
     "knownServiceUuids": [
       "12345678-1234-5678-9abc-def123456789",
     ],
@@ -5226,7 +5227,7 @@ The [=remote end steps=] with command parameters |params| are:
 1. For each |navigable| of |navigables|:
     1. Let |document| be |navigable|'s <a>active document</a>.
     1. <a>Queue a task</a> on |document|'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
-        1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a> |simulatedDevice| inside |navigable|'s <a>active window</a>'s [=associated Bluetooth=].
+        1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a> |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s [=associated Bluetooth=].
         1. If |simulatedDeviceInstance|.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
         1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
 1. Return [=success=] with data `null`.
@@ -5247,7 +5248,7 @@ A [=local end=] could simulate a device advertisement by sending the following m
       "scanRecord": {
         "name": "Heart Rate",
         "uuids": ["0000180d-0000-1000-8000-00805f9b34fb"],
-        "manufacturerData": { 17: [0, 255, 1, 1, 127] },
+        "manufacturerData": [ { key: 17, data: [0, 255, 1, 1, 127] } ],
         "appearance": 1,
         "txPower": 1
       }
