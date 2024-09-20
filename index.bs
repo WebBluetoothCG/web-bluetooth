@@ -1421,7 +1421,7 @@ steps:
   devices, but for now it only ever returns a single one.
 </div>
 
-1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |global| be the [=relevant global object=] for |storage|.
 1. Let |document| be |global|'s [=associated Document=].
 1. If |document| is not [=allowed to use=] the [=policy-controlled feature=]
     named "[=policy-controlled feature/bluetooth=]", throw a {{SecurityError}}
@@ -1482,8 +1482,8 @@ steps:
     for example because there is no Bluetooth adapter with which to scan, or
     because the filters can't be matched by any possible advertising packet, the
     UA MAY return `[]` and abort these steps.
-1. <a>Scan for devices</a> with |global| as the <i>relevant global object</i> and <var>requiredServiceUUIDs</var> as the <i>set of
-    <a>Service</a> UUIDs</i>, and let <var>scanResult</var> be the result.
+1. Let |scanResult| be the result of invoking [=scan for devices=] with |global| and
+    |requiredServiceUUIDs|.
 1. If |filters| isn't `null`, do the following sub-steps:
     1. Remove devices from <var>scanResult</var> if they do
         not <a>match a filter</a> in <var>uuidFilters</var>.
@@ -1653,7 +1653,7 @@ returned from the following steps:
 </div>
 
 <div algorithm="scanning for Bluetooth devices">
-To <dfn>scan for devices</dfn> with parameters <var>relevant global object</var> and an optional <var>set of <a>Service</a>
+To <dfn>scan for devices</dfn> with parameters <var>global</var> and an optional <var>set of <a>Service</a>
 UUIDs</var>, defaulting to the set of all UUIDs, the UA MUST perform the
 following steps:
 1. If the UA has scanned for devices recently with a set of UUIDs that was a
@@ -1664,11 +1664,11 @@ following steps:
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
-1. Let |topLevelTraversable| be the |relevant global object|'s [=Window/navigable=]'s
+1. Let |topLevelTraversable| be the |global|'s [=Window/navigable=]'s
     [=navigable/top-level traversable=].
-1. Let |simulatedBluetoothDevices| be an empty [=set=].
+1. Let |simulatedBluetoothDevices| be an empty <a spec="infra">list</a>.
 1. If |topLevelTraversable| has a [=simulated Bluetooth adapter=], let
-    |simulatedBluetoothDevices| be its set of [=simulated Bluetooth devices=].
+    |simulatedBluetoothDevices| be the result of [=get the values=] of its  [=simulated Bluetooth device mapping=].
 
     Issue: Support asynchronous device discovery.
 
@@ -2517,7 +2517,8 @@ broadcasting, measured in dBm. This is used to compute the path loss as
 in dBm. This is used to compute the path loss as <code>this.txPower -
 this.rssi</code>.
 
-<dfn>manufacturerData</dfn> maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octets}}.
+<dfn>manufacturerData</dfn> maps <code>unsigned short</code> Company Identifier
+Codes to {{DataView}}s.
 
 <dfn>serviceData</dfn> maps {{UUID}}s to {{DataView}}s.
 </div>
@@ -4858,7 +4859,7 @@ if the following steps return `blocked`:
 
 Each {{Navigator}} has an <dfn>associated `Bluetooth`</dfn>, which is a {{Bluetooth}} object. Upon creation of the {{Navigator}} object, its <a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object created in the {{Navigator}} object's [=relevant realm=].
 
-{{Navigator}}'s <dfn for="Navigator">bluetooth</dfn> getter steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
+{{Navigator}}'s {{Navigator/bluetooth}} getter steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
 
 # Integrations # {#integrations}
 
@@ -4881,7 +4882,7 @@ Each [=navigable/top-level traversable=] may have a <dfn>simulated Bluetooth ada
 
 Each <a>simulated Bluetooth adapter</a> has a <dfn>simulated Bluetooth device mapping</dfn>, which is an <a>ordered map</a> of Bluetooth address {{strings}} to <a>simulated Bluetooth devices</a>.
 
-Each <a>simulated Bluetooth adapter</a> has a [=state=] that is a string enumeration describing the current state of the adapter. The possible enumeration values are:
+Each <a>simulated Bluetooth adapter</a> has an <dfn>adapter state</dfn> that is a string enumeration describing the current state of the adapter. The possible enumeration values are:
   * `'powered-on'`
   * `'powered-off'`
   * `'absent'`
@@ -5008,7 +5009,7 @@ A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [
   <dd>is an <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.</dd>
 
   <dt><code>manufacturerData</code></dt>
-  <dd>maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octets}}.</dd>
+  <dd>maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octet}}s.</dd>
 </dl>
 
 
@@ -5104,11 +5105,11 @@ bluetooth.SimulateAdapterParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let contextId be params["context"].
+1. Let |contextId| be params["context"].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. If |navigable| is not a [=top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
-1. Set |simulatedBluetoothAdapter|'s state to |params|[`"state"`].
+1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
 1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
 1. Return [=success=] with data `null`.
 
@@ -5150,12 +5151,12 @@ The [=remote end steps=] with command parameters |params| are:
 
 1. Let |contextId| be params["context"].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. If |navigable| is not a [=top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceAddress| be |params|[`"address"`].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
-1. If |deviceMapping|[|deviceAddress|] [=exists=], return [=error=] with [=error code=] [=invalid argument=].
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
 1. Set |simulatedBluetoothDevice|'s name to |params|[`"name"`].
 1. Set |simulatedBluetoothDevice|'s address to |params|[`"address"`].
@@ -5211,18 +5212,18 @@ The [=remote end steps=] with command parameters |params| are:
 
 1. Let |contextId| be params["context"].
 1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. If |topLevelNavigable| is not a [=top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. If |topLevelNavigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |scanEntry| be |params|[`"scanEntry"`].
 1. Let |deviceAddress| be |scanEntry|[`"deviceAddress"`].
 1. Let |simulatedBluetoothAdapter| be |topLevelNavigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
-1. If |deviceMapping|[|deviceAddress|] [=exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|]. Otherwise, let |simulatedDevice| be a new <a>simulated Bluetooth device</a> with |deviceAddress| and set |deviceMapping|[|deviceAddress|] to |simulatedDevice|.
-1. If the [=navigable/top-level traversable=] is currently executing the
-    [=scan for devices=] algorithm, insert <var>simulatedDevice</var> into
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|]. Otherwise, let |simulatedDevice| be a new <a>simulated Bluetooth device</a> with |deviceAddress| and set |deviceMapping|[|deviceAddress|] to |simulatedDevice|.
+1. If |topLevelNavigable| is currently executing the [=scan for devices=] algorithm,
+    insert <var>simulatedDevice</var> into
     the <em>simulatedBluetoothDevices</em> variable within that algorithm.
 
-    Issue: Inserting data into variables from another algorithm could be improved.
+    Issue: Inserting data into variables from another algorithm is not well defined. The <a>scan for devices</a> algorithm needs to define asynchronous device discovery in order to match implementations.
 1. Let |navigables| be the <a>inclusive descendant navigables</a> of |topLevelNavigable|'s <a>active document</a>.
 1. For each |navigable| of |navigables|:
     1. Let |document| be |navigable|'s <a>active document</a>.
