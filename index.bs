@@ -2006,7 +2006,7 @@ steps <a>in parallel</a>:
 1. Let |simulatedBluetoothAdapter| be [=this=]'s [=Window/navigable=]'s
     [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is not empty,
-    1. If |simulatedBluetoothAdapter|["state"] is "absent", [=queue a task=] to [=resolve=] |promise| with `false`.
+    1. If |simulatedBluetoothAdapter|'s [=adapter state=] is "absent", [=queue a task=] to [=resolve=] |promise| with `false`.
     1. Otherwise, [=queue a task=] to [=resolve=] |promise| with `true`.
     1. Abort these steps.
 
@@ -4883,11 +4883,11 @@ Each [=navigable/top-level traversable=] may have a <dfn>simulated Bluetooth ada
 Each <a>simulated Bluetooth adapter</a> has a <dfn>simulated Bluetooth device mapping</dfn>, which is an <a>ordered map</a> of Bluetooth address {{strings}} to <a>simulated Bluetooth devices</a>.
 
 Each <a>simulated Bluetooth adapter</a> has an <dfn>adapter state</dfn> that is a string enumeration describing the current state of the adapter. The possible enumeration values are:
-  * `'powered-on'`
-  * `'powered-off'`
-  * `'absent'`
+  * "powered-on"
+  * "powered-off"
+  * "absent"
 
-A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>.
+A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>, and may have associated properties like <a>Manufacturer Specific Data</a> and <a>Service UUIDs</a>.
 
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
@@ -5009,7 +5009,7 @@ A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [
   <dd>is an <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.</dd>
 
   <dt><code>manufacturerData</code></dt>
-  <dd>maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octet}}s.</dd>
+  <dd>list of <code>bluetooth.BluetoothManufacturerData</code> that maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octet}}s.</dd>
 </dl>
 
 
@@ -5160,8 +5160,8 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
 1. Set |simulatedBluetoothDevice|'s name to |params|[`"name"`].
 1. Set |simulatedBluetoothDevice|'s address to |params|[`"address"`].
-1. Set |simulatedBluetoothDevice|'s manufacturer data to |params|[`"manufacturerData"`].
-1. Set |simulatedBluetoothDevice|'s known service UUIDs to |params|[`"knownServiceUuids"`].
+1. Set |simulatedBluetoothDevice|'s <a>manufacturer specific data</a> to |params|[`"manufacturerData"`].
+1. Set |simulatedBluetoothDevice|'s <a>service UUIDs</a> to |params|[`"knownServiceUuids"`].
 1. Set |deviceMapping|[|deviceAddress|] to |simulatedBluetoothDevice|.
 1. Return [=success=] with data `null`.
 
