@@ -127,6 +127,12 @@ spec: html
 spec: webidl
     type: dfn
         text: resolve
+spec: webdriver
+    type: dfn
+        text: remote end steps
+    type: dfn
+        text: current browsing context
+
 </pre>
 
 <style>
@@ -1415,8 +1421,8 @@ steps:
   devices, but for now it only ever returns a single one.
 </div>
 
-1. Let |document| be [=this=]'s [=relevant global object=]'s
-    [=associated Document=].
+1. Let |global| be the [=relevant global object=] for |storage|.
+1. Let |document| be |global|'s [=associated Document=].
 1. If |document| is not [=allowed to use=] the [=policy-controlled feature=]
     named "[=policy-controlled feature/bluetooth=]", throw a {{SecurityError}}
     and abort these steps.
@@ -1476,8 +1482,8 @@ steps:
     for example because there is no Bluetooth adapter with which to scan, or
     because the filters can't be matched by any possible advertising packet, the
     UA MAY return `[]` and abort these steps.
-1. <a>Scan for devices</a> with <var>requiredServiceUUIDs</var> as the <i>set of
-    <a>Service</a> UUIDs</i>, and let <var>scanResult</var> be the result.
+1. Let |scanResult| be the result of invoking [=scan for devices=] with |global| and
+    |requiredServiceUUIDs|.
 1. If |filters| isn't `null`, do the following sub-steps:
     1. Remove devices from <var>scanResult</var> if they do
         not <a>match a filter</a> in <var>uuidFilters</var>.
@@ -1647,7 +1653,7 @@ returned from the following steps:
 </div>
 
 <div algorithm="scanning for Bluetooth devices">
-To <dfn>scan for devices</dfn> with an optional <var>set of <a>Service</a>
+To <dfn>scan for devices</dfn> with parameters <var>global</var> and an optional <var>set of <a>Service</a>
 UUIDs</var>, defaulting to the set of all UUIDs, the UA MUST perform the
 following steps:
 1. If the UA has scanned for devices recently with a set of UUIDs that was a
@@ -1658,6 +1664,14 @@ following steps:
 1. Let <var>nearbyDevices</var> be a set of <a>Bluetooth device</a>s, initially
     equal to the set of devices that are connected (have an <a>ATT Bearer</a>)
     to the UA.
+1. Let |topLevelTraversable| be the |global|'s [=Window/navigable=]'s
+    [=navigable/top-level traversable=].
+1. Let |simulatedBluetoothDevices| be an empty <a spec="infra">list</a>.
+1. If |topLevelTraversable| has a [=simulated Bluetooth adapter=], let
+    |simulatedBluetoothDevices| be the result of [=getting the values=] of its  [=simulated Bluetooth device mapping=].
+
+    Issue: Support asynchronous device discovery.
+
 1. If the UA supports the LE transport, perform the <a>General Discovery
     Procedure</a>, except that the UA may include devices that have no
     <a>Discoverable Mode</a> flag set, and add the discovered <a>Bluetooth
@@ -1677,7 +1691,7 @@ following steps:
     immutable device address.
 1. Let <var>result</var> be a set of <a>Bluetooth device</a>s, initially empty.
 1. For each <a>Bluetooth device</a> <var>device</var> in
-    <var>nearbyDevices</var>, do the following sub-steps:
+    <var>nearbyDevices</var> and <var>simulatedBluetoothDevices</var>, do the following sub-steps:
     1. If <var>device</var>'s <a>supported physical transports</a> include LE
         and its <a>Bluetooth Device Name</a> is partial or absent, the UA SHOULD
         perform the <a>Name Discovery Procedure</a> to acquire a complete name.
@@ -1988,6 +2002,14 @@ steps <a>in parallel</a>:
       Note: If the Web Bluetooth permission has been blocked by the user, the UA
       may <a>resolve</a> |promise| with  `false`.
     </div>
+
+1. Let |simulatedBluetoothAdapter| be [=this=]'s [=Window/navigable=]'s
+    [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is not empty,
+    1. If |simulatedBluetoothAdapter|'s [=adapter state=] is "absent", [=queue a task=] to [=resolve=] |promise| with `false`.
+    1. Otherwise, [=queue a task=] to [=resolve=] |promise| with `true`.
+    1. Abort these steps.
+
 1. If the UA is running on a system that has a Bluetooth radio <a>queue a
     task</a> to <a>resolve</a> |promise| with `true` regardless of the powered
     state of the Bluetooth radio.
@@ -4835,6 +4857,10 @@ if the following steps return `blocked`:
   };
 </xmp>
 
+Each {{Navigator}} has an <dfn>associated `Bluetooth`</dfn>, which is a {{Bluetooth}} object. Upon creation of the {{Navigator}} object, its <a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object created in the {{Navigator}} object's [=relevant realm=].
+
+{{Navigator}}'s <dfn attribute for="Navigator">bluetooth</dfn> getter steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
+
 # Integrations # {#integrations}
 
 ## Permissions Policy ## {#permissions-policy}
@@ -4850,10 +4876,30 @@ The <a>default allowlist</a> for this feature is <code>["self"]</code>.
 
 For the purposes of user-agent automation and application testing, this document defines extensions to the [[WebDriver-BiDi]] specification.
 
+The Web Bluetooth API and its extension specifications pose a challenge to test authors, as fully exercising those interfaces requires physical hardware devices that respond in predictable ways. To address this challenge this document defines a number of WebDriver-BiDi extension commands that allow defining and controlling simulated peripherals and advertisements that behave like physical device peripherals and their advertisements. These simulated peripherals and advertisements represent devices with particular properties and whose readings can be entirely defined by users.
+
+Each [=navigable/top-level traversable=] may have a <dfn>simulated Bluetooth adapter</dfn>, that is a software defined Bluetooth adapter that has a set of discovered <a>simulated Bluetooth devices</a> and can assume roles like <a>Central</a>.
+
+Each <a>simulated Bluetooth adapter</a> has a <dfn>simulated Bluetooth device mapping</dfn>, which is an <a>ordered map</a> of Bluetooth address {{strings}} to <a>simulated Bluetooth devices</a>.
+
+Each <a>simulated Bluetooth adapter</a> has an <dfn>adapter state</dfn> that is a string enumeration describing the current state of the adapter. The possible enumeration values are:
+  * "powered-on"
+  * "powered-off"
+  * "absent"
+
+A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>, and may have associated properties like <a>Manufacturer Specific Data</a> and <a>Service UUIDs</a>.
+
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
 processing of CDDL snippets. Currently, other modules cannot be
 referenced.
+
+## Definitions ## {#bluetooth-bidi-definitions}
+
+<pre class="cddl remote-cddl local-cddl">
+bluetooth.BluetoothServiceUuid = text;
+bluetooth.BluetoothManufacturerData = { key: uint, data: bstr };
+</pre>
 
 ## The bluetooth module ## {#bluetooth-module}
 
@@ -4938,6 +4984,35 @@ To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
 
 </div>
 
+#### The bluetooth.ScanRecord Type #### {#bluetooth-scanrecord-type}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+
+bluetooth.ScanRecord = {
+  ? name: text,
+  ? uuids: [ * bluetooth.BluetoothServiceUuid ],
+  ? appearance: number,
+  ? manufacturerData: [ * bluetooth.BluetoothManufacturerData ],
+}
+</pre>
+
+A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [=Bluetooth device=].
+
+<dl>
+  <dt><code>name</code></dt>
+  <dd>is the [=Bluetooth device=]'s local name, or a prefix of it.</dd>
+
+  <dt><code>uuids</code></dt>
+  <dd>lists the Service UUIDs that this scan record says the [=Bluetooth device=]'s GATT server supports.</dd>
+
+  <dt><code>appearance</code></dt>
+  <dd>is an <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.</dd>
+
+  <dt><code>manufacturerData</code></dt>
+  <dd>list of <code>bluetooth.BluetoothManufacturerData</code> that maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octet}}s.</dd>
+</dl>
+
+
 ### Errors ### {#bidi-errors}
 
 This specification extends the set of [=error codes=] from
@@ -5008,6 +5083,177 @@ A [=local end=] could dismiss a prompt by sending the following message:
     "prompt": "pmt-e0a234b",
     "accept": true,
     "device": "dvc-9b3b872"
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateAdapter Command #### {#bluetooth-simulateAdapter-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.simulateAdapter = (
+   method: "bluetooth.simulateAdapter",
+   params: bluetooth.SimulateAdapterParameters,
+)
+
+bluetooth.SimulateAdapterParameters = {
+   context: text,
+   state: "absent" / "powered-off" / "powered-on"
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateAdapter">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |contextId| be params["context"].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
+1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
+1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate an adapter by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateAdapter",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "state": "powered-on",
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulatePreconnectedPeripheral Command #### {#bluetooth-simulateconnectedperipheral-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulatePreconnectedPeripheral = (
+   method: "bluetooth.simulatePreconnectedPeripheral",
+   params: bluetooth.SimulatePreconnectedPeripheralParameters,
+)
+
+bluetooth.SimulatePreconnectedPeripheralParameters = {
+   context: text,
+   address: text,
+   name: text,
+   manufacturerData: [ * bluetooth.BluetoothManufacturerData ],
+   knownServiceUuids: [ * bluetooth.BluetoothServiceUuid ]
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |contextId| be params["context"].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
+1. Set |simulatedBluetoothDevice|'s name to |params|[`"name"`].
+1. Set |simulatedBluetoothDevice|'s address to |params|[`"address"`].
+1. Set |simulatedBluetoothDevice|'s <a>manufacturer specific data</a> to |params|[`"manufacturerData"`].
+1. Set |simulatedBluetoothDevice|'s <a>service UUIDs</a> to |params|[`"knownServiceUuids"`].
+1. Set |deviceMapping|[|deviceAddress|] to |simulatedBluetoothDevice|.
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a preconnected peripheral by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulatePreconnectedPeripheral",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "name": "Some Device",
+    "manufacturerData": [ { key: 17, data: [0, 255, 1, 1, 127] } ],
+    "knownServiceUuids": [
+      "12345678-1234-5678-9abc-def123456789",
+    ],
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateAdvertisement Command #### {#bluetooth-simulateadvertisement-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateAdvertisement = (
+   method: "bluetooth.simulateAdvertisement",
+   params: bluetooth.SimulateAdvertisementParameters,
+)
+
+bluetooth.SimulateAdvertisementParameters = {
+   context: text,
+   scanEntry: bluetooth.SimulateAdvertisementScanEntryParameters
+}
+
+bluetooth.SimulateAdvertisementScanEntryParameters = {
+   deviceAddress: text,
+   rssi: number,
+   scanRecord: bluetooth.ScanRecord
+}
+
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateAdvertisement">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |contextId| be params["context"].
+1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |topLevelNavigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. Let |scanEntry| be |params|[`"scanEntry"`].
+1. Let |deviceAddress| be |scanEntry|[`"deviceAddress"`].
+1. Let |simulatedBluetoothAdapter| be |topLevelNavigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|]. Otherwise, let |simulatedDevice| be a new <a>simulated Bluetooth device</a> with |deviceAddress| and set |deviceMapping|[|deviceAddress|] to |simulatedDevice|.
+1. If |topLevelNavigable| is currently executing the [=scan for devices=] algorithm,
+    insert <var>simulatedDevice</var> into
+    the <em>simulatedBluetoothDevices</em> variable within that algorithm.
+
+    Issue: Inserting data into variables from another algorithm is not well defined. The <a>scan for devices</a> algorithm needs to define asynchronous device discovery in order to match implementations.
+1. Let |navigables| be the <a>inclusive descendant navigables</a> of |topLevelNavigable|'s <a>active document</a>.
+1. For each |navigable| of |navigables|:
+    1. Let |document| be |navigable|'s <a>active document</a>.
+    1. <a>Queue a task</a> on |document|'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
+        1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a> |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s [=associated Bluetooth=].
+        1. If |simulatedDeviceInstance|.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
+        1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
+1. Return [=success=] with data `null`.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a device advertisement by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateAdvertisement",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "scanEntry": {
+      "deviceAddress": "08:08:08:08:08:08",
+      "rssi": -10,
+      "scanRecord": {
+        "name": "Heart Rate",
+        "uuids": ["0000180d-0000-1000-8000-00805f9b34fb"],
+        "manufacturerData": [ { key: 17, data: [0, 255, 1, 1, 127] } ],
+        "appearance": 1,
+        "txPower": 1
+      }
+    }
   }
 }
 </pre>
