@@ -4898,8 +4898,16 @@ referenced.
 
 <pre class="cddl remote-cddl local-cddl">
 bluetooth.BluetoothServiceUuid = text;
-bluetooth.BluetoothManufacturerData = { key: uint, data: bstr };
+bluetooth.BluetoothManufacturerData = { key: uint, data: tstr };
 </pre>
+
+<dl>
+  <dt><code>key</code></dt>
+  <dd>is the Company Identifier Code.</dd>
+
+  <dt><code>data</code></dt>
+  <dd>is the manufacturer data [=byte sequence=], base64 encoded.</dd>
+</dl>
 
 ## The bluetooth module ## {#bluetooth-module}
 
@@ -5009,7 +5017,7 @@ A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [
   <dd>is an <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.</dd>
 
   <dt><code>manufacturerData</code></dt>
-  <dd>list of <code>bluetooth.BluetoothManufacturerData</code> that maps {{unsigned short}} Company Identifier Codes to [=lists=] of {{octet}}s.</dd>
+  <dd>list of <code>BluetoothManufacturerData</code> that maps {{unsigned short}} Company Identifier Codes to base64 encoded manufacturer data [=byte sequences=].</dd>
 </dl>
 
 
@@ -5160,7 +5168,7 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
 1. Set |simulatedBluetoothDevice|'s name to |params|[`"name"`].
 1. Set |simulatedBluetoothDevice|'s address to |params|[`"address"`].
-1. Set |simulatedBluetoothDevice|'s <a>manufacturer specific data</a> to |params|[`"manufacturerData"`].
+1. Set |simulatedBluetoothDevice|'s <a>manufacturer specific data</a> to the output of [=forgiving-base64 decode=] performed on |params|[`"manufacturerData"`].
 1. Set |simulatedBluetoothDevice|'s <a>service UUIDs</a> to |params|[`"knownServiceUuids"`].
 1. Set |deviceMapping|[|deviceAddress|] to |simulatedBluetoothDevice|.
 1. Return [=success=] with data `null`.
@@ -5177,7 +5185,7 @@ A [=local end=] could simulate a preconnected peripheral by sending the followin
     "context": "cxt-d03fdd81",
     "address": "09:09:09:09:09:09",
     "name": "Some Device",
-    "manufacturerData": [ { key: 17, data: [0, 255, 1, 1, 127] } ],
+    "manufacturerData": [ { key: 17, data: "AP8BAX8=" } ],
     "knownServiceUuids": [
       "12345678-1234-5678-9abc-def123456789",
     ],
@@ -5249,7 +5257,7 @@ A [=local end=] could simulate a device advertisement by sending the following m
       "scanRecord": {
         "name": "Heart Rate",
         "uuids": ["0000180d-0000-1000-8000-00805f9b34fb"],
-        "manufacturerData": [ { key: 17, data: [0, 255, 1, 1, 127] } ],
+        "manufacturerData": [ { key: 17, data: "AP8BAX8=" } ],
         "appearance": 1,
         "txPower": 1
       }
