@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version 82ce88815, updated Thu Sep 7 16:33:55 2023 -0700" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
-  <meta content="5fca8d95ebc6ad52d967c12a692359cadae12b23" name="document-revision">
+  <meta content="f3b31870764ce76fa1fa671f7bcdac7944a246a0" name="document-revision">
 <style>
   .argument-list { display: inline-block; vertical-align: top; }
   /* Show self-links for various elements. This is incompatible with nearby floats. */
@@ -937,7 +937,7 @@ var.selected6 { background-color: #FFBCF2; box-shadow: 0 0 0 2px #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2024-10-04">4 October 2024</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2024-10-09">9 October 2024</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -4940,8 +4940,14 @@ processing of CDDL snippets. Currently, other modules cannot be
 referenced.</p>
    <h3 class="heading settled" data-level="12.1" id="bluetooth-bidi-definitions"><span class="secno">12.1. </span><span class="content">Definitions</span><a class="self-link" href="#bluetooth-bidi-definitions"></a></h3>
 <pre class="cddl local-cddl remote-cddl">bluetooth.BluetoothServiceUuid = text;
-bluetooth.BluetoothManufacturerData = { key: uint, data: bstr };
+bluetooth.BluetoothManufacturerData = { key: uint, data: tstr };
 </pre>
+   <dl>
+    <dt><code>key</code>
+    <dd>is the Company Identifier Code.
+    <dt><code>data</code>
+    <dd>is the manufacturer data <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence">byte sequence</a>, base64 encoded.
+   </dl>
    <h3 class="heading settled" data-level="12.2" id="bluetooth-module"><span class="secno">12.2. </span><span class="content">The bluetooth module</span><a class="self-link" href="#bluetooth-module"></a></h3>
    <p>The bluetooth module contains commands for managing the remote end Bluetooth behavior.</p>
    <h4 class="heading settled" data-level="12.2.1" id="bidi-types"><span class="secno">12.2.1. </span><span class="content">Types</span><a class="self-link" href="#bidi-types"></a></h4>
@@ -5048,7 +5054,7 @@ device</a>.</p>
     <dt><code>appearance</code>
     <dd>is an <a data-link-type="dfn" href="#appearance" id="ref-for-appearance②">Appearance</a>, one of the values defined by the <code class="idl"><a data-link-type="idl" href="https://github.com/WebBluetoothCG/registries/blob/master/gatt_assigned_characteristics.txt#:~:text=gap.appearance" id="ref-for-:~:text=gap.appearance①">gap.appearance</a></code> characteristic.
     <dt><code>manufacturerData</code>
-    <dd>list of <code>bluetooth.BluetoothManufacturerData</code> that maps <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-unsigned-short" id="ref-for-idl-unsigned-short⑨">unsigned short</a></code> Company Identifier Codes to <a data-link-type="dfn" href="https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#sec-list-and-record-specification-type" id="ref-for-sec-list-and-record-specification-type">lists</a> of <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-octet" id="ref-for-idl-octet">octet</a></code>s.
+    <dd>list of <code>BluetoothManufacturerData</code> that maps <code class="idl"><a data-link-type="idl" href="https://webidl.spec.whatwg.org/#idl-unsigned-short" id="ref-for-idl-unsigned-short⑨">unsigned short</a></code> Company Identifier Codes to base64 encoded manufacturer data <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#byte-sequence" id="ref-for-byte-sequence①">byte sequences</a>.
    </dl>
    <h4 class="heading settled" data-level="12.2.2" id="bidi-errors"><span class="secno">12.2.2. </span><span class="content">Errors</span><a class="self-link" href="#bidi-errors"></a></h4>
    <p>This specification extends the set of <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-error-code" id="ref-for-dfn-error-code③">error codes</a> from <a data-link-type="biblio" href="#biblio-webdriver-bidi" title="WebDriver BiDi">WebDriver BiDi</a> with the following additional codes:</p>
@@ -5208,7 +5214,7 @@ device</a>.</p>
      <li data-md>
       <p>Set <var>simulatedBluetoothDevice</var>’s address to <var>params</var>[<code>"address"</code>].</p>
      <li data-md>
-      <p>Set <var>simulatedBluetoothDevice</var>’s <a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data⑤">manufacturer specific data</a> to <var>params</var>[<code>"manufacturerData"</code>].</p>
+      <p>Set <var>simulatedBluetoothDevice</var>’s <a data-link-type="dfn" href="#manufacturer-specific-data" id="ref-for-manufacturer-specific-data⑤">manufacturer specific data</a> to the output of <a data-link-type="dfn" href="https://infra.spec.whatwg.org/#forgiving-base64-decode" id="ref-for-forgiving-base64-decode">forgiving-base64 decode</a> performed on <var>params</var>[<code>"manufacturerData"</code>].</p>
      <li data-md>
       <p>Set <var>simulatedBluetoothDevice</var>’s <a data-link-type="dfn" href="#service-uuid-data-type" id="ref-for-service-uuid-data-type⑨">service UUIDs</a> to <var>params</var>[<code>"knownServiceUuids"</code>].</p>
      <li data-md>
@@ -5217,15 +5223,15 @@ device</a>.</p>
       <p>Return <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-success" id="ref-for-dfn-success④">success</a> with data <code>null</code>.</p>
     </ol>
    </div>
-   <div class="example" id="example-05a0d714">
-    <a class="self-link" href="#example-05a0d714"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends②">local end</a> could simulate a preconnected peripheral by sending the following message: 
+   <div class="example" id="example-7050eb6b">
+    <a class="self-link" href="#example-7050eb6b"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends②">local end</a> could simulate a preconnected peripheral by sending the following message: 
 <pre class="highlight"><c- p>{</c->
   <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulatePreconnectedPeripheral"</c-><c- p>,</c->
   <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
     <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
     <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
     <c- f>"name"</c-><c- p>:</c-> <c- u>"Some Device"</c-><c- p>,</c->
-    <c- f>"manufacturerData"</c-><c- p>:</c-> <c- p>[</c-> <c- p>{</c-> key<c- p>:</c-> <c- mi>17</c-><c- p>,</c-> da<c- kc>ta</c-><c- p>:</c-> <c- p>[</c-><c- mi>0</c-><c- p>,</c-> <c- mi>255</c-><c- p>,</c-> <c- mi>1</c-><c- p>,</c-> <c- mi>1</c-><c- p>,</c-> <c- mi>127</c-><c- p>]</c-> <c- p>}</c-> <c- p>],</c->
+    <c- f>"manufacturerData"</c-><c- p>:</c-> <c- p>[</c-> <c- p>{</c-> key<c- p>:</c-> <c- mi>17</c-><c- p>,</c-> da<c- kc>ta</c-><c- p>:</c-> <c- u>"AP8BAX8="</c-> <c- p>}</c-> <c- p>],</c->
     <c- f>"knownServiceUuids"</c-><c- p>:</c-> <c- p>[</c->
       <c- u>"12345678-1234-5678-9abc-def123456789"</c-><c- p>,</c->
     <c- p>],</c->
@@ -5298,8 +5304,8 @@ the <em>simulatedBluetoothDevices</em> variable within that algorithm.</p>
       <p>Return <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-success" id="ref-for-dfn-success⑤">success</a> with data <code>null</code>.</p>
     </ol>
    </div>
-   <div class="example" id="example-e29dffec">
-    <a class="self-link" href="#example-e29dffec"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends③">local end</a> could simulate a device advertisement by sending the following message: 
+   <div class="example" id="example-2a9b64bf">
+    <a class="self-link" href="#example-2a9b64bf"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends③">local end</a> could simulate a device advertisement by sending the following message: 
 <pre class="highlight"><c- p>{</c->
   <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateAdvertisement"</c-><c- p>,</c->
   <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
@@ -5310,7 +5316,7 @@ the <em>simulatedBluetoothDevices</em> variable within that algorithm.</p>
       <c- f>"scanRecord"</c-><c- p>:</c-> <c- p>{</c->
         <c- f>"name"</c-><c- p>:</c-> <c- u>"Heart Rate"</c-><c- p>,</c->
         <c- f>"uuids"</c-><c- p>:</c-> <c- p>[</c-><c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>],</c->
-        <c- f>"manufacturerData"</c-><c- p>:</c-> <c- p>[</c-> <c- p>{</c-> key<c- p>:</c-> <c- mi>17</c-><c- p>,</c-> da<c- kc>ta</c-><c- p>:</c-> <c- p>[</c-><c- mi>0</c-><c- p>,</c-> <c- mi>255</c-><c- p>,</c-> <c- mi>1</c-><c- p>,</c-> <c- mi>1</c-><c- p>,</c-> <c- mi>127</c-><c- p>]</c-> <c- p>}</c-> <c- p>],</c->
+        <c- f>"manufacturerData"</c-><c- p>:</c-> <c- p>[</c-> <c- p>{</c-> key<c- p>:</c-> <c- mi>17</c-><c- p>,</c-> da<c- kc>ta</c-><c- p>:</c-> <c- u>"AP8BAX8="</c-> <c- p>}</c-> <c- p>],</c->
         <c- f>"appearance"</c-><c- p>:</c-> <c- mi>1</c-><c- p>,</c->
         <c- f>"txPower"</c-><c- p>:</c-> <c- mi>1</c->
       <c- p>}</c->
@@ -6252,7 +6258,6 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="b107f911">current realm</span>
      <li><span class="dfn-paneled" id="1bd9bfdc">exec(string)</span>
      <li><span class="dfn-paneled" id="c15f1628">internal slot</span>
-     <li><span class="dfn-paneled" id="96c4a495">lists</span>
      <li><span class="dfn-paneled" id="a262536f">realm</span>
      <li><span class="dfn-paneled" id="7ec42884">split(separator, limit)</span>
     </ul>
@@ -6308,8 +6313,10 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="1adcc035">abort when</span>
      <li><span class="dfn-paneled" id="53275e46">append</span>
      <li><span class="dfn-paneled" id="b7f60025">ascii lower hex digit</span>
+     <li><span class="dfn-paneled" id="3de9e659">byte sequence</span>
      <li><span class="dfn-paneled" id="1243a891">exist</span>
      <li><span class="dfn-paneled" id="45209803">for each</span>
+     <li><span class="dfn-paneled" id="73e75483">forgiving-base64 decode</span>
      <li><span class="dfn-paneled" id="d5890b17">getting the values</span>
      <li><span class="dfn-paneled" id="715f22e4">if aborted</span>
      <li><span class="dfn-paneled" id="649608b9">list</span>
@@ -6410,7 +6417,6 @@ effect as trying to write to a <code class="idl"><a data-link-type="idl" href="h
      <li><span class="dfn-paneled" id="f4813f78">byte</span>
      <li><span class="dfn-paneled" id="ae4bc361">converted to an ecmascript value</span>
      <li><span class="dfn-paneled" id="77996ab1">maplike</span>
-     <li><span class="dfn-paneled" id="bc5645aa">octet</span>
      <li><span class="dfn-paneled" id="750a2f08">react</span>
      <li><span class="dfn-paneled" id="b262501e">reject</span>
      <li><span class="dfn-paneled" id="3b90bdcd">resolve</span>
@@ -8007,7 +8013,6 @@ window.dfnpanelData['0c99fb90'] = {"dfnID": "0c99fb90", "url": "https://tc39.git
 window.dfnpanelData['b107f911'] = {"dfnID": "b107f911", "url": "https://tc39.github.io/ecma262/#current-realm", "dfnText": "current realm", "refSections": [{"refs": [{"id": "ref-for-current-realm"}], "title": "4.1. Permission API Integration"}], "external": true};
 window.dfnpanelData['1bd9bfdc'] = {"dfnID": "1bd9bfdc", "url": "https://tc39.es/ecma262/multipage/text-processing.html#sec-regexp.prototype.exec", "dfnText": "exec(string)", "refSections": [{"refs": [{"id": "ref-for-sec-regexp.prototype.exec"}], "title": "9. The Blocklist"}], "external": true};
 window.dfnpanelData['c15f1628'] = {"dfnID": "c15f1628", "url": "https://tc39.github.io/ecma262/#sec-object-internal-methods-and-internal-slots", "dfnText": "internal slot", "refSections": [{"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots"}, {"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2460"}], "title": "4. Device Discovery"}, {"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2461"}], "title": "4.1. Permission API Integration"}, {"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2462"}, {"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2463"}], "title": "5.2. BluetoothDevice"}, {"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2464"}, {"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2465"}], "title": "6.2. BluetoothRemoteGATTServer"}, {"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2466"}, {"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2467"}], "title": "6.3. BluetoothRemoteGATTService"}, {"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2468"}, {"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2460\u24ea"}], "title": "6.4. BluetoothRemoteGATTCharacteristic"}, {"refs": [{"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2460\u2460"}, {"id": "ref-for-sec-object-internal-methods-and-internal-slots\u2460\u2461"}], "title": "6.5. BluetoothRemoteGATTDescriptor"}], "external": true};
-window.dfnpanelData['96c4a495'] = {"dfnID": "96c4a495", "url": "https://tc39.es/ecma262/multipage/ecmascript-data-types-and-values.html#sec-list-and-record-specification-type", "dfnText": "lists", "refSections": [{"refs": [{"id": "ref-for-sec-list-and-record-specification-type"}], "title": "12.2.1.4. The bluetooth.ScanRecord Type"}], "external": true};
 window.dfnpanelData['a262536f'] = {"dfnID": "a262536f", "url": "https://tc39.github.io/ecma262/#sec-code-realms", "dfnText": "realm", "refSections": [{"refs": [{"id": "ref-for-sec-code-realms"}], "title": "4. Device Discovery"}, {"refs": [{"id": "ref-for-sec-code-realms\u2460"}], "title": "4.1. Permission API Integration"}, {"refs": [{"id": "ref-for-sec-code-realms\u2461"}], "title": "5.2. BluetoothDevice"}, {"refs": [{"id": "ref-for-sec-code-realms\u2462"}], "title": "6.2. BluetoothRemoteGATTServer"}, {"refs": [{"id": "ref-for-sec-code-realms\u2463"}], "title": "6.4. BluetoothRemoteGATTCharacteristic"}, {"refs": [{"id": "ref-for-sec-code-realms\u2464"}, {"id": "ref-for-sec-code-realms\u2465"}, {"id": "ref-for-sec-code-realms\u2466"}], "title": "6.6.3. Responding to Disconnection"}], "external": true};
 window.dfnpanelData['7ec42884'] = {"dfnID": "7ec42884", "url": "https://tc39.es/ecma262/multipage/text-processing.html#sec-string.prototype.split", "dfnText": "split(separator, limit)", "refSections": [{"refs": [{"id": "ref-for-sec-string.prototype.split"}], "title": "9. The Blocklist"}], "external": true};
 window.dfnpanelData['a3033be5'] = {"dfnID": "a3033be5", "url": "https://encoding.spec.whatwg.org/#utf-8-decode-without-bom", "dfnText": "utf-8 decode without bom", "refSections": [{"refs": [{"id": "ref-for-utf-8-decode-without-bom"}], "title": "5.1. Global Bluetooth device properties"}, {"refs": [{"id": "ref-for-utf-8-decode-without-bom\u2460"}], "title": "5.2.3. Responding to Advertising Events"}], "external": true};
@@ -8047,8 +8052,10 @@ window.dfnpanelData['30717154'] = {"dfnID": "30717154", "url": "https://html.spe
 window.dfnpanelData['1adcc035'] = {"dfnID": "1adcc035", "url": "https://infra.spec.whatwg.org/#abort-when", "dfnText": "abort when", "refSections": [{"refs": [{"id": "ref-for-abort-when"}], "title": "5.2. BluetoothDevice"}], "external": true};
 window.dfnpanelData['53275e46'] = {"dfnID": "53275e46", "url": "https://infra.spec.whatwg.org/#list-append", "dfnText": "append", "refSections": [{"refs": [{"id": "ref-for-list-append"}], "title": "12.2.1.3. The bluetooth.RequestDevicePrompt Type"}], "external": true};
 window.dfnpanelData['b7f60025'] = {"dfnID": "b7f60025", "url": "https://infra.spec.whatwg.org/#ascii-lower-hex-digit", "dfnText": "ascii lower hex digit", "refSections": [{"refs": [{"id": "ref-for-ascii-lower-hex-digit"}], "title": "8. Advertising Data Filter"}, {"refs": [{"id": "ref-for-ascii-lower-hex-digit\u2460"}], "title": "9. The Blocklist"}], "external": true};
+window.dfnpanelData['3de9e659'] = {"dfnID": "3de9e659", "url": "https://infra.spec.whatwg.org/#byte-sequence", "dfnText": "byte sequence", "refSections": [{"refs": [{"id": "ref-for-byte-sequence"}], "title": "12.1. Definitions"}, {"refs": [{"id": "ref-for-byte-sequence\u2460"}], "title": "12.2.1.4. The bluetooth.ScanRecord Type"}], "external": true};
 window.dfnpanelData['1243a891'] = {"dfnID": "1243a891", "url": "https://infra.spec.whatwg.org/#map-exists", "dfnText": "exist", "refSections": [{"refs": [{"id": "ref-for-map-exists"}], "title": "12.2.1.3. The bluetooth.RequestDevicePrompt Type"}, {"refs": [{"id": "ref-for-map-exists\u2460"}], "title": "12.2.3.3. The bluetooth.simulatePreconnectedPeripheral Command"}, {"refs": [{"id": "ref-for-map-exists\u2461"}], "title": "12.2.3.4. The bluetooth.simulateAdvertisement Command"}], "external": true};
 window.dfnpanelData['45209803'] = {"dfnID": "45209803", "url": "https://infra.spec.whatwg.org/#map-iterate", "dfnText": "for each", "refSections": [{"refs": [{"id": "ref-for-map-iterate"}], "title": "5.2. BluetoothDevice"}], "external": true};
+window.dfnpanelData['73e75483'] = {"dfnID": "73e75483", "url": "https://infra.spec.whatwg.org/#forgiving-base64-decode", "dfnText": "forgiving-base64 decode", "refSections": [{"refs": [{"id": "ref-for-forgiving-base64-decode"}], "title": "12.2.3.3. The bluetooth.simulatePreconnectedPeripheral Command"}], "external": true};
 window.dfnpanelData['d5890b17'] = {"dfnID": "d5890b17", "url": "https://infra.spec.whatwg.org/#map-getting-the-values", "dfnText": "getting the values", "refSections": [{"refs": [{"id": "ref-for-map-getting-the-values"}], "title": "4. Device Discovery"}], "external": true};
 window.dfnpanelData['715f22e4'] = {"dfnID": "715f22e4", "url": "https://infra.spec.whatwg.org/#if-aborted", "dfnText": "if aborted", "refSections": [{"refs": [{"id": "ref-for-if-aborted"}], "title": "5.2. BluetoothDevice"}], "external": true};
 window.dfnpanelData['649608b9'] = {"dfnID": "649608b9", "url": "https://infra.spec.whatwg.org/#list", "dfnText": "list", "refSections": [{"refs": [{"id": "ref-for-list"}], "title": "4. Device Discovery"}, {"refs": [{"id": "ref-for-list\u2460"}], "title": "12.2.1.3. The bluetooth.RequestDevicePrompt Type"}], "external": true};
@@ -8117,7 +8124,6 @@ window.dfnpanelData['5372cca8'] = {"dfnID": "5372cca8", "url": "https://webidl.s
 window.dfnpanelData['f4813f78'] = {"dfnID": "f4813f78", "url": "https://webidl.spec.whatwg.org/#idl-byte", "dfnText": "byte", "refSections": [{"refs": [{"id": "ref-for-idl-byte"}, {"id": "ref-for-idl-byte\u2460"}, {"id": "ref-for-idl-byte\u2461"}, {"id": "ref-for-idl-byte\u2462"}], "title": "5.2.3. Responding to Advertising Events"}], "external": true};
 window.dfnpanelData['ae4bc361'] = {"dfnID": "ae4bc361", "url": "https://webidl.spec.whatwg.org/#dfn-convert-idl-to-javascript-value", "dfnText": "converted to an ecmascript value", "refSections": [{"refs": [{"id": "ref-for-dfn-convert-idl-to-javascript-value"}, {"id": "ref-for-dfn-convert-idl-to-javascript-value\u2460"}], "title": "4. Device Discovery"}], "external": true};
 window.dfnpanelData['77996ab1'] = {"dfnID": "77996ab1", "url": "https://webidl.spec.whatwg.org/#dfn-maplike", "dfnText": "maplike", "refSections": [{"refs": [{"id": "ref-for-dfn-maplike"}], "title": "5.2.3.1. BluetoothManufacturerDataMap"}, {"refs": [{"id": "ref-for-dfn-maplike\u2460"}], "title": "5.2.3.2. BluetoothServiceDataMap"}], "external": true};
-window.dfnpanelData['bc5645aa'] = {"dfnID": "bc5645aa", "url": "https://webidl.spec.whatwg.org/#idl-octet", "dfnText": "octet", "refSections": [{"refs": [{"id": "ref-for-idl-octet"}], "title": "12.2.1.4. The bluetooth.ScanRecord Type"}], "external": true};
 window.dfnpanelData['750a2f08'] = {"dfnID": "750a2f08", "url": "https://webidl.spec.whatwg.org/#dfn-perform-steps-once-promise-is-settled", "dfnText": "react", "refSections": [{"refs": [{"id": "ref-for-dfn-perform-steps-once-promise-is-settled"}], "title": "6.2. BluetoothRemoteGATTServer"}], "external": true};
 window.dfnpanelData['b262501e'] = {"dfnID": "b262501e", "url": "https://webidl.spec.whatwg.org/#reject", "dfnText": "reject", "refSections": [{"refs": [{"id": "ref-for-reject"}, {"id": "ref-for-reject\u2460"}, {"id": "ref-for-reject\u2461"}, {"id": "ref-for-reject\u2462"}, {"id": "ref-for-reject\u2463"}], "title": "4. Device Discovery"}, {"refs": [{"id": "ref-for-reject\u2464"}, {"id": "ref-for-reject\u2465"}, {"id": "ref-for-reject\u2466"}, {"id": "ref-for-reject\u2467"}], "title": "5.2. BluetoothDevice"}, {"refs": [{"id": "ref-for-reject\u2468"}], "title": "6.1.2. The Bluetooth cache"}, {"refs": [{"id": "ref-for-reject\u2460\u24ea"}, {"id": "ref-for-reject\u2460\u2460"}, {"id": "ref-for-reject\u2460\u2461"}, {"id": "ref-for-reject\u2460\u2462"}, {"id": "ref-for-reject\u2460\u2463"}, {"id": "ref-for-reject\u2460\u2464"}], "title": "6.2. BluetoothRemoteGATTServer"}, {"refs": [{"id": "ref-for-reject\u2460\u2465"}], "title": "6.3. BluetoothRemoteGATTService"}, {"refs": [{"id": "ref-for-reject\u2460\u2466"}, {"id": "ref-for-reject\u2460\u2467"}, {"id": "ref-for-reject\u2460\u2468"}, {"id": "ref-for-reject\u2461\u24ea"}, {"id": "ref-for-reject\u2461\u2460"}, {"id": "ref-for-reject\u2461\u2461"}, {"id": "ref-for-reject\u2461\u2462"}, {"id": "ref-for-reject\u2461\u2463"}, {"id": "ref-for-reject\u2461\u2464"}, {"id": "ref-for-reject\u2461\u2465"}, {"id": "ref-for-reject\u2461\u2466"}, {"id": "ref-for-reject\u2461\u2467"}], "title": "6.4. BluetoothRemoteGATTCharacteristic"}, {"refs": [{"id": "ref-for-reject\u2461\u2468"}], "title": "6.4.1. BluetoothCharacteristicProperties"}, {"refs": [{"id": "ref-for-reject\u2462\u24ea"}, {"id": "ref-for-reject\u2462\u2460"}, {"id": "ref-for-reject\u2462\u2461"}, {"id": "ref-for-reject\u2462\u2462"}, {"id": "ref-for-reject\u2462\u2463"}, {"id": "ref-for-reject\u2462\u2464"}], "title": "6.5. BluetoothRemoteGATTDescriptor"}], "external": true};
 window.dfnpanelData['3b90bdcd'] = {"dfnID": "3b90bdcd", "url": "https://webidl.spec.whatwg.org/#resolve", "dfnText": "resolve", "refSections": [{"refs": [{"id": "ref-for-resolve"}, {"id": "ref-for-resolve\u2460"}], "title": "4. Device Discovery"}, {"refs": [{"id": "ref-for-resolve\u2461"}, {"id": "ref-for-resolve\u2462"}, {"id": "ref-for-resolve\u2463"}, {"id": "ref-for-resolve\u2464"}, {"id": "ref-for-resolve\u2465"}, {"id": "ref-for-resolve\u2466"}, {"id": "ref-for-resolve\u2467"}], "title": "4.2. Overall Bluetooth availability"}, {"refs": [{"id": "ref-for-resolve\u2468"}, {"id": "ref-for-resolve\u2460\u24ea"}, {"id": "ref-for-resolve\u2460\u2460"}], "title": "5.2. BluetoothDevice"}, {"refs": [{"id": "ref-for-resolve\u2460\u2461"}], "title": "6.1.2. The Bluetooth cache"}, {"refs": [{"id": "ref-for-resolve\u2460\u2462"}], "title": "6.2. BluetoothRemoteGATTServer"}, {"refs": [{"id": "ref-for-resolve\u2460\u2463"}], "title": "6.3. BluetoothRemoteGATTService"}, {"refs": [{"id": "ref-for-resolve\u2460\u2464"}, {"id": "ref-for-resolve\u2460\u2465"}, {"id": "ref-for-resolve\u2460\u2466"}, {"id": "ref-for-resolve\u2460\u2467"}, {"id": "ref-for-resolve\u2460\u2468"}, {"id": "ref-for-resolve\u2461\u24ea"}, {"id": "ref-for-resolve\u2461\u2460"}], "title": "6.4. BluetoothRemoteGATTCharacteristic"}, {"refs": [{"id": "ref-for-resolve\u2461\u2461"}], "title": "6.4.1. BluetoothCharacteristicProperties"}, {"refs": [{"id": "ref-for-resolve\u2461\u2462"}, {"id": "ref-for-resolve\u2461\u2463"}, {"id": "ref-for-resolve\u2461\u2464"}], "title": "6.5. BluetoothRemoteGATTDescriptor"}], "external": true};
