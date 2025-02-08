@@ -30,6 +30,7 @@ Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓     
 └ Manufacturer Data       | 92        | 92      | 92  | 92    | 92      |
 └ Service Data            |           |         |     |       |        |
 └ acceptAllDevices        | ✓         | ✓       | ✓   | ✓     | ✓      |
+└ Exclusion filters       | 114       | 114     | 114  | 114   | 114    |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 permissions.request()     |           |         |     |       |         |
 permissions.query()       |           |         |     |       |         |
@@ -88,6 +89,8 @@ Tip: Chrome channel releases are tracked at [https://googlechromelabs.github.io/
 
 Note: [WebBLE](https://itunes.apple.com/us/app/webble/id1193531073) is an app for iOS that supports the GATT Communication API. It was created initially for the [Puck.js project](https://www.espruino.com/Puck.js+Quick+Start#ios-iphone-ipad-).
 
+[Bluefy](https://apps.apple.com/us/app/bluefy-web-ble-browser/id1492822055) is a free alternative to WebBLE created by [PNNSoft](https://pnnsoft.com/)
+
 # Samsung Internet
 In Samsung Internet v6.4, the GATT Communication API is shipped without any flag.
 
@@ -95,20 +98,29 @@ In Samsung Internet v6.4, the GATT Communication API is shipped without any flag
 - https://samsunginter.net/docs/web-bluetooth
 
 # Opera
-Available behind a flag `opera://flags/#enable-web-bluetooth`.
+Supported but not working on latest versions on desktop:
+- https://forums.opera.com/topic/37464/web-bluetooth
+
+Works on Android since version 46.
+
+# Vivaldi
+Supported but not working on desktop (same issue than Opera's).
+
+Works on Android.
 
 # Servo
 https://szeged.github.io/servo/
 
 # Firefox
+Not supported and no plan to support it in the near future:
 - https://mozilla.github.io/standards-positions/#web-bluetooth
-- https://github.com/mozilla/standards-positions/issues/95#issuecomment-644962468
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
 
 # Microsoft Edge
-https://dev.windows.com/en-us/microsoft-edge/platform/status/webbluetooth
+Supported as of version 79.
 
 # Safari
+Not supported and no plan to support it in the near future:
 - https://webkit.org/tracking-prevention/#anti-fingerprinting
 - https://bugs.webkit.org/show_bug.cgi?id=101034
 
