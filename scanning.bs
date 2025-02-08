@@ -51,13 +51,18 @@ spec: web-bluetooth; urlPrefix: index.html#
         text: BluetoothDevice
 </pre>
 <pre class="link-defaults">
+spec:dom
+    type:dfn
+        for:/
+            text:document
 spec: webidl
     type: dfn
         text: resolve
 spec:web-bluetooth
     type: dfn
         text: read only arraybuffer
-    type:enum-value; for:PermissionName; text:"bluetooth"
+    type: permission
+        text: "bluetooth"
 </pre>
 
 <style>
@@ -159,7 +164,7 @@ spec:web-bluetooth
     If a user has already given a site permission to know their location,
     it might be ok to implicitly grant access to BLE advertisements.
     However, BLE advertisements give away
-    strictly less location information than full [[geolocation-api]] access,
+    strictly less location information than full [[geolocation]] access,
     so UAs should allow users to grant that intermediate level of access.
   </p>
 
@@ -199,7 +204,7 @@ spec:web-bluetooth
 
     partial interface Bluetooth {
       [SecureContext]
-      Promise&lt;BluetoothLEScan> requestLEScan(optional BluetoothLEScanOptions options);
+      Promise&lt;BluetoothLEScan> requestLEScan(optional BluetoothLEScanOptions options = {});
     };
   </pre>
   <div class="note" heading="{{Bluetooth/requestLEScan()}} summary">
@@ -247,6 +252,12 @@ spec:web-bluetooth
     </p>
     <ol class="algorithm">
       <li>
+        If [=this=]'s [=relevant global object=]'s [=associated Document=] is 
+        not [=allowed to use=] the [=policy-controlled feature=] named 
+        <code>"bluetooth"</code>, <a>reject</a> |promise| with a 
+        {{SecurityError}} and abort these steps.
+      </li>
+      <li>
         If <code>|options|.acceptAllAdvertisements</code> is `true`,
         and <code>|options|.filters</code> is present,
         <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
@@ -262,8 +273,9 @@ spec:web-bluetooth
       </li>
       <li>
         Let |filters| be
-        <code>|options|.filters.map(filter=>new
-        {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>.
+        <code>{{Array.prototype.map}}.call(|options|.filters,
+          filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>
+        if <code>|options|.filters</code> is present, or an empty {{FrozenArray}} otherwise.
         If this throws an exception,
         <a>reject</a> |promise| with that exception and abort these steps.
       </li>
@@ -283,7 +295,7 @@ spec:web-bluetooth
         activation</a> on its [=relevant global object=] when triggered.
       </li>
       <li>
-        If the result is {{"denied"}},
+        If the result is "{{PermissionState/denied}}",
         reject |promise| with a {{NotAllowedError}} and abort these steps.
       </li>
       <li>
@@ -344,31 +356,36 @@ spec:web-bluetooth
     <h3 id="scan-control">Controlling a BLE scan</h3>
 
     <pre class="idl">
+      [Exposed=Window, SecureContext]
       interface BluetoothDataFilter {
-        constructor(optional BluetoothDataFilterInit init);
+        constructor(optional BluetoothDataFilterInit init = {});
         readonly attribute ArrayBuffer dataPrefix;
         readonly attribute ArrayBuffer mask;
       };
 
+      [Exposed=Window, SecureContext]
       interface BluetoothManufacturerDataFilter {
         constructor(optional object init);
         readonly maplike&lt;unsigned short, BluetoothDataFilter>;
       };
 
+      [Exposed=Window, SecureContext]
       interface BluetoothServiceDataFilter {
         constructor(optional object init);
         readonly maplike&lt;UUID, BluetoothDataFilter>;
       };
 
+      [Exposed=Window, SecureContext]
       interface BluetoothLEScanFilter {
-        constructor(optional BluetoothLEScanFilterInit init);
+        constructor(optional BluetoothLEScanFilterInit init = {});
         readonly attribute DOMString? name;
         readonly attribute DOMString? namePrefix;
-        readonly attribute FrozenArray&lt;UUID>? services;
+        readonly attribute FrozenArray&lt;UUID> services;
         readonly attribute BluetoothManufacturerDataFilter manufacturerData;
         readonly attribute BluetoothServiceDataFilter serviceData;
       };
 
+      [Exposed=Window, SecureContext]
       interface BluetoothLEScan {
         readonly attribute FrozenArray&lt;BluetoothLEScanFilter> filters;
         readonly attribute boolean keepRepeatedDevices;
@@ -376,7 +393,7 @@ spec:web-bluetooth
 
         readonly attribute boolean active;
 
-        void stop();
+        undefined stop();
       };
     </pre>
 
@@ -412,9 +429,11 @@ spec:web-bluetooth
           <code>new BluetoothServiceDataFilter(|init|.{{BluetoothLEScanFilterInit/serviceData}})</code>.
         </li>
         <li>
-          If <code>|init|.{{BluetoothLEScanFilterInit/services}}</code> is present,
-          initialize <code>this.{{BluetoothLEScanFilter/services}}</code> as
-          <code>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(|init|.{{BluetoothLEScanFilterInit/services}})</code>.
+          Initialize <code>this.{{BluetoothLEScanFilter/services}}</code> as
+          <code>{{Array.prototype.map}}.call(|init|.{{BluetoothLEScanFilterInit/services}},
+            service=>{{BluetoothUUID/getService()|BluetoothUUID.getService}}(service))</code>
+          if <code>|init|.{{BluetoothLEScanFilterInit/services}}</code> is present,
+          or an empty {{FrozenArray}} otherwise.
         </li>
         <li>
           For each other present member in |init|,
@@ -532,8 +551,9 @@ active=] [=document=]. When [=fully active|full activity=] is lost, scanning
 operations for that [=document=] need to be aborted.
 
 <div algorithm="handle full activity loss">
-When the user agent determines that a [=responsible document=] of the [=current
-settings object=] is no longer [=fully active=], it must run these steps:
+When the user agent determines that a <a>associated <code>Document</code></a> of
+the [=current settings object=]'s [=relevant global object=] is no longer
+[=fully active=], it must run these steps:
 
 1. [=map/For each=] |activeScan| in <code>
     navigator.bluetooth.{{[[activeScans]]}}</code>, perform the following
@@ -567,6 +587,7 @@ settings object=] is no longer [=fully active=], it must run these steps:
       <dt><a>permission result type</a></dt>
       <dd>
         <pre class="idl">
+          [Exposed=Window, SecureContext]
           interface BluetoothLEScanPermissionResult : PermissionStatus {
             attribute FrozenArray&lt;BluetoothLEScan> scans;
           };
@@ -585,7 +606,7 @@ settings object=] is no longer [=fully active=], it must run these steps:
             to |descriptor|'s <a>permission state</a>.
           </li>
           <li>
-            If <code>|result|.{{PermissionStatus/state}}</code> is {{"denied"}},
+            If <code>|result|.{{PermissionStatus/state}}</code> is "{{PermissionState/denied}}",
             set <code>|result|.scans</code> to an empty {{FrozenArray}}
             and abort these steps.
           </li>
@@ -619,7 +640,7 @@ settings object=] is no longer [=fully active=], it must run these steps:
                     keepRepeatedDevices: <var>activeScan</var>.keepRepeatedDevices
                   }
                 </pre>
-                is not {{"granted"}},
+                is not "{{PermissionState/granted}}",
                 call <code>|activeScan|.{{stop()}}</code>.
               </li>
             </ol>
@@ -662,7 +683,7 @@ settings object=] is no longer [=fully active=], it must run these steps:
               Note: the user's <a href="#scanning-permission">permission to scan</a>
               likely indicates that
               they intend newly-discovered devices to appear in
-              {{"bluetooth"}}'s <a>extra permission data</a>,
+              <a permission>"bluetooth"</a>'s <a>extra permission data</a>,
               but possibly with {{AllowedBluetoothDevice/mayUseGATT}} set to `false`.
             </li>
             <li>
@@ -805,15 +826,14 @@ settings object=] is no longer [=fully active=], it must run these steps:
     the name MUST resolve to its initial value,
     ignoring any changes that have been made to the name in the current execution environment.
     For example, when the {{Bluetooth/requestLEScan()}} algorithm says to call
-    <code>|options|.filters.map(filter=>new
-    {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>,
-    this MUST apply the
-    {{Array.prototype.map}} algorithm defined in [[ECMAScript]]
-    with <code>|options|.services</code> as its <code>this</code> parameter and
-    the algorithm defined at {{BluetoothLEScanFilter/BluetoothLEScanFilter()}}
-    as its <code>callbackfn</code> parameter,
-    regardless of any modifications that have been made to <code>window</code>,
-    <code>Array</code>, <code>Array.prototype</code>, <code>Array.prototype.map</code>,
+    <code>{{Array.prototype.map}}.call(|options|.filters,
+      filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>,
+    this MUST apply the {{Array.prototype.map}} algorithm defined in [[ECMAScript]]
+    with <code>|options|.filters</code> as its <code>this</code> parameter and
+    <code>filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter)</code>
+    as its <code>callbackfn</code> parameter, regardless of any modifications that have
+    been made to <code>window</code>, <code>Array</code>,
+    <code>Array.prototype</code>, <code>Array.prototype.map</code>,
     <code>Function</code>, <code>Function.prototype</code>,
     <code>BluetoothLEScanFilter</code>, or other objects.
   </p>

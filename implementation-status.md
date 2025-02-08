@@ -27,8 +27,10 @@ Referring Device (Physical Web) |     |         |     |       |         |
 Discovery                 | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Service list            | ✓         | ✓       | ✓   | ✓     | ✓       |
 └ Name or prefix          | ✓         | ✓       | ✓   | ✓     | ✓       |
-└ Manufacturer/Service data |         |         |     |       |         |
+└ Manufacturer Data       | 92        | 92      | 92  | 92    | 92      |
+└ Service Data            |           |         |     |       |        |
 └ acceptAllDevices        | ✓         | ✓       | ✓   | ✓     | ✓      |
+└ Exclusion filters       | 114       | 114     | 114  | 114   | 114    |
 Chooser UI                | ✓         | ✓       | ✓   | ✓     | ✓       |
 permissions.request()     |           |         |     |       |         |
 permissions.query()       |           |         |     |       |         |
@@ -57,6 +59,7 @@ TypeError for bad UUIDs   | ✓         | ✓       | ✓   | ✓     | ✓     
 Invalidate GATT attributes upon disconnect | ✓ | ✓   | ✓   | ✓     | ✓     |
 GATT Blocklist            | ✓         | ✓       | ✓   | ✓     | ✓       |
 Low-latency Blocklist Updates | ✓     | ✓       | ✓   | ✓     | ✓       |
+On-demand device pairing  |           | ✓       | ✓   |        |         |
 
 ## [Scanning API](https://webbluetoothcg.github.io/web-bluetooth/scanning.html)
 
@@ -109,15 +112,16 @@ Works on Android.
 https://szeged.github.io/servo/
 
 # Firefox
-Not supported and no plan tu support it in the near future:
+Not supported and no plan to support it in the near future:
+- https://mozilla.github.io/standards-positions/#web-bluetooth
 - https://bugzilla.mozilla.org/show_bug.cgi?id=1204396
 
 # Microsoft Edge
 Supported as of version 79.
 
 # Safari
-Won't support it in the near future:
-- https://webkit.org/tracking-prevention
+Not supported and no plan to support it in the near future:
+- https://webkit.org/tracking-prevention/#anti-fingerprinting
 - https://bugs.webkit.org/show_bug.cgi?id=101034
 
 # Node.js
