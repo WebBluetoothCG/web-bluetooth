@@ -559,6 +559,9 @@ that UAs will choose not to prompt.
   Bluetooth includes ServiceEventHandlers;
 </xmp>
 
+Methods on this interface typically complete asynchronously, queuing work on
+the <dfn>bluetooth task source</dfn>.
+
 <div class="note" heading="{{Bluetooth}} members">
 Note: {{Bluetooth/getAvailability()}} informs the page whether Bluetooth is
 available at all. An adapter that's disabled through software should count as
@@ -1340,19 +1343,23 @@ A {{BluetoothDataFilterInit}} |filter1| is a
 
 <div algorithm="getDevice invocation">
 To <code><dfn method for="Bluetooth">getDevices()</dfn></code> method, when
-invoked and given a {{BluetoothPermissionStorage}} |storage|, MUST return
-[=a new promise=] |promise| and run the following steps [=in parallel=]:
+invoked and given a {{BluetoothPermissionStorage}} |storage|, MUST run the
+following steps:
 
-1. If [=this=]'s [=relevant global object=]'s [=associated Document=] is not
-    [=allowed to use=] the [=policy-controlled feature=] named
-    "[=policy-controlled feature/bluetooth=]", <a>reject</a> |promise| with a
-    {{SecurityError}} and abort these steps.
-1. Let |devices| be a new empty {{Array}}.
-1. For each |allowedDevice| in
-    <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>, add
-    the {{BluetoothDevice}} object representing |allowedDevice|@{{[[device]]}}
-    to |devices|.
-1. [=Resolve=] |promise| with |devices|.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. If |global|'s [=associated Document=] is not [=allowed to use=] the
+    [=policy-controlled feature=] named
+    "[=policy-controlled feature/bluetooth=]", return [=a promise rejected
+    with=] a {{SecurityError}}.
+1. Let |promise| be [=a new promise=].
+1. Run the following steps [=in parallel=]:
+    1. Let |devices| be a new empty {{Array}}.
+    1. For each |allowedDevice| in
+        <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>,
+        add the {{BluetoothDevice}} object representing
+        |allowedDevice|@{{[[device]]}} to |devices|.
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to [=resolve=] |promise| with |devices|.
 
     <div class="note unstable">
       Note: The {{BluetoothDevice}}s in |devices| may not be in range of the
@@ -1364,42 +1371,47 @@ invoked and given a {{BluetoothPermissionStorage}} |storage|, MUST return
       calling
       <code>|event|.device.gatt.{{BluetoothRemoteGATTServer/connect()}}</code>.
     </div>
+1. Return |promise|.
 
 </div>
 
 <div algorithm="requestDevice invocation">
 The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)
-</dfn></code> method, when invoked, MUST return <a>a new promise</a> |promise|
-and run the following steps <a>in parallel</a>:
+</dfn></code> method, when invoked, MUST run the following steps:
 
 1. If <code>|options|.{{RequestDeviceOptions/exclusionFilters}}</code> is
     present and <code>|options|.{{RequestDeviceOptions/filters}}</code> is not present,
-    <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+    return [=a promise rejected with=] a {{TypeError}}.
 1. If <code>|options|.{{RequestDeviceOptions/filters}}</code> is present and
     <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `true`,
     or if <code>|options|.{{RequestDeviceOptions/filters}}</code> is not present
     and <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is
-    `false`, <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+    `false`, return [=a promise rejected with=] a {{TypeError}}.
 
     <div class="note">
       Note: This enforces that exactly one of {{RequestDeviceOptions/filters}}
       or <code>{{RequestDeviceOptions/acceptAllDevices}}:true</code> is present.
     </div>
-1. <a>Request Bluetooth devices</a>, passing
-    <code>|options|.{{RequestDeviceOptions/filters}}</code> if
-    <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is `false`
-    or `null` otherwise, passing
-    <code>|options|.{{RequestDeviceOptions/exclusionFilters}}</code> if it
-    exists or `null` otherwise, passing
-    <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>, and
-    passing
-    <code>|options|.{{RequestDeviceOptions/optionalManufacturerData}}</code>,
-    and let |devices| be the result.
-1. If the previous step threw an exception, <a>reject</a> |promise| with that
-    exception and abort these steps.
-1. If |devices| is an empty sequence, <a>reject</a> |promise| with a
-    {{NotFoundError}} and abort these steps.
-1. <a>Resolve</a> |promise| with <code>|devices|[0]</code>.
+1. Let |promise| be [=a new promise=].
+1. Run the following steps [=in parallel=]:
+    1. <a>Request Bluetooth devices</a>, passing
+        <code>|options|.{{RequestDeviceOptions/filters}}</code> if
+        <code>|options|.{{RequestDeviceOptions/acceptAllDevices}}</code> is
+        `false` or `null` otherwise, passing
+        <code>|options|.{{RequestDeviceOptions/exclusionFilters}}</code> if it
+        exists or `null` otherwise, passing
+        <code>|options|.{{RequestDeviceOptions/optionalServices}}</code>, and
+        passing
+        <code>|options|.{{RequestDeviceOptions/optionalManufacturerData}}</code>,
+        and let |devices| be the result.
+    1. [=Queue a global task=] on [=this=]'s [=relevant global object=] using
+        the [=bluetooth task source=] to run the following steps:
+        1. If the previous step threw an exception, [=reject=] |promise| with that
+            exception and abort these steps.
+        1. If |devices| is an empty sequence, [=reject=] |promise| with a
+            {{NotFoundError}} and abort these steps.
+        1. [=Resolve=] |promise| with <code>|devices|[0]</code>.
+1. Return |promise|.
 
 </div>
 
@@ -2688,7 +2700,7 @@ the UA MUST perform the following steps:
 
 1. <a>Fire an event</a> named "{{advertisementreceived}}" using
     {{BluetoothAdvertisingEvent}} initialized with
-    <var>event</var>)</code>, with its {{Event/isTrusted}} attribute initialized
+    <var>event</var>, with its {{Event/isTrusted}} attribute initialized
     to `true`, at <var>deviceObj</var>.
 
 </div>
@@ -2757,8 +2769,6 @@ constructor MUST perform the following steps:
           service's data, converted to {{DataView}}s.
         </p>
       </section>
-    </section>
-  </section>
 </div>
 
 # GATT Interaction # {#gatt-interaction}
@@ -2875,37 +2885,36 @@ parallel</a>.
 
 <div algorithm="query Bluetooth cache">
 To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
-<var>deviceObj</var> for entries matching some description, the UA MUST return a
-<code><var>deviceObj</var>.gatt</code>-<a>connection-checking wrapper</a> around
-<a>a new promise</a> <var>promise</var> and run the following steps <a>in
-parallel</a>:
+|deviceObj| for entries matching some description, the UA MUST return a
+|deviceObj|.{{BluetoothDevice/gatt}}-[=connection-checking wrapper=] around
+[=a new promise=] |promise| and run the following steps [=in parallel=]:
 
-1. <a>Populate the Bluetooth cache</a> with entries matching the description.
-1. If the previous step returns an error, <a>reject</a> <var>promise</var> with
-    that error and abort these steps.
-1. Let <var>entries</var> be the sequence of known-present cache entries
-    matching the description.
-1. Let <var>context</var> be
-    <code><var>deviceObj</var>.{{BluetoothDevice/[[context]]}}</code>.
-1. Let <var>result</var> be a new sequence.
-1. For each <var>entry</var> in <var>entries</var>:
-    1. If <var>entry</var> has no associated
+1. Let |global| be |deviceObj|'s [=relevant global object=].
+1. [=Populate the Bluetooth cache=] with entries matching the description.
+1. If the previous step returns an error, [=queue a global task=] on |global|
+    using the [=bluetooth task source=] to [=reject=] |promise| with that error
+    and abort these steps.
+1. Let |entries| be the sequence of known-present cache entries matching the
+    description.
+1. Let |context| be |deviceObj|.{{BluetoothDevice/[[context]]}}.
+1. Let |result| be a new sequence.
+1. For each |entry| in |entries|:
+    1. If |entry| has no associated
         <code>Promise&lt;BluetoothGATT*></code> instance in
-        <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}, <a>create a
-        <code>BluetoothRemoteGATTService</code> representing</a>
-        <var>entry</var>, <a>create a
-        <code>BluetoothRemoteGATTCharacteristic</code> representing</a>
-        <var>entry</var>, or <a>create a
-        <code>BluetoothRemoteGATTDescriptor</code> representing</a>
-        <var>entry</var>, depending on whether <var>entry</var> is a Service,
-        Characteristic, or Descriptor, and add a mapping from <var>entry</var>
-        to the resulting <code>Promise</code> in
-        <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
-    1. Append to <var>result</var> the <code>Promise&lt;BluetoothGATT*></code>
-        instance associated with <var>entry</var> in
-        <var>context</var>.{{Bluetooth/[[attributeInstanceMap]]}}.
-1. <a>Resolve</a> <var>promise</var> with the result of <a>waiting for all</a>
-    elements of <var>result</var>.
+        |context|.{{Bluetooth/[[attributeInstanceMap]]}}, <a>create a
+        <code>BluetoothRemoteGATTService</code> representing</a> |entry|,
+        <a>create a <code>BluetoothRemoteGATTCharacteristic</code>
+        representing</a> |entry|, or <a>create a
+        <code>BluetoothRemoteGATTDescriptor</code> representing</a> |entry|,
+        depending on whether |entry| is a Service, Characteristic, or
+        Descriptor, and add a mapping from |entry| to the resulting {{Promise}}
+        in |context|.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Append to |result| the <code>Promise&lt;BluetoothGATT*></code>
+        instance associated with |entry| in
+        |context|.{{Bluetooth/[[attributeInstanceMap]]}}.
+1. [=Queue a global task=] on |global| using the [=bluetooth task source=] to
+    [=resolve=] |promise| with the result of [=waiting for all=] elements of
+    |result|.
 
 </div>
 
@@ -2978,7 +2987,7 @@ the UA MUST perform the following steps:
     Let <var>promise</var> be the result.
 1. <a>Upon fulfillment</a> of <var>promise</var> with |result|, run the
     following steps:
-    * If |result| is empty, throw a {{NotFoundError}},</li>
+    * If |result| is empty, throw a {{NotFoundError}}.
     * Otherwise, if the <var>single</var> flag is set, returns the first (only)
         element of |result|.
     * Otherwise, return |result|.
@@ -3083,26 +3092,26 @@ slots</a> described in the following table:
 The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code>
 method, when invoked, MUST perform the following steps:
 
-1. Let |promise| be <a>a new promise</a>.
-1. If <code>this.device.{{[[representedDevice]]}}</code> is `null`, <a>queue a
-    task</a> to <a>reject</a> |promise| with a {{NetworkError}}, return
-    |promise|, and abort these steps.
-1. If the UA is currently using the Bluetooth system, it MAY <a>queue a task</a>
-    to <a>reject</a> |promise| with a {{NetworkError}}, return |promise|, and
-    abort these steps.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
+    is `null`, return [=a promise rejected with=] a "{{NetworkError}}"
+    {{DOMException}}.
+1. If the UA is currently using the Bluetooth system, it MAY return [=a promise
+    rejected with=] a "{{NetworkError}}" {{DOMException}}.
 
     Issue(188): Implementations may be able to avoid this {{NetworkError}},
     but for now sites need to serialize their use of this API
     and/or give the user a way to retry failed operations.
-1. Add |promise| to <code>this.{{[[activeAlgorithms]]}}</code>.
-1. Return |promise| and run the following steps <a>in parallel</a>:
-    1. If <code>this.device.{{[[representedDevice]]}}</code> has no <a>ATT
-        Bearer</a>, do the following sub-steps:
+1. Let |promise| be [=a new promise=].
+1. Add |promise| to [=this=].{{[[activeAlgorithms]]}}.
+1. Run the following steps [=in parallel=]:
+    1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
+        has no [=ATT Bearer=], do the following sub-steps:
         1. <p id="create-an-att-bearer">Attempt to create an <a>ATT Bearer</a>
             using the procedures described in "Connection Establishment" under
             <a>GAP Interoperability Requirements</a>. Abort this attempt if
             |promise| is removed from
-            <code>this.{{[[activeAlgorithms]]}}</code>.</p>
+            [=this=].{{[[activeAlgorithms]]}}.</p>
 
             <div class="note">
               Note: These procedures can wait forever
@@ -3111,14 +3120,18 @@ method, when invoked, MUST perform the following steps:
               if it no longer wants to connect.
             </div>
         1. If this attempt was aborted because |promise| was removed from
-            <code>this.{{[[activeAlgorithms]]}}</code>, <a>reject</a>
-            <var>promise</var> with an {{AbortError}} and abort these steps.
-        1. If this attempt failed for another reason, <a>reject</a>
-            <var>promise</var> with a {{NetworkError}} and abort these steps.
-        1. Use the <a>Exchange MTU</a> procedure to negotiate the largest
+            [=this=].{{[[activeAlgorithms]]}}, [=queue a global task=] on
+            |global| using the [=bluetooth task source=] to [=reject=]
+            |promise| with an "{{AbortError}}" {{DOMException}} and abort these
+            steps.
+        1. If this attempt failed for another reason, [=queue a global task=]
+            on |global| using the [=bluetooth task source=] to [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
+            these steps.
+        1. Use the [=Exchange MTU=] procedure to negotiate the largest
             supported MTU. Ignore any errors from this step.
         1. The UA MAY attempt to bond with the remote device using the <a>BR/EDR
-            Bonding Procedure</a> or the <a>LE Bonding Procedure</a>.
+            Bonding Procedure</a> or the [=LE Bonding Procedure=].
 
             Note: We would normally prefer to give the website control over
             whether and when bonding happens, but the [Core
@@ -3129,18 +3142,22 @@ method, when invoked, MUST perform the following steps:
             platforms where that's possible. This may cause a user-visible
             pairing dialog to appear when a connection is created, instead of
             when a restricted characteristic is accessed.
-    1. <a>Queue a task</a> to perform the following sub-steps:
-        1. If |promise| is not in <code>this.{{[[activeAlgorithms]]}}</code>,
-            <a>reject</a> <var>promise</var> with an {{AbortError}},
-            <a>garbage-collect the connection</a> of
-            <code>this.{{[[representedDevice]]}}</code>, and abort these steps.
-        1. Remove |promise| from <code>this.{{[[activeAlgorithms]]}}</code>.
-        1. If <code>this.device.{{[[representedDevice]]}}</code> is `null`,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}},
-            <a>garbage-collect the connection</a> of
-            <code>this.{{[[representedDevice]]}}</code>, and abort these steps.
-        1. Set `this.connected` to `true`.
-        1. <a>Resolve</a> <var>promise</var> with <code>this</code>.
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to perform the following sub-steps:
+        1. If |promise| is not in [=this=].{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with an "{{AbortError}}" {{DOMException}},
+            [=garbage-collect the connection=] of
+            [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}},
+            and abort these steps.
+        1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.
+        1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
+            is `null`, [=reject=] |promise| with a "{{NetworkError}}"
+            {{DOMException}}, [=garbage-collect the connection=] of
+            [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}},
+            and abort these steps.
+        1. Set [=this=].{{BluetoothRemoteGATTServer/connected}} to `true`.
+        1. [=Resolve=] |promise| with [=this=].
+1. Return |promise|.
 
 </div>
 
@@ -3311,22 +3328,28 @@ slots</a> described in the following table:
 
 <div algorithm="BluetoothRemoteGATTService construction">
 To <dfn>create a <code>BluetoothRemoteGATTService</code> representing</dfn> a
-Service <var>service</var>, the UA must return <a>a new promise</a>
-<var>promise</var> and run the following steps <a>in parallel</a>.
+Service <var>service</var>, the UA must run the following steps:
 
-1. Let <var>result</var> be a new instance of {{BluetoothRemoteGATTService}}
-    with its {{[[representedService]]}} slot initialized to |service|.
-1. <a>Get the <code>BluetoothDevice</code> representing</a> the device in which
-    <var>service</var> appears, and let <var>device</var> be the result.
-1. If the previous step threw an error, <a>reject</a> <var>promise</var> with
-    that error and abort these steps.
-1. Initialize <code><var>result</var>.device</code> from <var>device</var>.
-1. Initialize <code><var>result</var>.uuid</code> from the UUID of
-    <var>service</var>.
-1. If <var>service</var> is a Primary Service, initialize
-    <code><var>result</var>.isPrimary</code> to true. Otherwise initialize
-    <code><var>result</var>.isPrimary</code> to false.
-1. <a>Resolve</a> <var>promise</var> with <var>result</var>.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |promise| be [=a new promise=].
+1. Run the following steps <a>in parallel</a>:
+    1. Let |result| be a new instance of {{BluetoothRemoteGATTService}}
+        with its {{[[representedService]]}} slot initialized to |service|.
+    1. <a>Get the <code>BluetoothDevice</code> representing</a> the device in
+        which |service| appears, and let |device| be the result.
+    1. If the previous step threw an error, [=queue a global task=] on |global|
+        using the [=bluetooth task source=] to [=reject=] |promise| with
+        that error and abort these steps.
+    1. Initialize |result|.{{BluetoothRemoteGATTService/device}} from |device|.
+    1. Initialize |result|.{{BluetoothRemoteGATTService/uuid}} from the UUID of
+        |service|.
+    1. If |service| is a Primary Service, initialize
+        |result|.{{BluetoothRemoteGATTService/isPrimary}} to `true`. Otherwise,
+        initialize |result|.{{BluetoothRemoteGATTService/isPrimary}} to
+        `false`.
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to [=resolve=] |promise| with |result|.
+1. Return |promise|.
 
 </div>
 
@@ -3447,31 +3470,35 @@ Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
 
 <div algorithm="BluetoothRemoteGATTCharacteristic constructor">
 To <dfn>create a <code>BluetoothRemoteGATTCharacteristic</code>
-representing</dfn> a Characteristic <var>characteristic</var>, the UA must
-return <a>a new promise</a> <var>promise</var> and run the following steps <a>in
-parallel</a>.
+representing</dfn> a Characteristic |characteristic|, the UA must
+run the following steps:
 
-1. Let <var>result</var> be a new instance of
-    {{BluetoothRemoteGATTCharacteristic}} with its
-    {{[[representedCharacteristic]]}} slot initialized to |characteristic|.
-1. Initialize <code><var>result</var>.service</code> from the
-    {{BluetoothRemoteGATTService}} instance representing the Service in which
-    <var>characteristic</var> appears.
-1. Initialize <code><var>result</var>.uuid</code> from the UUID of
-    <var>characteristic</var>.
-1. <a>Create a <code>BluetoothCharacteristicProperties</code> instance from the
-    Characteristic</a> <var>characteristic</var>, and let
-    <var>propertiesPromise</var> be the result.
-1. Wait for <var>propertiesPromise</var> to settle.
-1. If <var>propertiesPromise</var> was rejected, <a>resolve</a>
-    <var>promise</var> with <var>propertiesPromise</var> and abort these steps.
-1. Initialize <code><var>result</var>.properties</code> from the value
-    <var>propertiesPromise</var> was fulfilled with.
-1. Initialize <code><var>result</var>.value</code> to <code>null</code>. The UA
-    MAY initialize <code><var>result</var>.value</code> to a new {{DataView}}
-    wrapping a new {{ArrayBuffer}} containing the most recently read value from
-    <var>characteristic</var> if this value is available.
-1. <a>Resolve</a> <var>promise</var> with <var>result</var>.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |promise| be [=a new promise=].
+1. Run the following steps [=in parallel=]:
+    1. Let |result| be a new instance of
+        {{BluetoothRemoteGATTCharacteristic}} with its
+        {{[[representedCharacteristic]]}} slot initialized to |characteristic|.
+    1. Initialize |result|.{{BluetoothRemoteGATTCharacteristic/service}}< from the
+        {{BluetoothRemoteGATTService}} instance representing the Service in which
+        |characteristic| appears.
+    1. Initialize |result|.{{BluetoothRemoteGATTCharacteristic/uuid}} from the UUID of
+        |characteristic|.
+    1. <a>Create a <code>BluetoothCharacteristicProperties</code> instance from the
+        Characteristic</a> |characteristic|, and let |properties| be the result.
+    1. If the previous step returned an error, [=queue a global task=] on |global|
+        using the [=bluetooth task source=] to [=reject=] |promise| with
+        that error and abort these steps.
+    1. Initialize |result|.{{BluetoothRemoteGATTCharacteristic/properties}} to
+        |properties|.
+    1. Initialize |result|.{{BluetoothRemoteGATTCharacteristic/value}} to
+        <code>null</code>. The UA MAY initialize
+        |result|.{{BluetoothRemoteGATTCharacteristic/value}} to a [=new=]
+        {{DataView}} wrapping a [=new=] {{ArrayBuffer}} containing the most
+        recently read value from |characteristic| if this value is available.
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to [=resolve=] |promise| with |result|.
+1. Return |promise|.
 
 </div>
 
@@ -3505,43 +3532,49 @@ getDescriptors(<var>descriptor</var>)</dfn></code> method retrieves a list of
 The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
 </code> method, when invoked, MUST run the following steps:
 
-1. If <code>this.uuid</code> is <a>blocklisted for reads</a>, return <a>a promise
-    rejected with</a> a {{SecurityError}} and abort these steps.
-1. If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}
-    </code> is `false`, return <a>a promise rejected with</a> a {{NetworkError}}
-    and abort these steps.
-1. Let |characteristic| be <code>this.{{[[representedCharacteristic]]}}</code>.
-1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
-    {{InvalidStateError}} and abort these steps.
-1. Return a <code>this.service.device.gatt</code>-<a>connection-checking
-    wrapper</a> around <a>a new promise</a> <var>promise</var> and run the
-    following steps <a>in parallel</a>:
-    1. If the <code>Read</code> bit is not set in <var>characteristic</var>'s
-        <a lt="Characteristic Properties">properties</a>, <a>reject</a>
-        <var>promise</var> with a {{NotSupportedError}} and abort these steps.
-    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
-        |promise| with a {{NetworkError}} and abort these steps.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |gatt| be [=this=].{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
+1. If [=this=].{{BluetoothRemoteGATTCharacteristic/uuid}} is [=blocklisted
+    for reads=], return [=a promise rejected with=] a "{{SecurityError}}"
+    {{DOMException}} and abort these steps.
+1. If |gatt|.{{BluetoothRemoteGATTServer/connected}}
+    is `false`, return [=a promise rejected with=] a "{{NetworkError}}"
+    {{DOMException}} and abort these steps.
+1. Let |characteristic| be [=this=].{{[[representedCharacteristic]]}}.
+1. If |characteristic| is `null`, return [=a promise rejected with=] an
+    "{{InvalidStateError}}" {{DOMException}} and abort these steps.
+1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
+    |promise| and run the following steps [=in parallel=]:
+    1. If the <code>Read</code> bit is not set in |characteristic|'s
+        <a lt="Characteristic Properties">properties</a>, [=queue a global
+        task=] on |global| using the [=bluetooth task source=] to [=reject=]
+        |promise| with a "{{NotSupportedError}}" {{DOMException}} and abort
+        these steps.
+    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+        global task=] on |global| using the [=bluetooth task source=] to
+        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+        abort these steps.
 
         Issue(188): Implementations may be able to avoid this {{NetworkError}},
         but for now sites need to serialize their use of this API and/or give
         the user a way to retry failed operations.
-    1. Use any combination of the sub-procedures in the <a>Characteristic Value
-        Read</a> procedure to retrieve the value of <var>characteristic</var>.
+    1. Use any combination of the sub-procedures in the [=Characteristic Value
+        Read=] procedure to retrieve the value of |characteristic|.
         Handle errors as described in <a href="#error-handling"></a>.
-    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
-        with that error and abort these steps.
-    1. <a>Queue a task</a> to perform the following steps:
-        1. If <var>promise</var> is not in <code>
-            this.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to perform the following steps:
+        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
             these steps.
-        1. Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved
-            value, and assign <code>new DataView(<var>buffer</var>)</code> to
-            <code>this.value</code>.
-        1. <a>Fire an event</a> named {{characteristicvaluechanged}} with its
-            <code>bubbles</code> attribute initialized to <code>true</code> at
-            <code>this</code>.
-        1. <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+        1. If the sub-procedures above returned an error, [=reject=] |promise|
+            with that error and abort these steps.
+        1. Let |buffer| be a [=new=] {{ArrayBuffer}} holding the retrieved
+            value, and assign a [=new=] {{DataView}} created with |buffer| to
+            [=this=].{{BluetoothRemoteGATTCharacteristic/value}}.
+        1. [=Fire an event=] named "{{characteristicvaluechanged}}" with its
+            {{Event/bubbles}} attribute initialized to `true` at [=this=].
+        1. [=Resolve=] |promise| with
+            [=this=].{{BluetoothRemoteGATTCharacteristic/value}}.
 
 </div>
 
@@ -3553,59 +3586,62 @@ To <dfn>WriteCharacteristicValue</dfn>(<span class="argument-list">
 </span><br>
 the UA MUST perform the following steps:
 
-1. If <code>|this|.uuid</code> is <a>blocklisted for writes</a>, return
-    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-1. Let <var>bytes</var> be <a>a copy of the bytes held</a> by
-    <code><var>value</var></code>.
-1. If <var>bytes</var> is more than 512 bytes long (the maximum length of an
-    attribute value, per <a>Long Attribute Values</a>) return <a>a promise
-    rejected with</a> an {{InvalidModificationError}} and abort these steps.
-1. If <code>|this|.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}
-    </code> is `false`, return <a>a promise rejected with</a> a {{NetworkError}}
-    and abort these steps.
-1. Let |characteristic| be
-    <code>|this|.{{[[representedCharacteristic]]}}</code>.
-1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
-    {{InvalidStateError}} and abort these steps.
-1. Return a <code>|this|.service.device.gatt</code>-
-    <a>connection-checking wrapper</a> around <a>a new promise</a>
-    <var>promise</var> and run the following steps in parallel.
+1. Let |global| be |this|'s [=relevant global object=].
+1. Let |gatt| be |this|.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
+1. If |this|.{{BluetoothRemoteGATTCharacteristic/uuid}} is [=blocklisted for
+    writes=], return [=a promise rejected with=] a "{{SecurityError}}"
+    {{DOMException}} and abort these steps.
+1. Let |bytes| be [=a copy of the bytes held=] by |value|.
+1. If |bytes| is more than 512 bytes long (the maximum length of an attribute
+    value, per [=Long Attribute Values=]) return [=a promise rejected with=]
+    an "{{InvalidModificationError}}" {{DOMException}} and abort these steps.
+1. If |gatt|.{{BluetoothRemoteGATTServer/connected}} is `false`, return [=a
+    promise rejected with=] a "{{NetworkError}}" {{DOMException}} and abort
+    these steps.
+1. Let |characteristic| be |this|.{{[[representedCharacteristic]]}}.
+1. If |characteristic| is `null`, return [=a promise rejected with=] an
+    "{{InvalidStateError}}" {{DOMException}} and abort these steps.
+1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
+    |promise| and run the following steps [=in parallel=].
     1. Assert: |response| is one of "required", "never", or "optional".
-    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
-        |promise| with a {{NetworkError}} and abort these steps.
+    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+        global task=] on |global| using the [=bluetooth task source=] to
+        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+        abort these steps.
 
         Issue(188): Implementations may be able to avoid this {{NetworkError}},
         but for now sites need to serialize their use of this API
         and/or give the user a way to retry failed operations.
-    1. Write <var>bytes</var> to <var>characteristic</var> by performing the
+    1. Write |bytes| to |characteristic| by performing the
         following steps:
 
         <dl class="switch">
           <dt>If |response| is "required"</dt>
           <dd>
-            Use the <a>Write Characteristic Value</a> procedure.
+            Use the [=Write Characteristic Value=] procedure.
           </dd>
           <dt>If |response| is "never"</dt>
           <dd>
-            Use the <a>Write Without Response</a> procedure.
+            Use the [=Write Without Response=] procedure.
           </dd>
           <dt>Otherwise</dt>
           <dd>
-            Use any combination of the sub-procedures in
-            the <a>Characteristic Value Write</a> procedure.
+            Use any combination of the sub-procedures in the [=Characteristic
+            Value Write=] procedure.
           </dd>
         </dl>
         Handle errors as described in <a href="#error-handling"></a>.
-    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
-        with that error and abort these steps.
-    1. <a>Queue a task</a> to perform the following steps:
-        1. If <var>promise</var> is not in
-            <code>|this|.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+    1. <a>Queue a global task</a> using |global| on the [=bluetooth task
+        source=] to perform the following steps:
+        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
             these steps.
-        1. Set <code>|this|.value</code> to a new {{DataView}} wrapping a new
-            {{ArrayBuffer}} containing <var>bytes</var>.
-        1. <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+        1. If the procedure above returned an error, [=reject=] |promise|
+            with that error and abort these steps.
+        1. Set |this|.{{BluetoothRemoteGATTCharacteristic/value}} to a
+            [=new=] {{DataView}} wrapping a [=new=] {{ArrayBuffer}} containing
+            |bytes|.
+        1. [=Resolve=] |promise| with <code>undefined</code>.
 
 </div>
 
@@ -3664,53 +3700,67 @@ unavoidable risk that some notifications will be missed in the gap before
 
 <div algorithm="BluetoothRemoteGATTCharacteristic startNotifications">
 The <code><dfn method for="BluetoothRemoteGATTCharacteristic">
-startNotifications()</dfn></code> method, when invoked, MUST return <a>a new
-promise</a> <var>promise</var> and run the following steps <a>in parallel</a>.
-See <a href="#notification-events"></a> for details of receiving notifications.
+startNotifications()</dfn></code> method, when invoked, MUST run the following
+steps. See <a href="#notification-events"></a> for details of receiving
+notifications.
 
-1. If <code>this.uuid</code> is <a>blocklisted for reads</a>, <a>reject</a>
-    <var>promise</var> with a {{SecurityError}} and abort these steps.
-1. If <code>this.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}
-    </code> is `false`, <a>reject</a> <var>promise</var> with a {{NetworkError}}
-    and abort these steps.
-1. Let |characteristic| be <code>this.{{[[representedCharacteristic]]}}</code>.
-1. If |characteristic| is `null`, return <a>a promise rejected with</a> an
-    {{InvalidStateError}} and abort these steps.
-1. If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
-    in <var>characteristic</var>'s <a lt="Characteristic
-    Properties">properties</a>, <a>reject</a> <var>promise</var> with a
-    {{NotSupportedError}} and abort these steps.
-1. If <var>characteristic</var>'s <a>active notification context set</a>
-    contains {{Navigator/bluetooth|navigator.bluetooth}}, <a>resolve</a>
-    <var>promise</var> with `this` and abort these steps.
-1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
-    |promise| with a {{NetworkError}} and abort these steps.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |gatt| be [=this=].{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
+1. If [=this=].{{BluetoothRemoteGATTCharacteristic/uuid}} is [=blocklisted for
+    reads=], return [=a promise rejected with=] a "{{SecurityError}}"
+    {{DOMException}}.
+1. If |gatt|.{{BluetoothRemoteGATTServer/connected}} is `false`, return [=a
+    promise rejected with=] with a "{{NetworkError}}" {{DOMException}}.
+1. Let |characteristic| be [=this=].{{[[representedCharacteristic]]}}.
+1. If |characteristic| is `null`, return [=a promise rejected with=] an
+    "{{InvalidStateError}}" {{DOMException}}.
+1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
+    |promise| and run the following steps [=in parallel=].
+    1. If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
+        in |characteristic|'s <a lt="Characteristic Properties">properties</a>,
+        [=queue a global task=] on |global| using the [=bluetooth task source=]
+        to [=reject=] |promise| with a {{NotSupportedError}} and abort these
+        steps.
+    1. If |characteristic|'s [=active notification context set=] contains
+        {{Navigator/bluetooth|navigator.bluetooth}}, [=queue a global task=]
+        using the [=bluetooth task source=] to [=resolve=] |promise| with
+        [=this=] and abort these steps.
+    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+        global task=] using the [=bluetooth task source=] to [=reject=]
+        |promise| with a "{{NetworkError}}" {{DOMException}} and abort these
+        steps.
 
-    Issue(188): Implementations may be able to avoid this {{NetworkError}}, but
-    for now sites need to serialize their use of this API and/or give the user a
-    way to retry failed operations.
-1. If the characteristic has a <a>Client Characteristic Configuration</a>
-    descriptor, use any of the <a>Characteristic Descriptors</a> procedures to
-    ensure that one of the <code>Notification</code> or <code>Indication</code>
-    bits in <var>characteristic</var>'s <a>Client Characteristic
-    Configuration</a> descriptor is set, matching the constraints in
-    <var>characteristic</var>'s <a lt="Characteristic
-    Properties">properties</a>. The UA SHOULD avoid setting both bits, and MUST
-    deduplicate <a href="#notification-events">value-change events</a> if both
-    bits are set. Handle errors as described in <a href="#error-handling"></a>.
+        Issue(188): Implementations may be able to avoid this {{NetworkError}}, but
+        for now sites need to serialize their use of this API and/or give the user a
+        way to retry failed operations.
+    1. If the characteristic has a [=Client Characteristic Configuration=]
+        descriptor, use any of the [=Characteristic Descriptors=] procedures to
+        ensure that one of the <code>Notification</code> or <code>Indication</code>
+        bits in |characteristic|'s [=Client Characteristic Configuration=]
+        descriptor is set, matching the constraints in |characteristic|'s
+        <a lt="Characteristic Properties">properties</a>. The UA SHOULD avoid
+        setting both bits, and MUST deduplicate
+        <a href="#notification-events">value-change events</a> if both bits are
+        set. Handle errors as described in <a href="#error-handling"></a>.
 
-    <div class="note">
-      Note: Some devices have characteristics whose properties include the
-      Notify or Indicate bit but that don't have a <a>Client Characteristic
-      Configuration</a> descriptor. These non-standard-compliant characteristics
-      tend to send notifications or indications unconditionally, so this
-      specification allows applications to simply subscribe to their messages.
-    </div>
-1. If the previous step returned an error, <a>reject</a> <var>promise</var> with
-    that error and abort these steps.
-1. Add {{Navigator/bluetooth|navigator.bluetooth}} to
-    <var>characteristic</var>'s <a>active notification context set</a>.
-1. <a>Resolve</a> <var>promise</var> with `this`.
+        <div class="note">
+          Note: Some devices have characteristics whose properties include the
+          Notify or Indicate bit but that don't have a <a>Client Characteristic
+          Configuration</a> descriptor. These non-standard-compliant characteristics
+          tend to send notifications or indications unconditionally, so this
+          specification allows applications to simply subscribe to their messages.
+        </div>
+    1. If the procedures were successful,
+        {{Navigator/bluetooth|navigator.bluetooth}} to
+        |characteristic|'s [=active notification context set=].
+    1. [=Queue a global task=] using |global| on the [=bluetooth task source=]
+        to perform the following steps:
+        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
+            these steps.
+        1. If the procedures above returned an error, <a>reject</a> <var>promise</var> with
+            that error and abort these steps.
+        1. [=Resolve=] |promise| with [=this=].
 
 <div class="note">
 Note: After notifications are enabled, the resulting <a
@@ -3736,7 +3786,7 @@ promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
     Configuration</a> descriptor, the UA SHOULD use any of the <a>Characteristic
     Descriptors</a> procedures to clear the <code>Notification</code> and
     <code>Indication</code> bits in <var>characteristic</var>'s <a>Client
-    Characteristic Configuration</a> descriptor. </li>
+    Characteristic Configuration</a> descriptor.
 1. <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
 
 <div class="note">
@@ -3769,15 +3819,14 @@ interface BluetoothCharacteristicProperties {
 
 <div algorithm="BluetoothCharacteristicProperties constructor">
 To <dfn>create a <code>BluetoothCharacteristicProperties</code> instance from
-the Characteristic</dfn> <var>characteristic</var>, the UA MUST return <a>a new
-promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
+the Characteristic</dfn> |characteristic|, the UA MUST run the
+following steps:
 
-1. Let <var>propertiesObj</var> be a new instance of
+1. Let |propertiesObj| be a new instance of
     {{BluetoothCharacteristicProperties}}.
-1. Let <var>properties</var> be the <a>characteristic properties</a> of
-    <var>characteristic</var>.
-1. Initialize the attributes of <var>propertiesObj</var> from the corresponding
-    bits in <var>properties</var>:
+1. Let |properties| be the [=characteristic properties=] of |characteristic|.
+1. Initialize the attributes of |propertiesObj| from the corresponding
+    bits in |properties|:
     <table>
       <tr>
         <th>Attribute</th>
@@ -3812,26 +3861,25 @@ promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
         <td>Authenticated Signed Writes</td>
       </tr>
     </table>
-1. If the Extended Properties bit of the <a>characteristic properties</a> is not
-    set, initialize <code><var>propertiesObj</var>.reliableWrite</code> and
-    <code><var>propertiesObj</var>.writableAuxiliaries</code> to
+1. If the Extended Properties bit of the [=characteristic properties=] is not
+    set, initialize |propertiesObj|.{{BluetoothCharacteristicProperties/reliableWrite}} and
+    |propertiesObj|.{{BluetoothCharacteristicProperties/writableAuxiliaries}} to
     <code>false</code>. Otherwise, run the following steps:
     1. <a lt="Characteristic Descriptor Discovery">Discover</a> the
-        <a>Characteristic Extended Properties</a> descriptor for
-        <var>characteristic</var> and <a lt="Read Characteristic
-        Descriptors">read its value</a> into <var>extendedProperties</var>.
+        [=Characteristic Extended Properties=] descriptor for
+        |characteristic| and <a lt="Read Characteristic Descriptors">read its
+        value</a> into |extendedProperties|.
         Handle errors as described in <a href="#error-handling"></a>.
 
-        Issue: <a>Characteristic Extended Properties</a> isn't clear whether
+        Issue: [=Characteristic Extended Properties=] isn't clear whether
         the extended properties are immutable for a given Characteristic.
         If they are, the UA should be allowed to cache them.
-    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
-        with that error and abort these steps.
-    1. Initialize <code><var>propertiesObj</var>.reliableWrite</code> from the
-        Reliable Write bit of <var>extendedProperties</var>.
-    1. Initialize <code><var>propertiesObj</var>.writableAuxiliaries</code> from
-        the Writable Auxiliaries bit of <var>extendedProperties</var>.
-1. <a>Resolve</a> <var>promise</var> with <var>propertiesObj</var>.
+    1. If the previous step returned an error, return that error.
+    1. Initialize |propertiesObj|.{{BluetoothCharacteristicProperties/reliableWrite}}
+        from the Reliable Write bit of |extendedProperties|.
+    1. Initialize |propertiesObj|.{{BluetoothCharacteristicProperties/writableAuxiliaries}}
+        from the Writable Auxiliaries bit of |extendedProperties|.
+1. Return |propertiesObj|.
 
 </div>
 
@@ -3887,21 +3935,25 @@ slots</a> described in the following table:
 <div algorithm="BluetoothRemoteGATTDescriptor constructor">
 To <dfn>create a <code>BluetoothRemoteGATTDescriptor</code> representing</dfn>
 a Descriptor <var>descriptor</var>,
-the UA must return <a>a new promise</a> <var>promise</var>
-and run the following steps <a>in parallel</a>.
+the UA MUST run the following steps.
 
-1. Let <var>result</var> be a new instance of {{BluetoothRemoteGATTDescriptor}}
-    with its {{[[representedDescriptor]]}} slot initialized to |descriptor|.
-1. Initialize <code><var>result</var>.characteristic</code> from
-    the {{BluetoothRemoteGATTCharacteristic}} instance representing
-    the Characteristic in which <var>descriptor</var> appears.
-1. Initialize <code><var>result</var>.uuid</code> from the UUID of <var>descriptor</var>.
-1. Initialize <code><var>result</var>.value</code> to <code>null</code>.
-    The UA MAY initialize <code><var>result</var>.value</code> to
-    a new {{DataView}} wrapping a new {{ArrayBuffer}} containing
-    the most recently read value from <var>descriptor</var>
-    if this value is available.
-1. <a>Resolve</a> <var>promise</var> with <var>result</var>.
+1. Let |promise| be [=a new promise=].
+1. Run the following steps [=in parallel=]:
+    1. Let |result| be a new instance of {{BluetoothRemoteGATTDescriptor}}
+        with its {{[[representedDescriptor]]}} slot initialized to |descriptor|.
+    1. Initialize |result|.{{BluetoothRemoteGATTDescriptor/characteristic}}
+        from the {{BluetoothRemoteGATTCharacteristic}} instance representing
+        the Characteristic in which |descriptor| appears.
+    1. Initialize |result|.{{BluetoothRemoteGATTDescriptor/uuid}} from the UUID
+        of |descriptor|.
+    1. Initialize |result|.{{BluetoothRemoteGATTDescriptor/value}} to `null`.
+        The UA MAY initialize |result|.{{BluetoothRemoteGATTDescriptor/value}}
+        a [=new=] {{DataView}} wrapping a [=new=] {{ArrayBuffer}} containing
+        the most recently read value from |descriptor| if this value is
+        available.
+    1. [=Queue a global task=] using [=this=]'s [=relevant global object=] to
+        [=resolve=] |promise| with |result|.
+1. Return |promise|.
 
 </div>
 
@@ -3909,38 +3961,42 @@ and run the following steps <a>in parallel</a>.
 The <code><dfn method for="BluetoothRemoteGATTDescriptor">
 readValue()</dfn></code> method, when invoked, MUST run the following steps:
 
-1. If <code>this.uuid</code> is <a>blocklisted for reads</a>, return
-    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-1. If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-    is `false`, return <a>a promise rejected with</a> a {{NetworkError}} and
-    abort these steps.
-1. Let |descriptor| be <code>this.{{[[representedDescriptor]]}}</code>.
-1. If |descriptor| is `null`, return <a>a promise rejected with</a> an
-    {{InvalidStateError}} and abort these steps.
-1. Return a <code>this.characteristic.service.device.gatt</code>-
-    <a>connection-checking wrapper</a> around <a>a new promise</a>
-    <var>promise</var> and run the following steps <a>in parallel</a>:
-    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
-        |promise| with a {{NetworkError}} and abort these steps.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |gatt| be [=this=].{{BluetoothRemoteGATTDescriptor/characteristic}}.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
+1. If [=this=].{{BluetoothRemoteGATTDescriptor/uuid}} is [=blocklisted for
+    reads=], return [=a promise rejected with=] a "{{SecurityError}}"
+    {{DOMException}}.
+1. If |gatt|.{{BluetoothRemoteGATTServer/connected}} is `false`, return [=a
+    promise rejected with=] a "{{NetworkError}}" {{DOMException}}.
+1. Let |descriptor| be [=this=].{{[[representedDescriptor]]}}.
+1. If |descriptor| is `null`, return [=a promise rejected with=] an
+    "{{InvalidStateError}}" {{DOMException}}.
+1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
+    |promise| and run the following steps [=in parallel=]:
+    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+        global task=] on |global| using the [=bluetooth task source=] to
+        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+        abort these steps.
 
         Issue(188): Implementations may be able to avoid this {{NetworkError}},
         but for now sites need to serialize their use of this API
         and/or give the user a way to retry failed operations.
-    1. Use either the <a>Read Characteristic Descriptors</a> or the
-        <a>Read Long Characteristic Descriptors</a> sub-procedure to retrieve
-        the value of <var>descriptor</var>. Handle errors as described in <a
-        href="#error-handling"></a>.
-    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
-        with that error and abort these steps.
-    1. <a>Queue a task</a> to perform the following steps:
-        1. If <var>promise</var> is not in
-            <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+    1. Use either the [=Read Characteristic Descriptors=] or the [=Read Long
+        Characteristic Descriptors=] sub-procedure to retrieve the value of
+        |descriptor|. Handle errors as described in
+        <a href="#error-handling"></a>.
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to perform the following steps:
+        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
             these steps.
-        1. Let <var>buffer</var> be an {{ArrayBuffer}} holding the retrieved
-            value, and assign <code>new DataView(<var>buffer</var>)</code> to
-            <code>this.value</code>.
-        1. <a>Resolve</a> <var>promise</var> with <code>this.value</code>.
+        1. If the sub-procedure above returned an error, [=reject=] |promise|
+            with that error and abort these steps.
+        1. Let |buffer| be a [=new=] {{ArrayBuffer}} holding the retrieved
+            value, and assign a [=new=] {{DataView}} created with |buffer| to
+            [=this=].{{BluetoothRemoteGATTDescriptor/value}}.
+        1. [=Resolve=] |promise| with
+            [=this=].{{BluetoothRemoteGATTDescriptor/value}}.
 
 </div>
 
@@ -3949,42 +4005,44 @@ The <code><dfn method for="BluetoothRemoteGATTDescriptor">
 writeValue(<var>value</var>)</dfn></code> method, when invoked, MUST  run the
 following steps:
 
-1. If <code>this.uuid</code> is <a>blocklisted for writes</a>, return
-    <a>a promise rejected with</a> a {{SecurityError}} and abort these steps.
-1. Let <var>bytes</var> be <a>a copy of the bytes held</a> by
-    <code><var>value</var></code>.
-1. If <var>bytes</var> is more than 512 bytes long (the maximum length of an
-    attribute value, per <a>Long Attribute Values</a>) return <a>a promise
-    rejected with</a> an {{InvalidModificationError}} and abort these steps.
-1. If <code>this.characteristic.service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
-    is `false`, return <a>a promise rejected with</a> a {{NetworkError}} and
-    abort these steps.
-1. Let |descriptor| be <code>this.{{[[representedDescriptor]]}}</code>.
-1. If |descriptor| is `null`, return <a>a promise rejected with</a> an
-    {{InvalidStateError}} and abort these steps.
-1. Return a <code>this.characteristic.service.device.gatt</code>-
-    <a>connection-checking wrapper</a> around <a>a new promise</a>
-    <var>promise</var> and run the following steps in parallel.
-    1. If the UA is currently using the Bluetooth system, it MAY <a>reject</a>
-        |promise| with a {{NetworkError}} and abort these steps.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |gatt| be [=this=].{{BluetoothRemoteGATTDescriptor/characteristic}}.{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
+1. If [=this=].{{BluetoothRemoteGATTDescriptor/uuid}} is [=blocklisted for
+    writes=], return [=a promise rejected with=] a "{{SecurityError}}"
+    {{DOMException}}.
+1. Let |bytes| be [=a copy of the bytes held=] by |value|.
+1. If |bytes| is more than 512 bytes long (the maximum length of an attribute
+    value, per [=Long Attribute Values=]) return [=a promise rejected with=] an
+    "{{InvalidModificationError}}" {{DOMException}}.
+1. If |gatt|.{{BluetoothRemoteGATTServer/connected}} is `false`, return [=a
+    promise rejected with=] a "{{NetworkError}}" {{DOMException}}.
+1. Let |descriptor| be [=this=].{{[[representedDescriptor]]}}.
+1. If |descriptor| is `null`, return [=a promise rejected with=] an
+    "{{InvalidStateError}}" {{DOMException}}.
+1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
+    |promise| and run the following steps [=in parallel=].
+    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+        global task=] on |global| using the [=bluetooth task source=] to
+        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+        abort these steps.
 
         Issue(188): Implementations may be able to avoid this {{NetworkError}},
         but for now sites need to serialize their use of this API
         and/or give the user a way to retry failed operations.
-    1. Use either the <a>Write Characteristic Descriptors</a> or the <a>Write
-        Long Characteristic Descriptors</a> sub-procedure to write
-        <var>bytes</var> to <var>descriptor</var>. Handle errors as described in
+    1. Use either the [=Write Characteristic Descriptors=] or the [=Write Long
+        Characteristic Descriptors=] sub-procedure to write |bytes| to
+        |descriptor|. Handle errors as described in
         <a href="#error-handling"></a>.
-    1. If the previous step returned an error, <a>reject</a> <var>promise</var>
-        with that error and abort these steps.
-    1. <a>Queue a task</a> to perform the following steps:
-        1. If <var>promise</var> is not in
-            <code>this.characteristic.service.device.gatt.{{[[activeAlgorithms]]}}</code>,
-            <a>reject</a> <var>promise</var> with a {{NetworkError}} and abort
+    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+        to perform the following steps:
+        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
             these steps.
-        1. Set <code>this.value</code> to a new {{DataView}} wrapping a new
-            {{ArrayBuffer}} containing <var>bytes</var>.
-        1. <a>Resolve</a> <var>promise</var> with <code>undefined</code>.
+        1. If the sub-procedure above returned an error, [=reject=] |promise|
+            with that error and abort these steps.
+        1. Set [=this=].{{BluetoothRemoteGATTDescriptor/value}} to a [=new=]
+            {{DataView}} wrapping a [=new=] {{ArrayBuffer}} containing |bytes|.
+        1. [=Resolve=] |promise| with `undefined`.
 
 </div>
 
@@ -3999,7 +4057,7 @@ The <dfn for="Bluetooth tree">Bluetooth tree</dfn> is the name given to
 {{BluetoothRemoteGATTCharacteristic}}, or {{BluetoothRemoteGATTDescriptor}}
 interface <a>participate in a tree</a>.
 
-* The <a>children</a> of {{Navigator/bluetooth|navigator.bluetooth}}</code></a>
+* The <a>children</a> of {{Navigator/bluetooth|navigator.bluetooth}}
     are the {{BluetoothDevice}} objects representing devices in the
     {{BluetoothPermissionStorage/allowedDevices}} list in <a
     permission>"bluetooth"</a>'s <a>extra permission data</a> for
@@ -4598,14 +4656,14 @@ To <dfn>ResolveUUIDName</dfn>(<var>name</var>, <var>GATT assigned
 numbers</var>), the UA MUST perform the following steps:
 
 1. If <var>name</var> is an <code>unsigned long</code>, return
-    {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)</code>
+    {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(name)
     and abort these steps.
 1. If <var>name</var> is a <a>valid UUID</a>, return <var>name</var> and abort
     these steps.
 1. If <var>name</var> is a <a>valid name</a> and maps to a <a>valid UUID</a> in
     <var>GATT assigned numbers</var>, let <var>alias</var> be its assigned
     number, and return
-    {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(<var>alias</var>)</code>.
+    {{BluetoothUUID/canonicalUUID()|BluetoothUUID.canonicalUUID}}(<var>alias</var>).
 1. Otherwise, throw a {{TypeError}}.
 
 </div>
@@ -5720,4 +5778,3 @@ This specification uses a read-only type that is similar to WebIDL's
     </ol>
   </dd>
 </dl>
-</section>
