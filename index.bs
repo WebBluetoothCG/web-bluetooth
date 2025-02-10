@@ -123,6 +123,7 @@ spec: fingerprinting-guidance
         text: fingerprinting surface
 spec: html
     type: dfn
+        text: associated navigator; for: /
         text: browsing context; for: /
         text: global object; for: /
         text: navigable; for: /
@@ -559,8 +560,8 @@ that UAs will choose not to prompt.
   Bluetooth includes ServiceEventHandlers;
 </xmp>
 
-Methods on this interface typically complete asynchronously, queuing work on
-the <dfn>bluetooth task source</dfn>.
+Methods defined in this specification typically complete asynchronously, queuing
+work on the <dfn>Bluetooth task source</dfn>.
 
 <div class="note" heading="{{Bluetooth}} members">
 Note: {{Bluetooth/getAvailability()}} informs the page whether Bluetooth is
@@ -1358,7 +1359,7 @@ following steps:
         <code>|storage|.{{BluetoothPermissionStorage/allowedDevices}}</code>,
         add the {{BluetoothDevice}} object representing
         |allowedDevice|@{{[[device]]}} to |devices|.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to [=resolve=] |promise| with |devices|.
 
     <div class="note unstable">
@@ -1404,8 +1405,8 @@ The <code><dfn method for="Bluetooth">requestDevice(<var>options</var>)
         passing
         <code>|options|.{{RequestDeviceOptions/optionalManufacturerData}}</code>,
         and let |devices| be the result.
-    1. [=Queue a global task=] on [=this=]'s [=relevant global object=] using
-        the [=bluetooth task source=] to run the following steps:
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given [=this=]'s
+        [=relevant global object=] to run the following steps:
         1. If the previous step threw an exception, [=reject=] |promise| with that
             exception and abort these steps.
         1. If |devices| is an empty sequence, [=reject=] |promise| with a
@@ -2003,10 +2004,12 @@ The <code><dfn method for="Bluetooth">getAvailability()</dfn></code> method,
 when invoked, MUST return <a>a new promise</a> |promise| and run the following
 steps <a>in parallel</a>:
 
-1. If [=this=]'s [=relevant global object=]'s [=associated Document=] is not
-    [=allowed to use=] the [=policy-controlled feature=] named
-    "[=policy-controlled feature/bluetooth=]", <a>queue a task</a> to
-    <a>resolve</a> |promise| with `false`, and abort these steps.
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. If |global|'s [=associated Document=] is not [=allowed to use=] the
+    [=policy-controlled feature=] named
+    "[=policy-controlled feature/bluetooth=]", [=queue a global task=] on
+    the [=Bluetooth task source=] given |global| to [=resolve=] |promise|
+    with `false`, and abort these steps.
 1. <p id="override-availability">If the user has configured the UA to return a
     particular answer from this function for the current origin, <a>queue a
     task</a> to <a>resolve</a> |promise| with the configured answer, and abort
@@ -2020,14 +2023,19 @@ steps <a>in parallel</a>:
 1. Let |simulatedBluetoothAdapter| be [=this=]'s [=Window/navigable=]'s
     [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is not empty,
-    1. If |simulatedBluetoothAdapter|'s [=adapter state=] is "absent", [=queue a task=] to [=resolve=] |promise| with `false`.
-    1. Otherwise, [=queue a task=] to [=resolve=] |promise| with `true`.
+    1. If |simulatedBluetoothAdapter|'s [=adapter state=] is "absent", [=queue
+        a global task=] on the [=Bluetooth task source=] given |global| to
+        [=resolve=] |promise| with `false`.
+    1. Otherwise, [=queue a global task=] on the [=Bluetooth task source=]
+        given |global| to [=resolve=] |promise| with `true`.
     1. Abort these steps.
 
-1. If the UA is running on a system that has a Bluetooth radio <a>queue a
-    task</a> to <a>resolve</a> |promise| with `true` regardless of the powered
-    state of the Bluetooth radio.
-1. Otherwise, <a>queue a task</a> to <a>resolve</a> |promise| with `false`.
+1. If the UA is running on a system that has a Bluetooth radio [=queue a global
+    task=] on the [=Bluetooth task source=] given |global| to [=resolve=]
+    |promise| with `true` regardless of the powered state of the Bluetooth
+    radio.
+1. Otherwise, [=queue a global task=] on the [=Bluetooth task source=] given
+    |global| to [=resolve=] |promise| with `false`.
 
     <div class="note">
       Note: The promise is resolved <a>in parallel</a> to let the UA call out to
@@ -2066,17 +2074,20 @@ navigator.permissions.<a idl for="Permissions" lt="query()">query</a>({name: "bl
 If the UA becomes able or unable to use Bluetooth, for example because a radio
 was physically attached or detached, or the user has changed their <a
 href="#override-availability">configuration</a> for the answer returned from
-{{getAvailability()}}, the UA must <a>queue a task</a> on each <a>global
-object</a> |global|'s <a>responsible event loop</a> to run the following steps:
+{{getAvailability()}}, the UA must [=queue a global task=] on the [=Bluetooth
+task source=] given each [=global object=] |global| to run the following steps:
 
 1. Let |oldAvailability| be the value {{getAvailability()}} would have returned
     before the change.
 1. Let |newAvailability| be the value {{getAvailability()}} would return after
     the change.
-1. If |oldAvailability| is not the same as |newAvailability|, <a>fire an
-    event</a> named {{availabilitychanged}} using the {{ValueEvent}} interface
-    at <code>|global|.navigator.bluetooth</code> with its {{ValueEvent/value}}
-    attribute initialized to |newAvailability|.
+1. If |oldAvailability| is not the same as |newAvailability|,
+    1. Let |navigator| be |global|'s <a>associated <code>Navigator</code></a>.
+    1. Let |bluetooth| be |navigator|'s <a>associated
+        <code>Bluetooth</code></a>.
+    1. [=Fire an event=] named {{availabilitychanged}} using the {{ValueEvent}}
+        interface at |bluetooth| with its {{ValueEvent/value}} attribute
+        initialized to |newAvailability|.
 
 </div>
 
@@ -2335,6 +2346,7 @@ The <code><dfn method for="BluetoothDevice">watchAdvertisements(|options|)</dfn>
 </code> method, when invoked, MUST return <a>a new promise</a> |promise| and
 run the following steps:
 
+1. Let |global| be the [=relevant global object=] of [=this=].
 1. If <code>|options|.{{AbortSignal|signal}}</code> is present, then perform
     the following sub-steps:
     1. If <code>|options|.{{AbortSignal|signal}}</code> is
@@ -2357,8 +2369,9 @@ run the following steps:
               1. Ensure that the UA is scanning for this device's
                   advertisements. The UA SHOULD NOT filter out "duplicate"
                   advertisements for the same device.
-              1. If the UA fails to enable scanning, [=queue a task=] to
-                  perform the following steps, and abort these steps:
+              1. If the UA fails to enable scanning, [=queue a global task=]
+                  on the [=Bluetooth task source=] given |global| to perform
+                  the following steps, and abort these steps:
                   1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
                       `'not-watching'`.
                   1. [=Reject=] |promise| with one of the following errors:
@@ -2372,9 +2385,10 @@ run the following steps:
                         :: {{UnknownError}}
 
                       </dl>
-              1. [=Queue a task=] to perform the following steps, but [=abort
-                  when=] <code>this.{{[[watchAdvertisementsState]]}}</code>
-                  becomes `not-watching`:
+              1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                  |global| to perform the following steps, but [=abort when=]
+                  <code>this.{{[[watchAdvertisementsState]]}}</code> becomes
+                  `not-watching`:
                   1. Set <code>this.{{[[watchAdvertisementsState]]}}</code> to
                       `watching`.
                   1. Set <code>this.{{watchingAdvertisements}}</code> to `true`.
@@ -2413,12 +2427,11 @@ To <dfn>abort {{BluetoothDevice/watchAdvertisements}}</dfn> for a
 
 <div algorithm="abort all active watchAdvertisments">
 To <dfn>abort all active {{BluetoothDevice/watchAdvertisements}}</dfn>
-operations, run these steps:
+operations given a {{Bluetooth}} |bluetooth|, run these steps:
 
-1. [=map/For each=] <code>|device|</code> in
-    <code>{{Bluetooth}}.{{[[deviceInstanceMap]]}}</code>, perform the
-    following steps:
-    1. If <code>|device|.{{[[watchAdvertisementsState]]}}</code> is
+1. [=map/For each=] |device| in
+    |bluetooth|.{{[[deviceInstanceMap]]}}, perform the following steps:
+    1. If |device|.{{[[watchAdvertisementsState]]}} is
         `pending-watch` or `watching`, run [=abort watchAdvertisements=]
         with |device|.
 
@@ -2433,16 +2446,17 @@ Operations that initiate a scan for Bluetooth devices may only run in a visible
 aborted.
 
 <div algorithm="handle visibility change">
-When the user agent determines that the [=document visibility state|visibility
-state=] of the <a>associated <code>Document</code></a> of the
-[=current settings object=]'s [=relevant global object=] changes, it must run
-these steps:
+This specification defines the following [=page visibility change steps=] given
+|visibilityState| and |document|:
 
-1. Let <code>|document|</code> be the <a>associated <code>Document</code></a> of
-    the [=current settings object=]'s [=relevant global object=].
-1. If <code>|document|</code>'s [=document visibility state|visibility state=]
-    is not <code>"visible"</code>, then [=abort all active watchAdvertisements=]
-    operations.
+1. Let |global| be |document|'s [=relevant global object=].
+1. [=Queue a global task=] on the [=Bluetooth task source=] given |global| to
+    perform the following steps:
+    1. Let |navigator| be |global|'s <a>associated <code>Navigator</code></a>.
+    1. Let |bluetooth| be |navigator|'s <a>associated
+        <code>Bluetooth</code></a>.
+    1. If |visibilityState| is not <code>"visible"</code>, then [=abort all
+        active watchAdvertisements=] operations on |bluetooth|.
 
 </div>
 </div>
@@ -2455,11 +2469,17 @@ active=] [=document=]. When [=fully active|full activity=] is lost, scanning
 operations for that [=document=] need to be aborted.
 
 <div algorithm="handle full activity loss">
-When the user agent determines that a <a>associated <code>Document</code></a> of
-the [=current settings object=]'s [=relevant global object=] is no longer
-[=fully active=], it must run these steps:
+When the user agent determines that a {{Document}} is no longer [=fully
+active=], it must run these steps:
 
-1. Run [=abort all active watchAdvertisements=] operations.
+1. Let |document| be the {{Document}} that is no longer [=fully active=].
+1. Let |global| be |document|'s [=relevant global object=].
+1. [=Queue a global task=] on the [=Bluetooth task source=] given |global| to
+    perform the following steps:
+    1. Let |navigator| be |global|'s <a>associated <code>Navigator</code></a>.
+    1. Let |bluetooth| be |navigator|'s <a>associated
+        <code>Bluetooth</code></a>.
+    1. Run [=abort all active watchAdvertisements=] operations on |bluetooth|.
 
 </div>
 </div>
@@ -2891,9 +2911,9 @@ To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
 
 1. Let |global| be |deviceObj|'s [=relevant global object=].
 1. [=Populate the Bluetooth cache=] with entries matching the description.
-1. If the previous step returns an error, [=queue a global task=] on |global|
-    using the [=bluetooth task source=] to [=reject=] |promise| with that error
-    and abort these steps.
+1. If the previous step returns an error, [=queue a global task=] on the
+    [=Bluetooth task source=] given |global| to [=reject=] |promise| with that
+    error and abort these steps.
 1. Let |entries| be the sequence of known-present cache entries matching the
     description.
 1. Let |context| be |deviceObj|.{{BluetoothDevice/[[context]]}}.
@@ -2912,7 +2932,7 @@ To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
     1. Append to |result| the <code>Promise&lt;BluetoothGATT*></code>
         instance associated with |entry| in
         |context|.{{Bluetooth/[[attributeInstanceMap]]}}.
-1. [=Queue a global task=] on |global| using the [=bluetooth task source=] to
+1. [=Queue a global task=] on the [=Bluetooth task source=] given |global| to
     [=resolve=] |promise| with the result of [=waiting for all=] elements of
     |result|.
 
@@ -3121,11 +3141,11 @@ method, when invoked, MUST perform the following steps:
             </div>
         1. If this attempt was aborted because |promise| was removed from
             [=this=].{{[[activeAlgorithms]]}}, [=queue a global task=] on
-            |global| using the [=bluetooth task source=] to [=reject=]
+            the [=Bluetooth task source=] given |global| to [=reject=]
             |promise| with an "{{AbortError}}" {{DOMException}} and abort these
             steps.
         1. If this attempt failed for another reason, [=queue a global task=]
-            on |global| using the [=bluetooth task source=] to [=reject=]
+            on the [=Bluetooth task source=] given |global| to [=reject=]
             |promise| with a "{{NetworkError}}" {{DOMException}} and abort
             these steps.
         1. Use the [=Exchange MTU=] procedure to negotiate the largest
@@ -3142,7 +3162,7 @@ method, when invoked, MUST perform the following steps:
             platforms where that's possible. This may cause a user-visible
             pairing dialog to appear when a connection is created, instead of
             when a restricted characteristic is accessed.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following sub-steps:
         1. If |promise| is not in [=this=].{{[[activeAlgorithms]]}}, [=reject=]
             |promise| with an "{{AbortError}}" {{DOMException}},
@@ -3337,8 +3357,8 @@ Service <var>service</var>, the UA must run the following steps:
         with its {{[[representedService]]}} slot initialized to |service|.
     1. <a>Get the <code>BluetoothDevice</code> representing</a> the device in
         which |service| appears, and let |device| be the result.
-    1. If the previous step threw an error, [=queue a global task=] on |global|
-        using the [=bluetooth task source=] to [=reject=] |promise| with
+    1. If the previous step threw an error, [=queue a global task=] on the
+        [=Bluetooth task source=] given |global| to [=reject=] |promise| with
         that error and abort these steps.
     1. Initialize |result|.{{BluetoothRemoteGATTService/device}} from |device|.
     1. Initialize |result|.{{BluetoothRemoteGATTService/uuid}} from the UUID of
@@ -3347,7 +3367,7 @@ Service <var>service</var>, the UA must run the following steps:
         |result|.{{BluetoothRemoteGATTService/isPrimary}} to `true`. Otherwise,
         initialize |result|.{{BluetoothRemoteGATTService/isPrimary}} to
         `false`.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to [=resolve=] |promise| with |result|.
 1. Return |promise|.
 
@@ -3486,8 +3506,8 @@ run the following steps:
         |characteristic|.
     1. <a>Create a <code>BluetoothCharacteristicProperties</code> instance from the
         Characteristic</a> |characteristic|, and let |properties| be the result.
-    1. If the previous step returned an error, [=queue a global task=] on |global|
-        using the [=bluetooth task source=] to [=reject=] |promise| with
+    1. If the previous step returned an error, [=queue a global task=] on the
+        [=Bluetooth task source=] given |global| to [=reject=] |promise| with
         that error and abort these steps.
     1. Initialize |result|.{{BluetoothRemoteGATTCharacteristic/properties}} to
         |properties|.
@@ -3496,7 +3516,7 @@ run the following steps:
         |result|.{{BluetoothRemoteGATTCharacteristic/value}} to a [=new=]
         {{DataView}} wrapping a [=new=] {{ArrayBuffer}} containing the most
         recently read value from |characteristic| if this value is available.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to [=resolve=] |promise| with |result|.
 1. Return |promise|.
 
@@ -3547,11 +3567,11 @@ The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
     |promise| and run the following steps [=in parallel=]:
     1. If the <code>Read</code> bit is not set in |characteristic|'s
         <a lt="Characteristic Properties">properties</a>, [=queue a global
-        task=] on |global| using the [=bluetooth task source=] to [=reject=]
+        task=] on the [=Bluetooth task source=] given |global| to [=reject=]
         |promise| with a "{{NotSupportedError}}" {{DOMException}} and abort
         these steps.
     1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on |global| using the [=bluetooth task source=] to
+        global task=] on the [=Bluetooth task source=] given |global| to
         [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
         abort these steps.
 
@@ -3561,7 +3581,7 @@ The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
     1. Use any combination of the sub-procedures in the [=Characteristic Value
         Read=] procedure to retrieve the value of |characteristic|.
         Handle errors as described in <a href="#error-handling"></a>.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
             |promise| with a "{{NetworkError}}" {{DOMException}} and abort
@@ -3605,7 +3625,7 @@ the UA MUST perform the following steps:
     |promise| and run the following steps [=in parallel=].
     1. Assert: |response| is one of "required", "never", or "optional".
     1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on |global| using the [=bluetooth task source=] to
+        global task=] on the [=Bluetooth task source=] given |global| to
         [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
         abort these steps.
 
@@ -3631,7 +3651,7 @@ the UA MUST perform the following steps:
           </dd>
         </dl>
         Handle errors as described in <a href="#error-handling"></a>.
-    1. <a>Queue a global task</a> using |global| on the [=bluetooth task
+    1. <a>Queue a global task</a> on |global| using the [=Bluetooth task
         source=] to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
             |promise| with a "{{NetworkError}}" {{DOMException}} and abort
@@ -3718,17 +3738,17 @@ notifications.
     |promise| and run the following steps [=in parallel=].
     1. If neither of the <code>Notify</code> or <code>Indicate</code> bits are set
         in |characteristic|'s <a lt="Characteristic Properties">properties</a>,
-        [=queue a global task=] on |global| using the [=bluetooth task source=]
+        [=queue a global task=] on the [=Bluetooth task source=] given |global|
         to [=reject=] |promise| with a {{NotSupportedError}} and abort these
         steps.
     1. If |characteristic|'s [=active notification context set=] contains
         {{Navigator/bluetooth|navigator.bluetooth}}, [=queue a global task=]
-        using the [=bluetooth task source=] to [=resolve=] |promise| with
-        [=this=] and abort these steps.
+        on the [=Bluetooth task source=] given |global| to [=resolve=]
+        |promise| with [=this=] and abort these steps.
     1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] using the [=bluetooth task source=] to [=reject=]
-        |promise| with a "{{NetworkError}}" {{DOMException}} and abort these
-        steps.
+        global task=] on the [=Bluetooth task source=] given |global| to
+        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+        abort these steps.
 
         Issue(188): Implementations may be able to avoid this {{NetworkError}}, but
         for now sites need to serialize their use of this API and/or give the user a
@@ -3753,7 +3773,7 @@ notifications.
     1. If the procedures were successful,
         {{Navigator/bluetooth|navigator.bluetooth}} to
         |characteristic|'s [=active notification context set=].
-    1. [=Queue a global task=] using |global| on the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
             |promise| with a "{{NetworkError}}" {{DOMException}} and abort
@@ -3787,7 +3807,8 @@ promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
     Descriptors</a> procedures to clear the <code>Notification</code> and
     <code>Indication</code> bits in <var>characteristic</var>'s <a>Client
     Characteristic Configuration</a> descriptor.
-1. <a>Queue a task</a> to <a>resolve</a> <var>promise</var> with `this`.
+1. [=Queue a global task=] on the [=Bluetooth task source=] given [=this=]'s
+    [=relevant global object=]  to [=resolve=] |promise| with [=this=].
 
 <div class="note">
 Note: Queuing a task to resolve the promise ensures that no
@@ -3951,8 +3972,9 @@ the UA MUST run the following steps.
         a [=new=] {{DataView}} wrapping a [=new=] {{ArrayBuffer}} containing
         the most recently read value from |descriptor| if this value is
         available.
-    1. [=Queue a global task=] using [=this=]'s [=relevant global object=] to
-        [=resolve=] |promise| with |result|.
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given
+        [=this=]'s [=relevant global object=] to [=resolve=] |promise| with
+        |result|.
 1. Return |promise|.
 
 </div>
@@ -3974,7 +3996,7 @@ readValue()</dfn></code> method, when invoked, MUST run the following steps:
 1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
     |promise| and run the following steps [=in parallel=]:
     1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on |global| using the [=bluetooth task source=] to
+        global task=] on the [=Bluetooth task source=] given |global| to
         [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
         abort these steps.
 
@@ -3985,7 +4007,7 @@ readValue()</dfn></code> method, when invoked, MUST run the following steps:
         Characteristic Descriptors=] sub-procedure to retrieve the value of
         |descriptor|. Handle errors as described in
         <a href="#error-handling"></a>.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
             |promise| with a "{{NetworkError}}" {{DOMException}} and abort
@@ -4022,7 +4044,7 @@ following steps:
 1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
     |promise| and run the following steps [=in parallel=].
     1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on |global| using the [=bluetooth task source=] to
+        global task=] on the [=Bluetooth task source=] given |global| to
         [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
         abort these steps.
 
@@ -4033,7 +4055,7 @@ following steps:
         Characteristic Descriptors=] sub-procedure to write |bytes| to
         |descriptor|. Handle errors as described in
         <a href="#error-handling"></a>.
-    1. [=Queue a global task=] on |global| using the [=bluetooth task source=]
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
             |promise| with a "{{NetworkError}}" {{DOMException}} and abort
@@ -4162,8 +4184,8 @@ interface <a>participate in a tree</a>.
 When a <a>Bluetooth device</a> <var>device</var>'s <a>ATT Bearer</a> is lost
 (e.g. because the remote device moved out of range or the user used a platform
 feature to disconnect it), for each {{BluetoothDevice}} <var>deviceObj</var> the
-UA MUST <a>queue a task</a> on <var>deviceObj</var>'s <a>relevant settings
-object</a>'s <a>responsible event loop</a> to perform the following steps:
+UA MUST [=queue a global task=] on the [=Bluetooth task source=] given
+|deviceObj|'s [=relevant global object=] to perform the following steps:
 
 1. If <code><var>deviceObj</var>.{{BluetoothDevice/[[representedDevice]]}}</code>
     is not the <a>same device</a> as <var>device</var>, abort these steps.
@@ -4221,9 +4243,9 @@ When the UA receives a Bluetooth <a>Characteristic Value Notification</a>
 or <a lt="Characteristic Value Indications">Indication</a>,
 it must perform the following steps:
 
-1. For each <var>bluetoothGlobal</var> in the Characteristic's <a>active
-    notification context set</a>, <a>queue a task</a> on the event loop of the
-    script settings object of <var>bluetoothGlobal</var> to do the following
+1. For each |bluetoothGlobal| in the Characteristic's [=active notification
+    context set=], [=queue a global task=] on the [=Bluetooth task source=]
+    given |bluetoothGlobal|'s [=relevant global object=] to do the following
     sub-steps:
     1. Let <var>characteristicObject</var> be the
         {{BluetoothRemoteGATTCharacteristic}} in the <a>Bluetooth tree</a>
@@ -4396,9 +4418,9 @@ Changed characteristic, it MUST perform the following steps.
 1. Let <var>changedDevices</var> be the set of <a>Bluetooth device</a>s that
     contain any <a>Service</a> in <var>removedAttributes</var>,
     <var>addedAttributes</var>, and <var>changedServices</var>.
-1. For each {{BluetoothDevice}} <var>deviceObj</var> that is connected to a
-    device in <var>changedDevices</var>, <a>queue a task</a> on its <a>relevant
-    global object</a>'s <a>responsible event loop</a> to do the following steps:
+1. For each {{BluetoothDevice}} |deviceObj| that is connected to a device in
+    |changedDevices|, [=queue a global task=] on the [=Bluetooth task source=]
+    given |deviceObj|'s [=relevant global object=] to do the following steps:
     1. For each <a>Service</a> <var>service</var> in
         <var>removedAttributes</var>:
         1. If <code><var>deviceObj</var>.{{BluetoothDevice/[[allowedServices]]}}</code>
@@ -4915,9 +4937,13 @@ if the following steps return `blocked`:
   };
 </xmp>
 
-Each {{Navigator}} has an <dfn>associated `Bluetooth`</dfn>, which is a {{Bluetooth}} object. Upon creation of the {{Navigator}} object, its <a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object created in the {{Navigator}} object's [=relevant realm=].
+Each {{Navigator}} has an <dfn>associated `Bluetooth`</dfn>, which is a
+{{Bluetooth}} object. Upon creation of the {{Navigator}} object, its
+<a>associated `Bluetooth`</a> must be set to a new {{Bluetooth}} object
+created in the {{Navigator}} object's [=relevant realm=].
 
-{{Navigator}}'s <dfn attribute for="Navigator">bluetooth</dfn> getter steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
+{{Navigator}}'s <dfn attribute for="Navigator">bluetooth</dfn> getter
+steps are to return [=this=]'s <a>associated `Bluetooth`</a>.
 
 # Integrations # {#integrations}
 
