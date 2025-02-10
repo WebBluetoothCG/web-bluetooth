@@ -94,10 +94,6 @@ spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/document-sequences
     type: dfn
         text: navigable; url: navigable
 
-spec: html; urlPrefix: https://html.spec.whatwg.org/multipage/system-state.html#
-    type: dfn
-        text: associated Navigator; url: associated-navigator
-
 spec: WebIDL; urlPrefix: https://heycam.github.io/webidl/#
     type: dfn
         text: a copy of the bytes held; url: dfn-get-buffer-source-copy
@@ -127,6 +123,7 @@ spec: fingerprinting-guidance
         text: fingerprinting surface
 spec: html
     type: dfn
+        text: associated navigator; for: /
         text: browsing context; for: /
         text: global object; for: /
         text: navigable; for: /
@@ -2449,20 +2446,17 @@ Operations that initiate a scan for Bluetooth devices may only run in a visible
 aborted.
 
 <div algorithm="handle visibility change">
-When the user agent determines that the [=document visibility state|visibility
-state=] of a {{Document}} changes, it must run these steps:
+This specification defines the following [=page visibility change steps=] given
+|visibilityState| and |document|:
 
-1. Let |document| be the {{Document}} where the
-    [=document visibility state|visibility state=] changed.
 1. Let |global| be |document|'s [=relevant global object=].
 1. [=Queue a global task=] on the [=Bluetooth task source=] given |global| to
     perform the following steps:
     1. Let |navigator| be |global|'s <a>associated <code>Navigator</code></a>.
     1. Let |bluetooth| be |navigator|'s <a>associated
         <code>Bluetooth</code></a>.
-    1. If |document|'s [=document visibility state|visibility state=]
-        is not <code>"visible"</code>, then [=abort all active
-        watchAdvertisements=] operations on |bluetooth|.
+    1. If |visibilityState| is not <code>"visible"</code>, then [=abort all
+        active watchAdvertisements=] operations on |bluetooth|.
 
 </div>
 </div>
