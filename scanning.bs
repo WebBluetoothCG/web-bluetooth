@@ -246,28 +246,31 @@ spec:web-bluetooth
 
   <div algorithm>
     <p>
-      The <code><dfn method for="Bluetooth">requestLEScan(|options|)</dfn></code> method,
-      when invoked, MUST return <a>a new promise</a> |promise|
-      and run the following steps <a>in parallel</a>:
+      The <code><dfn method for="Bluetooth">requestLEScan(|options|)</dfn></code>
+      method, when invoked, MUST run the following steps:
     </p>
     <ol class="algorithm">
       <li>
-        If [=this=]'s [=relevant global object=]'s [=associated Document=] is 
-        not [=allowed to use=] the [=policy-controlled feature=] named 
-        <code>"bluetooth"</code>, <a>reject</a> |promise| with a 
-        {{SecurityError}} and abort these steps.
+        Let |global| be [=this=]'s [=relevant global object=].
       </li>
       <li>
-        If <code>|options|.acceptAllAdvertisements</code> is `true`,
-        and <code>|options|.filters</code> is present,
-        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+        Let |document| be |global|'s [=associated Document=].
+      <li>
+        If |document| is not [=allowed to use=] the [=policy-controlled
+        feature=] named `"bluetooth"`, return [=a promise rejected with=] a
+        "{{SecurityError}}" {{DOMException}}.
+      </li>
+      <li>
+        If |options|.{{BluetoothLEScanOptions/acceptAllAdvertisements}} is
+        `true`, and |options|.{{BluetoothLEScanOptions/filters}} is present,
+        return [=a promise rejected with=] a "{{TypeError}}" {{DOMException}}.
 
         Note: There's no need to include filters if all advertisements are being accepted.
       </li>
       <li>
-        If <code>|options|.acceptAllAdvertisements</code> is `false`,
-        and <code>|options|.filters</code> is either absent or empty,
-        <a>reject</a> |promise| with a {{TypeError}} and abort these steps.
+        If |options|.{{BluetoothLEScanOptions/acceptAllAdvertisements}} is
+        `false`, and |options|.{{BluetoothLEScanOptions/filters}} is either
+        absent or empty, return [=a promise rejected with=] a {{TypeError}}.
 
         Note: An empty set of filters wouldn't return any advertisements.
       </li>
@@ -275,79 +278,99 @@ spec:web-bluetooth
         Let |filters| be
         <code>{{Array.prototype.map}}.call(|options|.filters,
           filter=>new {{BluetoothLEScanFilter/BluetoothLEScanFilter()|BluetoothLEScanFilter}}(filter))</code>
-        if <code>|options|.filters</code> is present, or an empty {{FrozenArray}} otherwise.
-        If this throws an exception,
-        <a>reject</a> |promise| with that exception and abort these steps.
+        if |options|.{{BluetoothLEScanOptions/filters}} is present, or an empty
+        {{FrozenArray}} otherwise. If this throws an exception,
+        return [=a promise rejected with=] that exception.
       </li>
-      <li id="scanning-permission">
-        <a>Request permission to use</a>
-        <pre highlight="js">
-          {
-            name: <a idl>"bluetooth-le-scan"</a>,
-            filters: <var>options</var>.filters,
-            keepRepeatedDevices: <var>options</var>.keepRepeatedDevices,
-            acceptAllAdvertisements: <var>options</var>.acceptAllAdvertisements,
-          }
-        </pre>
-
-        Note: This may require that this algorithm has a <a
-        href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
-        activation</a> on its [=relevant global object=] when triggered.
-      </li>
-      <li>
-        If the result is "{{PermissionState/denied}}",
-        reject |promise| with a {{NotAllowedError}} and abort these steps.
-      </li>
-      <li>
-        Let |scan| be a new {{BluetoothLEScan}} instance
+       <li>
+        Let |scan| be a [=new=] {{BluetoothLEScan}} instance
         whose fields are initialized as in the following table:
         <table class="data">
           <thead><th>Field</th><th>Initial value</th></thead>
           <tr><td>{{BluetoothLEScan/filters}}</td><td>|filters|</td></tr>
           <tr>
             <td>{{BluetoothLEScan/keepRepeatedDevices}}</td>
-            <td><code>|options|.keepRepeatedDevices</code></td>
+            <td>|options|.{{BluetoothLEScanOptions/keepRepeatedDevices}}</td>
           </tr>
           <tr>
             <td>{{BluetoothLEScan/acceptAllAdvertisements}}</td>
-            <td><code>|options|.acceptAllAdvertisements</code></td>
+            <td>|options|.{{BluetoothLEScanOptions/acceptAllAdvertisements}}</td>
           </tr>
           <tr><td>{{BluetoothLEScan/active}}</td><td>`true`</td></tr>
         </table>
       </li>
       <li>
-        Add |scan| to <code>navigator.bluetooth.{{[[activeScans]]}}</code>.
+        Let |promise| be [=a new promise=].
       </li>
       <li>
-        Ensure the UA is scanning for BLE advertisements
-        in a mode that will receive at least
-        all advertisements <a for="BluetoothLEScan">matching</a> any scan
-        in any {{[[activeScans]]}} set in the whole UA.
+        Run the following steps [=in parallel=].
+        <ol>
+          <li id="scanning-permission">
+            <a>Request permission to use</a>
+            <pre highlight="js">
+              {
+                name: <a idl>"bluetooth-le-scan"</a>,
+                filters: <var>options</var>.filters,
+                keepRepeatedDevices: <var>options</var>.keepRepeatedDevices,
+                acceptAllAdvertisements: <var>options</var>.acceptAllAdvertisements,
+              }
+            </pre>
 
-        <p class="issue" id="issue-limit-scan-periods">
-          Find wording that allows the UA to limit its scan to only certain periods of time,
-          to save power.
-        </p>
+            Note: This may require that this algorithm has a <a
+            href="https://html.spec.whatwg.org/#tracking-user-activation"> transient
+            activation</a> on its [=relevant global object=] when triggered.
+          </li>
+          <li>
+            If the result is "{{PermissionState/denied}}", [=queue a global
+            task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{NotAllowedError}}" {{DOMException}}
+            and abort these steps.
+          </li>
+          <li>
+            Ensure the UA is scanning for BLE advertisements
+            in a mode that will receive at least
+            all advertisements <a for="BluetoothLEScan">matching</a> |scan| (in
+            addition to any {{[[activeScans]]}} set in the whole UA).
+
+            <p class="issue" id="issue-limit-scan-periods">
+              Find wording that allows the UA to limit its scan to only certain periods of time,
+              to save power.
+            </p>
+          </li>
+          <li>
+            [=Queue a global task=] on the [=Bluetooth task source=] given
+            |global| to run the following steps.
+            <ol>
+              <li>
+                If the UA failed to start scanning, [=reject=] |promise| with
+                one of the following errors, and abort these steps:
+
+                <dl class="switch">
+                  <dt>The UA doesn't support scanning for advertisements</dt>
+                  <dd>"{{NotSupportedError}}" {{DOMException}}</dd>
+
+                  <dt>Bluetooth is turned off</dt>
+                  <dd>"{{InvalidStateError}}" {{DOMException}}</dd>
+
+                  <dt>Other reasons</dt>
+                  <dd>"{{UnknownError}}" {{DOMException}}</dd>
+                </dl>
+              </li>
+              <li>
+                Let |bluetooth| be |document|'s [=associated Bluetooth=].
+              </li>
+              <li>
+                Add |scan| to |bluetooth|.{{[[activeScans]]}}.
+              </li>
+              <li>
+                [=Resolve=] |promise| with |scan|.
+              </li>
+            </ol>
+          </li>
+        </ol>
       </li>
       <li>
-        If the UA fails to start scanning,
-        remove |scan| from <code>navigator.bluetooth.{{[[activeScans]]}}</code>,
-        <a>reject</a> |promise| with one of the following errors,
-        and abort these steps:
-
-        <dl class="switch">
-          <dt>The UA doesn't support scanning for advertisements</dt>
-          <dd>{{NotSupportedError}}</dd>
-
-          <dt>Bluetooth is turned off</dt>
-          <dd>{{InvalidStateError}}</dd>
-
-          <dt>Other reasons</dt>
-          <dd>{{UnknownError}}</dd>
-        </dl>
-      </li>
-      <li>
-        <a>Resolve</a> |promise| with |scan|.
+        Return |promise|.
       </li>
     </ol>
   </div>
