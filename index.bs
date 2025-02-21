@@ -2027,6 +2027,9 @@ steps <a>in parallel</a>:
     1. If |simulatedBluetoothAdapter|'s [=adapter state=] is "absent", [=queue
         a global task=] on the [=Bluetooth task source=] given |global| to
         [=resolve=] |promise| with `false`.
+    1. If |simulatedBluetoothAdapter|'s [=LE supported state=] is `false`, [=queue
+        a global task=] on the [=Bluetooth task source=] given |global| to
+        [=resolve=] |promise| with `false`.
     1. Otherwise, [=queue a global task=] on the [=Bluetooth task source=]
         given |global| to [=resolve=] |promise| with `true`.
     1. Abort these steps.
@@ -4972,7 +4975,7 @@ Each <a>simulated Bluetooth adapter</a> has an <dfn>adapter state</dfn> that is 
   * "powered-off"
   * "absent"
 
-Each <a>simulated Bluetooth adapter</a> has a <dfn>le supported state</dfn> that is a boolean describing if the adapter supports Bluetooth Low Energy.
+Each <a>simulated Bluetooth adapter</a> has a <dfn lt="LE supported state">low-energy supported state</dfn> that is a boolean describing if the adapter supports Bluetooth Low Energy.
 
 A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>, and may have associated properties like <a>Manufacturer Specific Data</a> and <a>Service UUIDs</a>.
 
@@ -5209,17 +5212,20 @@ The [=remote end steps=] with command parameters |params| are:
     1. If |params|[`"leSupported"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
     1. If |params|[`"state"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
     1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
-    1. Set |simulatedBluetoothAdapter|'s <a>le supported state</a> to |params|[`"leSupported"`].
+    1. Set |simulatedBluetoothAdapter|'s <a>LE supported state</a> to |params|[`"leSupported"`].
     1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
     1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
     1. Return [=success=] with data `null`.
 1. If |params|[`"type"`] is `update`, run the following steps:
+    1. If |params|[`"leSupported"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
     1. If |params|[`"state"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
     1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
     1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
     1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
     1. Return [=success=] with data `null`.
 1. If |params|[`"type"`] is `remove`, run the following steps:
+    1. If |params|[`"leSupported"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
+    1. If |params|[`"state"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
     1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to empty.
     1. Return [=success=] with data `null`.
 
