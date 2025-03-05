@@ -5196,7 +5196,7 @@ bluetooth.simulateAdapter = (
 
 bluetooth.SimulateAdapterParameters = {
    context: text,
-   type: "create" / "update" / "remove",
+   type: "create" / "update",
    ? leSupported: bool,
    ? state: "absent" / "powered-off" / "powered-on"
 }
@@ -5205,7 +5205,7 @@ bluetooth.SimulateAdapterParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be params["context"].
+1. Let |contextId| be |params|["context"].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. If |params|[`"type"`] is `create`, run the following steps:
@@ -5222,11 +5222,6 @@ The [=remote end steps=] with command parameters |params| are:
     1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
     1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
     1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
-    1. Return [=success=] with data `null`.
-1. If |params|[`"type"`] is `remove`, run the following steps:
-    1. If |params|[`"leSupported"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
-    1. If |params|[`"state"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
-    1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to empty.
     1. Return [=success=] with data `null`.
 1. Return [=error=] with [=error code=] [=invalid argument=].
 
@@ -5263,15 +5258,38 @@ A [=local end=] could update the <a>adapter state</a> of an existing adapter by 
 </pre>
 </div>
 
+#### The bluetooth.disableSimulation Command #### {#bluetooth-disableSimulation-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.disableSimulation = (
+   method: "bluetooth.disableSimulation",
+   params: bluetooth.DisableSimulationParameters,
+)
+
+bluetooth.DisableSimulationParameters = {
+   context: text
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.disableSimulation">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |contextId| be |params|["context"].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
+1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to empty.
+1. Return [=success=] with data `null`.
+
+</div>
+
 <div class="example">
-A [=local end=] could remove an existing adapter by sending the following message:
+A [=local end=] could disable the existing simulation by sending the following message:
 
 <pre highlight="json">
 {
-  "method": "bluetooth.simulateAdapter",
+  "method": "bluetooth.disableSimulation",
   "params": {
-    "context": "cxt-d03fdd81",
-    "type": "remove",
+    "context": "cxt-d03fdd81"
   }
 }
 </pre>
