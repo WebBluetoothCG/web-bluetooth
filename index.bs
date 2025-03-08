@@ -5196,9 +5196,8 @@ bluetooth.simulateAdapter = (
 
 bluetooth.SimulateAdapterParameters = {
    context: text,
-   type: "create" / "update",
    ? leSupported: bool,
-   ? state: "absent" / "powered-off" / "powered-on"
+   state: "absent" / "powered-off" / "powered-on"
 }
 </pre>
 
@@ -5208,22 +5207,18 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |contextId| be |params|["context"].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
-1. If |params|[`"type"`] is `create`, run the following steps:
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, run the following steps:
     1. If |params|[`"leSupported"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
-    1. If |params|[`"state"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
     1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
     1. Set |simulatedBluetoothAdapter|'s <a>LE supported state</a> to |params|[`"leSupported"`].
     1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
     1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
     1. Return [=success=] with data `null`.
-1. If |params|[`"type"`] is `update`, run the following steps:
+1. If |simulatedBluetoothAdapter| is not empty, run the following steps:
     1. If |params|[`"leSupported"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
-    1. If |params|[`"state"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
-    1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
-    1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
     1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
     1. Return [=success=] with data `null`.
-1. Return [=error=] with [=error code=] [=invalid argument=].
 
 </div>
 
@@ -5235,7 +5230,6 @@ A [=local end=] could simulate an adapter that supports Bluetooth Low Energy by 
   "method": "bluetooth.simulateAdapter",
   "params": {
     "context": "cxt-d03fdd81",
-    "type": "create",
     "leSupported": true,
     "state": "powered-on",
   }
@@ -5251,7 +5245,6 @@ A [=local end=] could update the <a>adapter state</a> of an existing adapter by 
   "method": "bluetooth.simulateAdapter",
   "params": {
     "context": "cxt-d03fdd81",
-    "type": "update",
     "state": "powered-off",
   }
 }
