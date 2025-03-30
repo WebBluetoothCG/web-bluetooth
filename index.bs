@@ -2915,9 +2915,8 @@ To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
 [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
 1. Let |global| be |deviceObj|'s [=relevant global object=].
-1. Let |simulatedBluetoothAdapter| be |deviceObj|'s [=Window/navigable=]'s
-    [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>.
-1. If |simulatedBluetoothAdapter| is not empty, run the following steps:
+1. If |deviceObj|'s [=Window/navigable=]'s [=navigable/top-level traversable=]'s
+    <a>simulated Bluetooth adapter</a> is not empty, run the following steps:
     1. [=Trigger a gatt event=] given |deviceObj|'s [=Window/navigable=], |deviceObj|,
         and <code>"discovery"</code>.
     1. <a>Upon fulfillment</a> of <var>promise</var> with |params|, run the
@@ -2928,7 +2927,7 @@ To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
             1. Append to |result| the <code>Promise&lt;BluetoothGATT*></code>
                 instance in |context|.{{Bluetooth/[[attributeInstanceMap]]}} matching the
                 description.
-            1. Return |result|.
+            1. Return the result of [=waiting for all=] elements of |result|.
         1. Otherwise, throw a {{NetworkError}}.
     1. Abort these steps.
 1. [=Populate the Bluetooth cache=] with entries matching the description.
@@ -3145,17 +3144,18 @@ method, when invoked, MUST perform the following steps:
     and/or give the user a way to retry failed operations.
 1. Let |promise| be [=a new promise=].
 1. Add |promise| to [=this=].{{[[activeAlgorithms]]}}.
-1. Let |simulatedBluetoothAdapter| be [=this=]'s [=Window/navigable=]'s
-    [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>.
-1. If |simulatedBluetoothAdapter| is not empty,
+1. If [=this=]'s [=Window/navigable=]'s
+    [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a> is
+    not empty, run the following steps:
     1. [=Trigger a gatt event=] given [=this=]'s [=Window/navigable=],
         [=this=].{{BluetoothRemoteGATTServer/device}}, and <code>"connect"</code>.
     1. <a>Upon fulfillment</a> of <var>promise</var> with |params|, run the
         following steps:
-        1. If |params|[`"type"`] is `connection` and |params|[`"code"`] is `0`, do the following sub-steps:
-            1. Set |gatt|.{{BluetoothRemoteGATTServer/connected}} to `true`.
-            1. [=Resolve=] |promise| with |gatt|.
-        1. Otherwise, [=reject=] |promise| with {{NetworkError}}.
+        1. If |params|[`"type"`] is `connection` and |params|[`"code"`] is `0`,
+            do the following sub-steps:
+            1. Set [=this=].{{BluetoothRemoteGATTServer/connected}} to `true`.
+            1. return [=this=].
+        1. Otherwise, throw a {{NetworkError}}.
     1. Return |promise|.
 1. Run the following steps [=in parallel=]:
     1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
@@ -5489,12 +5489,14 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |gatt| be |simulatedDeviceInstance|.{{[[gatt]]}}.
-1. For each |promise| in |gatt|.{{[[activeAlgorithms]]}}, [=resolve=] |promise| with |params|.
+1. For each |promise| in |gatt|.{{[[activeAlgorithms]]}}, [=resolve=] |promise| with |params| and remove |promise|
+    from |gatt|.{{[[activeAlgorithms]]}}.
 
 </div>
 
 <div class="example">
-A [=local end=] could simulate a device gatt connection response by sending the following message:
+A [=local end=] could simulate a device gatt connection response of success
+(error code `0x00` according to <a>List of Error Codes</a>) by sending the following message:
 
 <pre highlight="json">
 {
@@ -5502,14 +5504,16 @@ A [=local end=] could simulate a device gatt connection response by sending the 
   "params": {
     "context": "cxt-d03fdd81",
     "address": "09:09:09:09:09:09",
-    "type": "connection"
+    "type": "connection",
+    "code": 0
   }
 }
 </pre>
 </div>
 
 <div class="example">
-A [=local end=] could simulate a device gatt service discovery response by sending the following message:
+A [=local end=] could simulate a device gatt service discovery response of success
+(error code `0x00` according to <a>List of Error Codes</a>) by sending the following message:
 
 <pre highlight="json">
 {
@@ -5518,6 +5522,7 @@ A [=local end=] could simulate a device gatt service discovery response by sendi
     "context": "cxt-d03fdd81",
     "address": "09:09:09:09:09:09",
     "type": "discovery"
+    "code": 0
   }
 }
 </pre>
@@ -5571,11 +5576,11 @@ bluetooth.GattEventGeneratedParameters = {
 </pre>
 
 <div algorithm="remote end event trigger for bluetooth.GattEventGenerated">
-To <dfn>trigger a gatt event</dfn> given a [=navigable=] |navigable|, a [=Bluetooth device=] |device|, and |type|:
+To <dfn>trigger a gatt event</dfn> given a [=navigable=] |navigable|, a {{BluetoothDevice}} |device|, and |type|:
 
 1. Let |navigableId| be |navigable|'s [=navigable id=].
 1. Let |params| be a [=map=] matching the <code>bluetooth.GattEventGeneratedParameters</code> production with the
-    <code>context</code> field set to |navigableId|, the <code>address</code> field set to |device|'s address, and the
+    <code>context</code> field set to |navigableId|, the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address, and the
     <code>type</code> field set to |type|.
 1. Let |body| be a [=map=] matching the <code>bluetooth.GattEventGenerated</code> production, with the
     <code>params</code> field set to |params|.
@@ -5651,6 +5656,15 @@ This specification uses a read-only type that is similar to WebIDL's
       </li>
       <li value="2">Core System Package [BR/EDR Controller volume]
         <ol type="A">
+          <li value="4">Error Codes
+            <ol>
+              <li value="1">Overview of Error Codes
+                <ol>
+                  <li value="3"><dfn>List of Error Codes</dfn></li>
+                </ol>
+              </li>
+            </ol>
+          </li>
           <li value="5">Host Controller Interface Functional Specification
             <ol>
               <li value="7">HCI Commands and Events
