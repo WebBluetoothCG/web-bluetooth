@@ -2915,20 +2915,24 @@ To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
 [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
 1. Let |global| be |deviceObj|'s [=relevant global object=].
-1. If |deviceObj|'s [=Window/navigable=]'s [=navigable/top-level traversable=]'s
+1. If |global|'s [=Window/navigable=]'s [=navigable/top-level traversable=]'s
     <a>simulated Bluetooth adapter</a> is not empty, run the following steps:
-    1. [=Trigger a gatt event=] given |deviceObj|'s [=Window/navigable=], |deviceObj|,
+    1. [=Trigger a gatt event=] given |global|'s [=Window/navigable=], |deviceObj|,
         and <code>"discovery"</code>.
-    1. <a>Upon fulfillment</a> of <var>promise</var> with |params|, run the
-        following steps:
+    1. Let |pendingAutomationPromise| be a [=a new promise=].
+    1. Add |pendingAutomationPromise| to [=this=].{{[[pendingAutomationResponse]]}}.
+    1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |params|,
+        run the following steps:
+        1. Remove |pendingAutomationPromise| from [=this=].{{[[pendingAutomationResponse]]}}.
         1. If |params|[`"type"`] is `discovery` and |params|[`"code"`] is `0`, do the
             following sub-steps:
             1. Let |result| be a new sequence.
             1. Append to |result| the <code>Promise&lt;BluetoothGATT*></code>
                 instance in |context|.{{Bluetooth/[[attributeInstanceMap]]}} matching the
                 description.
-            1. Return the result of [=waiting for all=] elements of |result|.
-        1. Otherwise, throw a {{NetworkError}}.
+            1. [=resolve=] |promise| with the result of [=waiting for all=] elements of
+                |result|.
+        1. Otherwise,  [=reject=] |promise| with a {{NetworkError}}.
     1. Abort these steps.
 1. [=Populate the Bluetooth cache=] with entries matching the description.
 1. If the previous step returns an error, [=queue a global task=] on the
@@ -3126,6 +3130,14 @@ slots</a> described in the following table:
       tell whether its <a>realm</a> was ever disconnected while it was running.
     </td>
   </tr>
+  <tr>
+    <td><dfn>\[[pendingAutomationResponse]]</dfn></td>
+    <td><code>new {{Set}}()</code></td>
+    <td>
+      Contains a {{Promise}} corresponding to each algorithm that is waiting for
+      the automation script to provide a response.
+    </td>
+  </tr>
 </table>
 
 <div algorithm="BluetoothRemoteGATTServer connect">
@@ -3144,18 +3156,20 @@ method, when invoked, MUST perform the following steps:
     and/or give the user a way to retry failed operations.
 1. Let |promise| be [=a new promise=].
 1. Add |promise| to [=this=].{{[[activeAlgorithms]]}}.
-1. If [=this=]'s [=Window/navigable=]'s
+1. If |global|'s [=Window/navigable=]'s
     [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a> is
     not empty, run the following steps:
-    1. [=Trigger a gatt event=] given [=this=]'s [=Window/navigable=],
+    1. [=Trigger a gatt event=] given |global|'s [=Window/navigable=],
         [=this=].{{BluetoothRemoteGATTServer/device}}, and <code>"connect"</code>.
-    1. <a>Upon fulfillment</a> of <var>promise</var> with |params|, run the
-        following steps:
+    1. Let |pendingAutomationPromise| be a [=a new promise=].
+    1. Add |pendingAutomationPromise| to [=this=].{{[[pendingAutomationResponse]]}}.
+    1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |params|,
+        run the following steps:
         1. If |params|[`"type"`] is `connection` and |params|[`"code"`] is `0`,
             do the following sub-steps:
             1. Set [=this=].{{BluetoothRemoteGATTServer/connected}} to `true`.
-            1. return [=this=].
-        1. Otherwise, throw a {{NetworkError}}.
+            1. [=Resolve=] |promise| with [=this=].
+        1. Otherwise, [=reject=] |promise| with  {{NetworkError}}.
     1. Return |promise|.
 1. Run the following steps [=in parallel=]:
     1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
@@ -5408,7 +5422,7 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be params["context"].
+1. Let |contextId| be |params|["context"].
 1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |topLevelNavigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |scanEntry| be |params|[`"scanEntry"`].
@@ -5477,7 +5491,7 @@ bluetooth.SimulateGattResponseParameters = {
 <div algorithm="remote end steps for bluetooth.simulateGattResponse">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be params["context"].
+1. Let |contextId| be |params|["context"].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. Let |deviceAddress| be |params|[`"address"`].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
@@ -5489,8 +5503,7 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |gatt| be |simulatedDeviceInstance|.{{[[gatt]]}}.
-1. For each |promise| in |gatt|.{{[[activeAlgorithms]]}}, [=resolve=] |promise| with |params| and remove |promise|
-    from |gatt|.{{[[activeAlgorithms]]}}.
+1. For each |promise| in |gatt|.{{[[pendingAutomationResponse]]}}, [=resolve=] |promise| with |params|.
 
 </div>
 
