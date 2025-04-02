@@ -3147,6 +3147,12 @@ method, when invoked, MUST perform the following steps:
         [=this=].{{[[pendingAutomationGATTConnectionResponse]]}}.
     1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |responseCode|,
         run the following steps:
+        1. If |promise| is not in [=this=].{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with an "{{AbortError}}" {{DOMException}},
+            [=garbage-collect the connection=] of
+            [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}},
+            and abort these steps.
+        1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.        
         1. If |responseCode| is `0`, do the following sub-steps:
             1. Set [=this=].{{BluetoothRemoteGATTServer/connected}} to `true`.
             1. [=Resolve=] |promise| with [=this=].
