@@ -2915,25 +2915,6 @@ To <dfn>query the Bluetooth cache</dfn> in a {{BluetoothDevice}} instance
 [=a new promise=] |promise| and run the following steps [=in parallel=]:
 
 1. Let |global| be |deviceObj|'s [=relevant global object=].
-1. If |global|'s [=Window/navigable=]'s [=navigable/top-level traversable=]'s
-    <a>simulated Bluetooth adapter</a> is not empty, run the following steps:
-    1. [=Trigger a gatt event=] given |global|'s [=Window/navigable=], |deviceObj|,
-        and <code>"discovery"</code>.
-    1. Let |pendingAutomationPromise| be a [=a new promise=].
-    1. Add |pendingAutomationPromise| to [=this=].{{[[pendingAutomationResponse]]}}.
-    1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |params|,
-        run the following steps:
-        1. Remove |pendingAutomationPromise| from [=this=].{{[[pendingAutomationResponse]]}}.
-        1. If |params|[`"type"`] is `discovery` and |params|[`"code"`] is `0`, do the
-            following sub-steps:
-            1. Let |result| be a new sequence.
-            1. Append to |result| the <code>Promise&lt;BluetoothGATT*></code>
-                instance in |context|.{{Bluetooth/[[attributeInstanceMap]]}} matching the
-                description.
-            1. [=resolve=] |promise| with the result of [=waiting for all=] elements of
-                |result|.
-        1. Otherwise,  [=reject=] |promise| with a {{NetworkError}}.
-    1. Abort these steps.
 1. [=Populate the Bluetooth cache=] with entries matching the description.
 1. If the previous step returns an error, [=queue a global task=] on the
     [=Bluetooth task source=] given |global| to [=reject=] |promise| with that
@@ -3131,11 +3112,11 @@ slots</a> described in the following table:
     </td>
   </tr>
   <tr>
-    <td><dfn>\[[pendingAutomationResponse]]</dfn></td>
+    <td><dfn>\[[pendingAutomationGATTConnectionResponse]]</dfn></td>
     <td><code>new {{Set}}()</code></td>
     <td>
-      Contains a {{Promise}} corresponding to each algorithm that is waiting for
-      the automation script to provide a response.
+      Contains {{promise}}s that are waiting for the automation script to provide
+      the response for a GATT connection attempt
     </td>
   </tr>
 </table>
@@ -3159,14 +3140,14 @@ method, when invoked, MUST perform the following steps:
 1. If |global|'s [=Window/navigable=]'s
     [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a> is
     not empty, run the following steps:
-    1. [=Trigger a gatt event=] given |global|'s [=Window/navigable=],
-        [=this=].{{BluetoothRemoteGATTServer/device}}, and <code>"connect"</code>.
+    1. [=Trigger a gatt connection attempted event=] given |global|'s [=Window/navigable=]
+        and [=this=].{{BluetoothRemoteGATTServer/device}}.
     1. Let |pendingAutomationPromise| be a [=a new promise=].
-    1. Add |pendingAutomationPromise| to [=this=].{{[[pendingAutomationResponse]]}}.
-    1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |params|,
+    1. Add |pendingAutomationPromise| to
+        [=this=].{{[[pendingAutomationGATTConnectionResponse]]}}.
+    1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |responseCode|,
         run the following steps:
-        1. If |params|[`"type"`] is `connection` and |params|[`"code"`] is `0`,
-            do the following sub-steps:
+        1. If |responseCode| is `0`, do the following sub-steps:
             1. Set [=this=].{{BluetoothRemoteGATTServer/connected}} to `true`.
             1. [=Resolve=] |promise| with [=this=].
         1. Otherwise, [=reject=] |promise| with  {{NetworkError}}.
@@ -5471,24 +5452,23 @@ A [=local end=] could simulate a device advertisement by sending the following m
 </pre>
 </div>
 
-#### The bluetooth.simulateGattResponse Command #### {#bluetooth-simulategattresponse-command}
+#### The bluetooth.simulateGattConnectionResponse Command #### {#bluetooth-simulategattconnectionresponse-command}
 
 <pre highlight="cddl" class="cddl remote-cddl local-cddl">
-bluetooth.SimulateGattResponse = (
-   method: "bluetooth.simulateGattResponse",
-   params: bluetooth.SimulateGattResponseParameters,
+bluetooth.SimulateGattConnectionResponse = (
+   method: "bluetooth.simulateGattConnectionResponse",
+   params: bluetooth.SimulateGattConnectionResponseParameters,
 )
 
-bluetooth.SimulateGattResponseParameters = {
+bluetooth.SimulateGattConnectionResponseParameters = {
    context: text,
    address: text,
-   type: "connection" / "discovery",
    code: uint
 }
 
 </pre>
 
-<div algorithm="remote end steps for bluetooth.simulateGattResponse">
+<div algorithm="remote end steps for bluetooth.simulateGattConnectionResponse">
 The [=remote end steps=] with command parameters |params| are:
 
 1. Let |contextId| be |params|["context"].
@@ -5503,7 +5483,7 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |gatt| be |simulatedDeviceInstance|.{{[[gatt]]}}.
-1. For each |promise| in |gatt|.{{[[pendingAutomationResponse]]}}, [=resolve=] |promise| with |params|.
+1. For each |promise| in |gatt|.{{[[pendingAutomationGATTConnectionResponse]]}}, [=resolve=] |promise| with |params|[`code`].
 
 </div>
 
@@ -5513,28 +5493,10 @@ A [=local end=] could simulate a device gatt connection response of success
 
 <pre highlight="json">
 {
-  "method": "bluetooth.simulateGattResponse",
+  "method": "bluetooth.simulateGattConnectionResponse",
   "params": {
     "context": "cxt-d03fdd81",
     "address": "09:09:09:09:09:09",
-    "type": "connection",
-    "code": 0
-  }
-}
-</pre>
-</div>
-
-<div class="example">
-A [=local end=] could simulate a device gatt service discovery response of success
-(error code `0x00` according to <a>List of Error Codes</a>) by sending the following message:
-
-<pre highlight="json">
-{
-  "method": "bluetooth.simulateGattResponse",
-  "params": {
-    "context": "cxt-d03fdd81",
-    "address": "09:09:09:09:09:09",
-    "type": "discovery"
     "code": 0
   }
 }
@@ -5573,29 +5535,27 @@ To <dfn>trigger a prompt updated event</dfn> given a [=navigable=] |navigable|, 
 
 </div>
 
-#### The bluetooth.gattEventGenerated Event #### {#bluetooth-gatteventgenerated-event}
+#### The bluetooth.gattConnectionAttempted Event #### {#bluetooth-gattConnectionAttempted-event}
 
 <pre highlight="cddl" class="cddl local-cddl">
-bluetooth.GattEventGenerated = (
-   method: "bluetooth.gattEventGenerated",
-   params: bluetooth.GattEventGeneratedParameters
+bluetooth.GattConnectionAttempted = (
+   method: "bluetooth.gattConnectionAttempted",
+   params: bluetooth.GattConnectionAttemptedParameters
 )
 
-bluetooth.GattEventGeneratedParameters = {
+bluetooth.GattConnectionAttemptedParameters = {
    context: text,
-   address: text,
-   type: "connection" / "discovery",
+   address: text
 }
 </pre>
 
-<div algorithm="remote end event trigger for bluetooth.GattEventGenerated">
-To <dfn>trigger a gatt event</dfn> given a [=navigable=] |navigable|, a {{BluetoothDevice}} |device|, and |type|:
+<div algorithm="remote end event trigger for bluetooth.GattConnectionAttempted">
+To <dfn>trigger a gatt connection attempted event</dfn> given a [=navigable=] |navigable| and a {{BluetoothDevice}} |device|:
 
 1. Let |navigableId| be |navigable|'s [=navigable id=].
-1. Let |params| be a [=map=] matching the <code>bluetooth.GattEventGeneratedParameters</code> production with the
-    <code>context</code> field set to |navigableId|, the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address, and the
-    <code>type</code> field set to |type|.
-1. Let |body| be a [=map=] matching the <code>bluetooth.GattEventGenerated</code> production, with the
+1. Let |params| be a [=map=] matching the <code>bluetooth.GattConnectionAttemptedParameters</code> production with the
+    <code>context</code> field set to |navigableId|, the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address.
+1. Let |body| be a [=map=] matching the <code>bluetooth.GattConnectionAttempted</code> production, with the
     <code>params</code> field set to |params|.
 1. Let |related navigables| be a [=/set=] containing |navigable|.
 1. For each |session| in the [=set of sessions for which an event is enabled=] given
