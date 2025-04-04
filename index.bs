@@ -3112,11 +3112,10 @@ slots</a> described in the following table:
     </td>
   </tr>
   <tr>
-    <td><dfn>\[[pendingAutomationGATTConnectionResponse]]</dfn></td>
-    <td><code>new {{Set}}()</code></td>
+    <td><dfn>\[[automatedGATTConnectionResponse]]</dfn></td>
+    <td><code>null</code></td>
     <td>
-      Contains {{promise}}s that are waiting for the automation script to provide
-      the response for a GATT connection attempt
+      The simulated GATT connection response code for a GATT connection attempt.
     </td>
   </tr>
 </table>
@@ -3137,65 +3136,58 @@ method, when invoked, MUST perform the following steps:
     and/or give the user a way to retry failed operations.
 1. Let |promise| be [=a new promise=].
 1. Add |promise| to [=this=].{{[[activeAlgorithms]]}}.
-1. If |global|'s [=Window/navigable=]'s
-    [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a> is
-    not empty, run the following steps:
-    1. [=Trigger a gatt connection attempted event=] given |global|'s [=Window/navigable=]
-        and [=this=].{{BluetoothRemoteGATTServer/device}}.
-    1. Let |pendingAutomationPromise| be a [=a new promise=].
-    1. Add |pendingAutomationPromise| to
-        [=this=].{{[[pendingAutomationGATTConnectionResponse]]}}.
-    1. <a>Upon fulfillment</a> of |pendingAutomationPromise| with |responseCode|,
-        run the following steps:
-        1. If |promise| is not in [=this=].{{[[activeAlgorithms]]}}, [=reject=]
-            |promise| with an "{{AbortError}}" {{DOMException}},
-            [=garbage-collect the connection=] of
-            [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}},
-            and abort these steps.
-        1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.        
-        1. If |responseCode| is `0`, do the following sub-steps:
-            1. Set [=this=].{{BluetoothRemoteGATTServer/connected}} to `true`.
-            1. [=Resolve=] |promise| with [=this=].
-        1. Otherwise, [=reject=] |promise| with  {{NetworkError}}.
-    1. Return |promise|.
 1. Run the following steps [=in parallel=]:
-    1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
-        has no [=ATT Bearer=], do the following sub-steps:
-        1. <p id="create-an-att-bearer">Attempt to create an <a>ATT Bearer</a>
-            using the procedures described in "Connection Establishment" under
-            <a>GAP Interoperability Requirements</a>. Abort this attempt if
-            |promise| is removed from
-            [=this=].{{[[activeAlgorithms]]}}.</p>
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. [=Trigger a gatt connection attempted event=] given |global|'s
+            [=Window/navigable=] and [=this=].{{BluetoothRemoteGATTServer/device}}.
+        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `null`, wait for
+            it to be non-`null`.
+        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is not `0`, do the
+            following sub-steps:
+            1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.
+            1. [=queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+    1. Otherwise, run the following steps:
+        1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
+            has no [=ATT Bearer=], do the following sub-steps:
+            1. <p id="create-an-att-bearer">Attempt to create an <a>ATT Bearer</a>
+                using the procedures described in "Connection Establishment" under
+                <a>GAP Interoperability Requirements</a>. Abort this attempt if
+                |promise| is removed from
+                [=this=].{{[[activeAlgorithms]]}}.</p>
 
-            <div class="note">
-              Note: These procedures can wait forever
-              if a connectable advertisement isn't received.
-              The website should call {{disconnect()}}
-              if it no longer wants to connect.
-            </div>
-        1. If this attempt was aborted because |promise| was removed from
-            [=this=].{{[[activeAlgorithms]]}}, [=queue a global task=] on
-            the [=Bluetooth task source=] given |global| to [=reject=]
-            |promise| with an "{{AbortError}}" {{DOMException}} and abort these
-            steps.
-        1. If this attempt failed for another reason, [=queue a global task=]
-            on the [=Bluetooth task source=] given |global| to [=reject=]
-            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
-            these steps.
-        1. Use the [=Exchange MTU=] procedure to negotiate the largest
-            supported MTU. Ignore any errors from this step.
-        1. The UA MAY attempt to bond with the remote device using the <a>BR/EDR
-            Bonding Procedure</a> or the [=LE Bonding Procedure=].
+                <div class="note">
+                  Note: These procedures can wait forever
+                  if a connectable advertisement isn't received.
+                  The website should call {{disconnect()}}
+                  if it no longer wants to connect.
+                </div>
+            1. If this attempt was aborted because |promise| was removed from
+                [=this=].{{[[activeAlgorithms]]}}, [=queue a global task=] on
+                the [=Bluetooth task source=] given |global| to [=reject=]
+                |promise| with an "{{AbortError}}" {{DOMException}} and abort these
+                steps.
+            1. If this attempt failed for another reason, [=queue a global task=]
+                on the [=Bluetooth task source=] given |global| to [=reject=]
+                |promise| with a "{{NetworkError}}" {{DOMException}} and abort
+                these steps.
+            1. Use the [=Exchange MTU=] procedure to negotiate the largest
+                supported MTU. Ignore any errors from this step.
+            1. The UA MAY attempt to bond with the remote device using the <a>BR/EDR
+                Bonding Procedure</a> or the [=LE Bonding Procedure=].
 
-            Note: We would normally prefer to give the website control over
-            whether and when bonding happens, but the [Core
-            Bluetooth](https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html)
-            platform API doesn't provide a way for UAs to implement such a knob.
-            Having a bond is more secure than not having one, so this
-            specification allows the UA to opportunistically create one on
-            platforms where that's possible. This may cause a user-visible
-            pairing dialog to appear when a connection is created, instead of
-            when a restricted characteristic is accessed.
+                Note: We would normally prefer to give the website control over
+                whether and when bonding happens, but the [Core
+                Bluetooth](https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html)
+                platform API doesn't provide a way for UAs to implement such a knob.
+                Having a bond is more secure than not having one, so this
+                specification allows the UA to opportunistically create one on
+                platforms where that's possible. This may cause a user-visible
+                pairing dialog to appear when a connection is created, instead of
+                when a restricted characteristic is accessed.
     1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following sub-steps:
         1. If |promise| is not in [=this=].{{[[activeAlgorithms]]}}, [=reject=]
@@ -5163,6 +5155,7 @@ BluetoothCommand = (
   bluetooth.DisableSimulation //
   bluetooth.SimulatePreconnectedPeripheral //
   bluetooth.SimulateAdvertisement //
+  bluetooth.SimulateGattConnectionResponse //
 )
 </pre>
 
@@ -5244,7 +5237,7 @@ bluetooth.SimulateAdapterParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
@@ -5307,7 +5300,7 @@ bluetooth.DisableSimulationParameters = {
 <div algorithm="remote end steps for bluetooth.disableSimulation">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to empty.
@@ -5409,7 +5402,7 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |topLevelNavigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |scanEntry| be |params|[`"scanEntry"`].
@@ -5477,7 +5470,7 @@ bluetooth.SimulateGattConnectionResponseParameters = {
 <div algorithm="remote end steps for bluetooth.simulateGattConnectionResponse">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. Let |deviceAddress| be |params|[`"address"`].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
@@ -5488,8 +5481,7 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
-1. Let |gatt| be |simulatedDeviceInstance|.{{[[gatt]]}}.
-1. For each |promise| in |gatt|.{{[[pendingAutomationGATTConnectionResponse]]}}, [=resolve=] |promise| with |params|[`code`].
+1. Set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to |params|[`"code"`].
 
 </div>
 
