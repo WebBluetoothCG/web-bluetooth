@@ -3144,10 +3144,12 @@ method, when invoked, MUST perform the following steps:
             [=Window/navigable=] and [=this=].{{BluetoothRemoteGATTServer/device}}.
         1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `null`, wait for
             it to be non-`null`.
-        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is not `0`, do the
+        1. Let |response| be [=this=].{{[[automatedGATTConnectionResponse]]}}.
+        1. Set [=this=].{{[[automatedGATTConnectionResponse]]}} to `null`.
+        1. If |response| is not `0`, do the
             following sub-steps:
             1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.
-            1. [=queue a global task=] on the [=Bluetooth task source=] given
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
                 |global| to [=reject=] |promise| with a "{{NetworkError}}"
                 {{DOMException}} and abort these steps.
     1. Otherwise, run the following steps:
@@ -5527,8 +5529,8 @@ To <dfn>trigger a prompt updated event</dfn> given a [=navigable=] |navigable|, 
 1. Set [=map of navigables to device prompts=][|navigableId|] to |prompt|.
 1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production with the <code>context</code> field set to |navigableId|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
 1. Let |body| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdated</code> production, with the <code>params</code> field set to |params|.
-1. Let |related navigables| be a [=/set=] containing |navigable|.
-1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |related navigables|:
+1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
@@ -5552,12 +5554,12 @@ To <dfn>trigger a gatt connection attempted event</dfn> given a [=navigable=] |n
 
 1. Let |navigableId| be |navigable|'s [=navigable id=].
 1. Let |params| be a [=map=] matching the <code>bluetooth.GattConnectionAttemptedParameters</code> production with the
-    <code>context</code> field set to |navigableId|, the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address.
+    <code>context</code> field set to |navigableId| and the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address.
 1. Let |body| be a [=map=] matching the <code>bluetooth.GattConnectionAttempted</code> production, with the
     <code>params</code> field set to |params|.
-1. Let |related navigables| be a [=/set=] containing |navigable|.
+1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
 1. For each |session| in the [=set of sessions for which an event is enabled=] given
-    "<code>bluetooth.gattEventGenerated</code>" and |related navigables|:
+    "<code>bluetooth.gattEventGenerated</code>" and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
