@@ -110,6 +110,7 @@ spec: WEBDRIVER; urlPrefix: https://w3c.github.io/webdriver/
     type: dfn
         text: error; url: dfn-error
         text: local end; url: dfn-local-ends
+        text: invalid element state; url: dfn-invalid-element-state
 
 </pre>
 <pre class="link-defaults">
@@ -3113,7 +3114,7 @@ slots</a> described in the following table:
   </tr>
   <tr>
     <td><dfn>\[[automatedGATTConnectionResponse]]</dfn></td>
-    <td><code>null</code></td>
+    <td><code>"not-expected"</code></td>
     <td>
       The simulated GATT connection response code for a GATT connection attempt.
     </td>
@@ -3142,10 +3143,12 @@ method, when invoked, MUST perform the following steps:
         is not empty, run the following steps:
         1. [=Trigger a gatt connection attempted event=] given |global|'s
             [=Window/navigable=] and [=this=].{{BluetoothRemoteGATTServer/device}}.
-        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `null`, wait for
-            it to be non-`null`.
+        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `"not-expected"`,
+            set it to `"expected"`.
+        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
+            wait for it to be changed.
         1. Let |response| be [=this=].{{[[automatedGATTConnectionResponse]]}}.
-        1. Set [=this=].{{[[automatedGATTConnectionResponse]]}} to `null`.
+        1. Set [=this=].{{[[automatedGATTConnectionResponse]]}} to `"not-expected"`.
         1. If |response| is not `0`, do the
             following sub-steps:
             1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.
@@ -5483,7 +5486,9 @@ The [=remote end steps=] with command parameters |params| are:
 1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
-1. Set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to |params|[`"code"`].
+1. If |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
+    set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to |params|[`"code"`].
+1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
 
 </div>
 
