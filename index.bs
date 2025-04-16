@@ -3136,6 +3136,8 @@ method, when invoked, MUST perform the following steps:
     but for now sites need to serialize their use of this API
     and/or give the user a way to retry failed operations.
 1. Let |promise| be [=a new promise=].
+1. If [=this=].{{BluetoothRemoteGATTServer/connected}} is `true`,
+    [=resolve=] |promise| with [=this=] and return |promise|.
 1. Add |promise| to [=this=].{{[[activeAlgorithms]]}}.
 1. Run the following steps [=in parallel=]:
     1. If |global|'s [=Window/navigable=]'s
@@ -3146,7 +3148,7 @@ method, when invoked, MUST perform the following steps:
         1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `"not-expected"`,
             set it to `"expected"`.
         1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
-            wait for it to be changed.
+            wait for it to change.
         1. Let |response| be [=this=].{{[[automatedGATTConnectionResponse]]}}.
         1. Set [=this=].{{[[automatedGATTConnectionResponse]]}} to `"not-expected"`.
         1. If |response| is not `0`, do the
