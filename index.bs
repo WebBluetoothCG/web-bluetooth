@@ -110,6 +110,7 @@ spec: WEBDRIVER; urlPrefix: https://w3c.github.io/webdriver/
     type: dfn
         text: error; url: dfn-error
         text: local end; url: dfn-local-ends
+        text: invalid element state; url: dfn-invalid-element-state
 
 </pre>
 <pre class="link-defaults">
@@ -3111,6 +3112,13 @@ slots</a> described in the following table:
       tell whether its <a>realm</a> was ever disconnected while it was running.
     </td>
   </tr>
+  <tr>
+    <td><dfn>\[[automatedGATTConnectionResponse]]</dfn></td>
+    <td><code>"not-expected"</code></td>
+    <td>
+      The simulated GATT connection response code for a GATT connection attempt.
+    </td>
+  </tr>
 </table>
 
 <div algorithm="BluetoothRemoteGATTServer connect">
@@ -3128,45 +3136,65 @@ method, when invoked, MUST perform the following steps:
     but for now sites need to serialize their use of this API
     and/or give the user a way to retry failed operations.
 1. Let |promise| be [=a new promise=].
+1. If [=this=].{{BluetoothRemoteGATTServer/connected}} is `true`,
+    [=resolve=] |promise| with [=this=] and return |promise|.
 1. Add |promise| to [=this=].{{[[activeAlgorithms]]}}.
 1. Run the following steps [=in parallel=]:
-    1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
-        has no [=ATT Bearer=], do the following sub-steps:
-        1. <p id="create-an-att-bearer">Attempt to create an <a>ATT Bearer</a>
-            using the procedures described in "Connection Establishment" under
-            <a>GAP Interoperability Requirements</a>. Abort this attempt if
-            |promise| is removed from
-            [=this=].{{[[activeAlgorithms]]}}.</p>
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. [=Trigger a gatt connection attempted event=] given |global|'s
+            [=Window/navigable=] and [=this=].{{BluetoothRemoteGATTServer/device}}.
+        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `"not-expected"`,
+            set it to `"expected"`.
+        1. If [=this=].{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
+            wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedGATTConnectionResponse]]}}.
+        1. Set [=this=].{{[[automatedGATTConnectionResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the
+            following sub-steps:
+            1. Remove |promise| from [=this=].{{[[activeAlgorithms]]}}.
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+    1. Otherwise, run the following steps:
+        1. If [=this=].{{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}}
+            has no [=ATT Bearer=], do the following sub-steps:
+            1. <p id="create-an-att-bearer">Attempt to create an <a>ATT Bearer</a>
+                using the procedures described in "Connection Establishment" under
+                <a>GAP Interoperability Requirements</a>. Abort this attempt if
+                |promise| is removed from
+                [=this=].{{[[activeAlgorithms]]}}.</p>
 
-            <div class="note">
-              Note: These procedures can wait forever
-              if a connectable advertisement isn't received.
-              The website should call {{disconnect()}}
-              if it no longer wants to connect.
-            </div>
-        1. If this attempt was aborted because |promise| was removed from
-            [=this=].{{[[activeAlgorithms]]}}, [=queue a global task=] on
-            the [=Bluetooth task source=] given |global| to [=reject=]
-            |promise| with an "{{AbortError}}" {{DOMException}} and abort these
-            steps.
-        1. If this attempt failed for another reason, [=queue a global task=]
-            on the [=Bluetooth task source=] given |global| to [=reject=]
-            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
-            these steps.
-        1. Use the [=Exchange MTU=] procedure to negotiate the largest
-            supported MTU. Ignore any errors from this step.
-        1. The UA MAY attempt to bond with the remote device using the <a>BR/EDR
-            Bonding Procedure</a> or the [=LE Bonding Procedure=].
+                <div class="note">
+                  Note: These procedures can wait forever
+                  if a connectable advertisement isn't received.
+                  The website should call {{disconnect()}}
+                  if it no longer wants to connect.
+                </div>
+            1. If this attempt was aborted because |promise| was removed from
+                [=this=].{{[[activeAlgorithms]]}}, [=queue a global task=] on
+                the [=Bluetooth task source=] given |global| to [=reject=]
+                |promise| with an "{{AbortError}}" {{DOMException}} and abort these
+                steps.
+            1. If this attempt failed for another reason, [=queue a global task=]
+                on the [=Bluetooth task source=] given |global| to [=reject=]
+                |promise| with a "{{NetworkError}}" {{DOMException}} and abort
+                these steps.
+            1. Use the [=Exchange MTU=] procedure to negotiate the largest
+                supported MTU. Ignore any errors from this step.
+            1. The UA MAY attempt to bond with the remote device using the <a>BR/EDR
+                Bonding Procedure</a> or the [=LE Bonding Procedure=].
 
-            Note: We would normally prefer to give the website control over
-            whether and when bonding happens, but the [Core
-            Bluetooth](https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html)
-            platform API doesn't provide a way for UAs to implement such a knob.
-            Having a bond is more secure than not having one, so this
-            specification allows the UA to opportunistically create one on
-            platforms where that's possible. This may cause a user-visible
-            pairing dialog to appear when a connection is created, instead of
-            when a restricted characteristic is accessed.
+                Note: We would normally prefer to give the website control over
+                whether and when bonding happens, but the [Core
+                Bluetooth](https://developer.apple.com/library/content/documentation/NetworkingInternetWeb/Conceptual/CoreBluetooth_concepts/AboutCoreBluetooth/Introduction.html)
+                platform API doesn't provide a way for UAs to implement such a knob.
+                Having a bond is more secure than not having one, so this
+                specification allows the UA to opportunistically create one on
+                platforms where that's possible. This may cause a user-visible
+                pairing dialog to appear when a connection is created, instead of
+                when a restricted characteristic is accessed.
     1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following sub-steps:
         1. If |promise| is not in [=this=].{{[[activeAlgorithms]]}}, [=reject=]
@@ -5134,6 +5162,7 @@ BluetoothCommand = (
   bluetooth.DisableSimulation //
   bluetooth.SimulatePreconnectedPeripheral //
   bluetooth.SimulateAdvertisement //
+  bluetooth.SimulateGattConnectionResponse //
 )
 </pre>
 
@@ -5215,7 +5244,7 @@ bluetooth.SimulateAdapterParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
@@ -5278,7 +5307,7 @@ bluetooth.DisableSimulationParameters = {
 <div algorithm="remote end steps for bluetooth.disableSimulation">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to empty.
@@ -5380,7 +5409,7 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be params["context"].
+1. Let |contextId| be |params|[`"context"`].
 1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |topLevelNavigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |scanEntry| be |params|[`"scanEntry"`].
@@ -5429,6 +5458,58 @@ A [=local end=] could simulate a device advertisement by sending the following m
 </pre>
 </div>
 
+#### The bluetooth.simulateGattConnectionResponse Command #### {#bluetooth-simulategattconnectionresponse-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateGattConnectionResponse = (
+   method: "bluetooth.simulateGattConnectionResponse",
+   params: bluetooth.SimulateGattConnectionResponseParameters,
+)
+
+bluetooth.SimulateGattConnectionResponseParameters = {
+   context: text,
+   address: text,
+   code: uint
+}
+
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateGattConnectionResponse">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+    Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. If |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
+    set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to |params|[`"code"`].
+1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a device gatt connection response of success
+(error code `0x00` according to <a>List of Error Codes</a>) by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateGattConnectionResponse",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "code": 0
+  }
+}
+</pre>
+</div>
+
 ### Events ### {#bidi-events}
 
 #### The bluetooth.requestDevicePromptUpdated Event #### {#bluetooth-requestdevicepromptupdated-event}
@@ -5453,10 +5534,39 @@ To <dfn>trigger a prompt updated event</dfn> given a [=navigable=] |navigable|, 
 1. Let |prompt| be the [=device prompt=] (|promptId|, |devices|).
 1. Let |serialized devices| be the result of [=serialize prompt devices=] with |prompt|.
 1. Set [=map of navigables to device prompts=][|navigableId|] to |prompt|.
-1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production  with the <code>context</code> field set to |navigableId|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
+1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production with the <code>context</code> field set to |navigableId|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
 1. Let |body| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdated</code> production, with the <code>params</code> field set to |params|.
-1. Let |related navigables| be a [=/set=] containing |navigable|.
-1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |related navigables|:
+1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |relatedNavigables|:
+    1. [=Emit an event=] with |session| and |body|.
+
+</div>
+
+#### The bluetooth.gattConnectionAttempted Event #### {#bluetooth-gattConnectionAttempted-event}
+
+<pre highlight="cddl" class="cddl local-cddl">
+bluetooth.GattConnectionAttempted = (
+   method: "bluetooth.gattConnectionAttempted",
+   params: bluetooth.GattConnectionAttemptedParameters
+)
+
+bluetooth.GattConnectionAttemptedParameters = {
+   context: text,
+   address: text
+}
+</pre>
+
+<div algorithm="remote end event trigger for bluetooth.GattConnectionAttempted">
+To <dfn>trigger a gatt connection attempted event</dfn> given a [=navigable=] |navigable| and a {{BluetoothDevice}} |device|:
+
+1. Let |navigableId| be |navigable|'s [=navigable id=].
+1. Let |params| be a [=map=] matching the <code>bluetooth.GattConnectionAttemptedParameters</code> production with the
+    <code>context</code> field set to |navigableId| and the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address.
+1. Let |body| be a [=map=] matching the <code>bluetooth.GattConnectionAttempted</code> production, with the
+    <code>params</code> field set to |params|.
+1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given
+    "<code>bluetooth.gattEventGenerated</code>" and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
@@ -5526,6 +5636,15 @@ This specification uses a read-only type that is similar to WebIDL's
       </li>
       <li value="2">Core System Package [BR/EDR Controller volume]
         <ol type="A">
+          <li value="4">Error Codes
+            <ol>
+              <li value="1">Overview of Error Codes
+                <ol>
+                  <li value="3"><dfn>List of Error Codes</dfn></li>
+                </ol>
+              </li>
+            </ol>
+          </li>
           <li value="5">Host Controller Interface Functional Specification
             <ol>
               <li value="7">HCI Commands and Events
