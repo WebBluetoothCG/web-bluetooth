@@ -4234,6 +4234,8 @@ To <dfn>clean up the disconnected device</dfn> |deviceObj|, the UA must:
 1. Set <code><var>deviceObj</var>.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
     to `false`.
 1. Clear <code><var>deviceObj</var>.gatt.{{[[activeAlgorithms]]}}</code>.
+1. Set <code><var>deviceObj</var>.gatt.{{[[automatedGATTConnectionResponse]]}}</code> to
+    `"not-expected"`.
 1. Let |context| be <code>|deviceObj|.{{[[context]]}}</code>.
 1. Remove all entries from <code>|context|.{{[[attributeInstanceMap]]}}</code>
     whose keys are inside <code>|deviceObj|.{{[[representedDevice]]}}</code>.
@@ -5163,6 +5165,7 @@ BluetoothCommand = (
   bluetooth.SimulatePreconnectedPeripheral //
   bluetooth.SimulateAdvertisement //
   bluetooth.SimulateGattConnectionResponse //
+  bluetooth.SimulateGattDisconnection //
 )
 </pre>
 
@@ -5505,6 +5508,60 @@ A [=local end=] could simulate a device gatt connection response of success
     "context": "cxt-d03fdd81",
     "address": "09:09:09:09:09:09",
     "code": 0
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateGattDisconnection Command #### {#bluetooth-simulategattdisconnection-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateGattDisconnection = (
+   method: "bluetooth.simulateGattDisconnection",
+   params: bluetooth.SimulateGattDisconnectionParameters,
+)
+
+bluetooth.SimulateGattDisconnectionParameters = {
+   context: text,
+   address: text,
+}
+
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateGattDisconnection">
+The [=remote end steps=] with command parameters |params| are:
+
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+    Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. If |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
+    set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to `0x15`.
+    <div class="note">
+      `0x15` represents `"Remote Device Terminated Connection due to Power Off"` according to the
+      <a>List of Error Codes</a>. This simulates a scenario where the Bluetooth device is not able to
+      respond to a GATT connection attempt.
+    </div>
+1. Otherwise, <a>clean up the disconnected device</a> |simulatedDeviceInstance|.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate device GATT disconnection by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateGattDisconnection",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
   }
 }
 </pre>
