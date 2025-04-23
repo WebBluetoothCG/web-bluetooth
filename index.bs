@@ -5173,6 +5173,7 @@ BluetoothCommand = (
   bluetooth.SimulateAdvertisement //
   bluetooth.SimulateGattConnectionResponse //
   bluetooth.SimulateGattDisconnection //
+  bluetooth.SimulateService //
 )
 </pre>
 
@@ -5606,20 +5607,21 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
+1. Let |uuid| be |params|[`"uuid"`].
 1. If |params|[`"type"`] is `"add"`:
-    1. If |serviceMapping|[|params|[`"uuid"`]] [=map/exists=], return [=error=] with [=error code=] [=invalid element state=].
+    1. If |serviceMapping|[|uuid|] [=map/exists=], return [=error=] with [=error code=] [=invalid element state=].
     1. Let |simulatedGattService| be a new <a>simulated GATT service</a>.
-    1. Set |simulatedGattService|'s <a>UUID</a> to |params|[`"uuid"`].
-    1. Set |serviceMapping|[|params|[`"uuid"`]] to |simulatedGattService|.
+    1. Set |simulatedGattService|'s <a>UUID</a> to |uuid|.
+    1. Set |serviceMapping|[|uuid|] to |simulatedGattService|.
     1. <a>Create a <code>BluetoothRemoteGATTService</code> representing</a> |simulatedGattService|
         and add a mapping from |simulatedGattService| to the resulting {{Promise}} in
         |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
     1. Return [=success=] with data `null`.
 1. Else if |params|[`"type"`] is `"remove"`:
-    1. If |serviceMapping|[|params|[`"uuid"`]] [=map/exists=], let |simulatedGattService| be |serviceMapping|[|params|[`"uuid"`]].
+    1. If |serviceMapping|[|uuid|] [=map/exists=], let |simulatedGattService| be |serviceMapping|[|uuid|].
     1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
     1. Remove |simulatedGattService| from |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
-    1. Remove |params|[`"uuid"`] from |serviceMapping|.
+    1. Remove |uuid| from |serviceMapping|.
     1. Return [=success=] with data `null`.
 1. Return [=error=] with [=error code=] [=invalid argument=].
 
