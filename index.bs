@@ -5018,8 +5018,18 @@ referenced.
 ## Definitions ## {#bluetooth-bidi-definitions}
 
 <pre class="cddl remote-cddl local-cddl">
-bluetooth.BluetoothServiceUuid = text;
+bluetooth.BluetoothUuid = text;
 bluetooth.BluetoothManufacturerData = { key: uint, data: tstr };
+bluetooth.CharacteristicProperties = {
+  ? broadcast: bool,
+  ? read: bool,
+  ? writeWithoutResponse: bool,
+  ? write: bool,
+  ? notify: bool,
+  ? indicate: bool,
+  ? authenticatedSignedWrites: bool,
+  ? extendedProperties: bool
+}
 </pre>
 
 <dl>
@@ -5119,7 +5129,7 @@ To <dfn>serialize prompt devices</dfn> given [=device prompt=] |prompt|:
 
 bluetooth.ScanRecord = {
   ? name: text,
-  ? uuids: [ * bluetooth.BluetoothServiceUuid ],
+  ? uuids: [ * bluetooth.BluetoothUuid ],
   ? appearance: number,
   ? manufacturerData: [ * bluetooth.BluetoothManufacturerData ],
 }
@@ -5166,6 +5176,11 @@ BluetoothCommand = (
   bluetooth.SimulateAdvertisement //
   bluetooth.SimulateGattConnectionResponse //
   bluetooth.SimulateGattDisconnection //
+  bluetooth.SimulateService //
+  bluetooth.SimulateCharacteristic //
+  bluetooth.simulateCharacteristicResponse //
+  bluetooth.SimulateDescriptor //
+  bluetooth.simulateDescriptorResponse //
 )
 </pre>
 
@@ -5344,7 +5359,7 @@ bluetooth.SimulatePreconnectedPeripheralParameters = {
    address: text,
    name: text,
    manufacturerData: [ * bluetooth.BluetoothManufacturerData ],
-   knownServiceUuids: [ * bluetooth.BluetoothServiceUuid ]
+   knownServiceUuids: [ * bluetooth.BluetoothUuid ]
 }
 </pre>
 
@@ -5567,6 +5582,271 @@ A [=local end=] could simulate device GATT disconnection by sending the followin
 </pre>
 </div>
 
+#### The bluetooth.simulateService Command #### {#bluetooth-simulateservice-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateService = (
+   method: "bluetooth.simulateService",
+   params: bluetooth.SimulateServiceParameters,
+)
+
+bluetooth.simulateServiceParameters = {
+   context: text,
+   address: text,
+   uuid: bluetooth.BluetoothUuid,
+   type: "add" / "remove",
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateService">
+
+Issue: TODO: Finish the algorithm of bluetooth.simulateService.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate adding a GATT service by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateService",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "uuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "type": "add"
+  }
+}
+</pre>
+</div>
+
+<div class="example">
+A [=local end=] could simulate removing a GATT service by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateService",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "uuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "type": "remove"
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.SimulateCharacteristic Command #### {#bluetooth-simulatecharacteristic-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateCharacteristic = (
+   method: "bluetooth.simulateCharacteristic",
+   params: bluetooth.SimulateCharacteristicParameters,
+)
+
+bluetooth.SimulateCharacteristicParameters = {
+   context: text,
+   address: text,
+   serviceUuid: bluetooth.BluetoothUuid,
+   characteristicUuid: bluetooth.BluetoothUuid,
+   ? characteristicProperties: bluetooth.CharacteristicProperties,
+   type: "add" / "remove"
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateCharacteristic">
+
+Issue: TODO: Finish the algorithm of bluetooth.simulateCharacteristic.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate adding a GATT characteristic with read, write, and notify properties
+by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateCharacteristic",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "serviceUuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "characteristicUuid": "00002a21-0000-1000-8000-00805f9b34fb",
+    "characteristicProperties": {
+      "read": true,
+      "write": true,
+      "notify": true},
+    "type": "add"
+  }
+}
+</pre>
+</div>
+
+<div class="example">
+A [=local end=] could simulate removing a GATT characteristic by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateCharacteristic",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "serviceUuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "characteristicUuid": "00002a21-0000-1000-8000-00805f9b34fb",
+    "type": "remove"
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateCharacteristicResponse Command #### {#bluetooth-simulatecharacteristicresponse-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateCharacteristicResponse = (
+   method: "bluetooth.simulateCharacteristicResponse",
+   params: bluetooth.SimulateCharacteristicResponseParameters,
+)
+
+bluetooth.SimulateCharacteristicResponseParameters = {
+   context: text,
+   address: text,
+   serviceUuid: bluetooth.BluetoothUuid,
+   characteristicUuid: bluetooth.BluetoothUuid,
+   type: "read" / "write" / "subscribe-to-notifications" / "unsubscribe-from-notifications",
+   code: uint
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateCharacteristicResponse">
+
+Issue: TODO: Finish the algorithm of bluetooth.simulateCharacteristicResponse.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a response of success (error code `0x00` according to <a>Error Response</a>)
+for a characteristic read operation by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateCharacteristicResponse",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "serviceUuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "characteristicUuid": "00002a21-0000-1000-8000-00805f9b34fb",
+    "type": "read",
+    "code": 0
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.SimulateDescriptor Command #### {#bluetooth-simulatedescriptor-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateDescriptor = (
+   method: "bluetooth.simulateDescriptor",
+   params: bluetooth.SimulateDescriptorParameters,
+)
+
+bluetooth.SimulateDescriptorParameters = {
+   context: text,
+   address: text,
+   serviceUuid: bluetooth.BluetoothUuid,
+   characteristicUuid: bluetooth.BluetoothUuid,
+   descriptorUuid: bluetooth.BluetoothUuid,
+   type: "add" / "remove"
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateDescriptor">
+
+Issue: TODO: Finish the algorithm of bluetooth.simulateDescriptor.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate adding a GATT descriptor by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateDescriptor",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "serviceUuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "characteristicUuid": "00002a21-0000-1000-8000-00805f9b34fb",
+    "descriptorUuid": "00002901-0000-1000-8000-00805f9b34fb",
+    "type": "add"
+  }
+}
+</pre>
+</div>
+
+<div class="example">
+A [=local end=] could simulate removing a GATT descriptor by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateDescriptor",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "serviceUuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "characteristicUuid": "00002a21-0000-1000-8000-00805f9b34fb",
+    "descriptorUuid": "00002901-0000-1000-8000-00805f9b34fb",
+    "type": "remove"
+  }
+}
+</pre>
+</div>
+
+#### The bluetooth.simulateDescriptorResponse Command #### {#bluetooth-simulatedescriptorresponse-command}
+
+<pre highlight="cddl" class="cddl remote-cddl local-cddl">
+bluetooth.SimulateDescriptorResponse = (
+   method: "bluetooth.simulateDescriptorResponse",
+   params: bluetooth.SimulateDescriptorResponseParameters,
+)
+
+bluetooth.SimulateDescriptorResponseParameters = {
+   context: text,
+   address: text,
+   serviceUuid: bluetooth.BluetoothUuid,
+   characteristicUuid: bluetooth.BluetoothUuid,
+   descriptorUuid: bluetooth.BluetoothUuid,
+   type: "read" / "write",
+   code: uint
+}
+</pre>
+
+<div algorithm="remote end steps for bluetooth.simulateDescriptorResponse">
+
+Issue: TODO: Finish the algorithm of bluetooth.simulateDescriptorResponse.
+
+</div>
+
+<div class="example">
+A [=local end=] could simulate a response of success (error code `0x00` according to <a>Error Response</a>)
+for a descriptor read operation by sending the following message:
+
+<pre highlight="json">
+{
+  "method": "bluetooth.simulateDescriptorResponse",
+  "params": {
+    "context": "cxt-d03fdd81",
+    "address": "09:09:09:09:09:09",
+    "serviceUuid": "0000180d-0000-1000-8000-00805f9b34fb",
+    "characteristicUuid": "00002a21-0000-1000-8000-00805f9b34fb",
+    "descriptorUuid": "00002901-0000-1000-8000-00805f9b34fb",
+    "type": "read",
+    "code": 0
+  }
+}
+</pre>
+</div>
+
 ### Events ### {#bidi-events}
 
 #### The bluetooth.requestDevicePromptUpdated Event #### {#bluetooth-requestdevicepromptupdated-event}
@@ -5625,6 +5905,55 @@ To <dfn>trigger a gatt connection attempted event</dfn> given a [=navigable=] |n
 1. For each |session| in the [=set of sessions for which an event is enabled=] given
     "<code>bluetooth.gattEventGenerated</code>" and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
+
+</div>
+
+#### The bluetooth.characteristicEventGenerated Event #### {#bluetooth-characteristicEventGenerated-event}
+
+<pre highlight="cddl" class="cddl local-cddl">
+bluetooth.CharacteristicEventGenerated = (
+   method: "bluetooth.characteristicEventGenerated",
+   params: bluetooth.CharacteristicEventGeneratedParameters
+)
+
+bluetooth.CharacteristicEventGeneratedParameters = {
+  context: text,
+  address: text,
+  serviceUuid: bluetooth.BluetoothUuid,
+  characteristicUuid: bluetooth.BluetoothUuid,
+  type: "read" / "write-with-response" / "write-without-response" / "subscribe-to-notifications" / "unsubscribe-from-notifications",
+  ? data: [ * uint ]
+}
+</pre>
+
+<div algorithm="remote end event trigger for bluetooth.characteristicEventGenerated">
+
+Issue: TODO: Finish the algorithm of bluetooth.characteristicEventGenerated.
+
+</div>
+
+#### The bluetooth.descriptorEventGenerated Event #### {#bluetooth-descriptoreventgenerated-event}
+
+<pre highlight="cddl" class="cddl local-cddl">
+bluetooth.DescriptorEventGenerated = (
+   method: "bluetooth.descriptorEventGenerated",
+   params: bluetooth.DescriptorEventGeneratedParameters
+)
+
+bluetooth.DescriptorEventGeneratedParameters = {
+  context: text,
+  address: text,
+  serviceUuid: bluetooth.BluetoothUuid,
+  characteristicUuid: bluetooth.BluetoothUuid,
+  descriptorUuid: bluetooth.BluetoothUuid,
+  type: "read" / "write",
+  ? data: [ * uint ]
+}
+</pre>
+
+<div algorithm="remote end event trigger for bluetooth.descriptorEventGenerated">
+
+Issue: TODO: Finish the algorithm of bluetooth.descriptorEventGenerated.
 
 </div>
 
