@@ -5008,7 +5008,15 @@ Each <a>simulated Bluetooth adapter</a> has an <dfn>adapter state</dfn> that is 
 
 Each <a>simulated Bluetooth adapter</a> has a <dfn lt="LE supported state">low-energy supported state</dfn> that is a boolean describing if the adapter supports Bluetooth Low Energy.
 
-A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that behaves like a physical device, and may be attached to a <a>simulated Bluetooth adapter</a>, and may have associated properties like <a>Manufacturer Specific Data</a> and <a>Service UUIDs</a>.
+A <dfn>simulated Bluetooth device</dfn> is a software defined [=Bluetooth device=] that
+behaves like a physical device, may be attached to a <a>simulated Bluetooth adapter</a>,
+may have associated properties like <a>Manufacturer Specific Data</a> and <a>Service UUIDs</a>,
+and has a <dfn>simulated GATT service mapping</dfn>, which is an <a>ordered map</a> of Bluetooth
+<a>UUID</a> strings to <a>simulated GATT services</a>.
+
+A <dfn>simulated GATT service</dfn> is a software defined [=Service=] that belongs to a
+<a>simulated Bluetooth device</a>, has a property of <a>UUID</a>, and is known-present in the
+<a>Bluetooth cache</a>.
 
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
@@ -5599,8 +5607,37 @@ bluetooth.SimulateServiceParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateService">
+The [=remote end steps=] with command parameters |params| are:
 
-Issue: TODO: Finish the algorithm of bluetooth.simulateService.
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
+1. Let |uuid| be |params|[`"uuid"`].
+1. If |params|[`"type"`] is `"add"`:
+    1. If |serviceMapping|[|uuid|] [=map/exists=], return [=error=] with [=error code=] [=invalid element state=].
+    1. Let |simulatedGattService| be a new <a>simulated GATT service</a>.
+    1. Set |simulatedGattService|'s <a>UUID</a> to |uuid|.
+    1. Set |serviceMapping|[|uuid|] to |simulatedGattService|.
+    1. <a>Create a <code>BluetoothRemoteGATTService</code> representing</a> |simulatedGattService|
+        and add a mapping from |simulatedGattService| to the resulting {{Promise}} in
+        |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Return [=success=] with data `null`.
+1. Else if |params|[`"type"`] is `"remove"`:
+    1. If |serviceMapping|[|uuid|] [=map/exists=], let |simulatedGattService| be |serviceMapping|[|uuid|].
+    1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. Remove |simulatedGattService| from |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Remove |uuid| from |serviceMapping|.
+    1. Return [=success=] with data `null`.
+1. Return [=error=] with [=error code=] [=invalid argument=].
 
 </div>
 
