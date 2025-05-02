@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b25686b9f, updated Fri Mar 14 14:15:20 2025 -0700" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
-  <meta content="d940d56a3981a15d240d545b06917c95e317fa8d" name="revision">
+  <meta content="4cc1268765238207d08e0dc912088b729eeb136c" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>
@@ -1010,7 +1010,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2025-04-21">21 April 2025</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2025-05-02">2 May 2025</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -1174,12 +1174,19 @@ over the Bluetooth 4 wireless standard using the Generic Attribute Profile (GATT
           <li><a href="#bluetooth-simulateadvertisement-command"><span class="secno">12.2.3.5</span> <span class="content">The bluetooth.simulateAdvertisement Command</span></a>
           <li><a href="#bluetooth-simulategattconnectionresponse-command"><span class="secno">12.2.3.6</span> <span class="content">The bluetooth.simulateGattConnectionResponse Command</span></a>
           <li><a href="#bluetooth-simulategattdisconnection-command"><span class="secno">12.2.3.7</span> <span class="content">The bluetooth.simulateGattDisconnection Command</span></a>
+          <li><a href="#bluetooth-simulateservice-command"><span class="secno">12.2.3.8</span> <span class="content">The bluetooth.simulateService Command</span></a>
+          <li><a href="#bluetooth-simulatecharacteristic-command"><span class="secno">12.2.3.9</span> <span class="content">The bluetooth.simulateCharacteristic Command</span></a>
+          <li><a href="#bluetooth-simulatecharacteristicresponse-command"><span class="secno">12.2.3.10</span> <span class="content">The bluetooth.simulateCharacteristicResponse Command</span></a>
+          <li><a href="#bluetooth-simulatedescriptor-command"><span class="secno">12.2.3.11</span> <span class="content">The bluetooth.simulateDescriptor Command</span></a>
+          <li><a href="#bluetooth-simulatedescriptorresponse-command"><span class="secno">12.2.3.12</span> <span class="content">The bluetooth.simulateDescriptorResponse Command</span></a>
          </ol>
         <li>
          <a href="#bidi-events"><span class="secno">12.2.4</span> <span class="content">Events</span></a>
          <ol class="toc">
           <li><a href="#bluetooth-requestdevicepromptupdated-event"><span class="secno">12.2.4.1</span> <span class="content">The bluetooth.requestDevicePromptUpdated Event</span></a>
           <li><a href="#bluetooth-gattConnectionAttempted-event"><span class="secno">12.2.4.2</span> <span class="content">The bluetooth.gattConnectionAttempted Event</span></a>
+          <li><a href="#bluetooth-characteristiceventgenerated-event"><span class="secno">12.2.4.3</span> <span class="content">The bluetooth.characteristicEventGenerated Event</span></a>
+          <li><a href="#bluetooth-descriptoreventgenerated-event"><span class="secno">12.2.4.4</span> <span class="content">The bluetooth.descriptorEventGenerated Event</span></a>
          </ol>
        </ol>
      </ol>
@@ -5165,8 +5172,18 @@ that controls whether the methods exposed by the <code class="idl"><a data-link-
 processing of CDDL snippets. Currently, other modules cannot be
 referenced.</p>
    <h3 class="heading settled" data-level="12.1" id="bluetooth-bidi-definitions"><span class="secno">12.1. </span><span class="content">Definitions</span><a class="self-link" href="#bluetooth-bidi-definitions"></a></h3>
-<pre class="cddl local-cddl remote-cddl">bluetooth.BluetoothServiceUuid = text;
+<pre class="cddl local-cddl remote-cddl">bluetooth.BluetoothUuid = text;
 bluetooth.BluetoothManufacturerData = { key: uint, data: tstr };
+bluetooth.CharacteristicProperties = {
+  ? broadcast: bool,
+  ? read: bool,
+  ? writeWithoutResponse: bool,
+  ? write: bool,
+  ? notify: bool,
+  ? indicate: bool,
+  ? authenticatedSignedWrites: bool,
+  ? extendedProperties: bool
+}
 </pre>
    <dl>
     <dt><code>key</code>
@@ -5265,7 +5282,7 @@ allows a user to <a data-link-type="dfn" href="https://w3c.github.io/permissions
    <h5 class="heading settled" data-level="12.2.1.4" id="bluetooth-scanrecord-type"><span class="secno">12.2.1.4. </span><span class="content">The bluetooth.ScanRecord Type</span><a class="self-link" href="#bluetooth-scanrecord-type"></a></h5>
 <pre class="cddl local-cddl remote-cddl highlight"><c- nc>bluetooth.ScanRecord</c-> <c- o>=</c-> <c- p>{</c->
   <c- o>?</c-> <c- s>name</c-><c- p>:</c-> text<c- p>,</c->
-  <c- o>?</c-> <c- s>uuids</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> <c- nc>bluetooth.BluetoothServiceUuid</c-> <c- p>],</c->
+  <c- o>?</c-> <c- s>uuids</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> <c- nc>bluetooth.BluetoothUuid</c-> <c- p>],</c->
   <c- o>?</c-> <c- s>appearance</c-><c- p>:</c-> number<c- p>,</c->
   <c- o>?</c-> <c- s>manufacturerData</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> <c- nc>bluetooth.BluetoothManufacturerData</c-> <c- p>],</c->
 <c- p>}</c->
@@ -5298,6 +5315,11 @@ allows a user to <a data-link-type="dfn" href="https://w3c.github.io/permissions
   <c- nc>bluetooth.SimulateAdvertisement</c-> <c- o>//</c->
   <c- nc>bluetooth.SimulateGattConnectionResponse</c-> <c- o>//</c->
   <c- nc>bluetooth.SimulateGattDisconnection</c-> <c- o>//</c->
+  <c- nc>bluetooth.SimulateService</c-> <c- o>//</c->
+  <c- nc>bluetooth.SimulateCharacteristic</c-> <c- o>//</c->
+  <c- nc>bluetooth.simulateCharacteristicResponse</c-> <c- o>//</c->
+  <c- nc>bluetooth.SimulateDescriptor</c-> <c- o>//</c->
+  <c- nc>bluetooth.simulateDescriptorResponse</c-> <c- o>//</c->
 <c- p>)</c->
 </pre>
    <h5 class="heading settled" data-level="12.2.3.1" id="bluetooth-handlerequestdeviceprompt-command"><span class="secno">12.2.3.1. </span><span class="content">The bluetooth.handleRequestDevicePrompt Command</span><a class="self-link" href="#bluetooth-handlerequestdeviceprompt-command"></a></h5>
@@ -5488,7 +5510,7 @@ allows a user to <a data-link-type="dfn" href="https://w3c.github.io/permissions
    <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
    <c- s>name</c-><c- p>:</c-> text<c- p>,</c->
    <c- s>manufacturerData</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> <c- nc>bluetooth.BluetoothManufacturerData</c-> <c- p>],</c->
-   <c- s>knownServiceUuids</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> <c- nc>bluetooth.BluetoothServiceUuid</c-> <c- p>]</c->
+   <c- s>knownServiceUuids</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> <c- nc>bluetooth.BluetoothUuid</c-> <c- p>]</c->
 <c- p>}</c->
 </pre>
    <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
@@ -5734,6 +5756,218 @@ set <var>simulatedDeviceInstance</var>.<code class="idl"><a data-link-type="idl"
 <c- p>}</c->
 </pre>
    </div>
+   <h5 class="heading settled" data-level="12.2.3.8" id="bluetooth-simulateservice-command"><span class="secno">12.2.3.8. </span><span class="content">The bluetooth.simulateService Command</span><a class="self-link" href="#bluetooth-simulateservice-command"></a></h5>
+<pre class="cddl local-cddl remote-cddl highlight"><c- nc>bluetooth.SimulateService</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.simulateService"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.SimulateServiceParameters</c-><c- p>,</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.SimulateServiceParameters</c-> <c- o>=</c-> <c- p>{</c->
+   <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>uuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>type</c-><c- p>:</c-> <c- u>"add"</c-> <c- o>/</c-> <c- u>"remove"</c-><c- p>,</c->
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateService">
+    <p class="issue" id="issue-fee5d72c"><a class="self-link" href="#issue-fee5d72c"></a> TODO: Finish the algorithm of bluetooth.simulateService.</p>
+   </div>
+   <div class="example" id="example-2aa527a7">
+    <a class="self-link" href="#example-2aa527a7"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends⑧">local end</a> could simulate adding a GATT service by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateService"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"uuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"add"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <div class="example" id="example-d52afee7">
+    <a class="self-link" href="#example-d52afee7"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends⑨">local end</a> could simulate removing a GATT service by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateService"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"uuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"remove"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <h5 class="heading settled" data-level="12.2.3.9" id="bluetooth-simulatecharacteristic-command"><span class="secno">12.2.3.9. </span><span class="content">The bluetooth.simulateCharacteristic Command</span><a class="self-link" href="#bluetooth-simulatecharacteristic-command"></a></h5>
+<pre class="cddl local-cddl remote-cddl highlight"><c- nc>bluetooth.SimulateCharacteristic</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.simulateCharacteristic"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.SimulateCharacteristicParameters</c-><c- p>,</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.SimulateCharacteristicParameters</c-> <c- o>=</c-> <c- p>{</c->
+   <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- o>?</c-> <c- s>characteristicProperties</c-><c- p>:</c-> <c- nc>bluetooth.CharacteristicProperties</c-><c- p>,</c->
+   <c- s>type</c-><c- p>:</c-> <c- u>"add"</c-> <c- o>/</c-> <c- u>"remove"</c->
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateCharacteristic">
+    <p class="issue" id="issue-2b52c0eb"><a class="self-link" href="#issue-2b52c0eb"></a> TODO: Finish the algorithm of bluetooth.simulateCharacteristic.</p>
+   </div>
+   <div class="example" id="example-dab7ac39">
+    <a class="self-link" href="#example-dab7ac39"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①⓪">local end</a> could simulate adding a GATT characteristic with read, write, and notify properties
+by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateCharacteristic"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicProperties"</c-><c- p>:</c-> <c- p>{</c->
+      <c- f>"read"</c-><c- p>:</c-> <c- kc>true</c-><c- p>,</c->
+      <c- f>"write"</c-><c- p>:</c-> <c- kc>true</c-><c- p>,</c->
+      <c- f>"notify"</c-><c- p>:</c-> <c- kc>true</c->
+    <c- p>},</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"add"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <div class="example" id="example-0ca5496a">
+    <a class="self-link" href="#example-0ca5496a"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①①">local end</a> could simulate removing a GATT characteristic by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateCharacteristic"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"remove"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <h5 class="heading settled" data-level="12.2.3.10" id="bluetooth-simulatecharacteristicresponse-command"><span class="secno">12.2.3.10. </span><span class="content">The bluetooth.simulateCharacteristicResponse Command</span><a class="self-link" href="#bluetooth-simulatecharacteristicresponse-command"></a></h5>
+<pre class="cddl local-cddl remote-cddl highlight"><c- nc>bluetooth.SimulateCharacteristicResponse</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.simulateCharacteristicResponse"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.SimulateCharacteristicResponseParameters</c-><c- p>,</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.SimulateCharacteristicResponseParameters</c-> <c- o>=</c-> <c- p>{</c->
+   <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>type</c-><c- p>:</c-> <c- u>"read"</c-> <c- o>/</c-> <c- u>"write"</c-> <c- o>/</c-> <c- u>"subscribe-to-notifications"</c-> <c- o>/</c-> <c- u>"unsubscribe-from-notifications"</c-><c- p>,</c->
+   <c- s>code</c-><c- p>:</c-> uint
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateCharacteristicResponse">
+    <p class="issue" id="issue-fe8e308f"><a class="self-link" href="#issue-fe8e308f"></a> TODO: Finish the algorithm of bluetooth.simulateCharacteristicResponse.</p>
+   </div>
+   <div class="example" id="example-cb26d94d">
+    <a class="self-link" href="#example-cb26d94d"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①②">local end</a> could simulate a response of success (error code <code>0x00</code> according to <a data-link-type="dfn" href="#error-response" id="ref-for-error-response①">Error Response</a>)
+for a characteristic read operation by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateCharacteristicResponse"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"read"</c-><c- p>,</c->
+    <c- f>"code"</c-><c- p>:</c-> <c- mi>0</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <h5 class="heading settled" data-level="12.2.3.11" id="bluetooth-simulatedescriptor-command"><span class="secno">12.2.3.11. </span><span class="content">The bluetooth.simulateDescriptor Command</span><a class="self-link" href="#bluetooth-simulatedescriptor-command"></a></h5>
+<pre class="cddl local-cddl remote-cddl highlight"><c- nc>bluetooth.SimulateDescriptor</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.simulateDescriptor"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.SimulateDescriptorParameters</c-><c- p>,</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.SimulateDescriptorParameters</c-> <c- o>=</c-> <c- p>{</c->
+   <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>descriptorUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>type</c-><c- p>:</c-> <c- u>"add"</c-> <c- o>/</c-> <c- u>"remove"</c->
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateDescriptor">
+    <p class="issue" id="issue-085e4a06"><a class="self-link" href="#issue-085e4a06"></a> TODO: Finish the algorithm of bluetooth.simulateDescriptor.</p>
+   </div>
+   <div class="example" id="example-9119b334">
+    <a class="self-link" href="#example-9119b334"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①③">local end</a> could simulate adding a GATT descriptor by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateDescriptor"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"descriptorUuid"</c-><c- p>:</c-> <c- u>"00002901-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"add"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <div class="example" id="example-8e64ed72">
+    <a class="self-link" href="#example-8e64ed72"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①④">local end</a> could simulate removing a GATT descriptor by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateDescriptor"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"descriptorUuid"</c-><c- p>:</c-> <c- u>"00002901-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"remove"</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
+   <h5 class="heading settled" data-level="12.2.3.12" id="bluetooth-simulatedescriptorresponse-command"><span class="secno">12.2.3.12. </span><span class="content">The bluetooth.simulateDescriptorResponse Command</span><a class="self-link" href="#bluetooth-simulatedescriptorresponse-command"></a></h5>
+<pre class="cddl local-cddl remote-cddl highlight"><c- nc>bluetooth.SimulateDescriptorResponse</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.simulateDescriptorResponse"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.SimulateDescriptorResponseParameters</c-><c- p>,</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.SimulateDescriptorResponseParameters</c-> <c- o>=</c-> <c- p>{</c->
+   <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+   <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>descriptorUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+   <c- s>type</c-><c- p>:</c-> <c- u>"read"</c-> <c- o>/</c-> <c- u>"write"</c-><c- p>,</c->
+   <c- s>code</c-><c- p>:</c-> uint
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateDescriptorResponse">
+    <p class="issue" id="issue-820c7611"><a class="self-link" href="#issue-820c7611"></a> TODO: Finish the algorithm of bluetooth.simulateDescriptorResponse.</p>
+   </div>
+   <div class="example" id="example-e668027f">
+    <a class="self-link" href="#example-e668027f"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①⑤">local end</a> could simulate a response of success (error code <code>0x00</code> according to <a data-link-type="dfn" href="#error-response" id="ref-for-error-response②">Error Response</a>)
+for a descriptor read operation by sending the following message: 
+<pre class="highlight"><c- p>{</c->
+  <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateDescriptorResponse"</c-><c- p>,</c->
+  <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
+    <c- f>"context"</c-><c- p>:</c-> <c- u>"cxt-d03fdd81"</c-><c- p>,</c->
+    <c- f>"address"</c-><c- p>:</c-> <c- u>"09:09:09:09:09:09"</c-><c- p>,</c->
+    <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"descriptorUuid"</c-><c- p>:</c-> <c- u>"00002901-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
+    <c- f>"type"</c-><c- p>:</c-> <c- u>"read"</c-><c- p>,</c->
+    <c- f>"code"</c-><c- p>:</c-> <c- mi>0</c->
+  <c- p>}</c->
+<c- p>}</c->
+</pre>
+   </div>
    <h4 class="heading settled" data-level="12.2.4" id="bidi-events"><span class="secno">12.2.4. </span><span class="content">Events</span><a class="self-link" href="#bidi-events"></a></h4>
    <h5 class="heading settled" data-level="12.2.4.1" id="bluetooth-requestdevicepromptupdated-event"><span class="secno">12.2.4.1. </span><span class="content">The bluetooth.requestDevicePromptUpdated Event</span><a class="self-link" href="#bluetooth-requestdevicepromptupdated-event"></a></h5>
 <pre class="cddl local-cddl highlight"><c- nc>bluetooth.RequestDevicePromptUpdated</c-> <c- o>=</c-> <c- p>(</c->
@@ -5802,6 +6036,43 @@ set <var>simulatedDeviceInstance</var>.<code class="idl"><a data-link-type="idl"
         <p><a data-link-type="dfn" href="https://w3c.github.io/webdriver-bidi/#emit-an-event" id="ref-for-emit-an-event①">Emit an event</a> with <var>session</var> and <var>body</var>.</p>
       </ol>
     </ol>
+   </div>
+   <h5 class="heading settled" data-level="12.2.4.3" id="bluetooth-characteristiceventgenerated-event"><span class="secno">12.2.4.3. </span><span class="content">The bluetooth.characteristicEventGenerated Event</span><a class="self-link" href="#bluetooth-characteristiceventgenerated-event"></a></h5>
+<pre class="cddl local-cddl highlight"><c- nc>bluetooth.CharacteristicEventGenerated</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.characteristicEventGenerated"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.CharacteristicEventGeneratedParameters</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.CharacteristicEventGeneratedParameters</c-> <c- o>=</c-> <c- p>{</c->
+  <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+  <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+  <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+  <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+  <c- s>type</c-><c- p>:</c-> <c- u>"read"</c-> <c- o>/</c-> <c- u>"write-with-response"</c-> <c- o>/</c-> <c- u>"write-without-response"</c-> <c- o>/</c-> <c- u>"subscribe-to-notifications"</c-> <c- o>/</c-> <c- u>"unsubscribe-from-notifications"</c-><c- p>,</c->
+  <c- o>?</c-> <c- s>data</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> uint <c- p>]</c->
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end event trigger for bluetooth.characteristicEventGenerated">
+    <p class="issue" id="issue-1436c566"><a class="self-link" href="#issue-1436c566"></a> TODO: Finish the algorithm of bluetooth.characteristicEventGenerated.</p>
+   </div>
+   <h5 class="heading settled" data-level="12.2.4.4" id="bluetooth-descriptoreventgenerated-event"><span class="secno">12.2.4.4. </span><span class="content">The bluetooth.descriptorEventGenerated Event</span><a class="self-link" href="#bluetooth-descriptoreventgenerated-event"></a></h5>
+<pre class="cddl local-cddl highlight"><c- nc>bluetooth.DescriptorEventGenerated</c-> <c- o>=</c-> <c- p>(</c->
+   <c- s>method</c-><c- p>:</c-> <c- u>"bluetooth.descriptorEventGenerated"</c-><c- p>,</c->
+   <c- s>params</c-><c- p>:</c-> <c- nc>bluetooth.DescriptorEventGeneratedParameters</c->
+<c- p>)</c->
+
+<c- nc>bluetooth.DescriptorEventGeneratedParameters</c-> <c- o>=</c-> <c- p>{</c->
+  <c- s>context</c-><c- p>:</c-> text<c- p>,</c->
+  <c- s>address</c-><c- p>:</c-> text<c- p>,</c->
+  <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+  <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+  <c- s>descriptorUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
+  <c- s>type</c-><c- p>:</c-> <c- u>"read"</c-> <c- o>/</c-> <c- u>"write"</c-><c- p>,</c->
+  <c- o>?</c-> <c- s>data</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> uint <c- p>]</c->
+<c- p>}</c->
+</pre>
+   <div class="algorithm" data-algorithm="remote end event trigger for bluetooth.descriptorEventGenerated">
+    <p class="issue" id="issue-124c7e36"><a class="self-link" href="#issue-124c7e36"></a> TODO: Finish the algorithm of bluetooth.descriptorEventGenerated.</p>
    </div>
    <h2 class="heading settled" data-level="13" id="terminology"><span class="secno">13. </span><span class="content">Terminology and Conventions</span><a class="self-link" href="#terminology"></a></h2>
    <p>This specification uses a few conventions and several terms from other
@@ -7233,6 +7504,13 @@ and/or give the user a way to retry failed operations. <a href="https://github.c
 processing of CDDL snippets. Currently, other modules cannot be
 referenced. <a class="issue-return" href="#issue-194ad560" title="Jump to section">↵</a></div>
    <div class="issue"> Inserting data into variables from another algorithm is not well defined. The <a data-link-type="dfn" href="#scan-for-devices">scan for devices</a> algorithm needs to define asynchronous device discovery in order to match implementations. <a class="issue-return" href="#issue-6d693d48" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.simulateService. <a class="issue-return" href="#issue-fee5d72c" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.simulateCharacteristic. <a class="issue-return" href="#issue-2b52c0eb" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.simulateCharacteristicResponse. <a class="issue-return" href="#issue-fe8e308f" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.simulateDescriptor. <a class="issue-return" href="#issue-085e4a06" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.simulateDescriptorResponse. <a class="issue-return" href="#issue-820c7611" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.characteristicEventGenerated. <a class="issue-return" href="#issue-1436c566" title="Jump to section">↵</a></div>
+   <div class="issue"> TODO: Finish the algorithm of bluetooth.descriptorEventGenerated. <a class="issue-return" href="#issue-124c7e36" title="Jump to section">↵</a></div>
   </div>
   <details class="mdn-anno unpositioned" data-anno-for="eventdef-bluetooth-availabilitychanged">
    <summary><b class="less-than-two-engines-flag" title="This feature is in less than two current engines.">⚠</b><span>MDN</span></summary>
@@ -8433,7 +8711,7 @@ let dfnPanelData = {
 "95d7775a": {"dfnID":"95d7775a","dfnText":"Uint8Array","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-Uint8Array"},{"id":"ref-for-idl-Uint8Array\u2460"}],"title":"8. Advertising Data Filter"}],"url":"https://webidl.spec.whatwg.org/#idl-Uint8Array"},
 "9604bc39": {"dfnID":"9604bc39","dfnText":"associated Navigator","external":true,"refSections":[{"refs":[{"id":"ref-for-associated-navigator"}],"title":"4.2. Overall Bluetooth availability"},{"refs":[{"id":"ref-for-associated-navigator\u2460"}],"title":"5.2.1. Handling Visibility Change"},{"refs":[{"id":"ref-for-associated-navigator\u2461"}],"title":"5.2.2. Handling Document Loss of Full Activity"},{"refs":[{"id":"ref-for-associated-navigator\u2462"}],"title":"12.2.3.5. The bluetooth.simulateAdvertisement Command"},{"refs":[{"id":"ref-for-associated-navigator\u2463"}],"title":"12.2.3.6. The bluetooth.simulateGattConnectionResponse Command"},{"refs":[{"id":"ref-for-associated-navigator\u2464"}],"title":"12.2.3.7. The bluetooth.simulateGattDisconnection Command"}],"url":"https://html.spec.whatwg.org/multipage/system-state.html#associated-navigator"},
 "9a517a7d": {"dfnID":"9a517a7d","dfnText":"queue a task","external":true,"refSections":[{"refs":[{"id":"ref-for-queue-a-task"}],"title":"4.2. Overall Bluetooth availability"},{"refs":[{"id":"ref-for-queue-a-task\u2460"}],"title":"5.2.3. Responding to Advertising Events"},{"refs":[{"id":"ref-for-queue-a-task\u2461"}],"title":"6.6.5. Responding to Service Changes"},{"refs":[{"id":"ref-for-queue-a-task\u2462"}],"title":"12.2.3.5. The bluetooth.simulateAdvertisement Command"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#queue-a-task"},
-"9a707b42": {"dfnID":"9a707b42","dfnText":"local end","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-local-ends"}],"title":"12.2.3.1. The bluetooth.handleRequestDevicePrompt Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2460"},{"id":"ref-for-dfn-local-ends\u2461"}],"title":"12.2.3.2. The bluetooth.simulateAdapter Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2462"}],"title":"12.2.3.3. The bluetooth.disableSimulation Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2463"}],"title":"12.2.3.4. The bluetooth.simulatePreconnectedPeripheral Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2464"}],"title":"12.2.3.5. The bluetooth.simulateAdvertisement Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2465"}],"title":"12.2.3.6. The bluetooth.simulateGattConnectionResponse Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2466"}],"title":"12.2.3.7. The bluetooth.simulateGattDisconnection Command"}],"url":"https://w3c.github.io/webdriver/#dfn-local-ends"},
+"9a707b42": {"dfnID":"9a707b42","dfnText":"local end","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-local-ends"}],"title":"12.2.3.1. The bluetooth.handleRequestDevicePrompt Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2460"},{"id":"ref-for-dfn-local-ends\u2461"}],"title":"12.2.3.2. The bluetooth.simulateAdapter Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2462"}],"title":"12.2.3.3. The bluetooth.disableSimulation Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2463"}],"title":"12.2.3.4. The bluetooth.simulatePreconnectedPeripheral Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2464"}],"title":"12.2.3.5. The bluetooth.simulateAdvertisement Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2465"}],"title":"12.2.3.6. The bluetooth.simulateGattConnectionResponse Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2466"}],"title":"12.2.3.7. The bluetooth.simulateGattDisconnection Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2467"},{"id":"ref-for-dfn-local-ends\u2468"}],"title":"12.2.3.8. The bluetooth.simulateService Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2460\u24ea"},{"id":"ref-for-dfn-local-ends\u2460\u2460"}],"title":"12.2.3.9. The bluetooth.simulateCharacteristic Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2460\u2461"}],"title":"12.2.3.10. The bluetooth.simulateCharacteristicResponse Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2460\u2462"},{"id":"ref-for-dfn-local-ends\u2460\u2463"}],"title":"12.2.3.11. The bluetooth.simulateDescriptor Command"},{"refs":[{"id":"ref-for-dfn-local-ends\u2460\u2464"}],"title":"12.2.3.12. The bluetooth.simulateDescriptorResponse Command"}],"url":"https://w3c.github.io/webdriver/#dfn-local-ends"},
 "9c19b7fc": {"dfnID":"9c19b7fc","dfnText":"navigable","external":true,"refSections":[{"refs":[{"id":"ref-for-navigable"}],"title":"4. Device Discovery"},{"refs":[{"id":"ref-for-navigable\u2460"}],"title":"12.2.4.1. The bluetooth.requestDevicePromptUpdated Event"},{"refs":[{"id":"ref-for-navigable\u2461"}],"title":"12.2.4.2. The bluetooth.gattConnectionAttempted Event"}],"url":"https://html.spec.whatwg.org/multipage/document-sequences.html#navigable"},
 "9c4c1e66": {"dfnID":"9c4c1e66","dfnText":"relevant settings object","external":true,"refSections":[{"refs":[{"id":"ref-for-relevant-settings-object"}],"title":"5.2. BluetoothDevice"},{"refs":[{"id":"ref-for-relevant-settings-object\u2460"}],"title":"5.2.3. Responding to Advertising Events"},{"refs":[{"id":"ref-for-relevant-settings-object\u2461"}],"title":"6.6.1. Bluetooth Tree"},{"refs":[{"id":"ref-for-relevant-settings-object\u2462"},{"id":"ref-for-relevant-settings-object\u2463"},{"id":"ref-for-relevant-settings-object\u2464"}],"title":"6.6.5. Responding to Service Changes"},{"refs":[{"id":"ref-for-relevant-settings-object\u2465"}],"title":"12.2.3.5. The bluetooth.simulateAdvertisement Command"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#relevant-settings-object"},
 "9cce47fd": {"dfnID":"9cce47fd","dfnText":"sequence","external":true,"refSections":[{"refs":[{"id":"ref-for-idl-sequence"},{"id":"ref-for-idl-sequence\u2460"},{"id":"ref-for-idl-sequence\u2461"},{"id":"ref-for-idl-sequence\u2462"},{"id":"ref-for-idl-sequence\u2463"},{"id":"ref-for-idl-sequence\u2464"},{"id":"ref-for-idl-sequence\u2465"},{"id":"ref-for-idl-sequence\u2466"}],"title":"4. Device Discovery"},{"refs":[{"id":"ref-for-idl-sequence\u2467"},{"id":"ref-for-idl-sequence\u2468"},{"id":"ref-for-idl-sequence\u2460\u24ea"},{"id":"ref-for-idl-sequence\u2460\u2460"},{"id":"ref-for-idl-sequence\u2460\u2461"},{"id":"ref-for-idl-sequence\u2460\u2462"}],"title":"4.1. Permission API Integration"},{"refs":[{"id":"ref-for-idl-sequence\u2460\u2463"}],"title":"5.2.3. Responding to Advertising Events"},{"refs":[{"id":"ref-for-idl-sequence\u2460\u2464"}],"title":"6.2. BluetoothRemoteGATTServer"},{"refs":[{"id":"ref-for-idl-sequence\u2460\u2465"},{"id":"ref-for-idl-sequence\u2460\u2466"}],"title":"6.3. BluetoothRemoteGATTService"},{"refs":[{"id":"ref-for-idl-sequence\u2460\u2467"}],"title":"6.4. BluetoothRemoteGATTCharacteristic"}],"url":"https://webidl.spec.whatwg.org/#idl-sequence"},
@@ -8720,7 +8998,7 @@ let dfnPanelData = {
 "ea3f6646": {"dfnID":"ea3f6646","dfnText":"participate in a tree","external":true,"refSections":[{"refs":[{"id":"ref-for-concept-tree-participate"}],"title":"6.6.1. Bluetooth Tree"}],"url":"https://dom.spec.whatwg.org/#concept-tree-participate"},
 "ebb01253": {"dfnID":"ebb01253","dfnText":"PermissionDescriptor","external":true,"refSections":[{"refs":[{"id":"ref-for-dom-permissiondescriptor"}],"title":"4.1. Permission API Integration"}],"url":"https://w3c.github.io/permissions/#dom-permissiondescriptor"},
 "ebe1c949": {"dfnID":"ebe1c949","dfnText":"body_sensor_location","external":true,"refSections":[{"refs":[{"id":"ref-for-:~:text=body_sensor_location"}],"title":"1.1. Examples"}],"url":"https://github.com/WebBluetoothCG/registries/blob/master/gatt_assigned_characteristics.txt#:~:text=body_sensor_location"},
-"error-response": {"dfnID":"error-response","dfnText":"Error Response","external":false,"refSections":[{"refs":[{"id":"ref-for-error-response"}],"title":"6.7. Error handling"}],"url":"#error-response"},
+"error-response": {"dfnID":"error-response","dfnText":"Error Response","external":false,"refSections":[{"refs":[{"id":"ref-for-error-response"}],"title":"6.7. Error handling"},{"refs":[{"id":"ref-for-error-response\u2460"}],"title":"12.2.3.10. The bluetooth.simulateCharacteristicResponse Command"},{"refs":[{"id":"ref-for-error-response\u2461"}],"title":"12.2.3.12. The bluetooth.simulateDescriptorResponse Command"}],"url":"#error-response"},
 "eventdef-bluetooth-availabilitychanged": {"dfnID":"eventdef-bluetooth-availabilitychanged","dfnText":"availabilitychanged","external":false,"refSections":[{"refs":[{"id":"ref-for-eventdef-bluetooth-availabilitychanged"}],"title":"4. Device Discovery"},{"refs":[{"id":"ref-for-eventdef-bluetooth-availabilitychanged\u2460"},{"id":"ref-for-eventdef-bluetooth-availabilitychanged\u2461"}],"title":"4.2. Overall Bluetooth availability"}],"url":"#eventdef-bluetooth-availabilitychanged"},
 "eventdef-bluetoothdeviceeventhandlers-advertisementreceived": {"dfnID":"eventdef-bluetoothdeviceeventhandlers-advertisementreceived","dfnText":"advertisementreceived","external":false,"refSections":[{"refs":[{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived"}],"title":"4. Device Discovery"},{"refs":[{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived\u2460"},{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived\u2461"},{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived\u2462"}],"title":"5.2.3. Responding to Advertising Events"},{"refs":[{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived\u2463"}],"title":"6.6.6. IDL event handlers"}],"url":"#eventdef-bluetoothdeviceeventhandlers-advertisementreceived"},
 "eventdef-bluetoothdeviceeventhandlers-gattserverdisconnected": {"dfnID":"eventdef-bluetoothdeviceeventhandlers-gattserverdisconnected","dfnText":"gattserverdisconnected","external":false,"refSections":[{"refs":[{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-gattserverdisconnected"}],"title":"4.1. Permission API Integration"},{"refs":[{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-gattserverdisconnected\u2460"}],"title":"6.6.3. Responding to Disconnection"},{"refs":[{"id":"ref-for-eventdef-bluetoothdeviceeventhandlers-gattserverdisconnected\u2461"}],"title":"6.6.6. IDL event handlers"}],"url":"#eventdef-bluetoothdeviceeventhandlers-gattserverdisconnected"},
