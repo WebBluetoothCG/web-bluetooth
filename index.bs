@@ -5015,7 +5015,12 @@ and has a <dfn>simulated GATT service mapping</dfn>, which is an <a>ordered map<
 <a>UUID</a> strings to <a>simulated GATT services</a>.
 
 A <dfn>simulated GATT service</dfn> is a software defined [=Service=] that belongs to a
-<a>simulated Bluetooth device</a>, has a property of <a>UUID</a>, and is known-present in the
+<a>simulated Bluetooth device</a>, has a property of <a>UUID</a>, is known-present in the
+<a>Bluetooth cache</a>. and has a <dfn>simulated GATT characteristic mapping</dfn>, which
+is an <a>ordered map</a> of Bluetooth <a>UUID</a> strings to <a>simulated GATT characteristics</a>.
+
+A <dfn>simulated GATT characteristic</dfn> is a software defined [=Characteristic=] that belongs to a
+<a>simulated GATT service</a>, has a property of <a>UUID</a>, and is known-present in the
 <a>Bluetooth cache</a>.
 
 Issue: CDDL snippetes use the "text" type instead of
@@ -5692,8 +5697,43 @@ bluetooth.SimulateCharacteristicParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateCharacteristic">
+The [=remote end steps=] with command parameters |params| are:
 
-Issue: TODO: Finish the algorithm of bluetooth.simulateCharacteristic.
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
+1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
+1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. If |params|[`"type"`] is `"add"`:
+    1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], return [=error=] with
+        [=error code=] [=invalid element state=].
+    1. Let |simulatedGattCharacteristic| be a new <a>simulated GATT characteristic</a>.
+    1. Set |simulatedGattCharacteristic|'s <a>UUID</a> to |characteristicUuid|.
+    1. Set |characteristicMapping|[|characteristicUuid|] to |simulatedGattCharacteristic|.
+    1. <a>Create a <code>BluetoothRemoteGATTCharacteristic</code> representing</a> |simulatedGattCharacteristic|
+        and add a mapping from |simulatedGattCharacteristic| to the resulting {{Promise}} in
+        |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Return [=success=] with data `null`.
+1. Else if |params|[`"type"`] is `"remove"`:
+    1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedGattCharacteristic|
+        be |characteristicMapping|[|characteristicUuid|].
+    1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. Remove |simulatedGattCharacteristic| from |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Remove |characteristicUuid| from |characteristicMapping|.
+    1. Return [=success=] with data `null`.
+1. Return [=error=] with [=error code=] [=invalid argument=].
 
 </div>
 
