@@ -7,7 +7,7 @@
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
   <meta content="Bikeshed version b25686b9f, updated Fri Mar 14 14:15:20 2025 -0700" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/" rel="canonical">
-  <meta content="bf09eed77f58ce29d742bff3ca9172f4af1f65d5" name="revision">
+  <meta content="f41724b9313788ddfde0f1c722c9ac5e29bc1771" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>
@@ -1010,7 +1010,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
   <div class="head">
    <p data-fill-with="logo"><a class="logo" href="https://www.w3.org/"> <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72"> </a> </p>
    <h1 class="p-name no-ref" id="title">Web Bluetooth</h1>
-   <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2025-05-06">6 May 2025</time></p>
+   <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>, <time class="dt-updated" datetime="2025-05-13">13 May 2025</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -5988,15 +5988,16 @@ by sending the following message:
    <c- s>serviceUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
    <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
    <c- s>type</c-><c- p>:</c-> <c- u>"read"</c-> <c- o>/</c-> <c- u>"write"</c-> <c- o>/</c-> <c- u>"subscribe-to-notifications"</c-> <c- o>/</c-> <c- u>"unsubscribe-from-notifications"</c-><c- p>,</c->
-   <c- s>code</c-><c- p>:</c-> uint
+   <c- s>code</c-><c- p>:</c-> uint<c- p>,</c->
+   <c- o>?</c-> <c- s>data</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> uint <c- p>]</c->
 <c- p>}</c->
 </pre>
    <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateCharacteristicResponse">
     <p class="issue" id="issue-fe8e308f"><a class="self-link" href="#issue-fe8e308f"></a> TODO: Finish the algorithm of bluetooth.simulateCharacteristicResponse.</p>
    </div>
-   <div class="example" id="example-cb26d94d">
-    <a class="self-link" href="#example-cb26d94d"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①②">local end</a> could simulate a response of success (error code <code>0x00</code> according to <a data-link-type="dfn" href="#error-response" id="ref-for-error-response①">Error Response</a>)
-for a characteristic read operation by sending the following message: 
+   <div class="example" id="example-9089acd4">
+    <a class="self-link" href="#example-9089acd4"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①②">local end</a> could simulate a response of success (error code <code>0x00</code> according to <a data-link-type="dfn" href="#error-response" id="ref-for-error-response①">Error Response</a>)
+with data for a characteristic read operation by sending the following message: 
 <pre class="highlight"><c- p>{</c->
   <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateCharacteristicResponse"</c-><c- p>,</c->
   <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
@@ -6005,7 +6006,8 @@ for a characteristic read operation by sending the following message:
     <c- f>"serviceUuid"</c-><c- p>:</c-> <c- u>"0000180d-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
     <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
     <c- f>"type"</c-><c- p>:</c-> <c- u>"read"</c-><c- p>,</c->
-    <c- f>"code"</c-><c- p>:</c-> <c- mi>0</c->
+    <c- f>"code"</c-><c- p>:</c-> <c- mi>0</c-><c- p>,</c->
+    <c- f>"data"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>2</c-><c- p>]</c->
   <c- p>}</c->
 <c- p>}</c->
 </pre>
@@ -6071,15 +6073,16 @@ for a characteristic read operation by sending the following message:
    <c- s>characteristicUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
    <c- s>descriptorUuid</c-><c- p>:</c-> <c- nc>bluetooth.BluetoothUuid</c-><c- p>,</c->
    <c- s>type</c-><c- p>:</c-> <c- u>"read"</c-> <c- o>/</c-> <c- u>"write"</c-><c- p>,</c->
-   <c- s>code</c-><c- p>:</c-> uint
+   <c- s>code</c-><c- p>:</c-> uint<c- p>,</c->
+   <c- o>?</c-> <c- s>data</c-><c- p>:</c-> <c- p>[</c-> <c- o>*</c-> uint <c- p>]</c->
 <c- p>}</c->
 </pre>
    <div class="algorithm" data-algorithm="remote end steps for bluetooth.simulateDescriptorResponse">
     <p class="issue" id="issue-820c7611"><a class="self-link" href="#issue-820c7611"></a> TODO: Finish the algorithm of bluetooth.simulateDescriptorResponse.</p>
    </div>
-   <div class="example" id="example-e668027f">
-    <a class="self-link" href="#example-e668027f"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①⑤">local end</a> could simulate a response of success (error code <code>0x00</code> according to <a data-link-type="dfn" href="#error-response" id="ref-for-error-response②">Error Response</a>)
-for a descriptor read operation by sending the following message: 
+   <div class="example" id="example-05504ca3">
+    <a class="self-link" href="#example-05504ca3"></a> A <a data-link-type="dfn" href="https://w3c.github.io/webdriver/#dfn-local-ends" id="ref-for-dfn-local-ends①⑤">local end</a> could simulate a response of success (error code <code>0x00</code> according to <a data-link-type="dfn" href="#error-response" id="ref-for-error-response②">Error Response</a>)
+with data for a descriptor read operation by sending the following message: 
 <pre class="highlight"><c- p>{</c->
   <c- f>"method"</c-><c- p>:</c-> <c- u>"bluetooth.simulateDescriptorResponse"</c-><c- p>,</c->
   <c- f>"params"</c-><c- p>:</c-> <c- p>{</c->
@@ -6089,7 +6092,8 @@ for a descriptor read operation by sending the following message:
     <c- f>"characteristicUuid"</c-><c- p>:</c-> <c- u>"00002a21-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
     <c- f>"descriptorUuid"</c-><c- p>:</c-> <c- u>"00002901-0000-1000-8000-00805f9b34fb"</c-><c- p>,</c->
     <c- f>"type"</c-><c- p>:</c-> <c- u>"read"</c-><c- p>,</c->
-    <c- f>"code"</c-><c- p>:</c-> <c- mi>0</c->
+    <c- f>"code"</c-><c- p>:</c-> <c- mi>0</c-><c- p>,</c->
+    <c- f>"data"</c-><c- p>:</c-> <c- p>[</c-><c- mi>1</c-><c- p>,</c-> <c- mi>2</c-><c- p>]</c->
   <c- p>}</c->
 <c- p>}</c->
 </pre>
