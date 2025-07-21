@@ -5020,8 +5020,11 @@ A <dfn>simulated GATT service</dfn> is a software defined [=Service=] that belon
 is an <a>ordered map</a> of Bluetooth <a>UUID</a> strings to <a>simulated GATT characteristics</a>.
 
 A <dfn>simulated GATT characteristic</dfn> is a software defined [=Characteristic=] that belongs to a
-<a>simulated GATT service</a>, has a property of <a>UUID</a>, and is known-present in the
-<a>Bluetooth cache</a>.
+<a>simulated GATT service</a>, has a property of <a>UUID</a>, a property of <a>Characteristic Properties</a>,
+and is known-present in the <a>Bluetooth cache</a>.
+
+<dfn>Simulated GATT characteristic properties</dfn> are software defined [=Characteristic Properties=] that belong to a
+<a>simulated GATT characteristic</a> and are known-present in the <a>Bluetooth cache</a>.
 
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
@@ -5719,14 +5722,35 @@ The [=remote end steps=] with command parameters |params| are:
 1. If |params|[`"type"`] is `"add"`:
     1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], return [=error=] with
         [=error code=] [=invalid element state=].
+    1. If |params|[`"characteristicProperties"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
+    1. Let |simulatedGattCharacteristicProperties| be new <a>simulated GATT characteristic properties</a> and run the following steps:
+        1. Let |properties| be |params|[`"characteristicProperties"`].
+        1. If |properties|[`"broadcast"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Broadcast` bit if
+            |properties|[`"broadcast"`] is `true`.
+        1. If |properties|[`"read"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Read` bit if
+            |properties|[`"read"`] is `true`.
+        1. If |properties|[`"writeWithoutResponse"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Write Without Response` bit if
+            |properties|[`"writeWithoutResponse"`] is `true`.
+        1. If |properties|[`"write"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Write` bit if
+            |properties|[`"write"`] is `true`.
+        1. If |properties|[`"notify"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Notify` bit if
+            |properties|[`"notify"`] is `true`.
+        1. If |properties|[`"indicate"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Indicate` bit if
+            |properties|[`"indicate"`] is `true`.
+        1. If |properties|[`"authenticatedSignedWrites"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Authenticated Signed Writes` bit if
+            |properties|[`"authenticatedSignedWrites"`] is `true`.
+        1. If |properties|[`"extendedProperties"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Extended Properties` bit if
+            |properties|[`"extendedProperties"`] is `true`.
     1. Let |simulatedGattCharacteristic| be a new <a>simulated GATT characteristic</a>.
     1. Set |simulatedGattCharacteristic|'s <a>UUID</a> to |characteristicUuid|.
+    1. Set |simulatedGattCharacteristic|'s <a>Characteristic Properties</a> to |simulatedGattCharacteristicProperties|.
     1. Set |characteristicMapping|[|characteristicUuid|] to |simulatedGattCharacteristic|.
     1. <a>Create a <code>BluetoothRemoteGATTCharacteristic</code> representing</a> |simulatedGattCharacteristic|
         and add a mapping from |simulatedGattCharacteristic| to the resulting {{Promise}} in
         |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
     1. Return [=success=] with data `null`.
 1. Else if |params|[`"type"`] is `"remove"`:
+    1. If |params|[`"characteristicProperties"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
     1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedGattCharacteristic|
         be |characteristicMapping|[|characteristicUuid|].
     1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
