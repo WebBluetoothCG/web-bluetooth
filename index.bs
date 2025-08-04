@@ -6194,7 +6194,44 @@ bluetooth.SimulateDescriptorResponseParameters = {
 
 <div algorithm="remote end steps for bluetooth.simulateDescriptorResponse">
 
-Issue: TODO: Finish the algorithm of bluetooth.simulateDescriptorResponse.
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+    Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
+1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
+1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedCharacteristic|
+    be |characteristicMapping|[|characteristicUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+1. Let |descriptorMapping| be |simulatedCharacteristic|'s <a>simulated GATT descriptor mapping</a>.
+1. Let |descriptorUuid| be |params|[`"descriptorUuid"`].
+1. If |descriptorMapping|[|descriptorUuid|] [=map/exists=], let |simulatedDescriptor|
+    be |descriptorMapping|[|descriptorUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. Let |promise| be |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}[|simulatedDescriptor|].
+1. <a>Upon fulfillment</a> of |promise| with |descriptor|, run the following steps:
+    1. If |params|[`"type"`] is `read`, run the following steps:
+        1. If |descriptor|.{{[[automatedDescriptorReadResponse]]}} is `expected`,
+            set |descriptor|.{{[[automatedDescriptorReadResponse]]}} to |params|[`"code"`] and
+            |descriptor|.{{[[automatedDescriptorReadResponseData]]}} to [=a copy of the bytes held=]
+            by |params|[`"data"`].
+        1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. If |params|[`"type"`] is `write`, run the following steps:
+        1. If |characteristic|.{{[[automatedDescriptorWriteResponse]]}} is `expected`,
+            set |characteristic|.{{[[automatedDescriptorWriteResponse]]}} to |params|[`"code"`].
+        1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 
 </div>
 
