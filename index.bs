@@ -3519,6 +3519,46 @@ Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
       Characteristic has been removed or otherwise invalidated.
     </td>
   </tr>
+  <tr>
+    <td><dfn>\[[automatedCharacteristicReadResponse]]</dfn></td>
+    <td><code>"not-expected"</code></td>
+    <td>
+      The simulated GATT characteristic response code for a GATT characteristic
+      read attempt.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[automatedCharacteristicReadResponseData]]</dfn></td>
+    <td>Empty <a>byte sequence</a></td>
+    <td>
+      The simulated GATT characteristic response data for a GATT characteristic
+      read attempt.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[automatedCharacteristicWriteResponse]]</dfn></td>
+    <td><code>"not-expected"</code></td>
+    <td>
+      The simulated GATT characteristic response code for a GATT characteristic
+      write attempt.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[automatedCharacteristicSubscribeToNotificationsResponse]]</dfn></td>
+    <td><code>"not-expected"</code></td>
+    <td>
+      The simulated GATT characteristic response code for an attempt to subscribe
+      to GATT characteristic notifications.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]</dfn></td>
+    <td><code>"not-expected"</code></td>
+    <td>
+      The simulated GATT characteristic response code for an attempt to unsubscribe
+      from GATT characteristic notifications.
+    </td>
+  </tr>
 </table>
 
 <div algorithm="BluetoothRemoteGATTCharacteristic constructor">
@@ -3603,17 +3643,39 @@ The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
         task=] on the [=Bluetooth task source=] given |global| to [=reject=]
         |promise| with a "{{NotSupportedError}}" {{DOMException}} and abort
         these steps.
-    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on the [=Bluetooth task source=] given |global| to
-        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
-        abort these steps.
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. If [=this=].{{[[automatedCharacteristicReadResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Trigger a simulated characteristic event=] given |global|'s
+            [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
+            |characteristic|, and `read`.
+        1. Set [=this=].{{[[automatedCharacteristicReadResponse]]}} to `"expected"`,
+            and wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedCharacteristicReadResponse]]}}.
+        1. Set [=this=].{{[[automatedCharacteristicReadResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the following sub-steps:
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+        1. Otherwise, let |buffer| be a [=new=] {{ArrayBuffer}} containing
+            [=this=].{{[[automatedCharacteristicReadResponseData]]}}.
+    1. Otherwise, run the following steps:
+        1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+            global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+            abort these steps.
 
-        Issue(188): Implementations may be able to avoid this {{NetworkError}},
-        but for now sites need to serialize their use of this API and/or give
-        the user a way to retry failed operations.
-    1. Use any combination of the sub-procedures in the [=Characteristic Value
-        Read=] procedure to retrieve the value of |characteristic|.
-        Handle errors as described in <a href="#error-handling"></a>.
+            Issue(188): Implementations may be able to avoid this {{NetworkError}},
+            but for now sites need to serialize their use of this API and/or give
+            the user a way to retry failed operations.
+        1. Use any combination of the sub-procedures in the [=Characteristic Value
+            Read=] procedure to retrieve the value of |characteristic| and let |buffer|
+            be a [=new=] {{ArrayBuffer}} holding the retrieved value.
+            Handle errors as described in <a href="#error-handling"></a>.
     1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
@@ -3621,8 +3683,7 @@ The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
             these steps.
         1. If the sub-procedures above returned an error, [=reject=] |promise|
             with that error and abort these steps.
-        1. Let |buffer| be a [=new=] {{ArrayBuffer}} holding the retrieved
-            value, and assign a [=new=] {{DataView}} created with |buffer| to
+        1. Assign a [=new=] {{DataView}} created with |buffer| to
             [=this=].{{BluetoothRemoteGATTCharacteristic/value}}.
         1. [=Fire an event=] named "{{characteristicvaluechanged}}" with its
             {{Event/bubbles}} attribute initialized to `true` at [=this=].
@@ -3657,33 +3718,52 @@ the UA MUST perform the following steps:
 1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
     |promise| and run the following steps [=in parallel=].
     1. Assert: |response| is one of "required", "never", or "optional".
-    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on the [=Bluetooth task source=] given |global| to
-        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
-        abort these steps.
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. If [=this=].{{[[automatedCharacteristicWriteResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Trigger a simulated characteristic event=] given |global|'s
+            [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
+            |characteristic|, `write`, and |bytes|.
+        1. Set [=this=].{{[[automatedCharacteristicWriteResponse]]}} to `"expected"`,
+            and wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedCharacteristicWriteResponse]]}}.
+        1. Set [=this=].{{[[automatedCharacteristicWriteResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the following sub-steps:
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+    1. Otherwise, run the following steps:
+        1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+            global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+            abort these steps.
 
-        Issue(188): Implementations may be able to avoid this {{NetworkError}},
-        but for now sites need to serialize their use of this API
-        and/or give the user a way to retry failed operations.
-    1. Write |bytes| to |characteristic| by performing the
-        following steps:
+            Issue(188): Implementations may be able to avoid this {{NetworkError}},
+            but for now sites need to serialize their use of this API
+            and/or give the user a way to retry failed operations.
+        1. Write |bytes| to |characteristic| by performing the
+            following steps:
 
-        <dl class="switch">
-          <dt>If |response| is "required"</dt>
-          <dd>
-            Use the [=Write Characteristic Value=] procedure.
-          </dd>
-          <dt>If |response| is "never"</dt>
-          <dd>
-            Use the [=Write Without Response=] procedure.
-          </dd>
-          <dt>Otherwise</dt>
-          <dd>
-            Use any combination of the sub-procedures in the [=Characteristic
-            Value Write=] procedure.
-          </dd>
-        </dl>
-        Handle errors as described in <a href="#error-handling"></a>.
+            <dl class="switch">
+              <dt>If |response| is "required"</dt>
+              <dd>
+                Use the [=Write Characteristic Value=] procedure.
+              </dd>
+              <dt>If |response| is "never"</dt>
+              <dd>
+                Use the [=Write Without Response=] procedure.
+              </dd>
+              <dt>Otherwise</dt>
+              <dd>
+                Use any combination of the sub-procedures in the [=Characteristic
+                Value Write=] procedure.
+              </dd>
+            </dl>
+            Handle errors as described in <a href="#error-handling"></a>.
     1. <a>Queue a global task</a> on |global| using the [=Bluetooth task
         source=] to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
@@ -3778,34 +3858,53 @@ notifications.
         {{Navigator/bluetooth|navigator.bluetooth}}, [=queue a global task=]
         on the [=Bluetooth task source=] given |global| to [=resolve=]
         |promise| with [=this=] and abort these steps.
-    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on the [=Bluetooth task source=] given |global| to
-        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
-        abort these steps.
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. If [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Trigger a simulated characteristic event=] given |global|'s
+            [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
+            |characteristic|, and `subscribe-to-notifications`.
+        1. Set [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to `"expected"`,
+            and wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}}.
+        1. Set [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the following sub-steps:
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+        1. Otherwise, let |success| to be `true`.
+    1. Otherwise, run the following steps:
+        1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+            global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+            abort these steps.
 
-        Issue(188): Implementations may be able to avoid this {{NetworkError}}, but
-        for now sites need to serialize their use of this API and/or give the user a
-        way to retry failed operations.
-    1. If the characteristic has a [=Client Characteristic Configuration=]
-        descriptor, use any of the [=Characteristic Descriptors=] procedures to
-        ensure that one of the <code>Notification</code> or <code>Indication</code>
-        bits in |characteristic|'s [=Client Characteristic Configuration=]
-        descriptor is set, matching the constraints in |characteristic|'s
-        <a lt="Characteristic Properties">properties</a>. The UA SHOULD avoid
-        setting both bits, and MUST deduplicate
-        <a href="#notification-events">value-change events</a> if both bits are
-        set. Handle errors as described in <a href="#error-handling"></a>.
+            Issue(188): Implementations may be able to avoid this {{NetworkError}}, but
+            for now sites need to serialize their use of this API and/or give the user a
+            way to retry failed operations.
+        1. If the characteristic has a [=Client Characteristic Configuration=]
+            descriptor, use any of the [=Characteristic Descriptors=] procedures to
+            ensure that one of the <code>Notification</code> or <code>Indication</code>
+            bits in |characteristic|'s [=Client Characteristic Configuration=]
+            descriptor is set, matching the constraints in |characteristic|'s
+            <a lt="Characteristic Properties">properties</a>. The UA SHOULD avoid
+            setting both bits, and MUST deduplicate
+            <a href="#notification-events">value-change events</a> if both bits are
+            set. Handle errors as described in <a href="#error-handling"></a>.
 
-        <div class="note">
-          Note: Some devices have characteristics whose properties include the
-          Notify or Indicate bit but that don't have a <a>Client Characteristic
-          Configuration</a> descriptor. These non-standard-compliant characteristics
-          tend to send notifications or indications unconditionally, so this
-          specification allows applications to simply subscribe to their messages.
-        </div>
-    1. If the procedures were successful,
-        {{Navigator/bluetooth|navigator.bluetooth}} to
-        |characteristic|'s [=active notification context set=].
+            <div class="note">
+              Note: Some devices have characteristics whose properties include the
+              Notify or Indicate bit but that don't have a <a>Client Characteristic
+              Configuration</a> descriptor. These non-standard-compliant characteristics
+              tend to send notifications or indications unconditionally, so this
+              specification allows applications to simply subscribe to their messages.
+            </div>
+        1. If the procedures were successful, let |success| to be `true`.
+    1. If |success| is `true`, add {{Navigator/bluetooth|navigator.bluetooth}} to|characteristic|'s [=active notification context set=].
     1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
@@ -3834,12 +3933,31 @@ promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
     {{InvalidStateError}} and abort these steps.
 1. If <var>characteristic</var>'s <a>active notification context set</a>
     contains {{Navigator/bluetooth|navigator.bluetooth}}, remove it.
-1. If <var>characteristic</var>'s <a>active notification context set</a> became
-    empty and the characteristic has a <a>Client Characteristic
-    Configuration</a> descriptor, the UA SHOULD use any of the <a>Characteristic
-    Descriptors</a> procedures to clear the <code>Notification</code> and
-    <code>Indication</code> bits in <var>characteristic</var>'s <a>Client
-    Characteristic Configuration</a> descriptor.
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. If [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Trigger a simulated characteristic event=] given |global|'s
+            [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
+            |characteristic|, and `unsubscribe-from-notifications`.
+        1. Set [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to `"expected"`,
+            and wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}}.
+        1. Set [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the following sub-steps:
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps..
+    1. Otherwise, run the following steps:
+        1. If <var>characteristic</var>'s <a>active notification context set</a> became
+            empty and the characteristic has a <a>Client Characteristic
+            Configuration</a> descriptor, the UA SHOULD use any of the <a>Characteristic
+            Descriptors</a> procedures to clear the <code>Notification</code> and
+            <code>Indication</code> bits in <var>characteristic</var>'s <a>Client
+            Characteristic Configuration</a> descriptor.
 1. [=Queue a global task=] on the [=Bluetooth task source=] given [=this=]'s
     [=relevant global object=]  to [=resolve=] |promise| with [=this=].
 
@@ -5821,8 +5939,49 @@ bluetooth.SimulateCharacteristicResponseParameters = {
 </pre>
 
 <div algorithm="remote end steps for bluetooth.simulateCharacteristicResponse">
+The [=remote end steps=] with command parameters |params| are:
 
-Issue: TODO: Finish the algorithm of bluetooth.simulateCharacteristicResponse.
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+    Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
+1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
+1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedGattCharacteristic|
+    be |characteristicMapping|[|characteristicUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. Let |promise| be |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}[|simulatedGattCharacteristic|].
+1. <a>Upon fulfillment</a> of |promise| with |characteristic|, run the following steps:
+    1. If |params|[`"type"`] is `read`, run the following steps:
+        1. If |characteristic|.{{[[automatedCharacteristicReadResponse]]}} is `expected`,
+            set |characteristic|.{{[[automatedCharacteristicReadResponse]]}} to |params|[`"code"`] and
+            |characteristic|.{{[[automatedCharacteristicReadResponseData]]}} to [=a copy of the bytes held=]
+            by |params|[`"data"`].
+        1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. If |params|[`"type"`] is `write`, run the following steps:
+        1. If |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} is `expected`,
+            set |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} to |params|[`"code"`].
+        1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. If |params|[`"type"`] is `subscribe-to-notifications`, run the following steps:
+        1. If |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is `expected`,
+            set |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to |params|[`"code"`].
+        1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. If |params|[`"type"`] is `unsubscribe-from-notifications`, run the following steps:
+        1. If |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is `expected`,
+            set |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to |params|[`"code"`].
+        1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 
 </div>
 
@@ -6041,7 +6200,25 @@ bluetooth.CharacteristicEventGeneratedParameters = {
 
 <div algorithm="remote end event trigger for bluetooth.characteristicEventGenerated">
 
-Issue: TODO: Finish the algorithm of bluetooth.characteristicEventGenerated.
+To <dfn>trigger a simulated characteristic event </dfn> given a [=navigable=] |navigable|, a {{BluetoothDevice}} |device|, a
+<a>simulated GATT characteristic</a> |characteristic|, <a>string</a> |type|, and an optional <a>byte sequence</a> |bytes|:
+
+1. Let |navigableId| be |navigable|'s [=navigable id=].
+1. Let |params| be a [=map=] matching the <code>bluetooth.CharacteristicEventGeneratedParameters</code> production and run
+    the following steps:
+    1. Set |params|[`"context"`] to |navigableId|.
+    1. Set |params|[`"address"`] to |device|.{{[[representedDevice]]}}'s address.
+    1. Let |service| be the <a>simulated GATT service</a> containing |characteristic|.
+    1. Set |params|[`"serviceUuid"`] to |service|'s <a>UUID</a>.
+    1. Set |params|[`"characteristicUuid"`] to |characteristic|'s <a>UUID</a>.
+    1. Set |params|[`"type"`] to |type|.
+    1. If |type| is `write`, set |params|[`"data"`] to a [=new=] {{Uint8Array}} wrapping a [=new=] {{ArrayBuffer}} containing |bytes|.
+1. Let |body| be a [=map=] matching the <code>bluetooth.CharacteristicEventGenerated</code> production, with the
+    <code>params</code> field set to |params|.
+1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given
+    "<code>bluetooth.characteristicEventGenerated</code>" and |relatedNavigables|:
+    1. [=Emit an event=] with |session| and |body|.
 
 </div>
 
