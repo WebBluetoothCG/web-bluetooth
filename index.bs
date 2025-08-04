@@ -4102,6 +4102,30 @@ slots</a> described in the following table:
     has been removed or otherwise invalidated.
   </td>
 </tr>
+<tr>
+  <td><dfn>\[[automatedDescriptorReadResponse]]</dfn></td>
+  <td><code>"not-expected"</code></td>
+  <td>
+    The simulated GATT descriptor response code for a GATT descriptor
+    read attempt.
+  </td>
+</tr>
+<tr>
+  <td><dfn>\[[automatedDescriptorReadResponseData]]</dfn></td>
+  <td>Empty <a>byte sequence</a></td>
+  <td>
+    The simulated GATT descriptor response data for a GATT descriptor
+    read attempt.
+  </td>
+</tr>
+<tr>
+  <td><dfn>\[[automatedDescriptorWriteResponse]]</dfn></td>
+  <td><code>"not-expected"</code></td>
+  <td>
+    The simulated GATT descriptor response code for a GATT descriptor
+    write attempt.
+  </td>
+</tr>
 </table>
 
 <div algorithm="BluetoothRemoteGATTDescriptor constructor">
@@ -4146,18 +4170,40 @@ readValue()</dfn></code> method, when invoked, MUST run the following steps:
     "{{InvalidStateError}}" {{DOMException}}.
 1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
     |promise| and run the following steps [=in parallel=]:
-    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on the [=Bluetooth task source=] given |global| to
-        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
-        abort these steps.
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. If [=this=].{{[[automatedDescriptorReadResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Trigger a simulated descriptor event=] given |global|'s
+            [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
+            |descriptor|, and `read`.
+        1. Set [=this=].{{[[automatedDescriptorReadResponse]]}} to `"expected"`,
+            and wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedDescriptorReadResponse]]}}.
+        1. Set [=this=].{{[[automatedDescriptorReadResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the following sub-steps:
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+        1. Otherwise, let |buffer| be a [=new=] {{ArrayBuffer}} containing
+            [=this=].{{[[automatedDescriptorReadResponseData]]}}.
+    1. Otherwise, run the following steps:
+        1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+            global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+            abort these steps.
 
-        Issue(188): Implementations may be able to avoid this {{NetworkError}},
-        but for now sites need to serialize their use of this API
-        and/or give the user a way to retry failed operations.
-    1. Use either the [=Read Characteristic Descriptors=] or the [=Read Long
-        Characteristic Descriptors=] sub-procedure to retrieve the value of
-        |descriptor|. Handle errors as described in
-        <a href="#error-handling"></a>.
+            Issue(188): Implementations may be able to avoid this {{NetworkError}},
+            but for now sites need to serialize their use of this API
+            and/or give the user a way to retry failed operations.
+        1. Use either the [=Read Characteristic Descriptors=] or the [=Read Long
+            Characteristic Descriptors=] sub-procedure to retrieve the value of
+            |descriptor| and let |buffer| be a [=new=] {{ArrayBuffer}} holding the
+            retrieved value. Handle errors as described in
+            <a href="#error-handling"></a>.
     1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
@@ -4165,8 +4211,7 @@ readValue()</dfn></code> method, when invoked, MUST run the following steps:
             these steps.
         1. If the sub-procedure above returned an error, [=reject=] |promise|
             with that error and abort these steps.
-        1. Let |buffer| be a [=new=] {{ArrayBuffer}} holding the retrieved
-            value, and assign a [=new=] {{DataView}} created with |buffer| to
+        1. Assign a [=new=] {{DataView}} created with |buffer| to
             [=this=].{{BluetoothRemoteGATTDescriptor/value}}.
         1. [=Resolve=] |promise| with
             [=this=].{{BluetoothRemoteGATTDescriptor/value}}.
@@ -4194,18 +4239,37 @@ following steps:
     "{{InvalidStateError}}" {{DOMException}}.
 1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
     |promise| and run the following steps [=in parallel=].
-    1. If the UA is currently using the Bluetooth system, it MAY [=queue a
-        global task=] on the [=Bluetooth task source=] given |global| to
-        [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
-        abort these steps.
+    1. If |global|'s [=Window/navigable=]'s
+        [=navigable/top-level traversable=]'s <a>simulated Bluetooth adapter</a>
+        is not empty, run the following steps:
+        1. If [=this=].{{[[automatedDescriptorWriteResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Trigger a simulated descriptor event=] given |global|'s
+            [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
+            |descriptor|, `write`, and |bytes|.
+        1. Set [=this=].{{[[automatedDescriptorWriteResponse]]}} to `"expected"`,
+            and wait for it to change.
+        1. Let |response| be [=this=].{{[[automatedDescriptorWriteResponse]]}}.
+        1. Set [=this=].{{[[automatedDescriptorWriteResponse]]}} to `"not-expected"`.
+        1. If |response| is not `0`, do the following sub-steps:
+            1. [=Queue a global task=] on the [=Bluetooth task source=] given
+                |global| to [=reject=] |promise| with a "{{NetworkError}}"
+                {{DOMException}} and abort these steps.
+    1. Otherwise, run the following steps:
+        1. If the UA is currently using the Bluetooth system, it MAY [=queue a
+            global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{NetworkError}}" {{DOMException}} and
+            abort these steps.
 
-        Issue(188): Implementations may be able to avoid this {{NetworkError}},
-        but for now sites need to serialize their use of this API
-        and/or give the user a way to retry failed operations.
-    1. Use either the [=Write Characteristic Descriptors=] or the [=Write Long
-        Characteristic Descriptors=] sub-procedure to write |bytes| to
-        |descriptor|. Handle errors as described in
-        <a href="#error-handling"></a>.
+            Issue(188): Implementations may be able to avoid this {{NetworkError}},
+            but for now sites need to serialize their use of this API
+            and/or give the user a way to retry failed operations.
+        1. Use either the [=Write Characteristic Descriptors=] or the [=Write Long
+            Characteristic Descriptors=] sub-procedure to write |bytes| to
+            |descriptor|. Handle errors as described in
+            <a href="#error-handling"></a>.
     1. [=Queue a global task=] on the [=Bluetooth task source=] given |global|
         to perform the following steps:
         1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
@@ -5139,10 +5203,14 @@ is an <a>ordered map</a> of Bluetooth <a>UUID</a> strings to <a>simulated GATT c
 
 A <dfn>simulated GATT characteristic</dfn> is a software defined [=Characteristic=] that belongs to a
 <a>simulated GATT service</a>, has a property of <a>UUID</a>, a property of <a>Characteristic Properties</a>,
-and is known-present in the <a>Bluetooth cache</a>.
+is known-present in the <a>Bluetooth cache</a>, and has a <dfn>simulated GATT descriptor mapping</dfn>, which
+is an <a>ordered map</a> of Bluetooth <a>UUID</a> strings to <a>simulated GATT descriptors</a>.
 
 <dfn>Simulated GATT characteristic properties</dfn> are software defined [=Characteristic Properties=] that belong to a
 <a>simulated GATT characteristic</a> and are known-present in the <a>Bluetooth cache</a>.
+
+A <dfn>simulated GATT descriptor</dfn> is a software defined [=Descriptor=] that belongs to a
+<a>simulated GATT characteristic</a>, has a property of <a>UUID</a>, and is known-present in the <a>Bluetooth cache</a>.
 
 Issue: CDDL snippetes use the "text" type instead of
 "browsingContext.BrowsingContext" to allow indepedent programmatic
@@ -6025,7 +6093,46 @@ bluetooth.SimulateDescriptorParameters = {
 
 <div algorithm="remote end steps for bluetooth.simulateDescriptor">
 
-Issue: TODO: Finish the algorithm of bluetooth.simulateDescriptor.
+1. Let |contextId| be |params|[`"context"`].
+1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
+1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
+1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
+1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a>
+    |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
+    [=associated Bluetooth=].
+1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
+1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
+1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedCharacteristic| be
+    |characteristicMapping|[|characteristicUuid|].
+1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
+1. Let |descriptorMapping| be |simulatedCharacteristic|'s <a>simulated GATT descriptor mapping</a>.
+1. Let |descriptorUuid| be |params|[`"descriptorUuid"`].
+1. If |params|[`"type"`] is `"add"`:
+    1. If |descriptorMapping|[|descriptorUuid|] [=map/exists=], return [=error=] with
+        [=error code=] [=invalid element state=].
+    1. Let |simulatedGattDescriptor| be a new <a>simulated GATT descriptor</a>.
+    1. Set |simulatedGattDescriptor|'s <a>UUID</a> to |descriptorUuid|.
+    1. Set |descriptorMapping|[|descriptorUuid|] to |simulatedGattDescriptor|.
+    1. <a>Create a <code>BluetoothRemoteGATTDescriptor</code> representing</a> |simulatedGattDescriptor|
+        and add a mapping from |simulatedGattDescriptor| to the resulting {{Promise}} in
+        |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Return [=success=] with data `null`.
+1. Else if |params|[`"type"`] is `"remove"`:
+    1. If |descriptorMapping|[|descriptorUuid|] [=map/exists=], let |simulatedGattDescriptor|
+        be |descriptorMapping|[|descriptorUuid|].
+    1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
+    1. Remove |simulatedGattDescriptor| from |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
+    1. Remove |descriptorUuid| from |descriptorMapping|.
+    1. Return [=success=] with data `null`.
+1. Return [=error=] with [=error code=] [=invalid argument=].
 
 </div>
 
@@ -6243,7 +6350,27 @@ bluetooth.DescriptorEventGeneratedParameters = {
 
 <div algorithm="remote end event trigger for bluetooth.descriptorEventGenerated">
 
-Issue: TODO: Finish the algorithm of bluetooth.descriptorEventGenerated.
+To <dfn>trigger a simulated descriptor event </dfn> given a [=navigable=] |navigable|, a {{BluetoothDevice}} |device|, a
+<a>simulated GATT descriptor</a> |descriptor|, <a>string</a> |type|, and an optional <a>byte sequence</a> |bytes|:
+
+1. Let |navigableId| be |navigable|'s [=navigable id=].
+1. Let |params| be a [=map=] matching the <code>bluetooth.DescriptorEventGeneratedParameters</code> production and run
+    the following steps:
+    1. Set |params|[`"context"`] to |navigableId|.
+    1. Set |params|[`"address"`] to |device|.{{[[representedDevice]]}}'s address.
+    1. Let |characteristic| be the <a>simulated GATT characteristic</a> containing |descriptor|.
+    1. Let |service| be the <a>simulated GATT service</a> containing |characteristic|.
+    1. Set |params|[`"serviceUuid"`] to |service|'s <a>UUID</a>.
+    1. Set |params|[`"characteristicUuid"`] to |characteristic|'s <a>UUID</a>.
+    1. Set |params|[`"descriptorUuid"`] to |descriptor|'s <a>UUID</a>.
+    1. Set |params|[`"type"`] to |type|.
+    1. If |type| is `write`, set |params|[`"data"`] to a [=new=] {{Uint8Array}} wrapping a [=new=] {{ArrayBuffer}} containing |bytes|.
+1. Let |body| be a [=map=] matching the <code>bluetooth.DescriptorEventGenerated</code> production, with the
+    <code>params</code> field set to |params|.
+1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
+1. For each |session| in the [=set of sessions for which an event is enabled=] given
+    "<code>bluetooth.descriptorEventGenerated</code>" and |relatedNavigables|:
+    1. [=Emit an event=] with |session| and |body|.
 
 </div>
 
