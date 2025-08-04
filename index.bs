@@ -3547,16 +3547,16 @@ Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
     <td><dfn>\[[automatedCharacteristicSubscribeToNotificationsResponse]]</dfn></td>
     <td><code>"not-expected"</code></td>
     <td>
-      The simulated GATT characteristic response code for a GATT characteristic
-      subscribing to notifications attempt.
+      The simulated GATT characteristic response code for an attempt to subscribe
+      to GATT characteristic notifications.
     </td>
   </tr>
   <tr>
     <td><dfn>\[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]</dfn></td>
     <td><code>"not-expected"</code></td>
     <td>
-      The simulated GATT characteristic response code for a GATT characteristic
-      unsubscribing from notifications attempt.
+      The simulated GATT characteristic response code for an attempt to unsubscribe
+      from GATT characteristic notifications.
     </td>
   </tr>
 </table>
@@ -3649,10 +3649,12 @@ The <code><dfn method for="BluetoothRemoteGATTCharacteristic">readValue()</dfn>
         1. [=Trigger a simulated characteristic event=] given |global|'s
             [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
             |characteristic|, and `read`.
-        1. If [=this=].{{[[automatedCharacteristicReadResponse]]}} is `"not-expected"`,
-            set it to `"expected"`.
-        1. If [=this=].{{[[automatedCharacteristicReadResponse]]}} is `"expected"`,
-            wait for it to change.
+        1. If [=this=].{{[[automatedCharacteristicReadResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. Set [=this=].{{[[automatedCharacteristicReadResponse]]}} to `"expected"`,
+            and wait for it to change.
         1. Let |response| be [=this=].{{[[automatedCharacteristicReadResponse]]}}.
         1. Set [=this=].{{[[automatedCharacteristicReadResponse]]}} to `"not-expected"`.
         1. If |response| is not `0`, do the following sub-steps:
@@ -3722,10 +3724,12 @@ the UA MUST perform the following steps:
         1. [=Trigger a simulated characteristic event=] given |global|'s
             [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
             |characteristic|, `write`, and |bytes|.
-        1. If [=this=].{{[[automatedCharacteristicWriteResponse]]}} is `"not-expected"`,
-            set it to `"expected"`.
-        1. If [=this=].{{[[automatedCharacteristicWriteResponse]]}} is `"expected"`,
-            wait for it to change.
+        1. If [=this=].{{[[automatedCharacteristicWriteResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. Set [=this=].{{[[automatedCharacteristicWriteResponse]]}} to `"expected"`,
+            and wait for it to change.
         1. Let |response| be [=this=].{{[[automatedCharacteristicWriteResponse]]}}.
         1. Set [=this=].{{[[automatedCharacteristicWriteResponse]]}} to `"not-expected"`.
         1. If |response| is not `0`, do the following sub-steps:
@@ -3860,10 +3864,12 @@ notifications.
         1. [=Trigger a simulated characteristic event=] given |global|'s
             [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
             |characteristic|, and `subscribe-to-notifications`.
-        1. If [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is `"not-expected"`,
-            set it to `"expected"`.
-        1. If [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is `"expected"`,
-            wait for it to change.
+        1. If [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. Set [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to `"expected"`,
+            and wait for it to change.
         1. Let |response| be [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}}.
         1. Set [=this=].{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to `"not-expected"`.
         1. If |response| is not `0`, do the following sub-steps:
@@ -3933,10 +3939,12 @@ promise</a> <var>promise</var> and run the following steps <a>in parallel</a>:
         1. [=Trigger a simulated characteristic event=] given |global|'s
             [=Window/navigable=], [=this=].{{BluetoothRemoteGATTServer/device}},
             |characteristic|, and `unsubscribe-from-notifications`.
-        1. If [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is `"not-expected"`,
-            set it to `"expected"`.
-        1. If [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is `"expected"`,
-            wait for it to change.
+        1. If [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is not `"not-expected"`,
+            [=queue a global task=] on the [=Bluetooth task source=] given |global| to
+            [=reject=] |promise| with a "{{InvalidStateError}}" {{DOMException}} and abort
+            these steps.
+        1. Set [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to `"expected"`,
+            and wait for it to change.
         1. Let |response| be [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}}.
         1. Set [=this=].{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to `"not-expected"`.
         1. If |response| is not `0`, do the following sub-steps:
@@ -5961,15 +5969,15 @@ The [=remote end steps=] with command parameters |params| are:
             |characteristic|.{{[[automatedCharacteristicReadResponseData]]}} to [=a copy of the bytes held=]
             by |params|[`"data"`].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. Else if |params|[`"type"`] is `write`, run the following steps:
+    1. If |params|[`"type"`] is `write`, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} is `expected`,
             set |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} to |params|[`"code"`].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. Else if |params|[`"type"`] is `subscribe-to-notifications`, run the following steps:
+    1. If |params|[`"type"`] is `subscribe-to-notifications`, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is `expected`,
             set |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to |params|[`"code"`].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. Else if |params|[`"type"`] is `unsubscribe-from-notifications`, run the following steps:
+    1. If |params|[`"type"`] is `unsubscribe-from-notifications`, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is `expected`,
             set |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to |params|[`"code"`].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
