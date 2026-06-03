@@ -124,6 +124,8 @@ Not supported and no plan to support it in the near future:
 - https://webkit.org/tracking-prevention/#anti-fingerprinting
 - https://bugs.webkit.org/show_bug.cgi?id=101034
 
+Note: on iOS and iPadOS, Web Bluetooth can be polyfilled inside Safari itself via the [iOSWebBLE](https://ioswebble.com) Safari extension, which bridges `navigator.bluetooth` to CoreBluetooth through a `SafariWebExtensionHandler` native process. This is a userland extension, not native WebKit support.
+
 # Node.js
 Node.js ports are available:
 - https://github.com/thegecko/webbluetooth
