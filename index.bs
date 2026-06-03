@@ -108,7 +108,6 @@ spec: PAGE-VISIBILITY; urlPrefix: https://www.w3.org/TR/page-visibility-2/#
 
 spec: WEBDRIVER; urlPrefix: https://w3c.github.io/webdriver/
     type: dfn
-        text: error; url: dfn-error
         text: local end; url: dfn-local-ends
         text: invalid element state; url: dfn-invalid-element-state
 
@@ -137,6 +136,10 @@ spec: webdriver
         text: remote end steps
     type: dfn
         text: current browsing context
+spec: webdriver2
+    type: dfn
+        text: success
+        text: error
 
 </pre>
 
@@ -5235,10 +5238,10 @@ bluetooth.CharacteristicProperties = {
 </pre>
 
 <dl>
-  <dt><code>key</code></dt>
+  <dt>{^bluetooth.BluetoothManufacturerData/key^}</dt>
   <dd>is the Company Identifier Code.</dd>
 
-  <dt><code>data</code></dt>
+  <dt>{^bluetooth.BluetoothManufacturerData/data^}</dt>
   <dd>is the manufacturer data [=byte sequence=], base64 encoded.</dd>
 </dl>
 
@@ -5278,7 +5281,7 @@ To <dfn>serialize a device</dfn> given a {{BluetoothDevice}} |device|:
 
 1. Let |id| be |device|.{{BluetoothDevice/id}}.
 1. Let |name| be |device|.{{BluetoothDevice/name}}.
-1. Return a [=map=] matching the <code>bluetooth.RequestDeviceInfo</code> production, with `"id"` set to |id| and `"name"` set to |name|.
+1. Return a [=map=] matching the {^bluetooth.RequestDeviceInfo^} production, with {^bluetooth.RequestDeviceInfo/"id"^} set to |id| and {^bluetooth.RequestDeviceInfo/"name"^} set to |name|.
 
 </div>
 
@@ -5340,16 +5343,16 @@ bluetooth.ScanRecord = {
 A `bluetooth.ScanRecord` represents data of the advertisement packet sent by a [=Bluetooth device=].
 
 <dl>
-  <dt><code>name</code></dt>
+  <dt>{^bluetooth.ScanRecord/name^}</dt>
   <dd>is the [=Bluetooth device=]'s local name, or a prefix of it.</dd>
 
-  <dt><code>uuids</code></dt>
+  <dt>{^bluetooth.ScanRecord/uuids^}</dt>
   <dd>lists the Service UUIDs that this scan record says the [=Bluetooth device=]'s GATT server supports.</dd>
 
-  <dt><code>appearance</code></dt>
+  <dt>{^bluetooth.ScanRecord/appearance^}</dt>
   <dd>is an <a>Appearance</a>, one of the values defined by the {{gap.appearance}} characteristic.</dd>
 
-  <dt><code>manufacturerData</code></dt>
+  <dt>{^bluetooth.ScanRecord/manufacturerData^}</dt>
   <dd>list of <code>BluetoothManufacturerData</code> that maps {{unsigned short}} Company Identifier Codes to base64 encoded manufacturer data [=byte sequences=].</dd>
 </dl>
 
@@ -5386,7 +5389,7 @@ BluetoothCommand = (
 )
 </pre>
 
-#### The bluetooth.handleRequestDevicePrompt Command #### {#bluetooth-handlerequestdeviceprompt-command}
+#### The {^bluetooth.handleRequestDevicePrompt^} Command #### {#bluetooth-handlerequestdeviceprompt-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.HandleRequestDevicePrompt = (
@@ -5414,14 +5417,14 @@ bluetooth.HandleRequestDevicePromptCancelParameters = (
 </pre>
 
 <div algorithm="remote end steps for bluetooth.handleRequestDevicePrompt">
-The [=remote end steps=] with |command parameters| are:
+The [=remote end steps=] with |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
-1. Let |promptId| be |params|[`"prompt"`].
+1. Let |contextId| be |params|[{^bluetooth.HandleRequestDevicePromptParameters/"context"^}].
+1. Let |promptId| be |params|[{^bluetooth.HandleRequestDevicePromptParameters/"prompt"^}].
 1. Let |prompt| be the result of [=trying=] to [=get a prompt=] with |contextId| and |promptId|.
-1. Let |accept| be the value of the <code>accept</code> field of |command parameters|.
+1. Let |accept| be the value of |params|[{^bluetooth.HandleRequestDevicePromptAcceptParameters/"accept"^}].
 1. If |accept| is true:
-    1. Let |deviceId| be the value of the <code>device</code> field of |command parameters|.
+    1. Let |deviceId| be the value of |params|[{^bluetooth.HandleRequestDevicePromptAcceptParameters/"device"^}].
     1. Let |device| be the result of [=trying=] to [=match a device in prompt=] given |prompt| and |deviceId|.
     1. Acknowledge |prompt| with |device|.
 1. Otherwise:
@@ -5446,7 +5449,7 @@ A [=local end=] could dismiss a prompt by sending the following message:
 </pre>
 </div>
 
-#### The bluetooth.simulateAdapter Command #### {#bluetooth-simulateAdapter-command}
+#### The {^bluetooth.simulateAdapter^} Command #### {#bluetooth-simulateAdapter-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateAdapter = (
@@ -5464,20 +5467,20 @@ bluetooth.SimulateAdapterParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdapter">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateAdapterParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, run the following steps:
-    1. If |params|[`"leSupported"`] does not [=map/exist=], set |params|[`"leSupported"`] to `true`.
+    1. If |params|[{^bluetooth.SimulateAdapterParameters/"leSupported"^}] does not [=map/exist=], set |params|[{^bluetooth.SimulateAdapterParameters/"leSupported"^}] to `true`.
     1. Let |simulatedBluetoothAdapter| be a new [=simulated Bluetooth adapter=].
-    1. Set |simulatedBluetoothAdapter|'s <a>LE supported state</a> to |params|[`"leSupported"`].
-    1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
+    1. Set |simulatedBluetoothAdapter|'s <a>LE supported state</a> to |params|[{^bluetooth.SimulateAdapterParameters/"leSupported"^}].
+    1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[{^bluetooth.SimulateAdapterParameters/"state"^}].
     1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to |simulatedBluetoothAdapter|.
     1. Return [=success=] with data `null`.
 1. If |simulatedBluetoothAdapter| is not empty, run the following steps:
-    1. If |params|[`"leSupported"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
-    1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[`"state"`].
+    1. If |params|[{^bluetooth.SimulateAdapterParameters/"leSupported"^}] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
+    1. Set |simulatedBluetoothAdapter|'s <a>adapter state</a> to |params|[{^bluetooth.SimulateAdapterParameters/"state"^}].
     1. Return [=success=] with data `null`.
 
 </div>
@@ -5511,7 +5514,7 @@ A [=local end=] could update the <a>adapter state</a> of an existing adapter by 
 </pre>
 </div>
 
-#### The bluetooth.disableSimulation Command #### {#bluetooth-disableSimulation-command}
+#### The {^bluetooth.disableSimulation^} Command #### {#bluetooth-disableSimulation-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.DisableSimulation = (
@@ -5527,7 +5530,7 @@ bluetooth.DisableSimulationParameters = {
 <div algorithm="remote end steps for bluetooth.disableSimulation">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.DisableSimulationParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Set |navigable|'s <a>simulated Bluetooth adapter</a> to empty.
@@ -5548,7 +5551,7 @@ A [=local end=] could disable the existing simulation by sending the following m
 </pre>
 </div>
 
-#### The bluetooth.simulatePreconnectedPeripheral Command #### {#bluetooth-simulateconnectedperipheral-command}
+#### The {^bluetooth.simulatePreconnectedPeripheral^} Command #### {#bluetooth-simulateconnectedperipheral-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulatePreconnectedPeripheral = (
@@ -5568,19 +5571,19 @@ bluetooth.SimulatePreconnectedPeripheralParameters = {
 <div algorithm="remote end steps for bluetooth.simulatePreconnectedPeripheral">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be params["context"].
+1. Let |contextId| be |params|[{^bluetooth.SimulatePreconnectedPeripheralParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |navigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulatePreconnectedPeripheralParameters/"address"^}].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
 1. If |deviceMapping|[|deviceAddress|] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
 1. Let |simulatedBluetoothDevice| be a new [=simulated Bluetooth device=].
-1. Set |simulatedBluetoothDevice|'s name to |params|[`"name"`].
-1. Set |simulatedBluetoothDevice|'s address to |params|[`"address"`].
-1. Set |simulatedBluetoothDevice|'s <a>manufacturer specific data</a> to the output of [=forgiving-base64 decode=] performed on |params|[`"manufacturerData"`].
-1. Set |simulatedBluetoothDevice|'s <a>service UUIDs</a> to |params|[`"knownServiceUuids"`].
+1. Set |simulatedBluetoothDevice|'s name to |params|[{^bluetooth.SimulatePreconnectedPeripheralParameters/"name"^}].
+1. Set |simulatedBluetoothDevice|'s address to |params|[{^bluetooth.SimulatePreconnectedPeripheralParameters/"address"^}].
+1. Set |simulatedBluetoothDevice|'s <a>manufacturer specific data</a> to the output of [=forgiving-base64 decode=] performed on |params|[{^bluetooth.SimulatePreconnectedPeripheralParameters/"manufacturerData"^}].
+1. Set |simulatedBluetoothDevice|'s <a>service UUIDs</a> to |params|[{^bluetooth.SimulatePreconnectedPeripheralParameters/"knownServiceUuids"^}].
 1. Set |deviceMapping|[|deviceAddress|] to |simulatedBluetoothDevice|.
 1. Return [=success=] with data `null`.
 
@@ -5605,7 +5608,7 @@ A [=local end=] could simulate a preconnected peripheral by sending the followin
 </pre>
 </div>
 
-#### The bluetooth.simulateAdvertisement Command #### {#bluetooth-simulateadvertisement-command}
+#### The {^bluetooth.simulateAdvertisement^} Command #### {#bluetooth-simulateadvertisement-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateAdvertisement = (
@@ -5629,11 +5632,11 @@ bluetooth.SimulateAdvertisementScanEntryParameters = {
 <div algorithm="remote end steps for bluetooth.simulateAdvertisement">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateAdvertisementParameters/"context"^}].
 1. Let |topLevelNavigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
 1. If |topLevelNavigable| is not a [=navigable/top-level traversable=], return [=error=] with [=error code=] [=invalid argument=].
-1. Let |scanEntry| be |params|[`"scanEntry"`].
-1. Let |deviceAddress| be |scanEntry|[`"deviceAddress"`].
+1. Let |scanEntry| be |params|[{^bluetooth.SimulateAdvertisementParameters/"scanEntry"^}].
+1. Let |deviceAddress| be |scanEntry|[{^bluetooth.SimulateAdvertisementScanEntryParameters/"deviceAddress"^}].
 1. Let |simulatedBluetoothAdapter| be |topLevelNavigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -5649,7 +5652,7 @@ The [=remote end steps=] with command parameters |params| are:
     1. <a>Queue a task</a> on |document|'s <a>relevant settings object</a>'s <a>responsible event loop</a> to do the following sub-steps:
         1. Let |simulatedDeviceInstance| be the result of <a>get the <code>BluetoothDevice</code> representing</a> |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s [=associated Bluetooth=].
         1. If |simulatedDeviceInstance|.{{[[watchAdvertisementsState]]}} is `not-watching`, abort these sub-steps.
-        1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[`"scanRecord"`], at |simulatedDeviceInstance|.
+        1. <a>Fire an `advertisementreceived` event</a> for the advertising event represented by |scanEntry|[{^bluetooth.SimulateAdvertisementScanEntryParameters/"scanRecord"^}] with [=received signal strength=] |scanEntry|[{^bluetooth.SimulateAdvertisementScanEntryParameters/"rssi"^}], at |simulatedDeviceInstance|.
 1. Return [=success=] with data `null`.
 
 </div>
@@ -5678,7 +5681,7 @@ A [=local end=] could simulate a device advertisement by sending the following m
 </pre>
 </div>
 
-#### The bluetooth.simulateGattConnectionResponse Command #### {#bluetooth-simulategattconnectionresponse-command}
+#### The {^bluetooth.simulateGattConnectionResponse^} Command #### {#bluetooth-simulategattconnectionresponse-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateGattConnectionResponse = (
@@ -5697,9 +5700,9 @@ bluetooth.SimulateGattConnectionResponseParameters = {
 <div algorithm="remote end steps for bluetooth.simulateGattConnectionResponse">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateGattConnectionResponseParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateGattConnectionResponseParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -5709,7 +5712,7 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. If |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} is `"expected"`,
-    set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to |params|[`"code"`].
+    set |simulatedDeviceInstance|.{{[[gatt]]}}.{{[[automatedGATTConnectionResponse]]}} to |params|[{^bluetooth.SimulateGattConnectionResponseParameters/"code"^}].
 1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
 
 </div>
@@ -5730,7 +5733,7 @@ A [=local end=] could simulate a device gatt connection response of success
 </pre>
 </div>
 
-#### The bluetooth.simulateGattDisconnection Command #### {#bluetooth-simulategattdisconnection-command}
+#### The {^bluetooth.simulateGattDisconnection^} Command #### {#bluetooth-simulategattdisconnection-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateGattDisconnection = (
@@ -5748,9 +5751,9 @@ bluetooth.SimulateGattDisconnectionParameters = {
 <div algorithm="remote end steps for bluetooth.simulateGattDisconnection">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateGattDisconnectionParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateGattDisconnectionParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -5784,7 +5787,7 @@ A [=local end=] could simulate device GATT disconnection by sending the followin
 </pre>
 </div>
 
-#### The bluetooth.simulateService Command #### {#bluetooth-simulateservice-command}
+#### The {^bluetooth.simulateService^} Command #### {#bluetooth-simulateservice-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateService = (
@@ -5803,9 +5806,9 @@ bluetooth.SimulateServiceParameters = {
 <div algorithm="remote end steps for bluetooth.simulateService">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateServiceParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateServiceParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -5815,8 +5818,8 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
-1. Let |uuid| be |params|[`"uuid"`].
-1. If |params|[`"type"`] is `"add"`:
+1. Let |uuid| be |params|[{^bluetooth.SimulateServiceParameters/"uuid"^}].
+1. If |params|[{^bluetooth.SimulateServiceParameters/"type"^}] is {^bluetooth.SimulateServiceParameters/type/"add"^}:
     1. If |serviceMapping|[|uuid|] [=map/exists=], return [=error=] with [=error code=] [=invalid element state=].
     1. Let |simulatedGattService| be a new <a>simulated GATT service</a>.
     1. Set |simulatedGattService|'s <a>UUID</a> to |uuid|.
@@ -5825,7 +5828,7 @@ The [=remote end steps=] with command parameters |params| are:
         and add a mapping from |simulatedGattService| to the resulting {{Promise}} in
         |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
     1. Return [=success=] with data `null`.
-1. If |params|[`"type"`] is `"remove"`:
+1. If |params|[{^bluetooth.SimulateServiceParameters/"type"^}] is {^bluetooth.SimulateServiceParameters/type/"remove"^}:
     1. If |serviceMapping|[|uuid|] [=map/exists=], let |simulatedGattService| be |serviceMapping|[|uuid|].
     1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
     1. Remove |simulatedGattService| from |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
@@ -5867,7 +5870,7 @@ A [=local end=] could simulate removing a GATT service by sending the following 
 </pre>
 </div>
 
-#### The bluetooth.simulateCharacteristic Command #### {#bluetooth-simulatecharacteristic-command}
+#### The {^bluetooth.simulateCharacteristic^} Command #### {#bluetooth-simulatecharacteristic-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateCharacteristic = (
@@ -5888,9 +5891,9 @@ bluetooth.SimulateCharacteristicParameters = {
 <div algorithm="remote end steps for bluetooth.simulateCharacteristic">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateCharacteristicParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateCharacteristicParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -5900,33 +5903,33 @@ The [=remote end steps=] with command parameters |params| are:
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
-1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. Let |serviceUuid| be |params|[{^bluetooth.SimulateCharacteristicParameters/"serviceUuid"^}].
 1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
-1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
-1. If |params|[`"type"`] is `"add"`:
+1. Let |characteristicUuid| be |params|[{^bluetooth.SimulateCharacteristicParameters/"characteristicUuid"^}].
+1. If |params|[{^bluetooth.SimulateCharacteristicParameters/"type"^}] is {^bluetooth.SimulateCharacteristicParameters/type/"add"^}:
     1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], return [=error=] with
         [=error code=] [=invalid element state=].
-    1. If |params|[`"characteristicProperties"`] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
+    1. If |params|[{^bluetooth.SimulateCharacteristicParameters/"characteristicProperties"^}] does not [=map/exist=], return [=error=] with [=error code=] [=invalid argument=].
     1. Let |simulatedGattCharacteristicProperties| be new <a>simulated GATT characteristic properties</a> and run the following steps:
-        1. Let |properties| be |params|[`"characteristicProperties"`].
-        1. If |properties|[`"broadcast"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Broadcast` bit if
-            |properties|[`"broadcast"`] is `true`.
-        1. If |properties|[`"read"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Read` bit if
-            |properties|[`"read"`] is `true`.
-        1. If |properties|[`"writeWithoutResponse"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Write Without Response` bit if
-            |properties|[`"writeWithoutResponse"`] is `true`.
-        1. If |properties|[`"write"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Write` bit if
-            |properties|[`"write"`] is `true`.
-        1. If |properties|[`"notify"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Notify` bit if
-            |properties|[`"notify"`] is `true`.
-        1. If |properties|[`"indicate"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Indicate` bit if
-            |properties|[`"indicate"`] is `true`.
-        1. If |properties|[`"authenticatedSignedWrites"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Authenticated Signed Writes` bit if
-            |properties|[`"authenticatedSignedWrites"`] is `true`.
-        1. If |properties|[`"extendedProperties"`] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Extended Properties` bit if
-            |properties|[`"extendedProperties"`] is `true`.
+        1. Let |properties| be |params|[{^bluetooth.SimulateCharacteristicParameters/"characteristicProperties"^}].
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"broadcast"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Broadcast` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"broadcast"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"read"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Read` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"read"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"writeWithoutResponse"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Write Without Response` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"writeWithoutResponse"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"write"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Write` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"write"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"notify"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Notify` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"notify"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"indicate"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Indicate` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"indicate"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"authenticatedSignedWrites"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Authenticated Signed Writes` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"authenticatedSignedWrites"^}] is `true`.
+        1. If |properties|[{^bluetooth.CharacteristicProperties/"extendedProperties"^}] [=map/exists=], set |simulatedGattCharacteristicProperties|'s `Extended Properties` bit if
+            |properties|[{^bluetooth.CharacteristicProperties/"extendedProperties"^}] is `true`.
     1. Let |simulatedGattCharacteristic| be a new <a>simulated GATT characteristic</a>.
     1. Set |simulatedGattCharacteristic|'s <a>UUID</a> to |characteristicUuid|.
     1. Set |simulatedGattCharacteristic|'s <a>Characteristic Properties</a> to |simulatedGattCharacteristicProperties|.
@@ -5935,8 +5938,8 @@ The [=remote end steps=] with command parameters |params| are:
         and add a mapping from |simulatedGattCharacteristic| to the resulting {{Promise}} in
         |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
     1. Return [=success=] with data `null`.
-1. If |params|[`"type"`] is `"remove"`:
-    1. If |params|[`"characteristicProperties"`] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
+1. If |params|[{^bluetooth.SimulateCharacteristicParameters/"type"^}] is {^bluetooth.SimulateCharacteristicParameters/type/"remove"^}:
+    1. If |params|[{^bluetooth.SimulateCharacteristicParameters/"characteristicProperties"^}] [=map/exists=], return [=error=] with [=error code=] [=invalid argument=].
     1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedGattCharacteristic|
         be |characteristicMapping|[|characteristicUuid|].
     1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
@@ -5987,7 +5990,7 @@ A [=local end=] could simulate removing a GATT characteristic by sending the fol
 </pre>
 </div>
 
-#### The bluetooth.simulateCharacteristicResponse Command #### {#bluetooth-simulatecharacteristicresponse-command}
+#### The {^bluetooth.simulateCharacteristicResponse^} Command #### {#bluetooth-simulatecharacteristicresponse-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateCharacteristicResponse = (
@@ -6009,20 +6012,20 @@ bluetooth.SimulateCharacteristicResponseParameters = {
 <div algorithm="remote end steps for bluetooth.simulateCharacteristicResponse">
 The [=remote end steps=] with command parameters |params| are:
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
 1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
     Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
-1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. Let |serviceUuid| be |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"serviceUuid"^}].
 1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
-1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. Let |characteristicUuid| be |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"characteristicUuid"^}].
 1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedGattCharacteristic|
     be |characteristicMapping|[|characteristicUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
@@ -6031,23 +6034,23 @@ The [=remote end steps=] with command parameters |params| are:
     [=associated Bluetooth=].
 1. Let |promise| be |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}[|simulatedGattCharacteristic|].
 1. <a>Upon fulfillment</a> of |promise| with |characteristic|, run the following steps:
-    1. If |params|[`"type"`] is `read`, run the following steps:
+    1. If |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"type"^}] is {^bluetooth.SimulateCharacteristicResponseParameters/type/"read"^}, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicReadResponse]]}} is `expected`,
-            set |characteristic|.{{[[automatedCharacteristicReadResponse]]}} to |params|[`"code"`] and
+            set |characteristic|.{{[[automatedCharacteristicReadResponse]]}} to |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"code"^}] and
             |characteristic|.{{[[automatedCharacteristicReadResponseData]]}} to [=a copy of the bytes held=]
-            by |params|[`"data"`].
+            by |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"data"^}].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. If |params|[`"type"`] is `write`, run the following steps:
+    1. If |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"type"^}] is {^bluetooth.SimulateCharacteristicResponseParameters/type/"write"^}, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} is `expected`,
-            set |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} to |params|[`"code"`].
+            set |characteristic|.{{[[automatedCharacteristicWriteResponse]]}} to |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"code"^}].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. If |params|[`"type"`] is `subscribe-to-notifications`, run the following steps:
+    1. If |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"type"^}] is {^bluetooth.SimulateCharacteristicResponseParameters/type/"subscribe-to-notifications"^}, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} is `expected`,
-            set |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to |params|[`"code"`].
+            set |characteristic|.{{[[automatedCharacteristicSubscribeToNotificationsResponse]]}} to |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"code"^}].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. If |params|[`"type"`] is `unsubscribe-from-notifications`, run the following steps:
+    1. If |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"type"^}] is {^bluetooth.SimulateCharacteristicResponseParameters/type/"unsubscribe-from-notifications"^}, run the following steps:
         1. If |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} is `expected`,
-            set |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to |params|[`"code"`].
+            set |characteristic|.{{[[automatedCharacteristicUnsubscribeFromNotificationsResponse]]}} to |params|[{^bluetooth.SimulateCharacteristicResponseParameters/"code"^}].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
     1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 
@@ -6073,7 +6076,7 @@ with data for a characteristic read operation by sending the following message:
 </pre>
 </div>
 
-#### The bluetooth.simulateDescriptor Command #### {#bluetooth-simulatedescriptor-command}
+#### The {^bluetooth.simulateDescriptor^} Command #### {#bluetooth-simulatedescriptor-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateDescriptor = (
@@ -6093,9 +6096,9 @@ bluetooth.SimulateDescriptorParameters = {
 
 <div algorithm="remote end steps for bluetooth.simulateDescriptor">
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateDescriptorParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateDescriptorParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
@@ -6105,17 +6108,17 @@ bluetooth.SimulateDescriptorParameters = {
     |simulatedDevice| inside |navigable|'s <a>active window</a>'s <a spec=HTML>associated <code>Navigator</code></a>'s
     [=associated Bluetooth=].
 1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
-1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. Let |serviceUuid| be |params|[{^bluetooth.SimulateDescriptorParameters/"serviceUuid"^}].
 1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
-1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. Let |characteristicUuid| be |params|[{^bluetooth.SimulateDescriptorParameters/"characteristicUuid"^}].
 1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedCharacteristic| be
     |characteristicMapping|[|characteristicUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |descriptorMapping| be |simulatedCharacteristic|'s <a>simulated GATT descriptor mapping</a>.
-1. Let |descriptorUuid| be |params|[`"descriptorUuid"`].
-1. If |params|[`"type"`] is `"add"`:
+1. Let |descriptorUuid| be |params|[{^bluetooth.SimulateDescriptorParameters/"descriptorUuid"^}].
+1. If |params|[{^bluetooth.SimulateDescriptorParameters/"type"^}] is {^bluetooth.SimulateDescriptorParameters/type/"add"^}:
     1. If |descriptorMapping|[|descriptorUuid|] [=map/exists=], return [=error=] with
         [=error code=] [=invalid element state=].
     1. Let |simulatedGattDescriptor| be a new <a>simulated GATT descriptor</a>.
@@ -6125,7 +6128,7 @@ bluetooth.SimulateDescriptorParameters = {
         and add a mapping from |simulatedGattDescriptor| to the resulting {{Promise}} in
         |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}.
     1. Return [=success=] with data `null`.
-1. If |params|[`"type"`] is `"remove"`:
+1. If |params|[{^bluetooth.SimulateDescriptorParameters/"type"^}] is {^bluetooth.SimulateDescriptorParameters/type/"remove"^}:
     1. If |descriptorMapping|[|descriptorUuid|] [=map/exists=], let |simulatedGattDescriptor|
         be |descriptorMapping|[|descriptorUuid|].
     1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
@@ -6172,7 +6175,7 @@ A [=local end=] could simulate removing a GATT descriptor by sending the followi
 </pre>
 </div>
 
-#### The bluetooth.simulateDescriptorResponse Command #### {#bluetooth-simulatedescriptorresponse-command}
+#### The {^bluetooth.simulateDescriptorResponse^} Command #### {#bluetooth-simulatedescriptorresponse-command}
 
 <pre highlight="cddl" class="cddl" data-cddl-module="remote-cddl,local-cddl">
 bluetooth.SimulateDescriptorResponse = (
@@ -6194,25 +6197,25 @@ bluetooth.SimulateDescriptorResponseParameters = {
 
 <div algorithm="remote end steps for bluetooth.simulateDescriptorResponse">
 
-1. Let |contextId| be |params|[`"context"`].
+1. Let |contextId| be |params|[{^bluetooth.SimulateDescriptorResponseParameters/"context"^}].
 1. Let |navigable| be the result of [=trying=] to [=get a navigable=] with |contextId|.
-1. Let |deviceAddress| be |params|[`"address"`].
+1. Let |deviceAddress| be |params|[{^bluetooth.SimulateDescriptorResponseParameters/"address"^}].
 1. Let |simulatedBluetoothAdapter| be |navigable|'s <a>simulated Bluetooth adapter</a>.
 1. If |simulatedBluetoothAdapter| is empty, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |deviceMapping| be |simulatedBluetoothAdapter|'s <a>simulated Bluetooth device mapping</a>.
 1. If |deviceMapping|[|deviceAddress|] [=map/exists=], let |simulatedDevice| be |deviceMapping|[|deviceAddress|].
     Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |serviceMapping| be |simulatedDevice|'s <a>simulated GATT service mapping</a>.
-1. Let |serviceUuid| be |params|[`"serviceUuid"`].
+1. Let |serviceUuid| be |params|[{^bluetooth.SimulateDescriptorResponseParameters/"serviceUuid"^}].
 1. If |serviceMapping|[|serviceUuid|] [=map/exists=], let |simulatedService| be |serviceMapping|[|serviceUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 1. Let |characteristicMapping| be |simulatedService|'s <a>simulated GATT characteristic mapping</a>.
-1. Let |characteristicUuid| be |params|[`"characteristicUuid"`].
+1. Let |characteristicUuid| be |params|[{^bluetooth.SimulateDescriptorResponseParameters/"characteristicUuid"^}].
 1. If |characteristicMapping|[|characteristicUuid|] [=map/exists=], let |simulatedCharacteristic|
     be |characteristicMapping|[|characteristicUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
 1. Let |descriptorMapping| be |simulatedCharacteristic|'s <a>simulated GATT descriptor mapping</a>.
-1. Let |descriptorUuid| be |params|[`"descriptorUuid"`].
+1. Let |descriptorUuid| be |params|[{^bluetooth.SimulateDescriptorResponseParameters/"descriptorUuid"^}].
 1. If |descriptorMapping|[|descriptorUuid|] [=map/exists=], let |simulatedDescriptor|
     be |descriptorMapping|[|descriptorUuid|].
 1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
@@ -6221,15 +6224,15 @@ bluetooth.SimulateDescriptorResponseParameters = {
     [=associated Bluetooth=].
 1. Let |promise| be |simulatedDeviceInstance|.{{[[context]]}}.{{Bluetooth/[[attributeInstanceMap]]}}[|simulatedDescriptor|].
 1. <a>Upon fulfillment</a> of |promise| with |descriptor|, run the following steps:
-    1. If |params|[`"type"`] is `read`, run the following steps:
+    1. If |params|[{^bluetooth.SimulateDescriptorResponseParameters/"type"^}] is {^bluetooth.SimulateDescriptorResponseParameters/type/"read"^}, run the following steps:
         1. If |descriptor|.{{[[automatedDescriptorReadResponse]]}} is `expected`,
-            set |descriptor|.{{[[automatedDescriptorReadResponse]]}} to |params|[`"code"`] and
+            set |descriptor|.{{[[automatedDescriptorReadResponse]]}} to |params|[{^bluetooth.SimulateDescriptorResponseParameters/"code"^}] and
             |descriptor|.{{[[automatedDescriptorReadResponseData]]}} to [=a copy of the bytes held=]
-            by |params|[`"data"`].
+            by |params|[{^bluetooth.SimulateDescriptorResponseParameters/"data"^}].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
-    1. If |params|[`"type"`] is `write`, run the following steps:
+    1. If |params|[{^bluetooth.SimulateDescriptorResponseParameters/"type"^}] is {^bluetooth.SimulateDescriptorResponseParameters/type/"write"^}, run the following steps:
         1. If |characteristic|.{{[[automatedDescriptorWriteResponse]]}} is `expected`,
-            set |characteristic|.{{[[automatedDescriptorWriteResponse]]}} to |params|[`"code"`].
+            set |characteristic|.{{[[automatedDescriptorWriteResponse]]}} to |params|[{^bluetooth.SimulateDescriptorResponseParameters/"code"^}].
         1. Otherwise, return [=error=] with [=error code=] [=invalid element state=].
     1. Otherwise, return [=error=] with [=error code=] [=invalid argument=].
 
@@ -6287,10 +6290,10 @@ To <dfn>trigger a prompt updated event</dfn> given a [=navigable=] |navigable|, 
 1. Let |prompt| be the [=device prompt=] (|promptId|, |devices|).
 1. Let |serialized devices| be the result of [=serialize prompt devices=] with |prompt|.
 1. Set [=map of navigables to device prompts=][|navigableId|] to |prompt|.
-1. Let |params| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdatedParameters</code> production with the <code>context</code> field set to |navigableId|, the <code>prompt</code> field set to |promptId|, and the <code>devices</code> field set to |serialized devices|.
-1. Let |body| be a [=map=] matching the <code>bluetooth.RequestDevicePromptUpdated</code> production, with the <code>params</code> field set to |params|.
+1. Let |params| be a [=map=] matching the {^bluetooth.RequestDevicePromptUpdatedParameters^} production with the {^bluetooth.RequestDevicePromptUpdatedParameters/"context"^} field set to |navigableId|, the {^bluetooth.RequestDevicePromptUpdatedParameters/"prompt"^} field set to |promptId|, and the {^bluetooth.RequestDevicePromptUpdatedParameters/"devices"^} field set to |serialized devices|.
+1. Let |body| be a [=map=] matching the {^bluetooth.RequestDevicePromptUpdated^} production, with the {^bluetooth.RequestDevicePromptUpdated/"params"^} field set to |params|.
 1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
-1. For each |session| in the [=set of sessions for which an event is enabled=] given "<code>bluetooth.requestDevicePromptUpdated</code>" and |relatedNavigables|:
+1. For each |session| in the [=set of sessions for which an event is enabled=] given {^bluetooth.RequestDevicePromptUpdated/method/"bluetooth.requestDevicePromptUpdated"^} and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
@@ -6313,13 +6316,13 @@ bluetooth.GattConnectionAttemptedParameters = {
 To <dfn>trigger a gatt connection attempted event</dfn> given a [=navigable=] |navigable| and a {{BluetoothDevice}} |device|:
 
 1. Let |navigableId| be |navigable|'s [=navigable id=].
-1. Let |params| be a [=map=] matching the <code>bluetooth.GattConnectionAttemptedParameters</code> production with the
-    <code>context</code> field set to |navigableId| and the <code>address</code> field set to |device|.{{[[representedDevice]]}}'s address.
-1. Let |body| be a [=map=] matching the <code>bluetooth.GattConnectionAttempted</code> production, with the
-    <code>params</code> field set to |params|.
+1. Let |params| be a [=map=] matching the {^bluetooth.GattConnectionAttemptedParameters^} production with the
+    {^bluetooth.GattConnectionAttemptedParameters/"context"^} field set to |navigableId| and the {^bluetooth.GattConnectionAttemptedParameters/"address"^} field set to |device|.{{[[representedDevice]]}}'s address.
+1. Let |body| be a [=map=] matching the {^bluetooth.GattConnectionAttempted^} production, with the
+    {^bluetooth.GattConnectionAttempted/"params"^} field set to |params|.
 1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
 1. For each |session| in the [=set of sessions for which an event is enabled=] given
-    "<code>bluetooth.gattEventGenerated</code>" and |relatedNavigables|:
+    {^bluetooth.GattConnectionAttempted/method/"bluetooth.gattConnectionAttempted"^} and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
@@ -6348,24 +6351,24 @@ To <dfn>trigger a simulated characteristic event </dfn> given a [=navigable=] |n
 <a>simulated GATT characteristic</a> |characteristic|, <a>string</a> |type|, and an optional <a>byte sequence</a> |bytes|:
 
 1. Let |navigableId| be |navigable|'s [=navigable id=].
-1. Let |params| be a [=map=] matching the <code>bluetooth.CharacteristicEventGeneratedParameters</code> production and run
+1. Let |params| be a [=map=] matching the {^bluetooth.CharacteristicEventGeneratedParameters^} production and run
     the following steps:
-    1. Set |params|[`"context"`] to |navigableId|.
-    1. Set |params|[`"address"`] to |device|.{{[[representedDevice]]}}'s address.
+    1. Set |params|[{^bluetooth.CharacteristicEventGeneratedParameters/"context"^}] to |navigableId|.
+    1. Set |params|[{^bluetooth.CharacteristicEventGeneratedParameters/"address"^}] to |device|.{{[[representedDevice]]}}'s address.
     1. Let |service| be the <a>simulated GATT service</a> containing |characteristic|.
-    1. Set |params|[`"serviceUuid"`] to |service|'s <a>UUID</a>.
-    1. Set |params|[`"characteristicUuid"`] to |characteristic|'s <a>UUID</a>.
-    1. Set |params|[`"type"`] to |type|.
-    1. If |type| is `write`, run the following steps:
+    1. Set |params|[{^bluetooth.CharacteristicEventGeneratedParameters/"serviceUuid"^}] to |service|'s <a>UUID</a>.
+    1. Set |params|[{^bluetooth.CharacteristicEventGeneratedParameters/"characteristicUuid"^}] to |characteristic|'s <a>UUID</a>.
+    1. Set |params|[{^bluetooth.CharacteristicEventGeneratedParameters/"type"^}] to |type|.
+    1. If |type| is {^bluetooth.CharacteristicEventGeneratedParameters/type/"write-with-response"^} or {^bluetooth.CharacteristicEventGeneratedParameters/type/"write-without-response"^}, run the following steps:
         1. Let |data| be an empty list.
         1. For each |byte| in |bytes|:
             1. Append |byte|'s [=byte/value=] to |data|.
-        1. Set |params|[`"data"`] to |data|.
-1. Let |body| be a [=map=] matching the <code>bluetooth.CharacteristicEventGenerated</code> production, with the
-    <code>params</code> field set to |params|.
+        1. Set |params|[{^bluetooth.CharacteristicEventGeneratedParameters/"data"^}] to |data|.
+1. Let |body| be a [=map=] matching the {^bluetooth.CharacteristicEventGenerated^} production, with the
+    {^bluetooth.CharacteristicEventGenerated/"params"^} field set to |params|.
 1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
 1. For each |session| in the [=set of sessions for which an event is enabled=] given
-    "<code>bluetooth.characteristicEventGenerated</code>" and |relatedNavigables|:
+    {^bluetooth.CharacteristicEventGenerated/method/"bluetooth.characteristicEventGenerated"^} and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
@@ -6395,26 +6398,26 @@ To <dfn>trigger a simulated descriptor event </dfn> given a [=navigable=] |navig
 <a>simulated GATT descriptor</a> |descriptor|, <a>string</a> |type|, and an optional <a>byte sequence</a> |bytes|:
 
 1. Let |navigableId| be |navigable|'s [=navigable id=].
-1. Let |params| be a [=map=] matching the <code>bluetooth.DescriptorEventGeneratedParameters</code> production and run
+1. Let |params| be a [=map=] matching the {^bluetooth.DescriptorEventGeneratedParameters^} production and run
     the following steps:
-    1. Set |params|[`"context"`] to |navigableId|.
-    1. Set |params|[`"address"`] to |device|.{{[[representedDevice]]}}'s address.
+    1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"context"^}] to |navigableId|.
+    1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"address"^}] to |device|.{{[[representedDevice]]}}'s address.
     1. Let |characteristic| be the <a>simulated GATT characteristic</a> containing |descriptor|.
     1. Let |service| be the <a>simulated GATT service</a> containing |characteristic|.
-    1. Set |params|[`"serviceUuid"`] to |service|'s <a>UUID</a>.
-    1. Set |params|[`"characteristicUuid"`] to |characteristic|'s <a>UUID</a>.
-    1. Set |params|[`"descriptorUuid"`] to |descriptor|'s <a>UUID</a>.
-    1. Set |params|[`"type"`] to |type|.
-    1. If |type| is `write`, run the following steps:
+    1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"serviceUuid"^}] to |service|'s <a>UUID</a>.
+    1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"characteristicUuid"^}] to |characteristic|'s <a>UUID</a>.
+    1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"descriptorUuid"^}] to |descriptor|'s <a>UUID</a>.
+    1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"type"^}] to |type|.
+    1. If |type| is {^bluetooth.DescriptorEventGeneratedParameters/type/"write"^}, run the following steps:
         1. Let |data| be an empty list.
         1. For each |byte| in |bytes|:
             1. Append |byte|'s [=byte/value=] to |data|.
-        1. Set |params|[`"data"`] to |data|.
-1. Let |body| be a [=map=] matching the <code>bluetooth.DescriptorEventGenerated</code> production, with the
-    <code>params</code> field set to |params|.
+        1. Set |params|[{^bluetooth.DescriptorEventGeneratedParameters/"data"^}] to |data|.
+1. Let |body| be a [=map=] matching the {^bluetooth.DescriptorEventGenerated^} production, with the
+    {^bluetooth.DescriptorEventGenerated/"params"^} field set to |params|.
 1. Let |relatedNavigables| be a [=/set=] containing |navigable|.
 1. For each |session| in the [=set of sessions for which an event is enabled=] given
-    "<code>bluetooth.descriptorEventGenerated</code>" and |relatedNavigables|:
+    {^bluetooth.DescriptorEventGenerated/method/"bluetooth.descriptorEventGenerated"^} and |relatedNavigables|:
     1. [=Emit an event=] with |session| and |body|.
 
 </div>
