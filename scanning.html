@@ -5,9 +5,9 @@
   <title>Web Bluetooth Scanning</title>
   <meta content="CG-DRAFT" name="w3c-status">
   <link href="https://www.w3.org/StyleSheets/TR/2021/cg-draft" rel="stylesheet">
-  <meta content="Bikeshed version 3f621ba99, updated Mon Jul 28 15:38:36 2025 -0700" name="generator">
+  <meta content="Bikeshed version cfb78d9c0, updated Tue Jun 2 16:21:00 2026 -0700" name="generator">
   <link href="https://webbluetoothcg.github.io/web-bluetooth/scanning.html" rel="canonical">
-  <meta content="0838e30db5cb69136da560a5e1aa6892f1de6999" name="revision">
+  <meta content="2e451c162f6a3f2277f86104223de4630710506e" name="revision">
   <meta content="dark light" name="color-scheme">
   <link href="https://www.w3.org/StyleSheets/TR/2021/dark.css" media="(prefers-color-scheme: dark)" rel="stylesheet" type="text/css">
 <style>
@@ -308,7 +308,7 @@ pre .property::before, pre .property::after {
 </style>
 <style>/* Boilerplate: style-counters */
 body {
-    counter-reset: example figure issue;
+    counter-reset: example figure issue table;
 }
 .issue {
     counter-increment: issue;
@@ -325,7 +325,7 @@ body {
 }
 .invalid.example:not(.no-marker)::before,
 .illegal.example:not(.no-marker)::before {
-    content: "Invalid Example" counter(example);
+    content: "Invalid Example " counter(example);
 }
 
 figcaption {
@@ -333,6 +333,13 @@ figcaption {
 }
 figcaption:not(.no-marker)::before {
     content: "Figure " counter(figure) " ";
+}
+
+figure.table figcaption {
+    counter-increment: table;
+}
+figure.table figcaption:not(.no-marker)::before {
+    content: "Table " counter(table) " ";
 }
 </style>
 <style>/* Boilerplate: style-dfn-panel */
@@ -695,6 +702,30 @@ c-[il] { color: #000000 } /* Literal.Number.Integer.Long */
     c-[vm] { color: #cb4b16 } /* Name.Variable.Magic */
     c-[il] { color: #657b83 } /* Literal.Number.Integer.Long */
 }
+
+@media print {
+    /* Darken colors for print that would otherwise print too faintly */
+    c-[c]  { color: #555555 } /* Comment */
+    c-[d]  { color: #555555 } /* Comment.Multiline */
+    c-[cp] { color: #555555 } /* Comment.Preproc */
+    c-[c1] { color: #555555 } /* Comment.Single */
+    c-[cs] { color: #555555 } /* Comment.Special */
+    c-[o]  { color: #222222 } /* Operator */
+    c-[p]  { color: #222222 } /* Punctuation */
+    c-[ow] { color: #222222 } /* Operator.Word */
+    c-[s]  { color: #664400 } /* Literal.String */
+    c-[t]  { color: #664400 } /* Literal.String.Single */
+    c-[u]  { color: #664400 } /* Literal.String.Double */
+    c-[sb] { color: #664400 } /* Literal.String.Backtick */
+    c-[sc] { color: #664400 } /* Literal.String.Char */
+    c-[sd] { color: #664400 } /* Literal.String.Doc */
+    c-[se] { color: #664400 } /* Literal.String.Escape */
+    c-[sh] { color: #664400 } /* Literal.String.Heredoc */
+    c-[si] { color: #664400 } /* Literal.String.Interpol */
+    c-[sx] { color: #664400 } /* Literal.String.Other */
+    c-[sr] { color: #664400 } /* Literal.String.Regex */
+    c-[ss] { color: #664400 } /* Literal.String.Symbol */
+}
 </style>
 <style>/* Boilerplate: style-var-click-highlighting */
 /*
@@ -745,9 +776,9 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
     <img alt="W3C" height="48" src="https://www.w3.org/StyleSheets/TR/2021/logos/W3C" width="72">
 </a>
 </p>
-   <h1 class="p-name no-ref" id="title">Web Bluetooth Scanning</h1>
+   <h1 class="no-ref p-name" id="title">Web Bluetooth Scanning</h1>
    <p id="w3c-state"><a href="https://www.w3.org/standards/types/#CG-DRAFT">Draft Community Group Report</a>,
-    <time class="dt-updated" datetime="2025-09-24">24 September 2025</time></p>
+    <time class="dt-updated" datetime="2026-06-03">3 June 2026</time></p>
    <details open>
     <summary>More details about this document</summary>
     <div data-fill-with="spec-metadata">
@@ -758,7 +789,7 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
       <dd><a href="https://github.com/WebBluetoothCG/web-bluetooth/issues/">GitHub</a>
       <dd><a href="#issues-index">Inline In Spec</a>
       <dt class="editor">Editor:
-      <dd class="editor p-author h-card vcard"><a class="p-name fn u-url url" href="https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors">See contributors on GitHub</a>
+      <dd class="editor h-card p-author vcard"><a class="fn p-name u-url url" href="https://github.com/WebBluetoothCG/web-bluetooth/graphs/contributors">See contributors on GitHub</a>
       <dt>Participate:
       <dd><a href="https://www.w3.org/community/web-bluetooth/">Join the W3C Community Group</a>
       <dd><a href="https://github.com/WebBluetoothCG/web-bluetooth">Fix the text through GitHub</a>
@@ -768,16 +799,16 @@ var[data-var-color="6"] { --var-vg: #FFBCF2; }
     </div>
    </details>
    <div data-fill-with="warning"></div>
-   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/policies/#copyright">Copyright</a> © 2025 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
+   <p class="copyright" data-fill-with="copyright"><a href="https://www.w3.org/policies/#copyright">Copyright</a> © 2026 the Contributors to the Web Bluetooth Specification, published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a> under the <a href="https://www.w3.org/community/about/agreements/cla/">W3C Community Contributor License Agreement (CLA)</a>.
 A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/">summary</a> is available.
 </p>
    <hr title="Separator for header">
   </div>
   <div class="p-summary" data-fill-with="abstract">
-   <h2 class="no-num no-toc no-ref heading settled" id="abstract"><span class="content">Abstract</span></h2>
+   <h2 class="heading no-num no-ref no-toc settled" id="abstract"><span class="content">Abstract</span></h2>
    <p>This document describes an API to scan for nearby Bluetooth Low Energy devices in real time.</p>
   </div>
-  <h2 class="no-num no-toc no-ref heading settled" id="sotd"><span class="content">Status of this document</span></h2>
+  <h2 class="heading no-num no-ref no-toc settled" id="sotd"><span class="content">Status of this document</span></h2>
   <div data-fill-with="status">
    <p>
   This specification was published by the <a href="https://www.w3.org/community/web-bluetooth/">Web Bluetooth Community Group</a>.
@@ -801,8 +832,8 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
   </div>
   <div data-fill-with="at-risk"></div>
   <nav data-fill-with="table-of-contents" id="toc">
-   <h2 class="no-num no-toc no-ref" id="contents">Table of Contents</h2>
-   <ol class="toc" role="directory">
+   <h2 class="no-num no-ref no-toc" id="contents">Table of Contents</h2>
+   <ol class="toc">
     <li>
      <a href="#introduction"><span class="secno">1</span> <span class="content">Introduction</span></a>
      <ol class="toc">
@@ -839,7 +870,7 @@ A human-readable <a href="http://www.w3.org/community/about/agreements/cla-deed/
      <a href="#references"><span class="secno"></span> <span class="content">References</span></a>
      <ol class="toc">
       <li><a href="#normative"><span class="secno"></span> <span class="content">Normative References</span></a>
-      <li><a href="#informative"><span class="secno"></span> <span class="content">Informative References</span></a>
+      <li><a href="#informative"><span class="secno"></span> <span class="content">Non-Normative References</span></a>
      </ol>
     <li><a href="#idl-index"><span class="secno"></span> <span class="content">IDL Index</span></a>
     <li><a href="#issues-index"><span class="secno"></span> <span class="content">Issues Index</span></a>
@@ -885,7 +916,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   navigator<c- p>.</c->bluetooth<c- p>.</c->addEventListener<c- p>(</c-><c- t>'</c-><a data-link-type="idl" href="https://webbluetoothcg.github.io/web-bluetooth/#eventdef-bluetoothdeviceeventhandlers-advertisementreceived" id="ref-for-eventdef-bluetoothdeviceeventhandlers-advertisementreceived"><c- t>advertisementreceived</c-></a><c- t>'</c-><c- p>,</c-> event <c- p>=></c-> <c- p>{</c->
     <c- a>let</c-> appleData <c- o>=</c-> event<c- p>.</c->manufacturerData<c- p>.</c->get<c- p>(</c-><a href="https://www.bluetooth.org/en-us/specification/assigned-numbers/company-identifiers" title="Apple, Inc.&apos;s Company Identifier"><c- mh>0x004C</c-></a><c- p>);</c->
     <c- k>if</c-> <c- p>(</c->appleData<c- p>.</c->byteLength <c- o>!=</c-> <c- mf>23</c-><c- p>)</c-> <c- p>{</c->
-      <c- c1>// Isn’t an iBeacon.</c->
+      <c- c1>// Isn't an iBeacon.</c->
       <c- k>return</c-><c- p>;</c->
     <c- p>}</c->
     <c- a>let</c-> major <c- o>=</c-> appleData<c- p>.</c->getUint16<c- p>(</c-><c- mf>18</c-><c- p>,</c-> <c- kc>false</c-><c- p>);</c->
@@ -952,7 +983,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
    </section>
    <section>
     <h2 class="heading settled" data-level="4" id="scanning"><span class="secno">4. </span><span class="content">Scanning for BLE advertisements</span><a class="self-link" href="#scanning"></a></h2>
-<pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-bluetoothlescanoptions"><code><c- g>BluetoothLEScanOptions</c-></code></dfn> {
+<pre class="def highlight idl"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-bluetoothlescanoptions"><code><c- g>BluetoothLEScanOptions</c-></code></dfn> {
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#idl-sequence" id="ref-for-idl-sequence"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit"><c- n>BluetoothLEScanFilterInit</c-></a>> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanOptions" data-dfn-type="dict-member" data-export data-type="sequence<BluetoothLEScanFilterInit>" id="dom-bluetoothlescanoptions-filters"><code><c- g>filters</c-></code></dfn>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean" href="#dom-bluetoothlescanoptions-keeprepeateddevices" id="ref-for-dom-bluetoothlescanoptions-keeprepeateddevices"><c- g>keepRepeatedDevices</c-></a> = <c- b>false</c->;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean①"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean" href="#dom-bluetoothlescanoptions-acceptalladvertisements" id="ref-for-dom-bluetoothlescanoptions-acceptalladvertisements"><c- g>acceptAllAdvertisements</c-></a> = <c- b>false</c->;
@@ -963,7 +994,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-promise" id="ref-for-idl-promise"><c- b>Promise</c-></a>&lt;<a data-link-type="idl-name" href="#bluetoothlescan" id="ref-for-bluetoothlescan"><c- n>BluetoothLEScan</c-></a>> <a class="idl-code" data-link-type="method" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan①"><c- g>requestLEScan</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="#dictdef-bluetoothlescanoptions" id="ref-for-dictdef-bluetoothlescanoptions"><c- n>BluetoothLEScanOptions</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="Bluetooth/requestLEScan(options), Bluetooth/requestLEScan()" data-dfn-type="argument" data-export id="dom-bluetooth-requestlescan-options-options"><code><c- g>options</c-></code></dfn> = {});
 };
 </pre>
-    <div class="note no-marker" role="note">
+    <div class="no-marker note" role="note">
      <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan②">requestLEScan()</a></code> summary</div>
      <p>
       <code>navigator.bluetooth.<code class="idl"><a data-link-type="idl" href="#dom-bluetooth-requestlescan" id="ref-for-dom-bluetooth-requestlescan③">requestLEScan(options)</a></code></code>
@@ -1139,7 +1170,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
     </div>
     <section>
      <h3 class="heading settled" data-level="4.1" id="scan-control"><span class="secno">4.1. </span><span class="content">Controlling a BLE scan</span><a class="self-link" href="#scan-control"></a></h3>
-<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext①"><c- g>SecureContext</c-></a>]
+<pre class="def highlight idl">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext①"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bluetoothdatafilter"><code><c- g>BluetoothDataFilter</c-></code></dfn> {
   <a class="idl-code" data-link-type="constructor" href="#dom-bluetoothdatafilter-bluetoothdatafilter" id="ref-for-dom-bluetoothdatafilter-bluetoothdatafilter"><c- g>constructor</c-></a>(<c- b>optional</c-> <a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothdatafilterinit" id="ref-for-dictdef-bluetoothdatafilterinit"><c- n>BluetoothDataFilterInit</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDataFilter/BluetoothDataFilter(init), BluetoothDataFilter/constructor(init), BluetoothDataFilter/BluetoothDataFilter(), BluetoothDataFilter/constructor()" data-dfn-type="argument" data-export id="dom-bluetoothdatafilter-bluetoothdatafilter-init-init"><code><c- g>init</c-></code></dfn> = {});
   <c- b>readonly</c-> <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-ArrayBuffer" id="ref-for-idl-ArrayBuffer"><c- b>ArrayBuffer</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothDataFilter" data-dfn-type="attribute" data-export data-readonly data-type="ArrayBuffer" id="dom-bluetoothdatafilter-dataprefix"><code><c- g>dataPrefix</c-></code></dfn>;
@@ -1149,13 +1180,13 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
 [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed①"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext②"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bluetoothmanufacturerdatafilter"><code><c- g>BluetoothManufacturerDataFilter</c-></code></dfn> {
   <a class="idl-code" data-link-type="constructor" href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter" id="ref-for-dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter"><c- g>constructor</c-></a>(<c- b>optional</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-object" id="ref-for-idl-object"><c- b>object</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothManufacturerDataFilter/BluetoothManufacturerDataFilter(init), BluetoothManufacturerDataFilter/constructor(init), BluetoothManufacturerDataFilter/BluetoothManufacturerDataFilter(), BluetoothManufacturerDataFilter/constructor()" data-dfn-type="argument" data-export id="dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-init-init"><code><c- g>init</c-></code></dfn>);
-  <c- b>readonly</c-> <c- b>maplike</c->&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-short" id="ref-for-idl-unsigned-short"><c- b>unsigned</c-> <c- b>short</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter"><c- n>BluetoothDataFilter</c-></a>>;
+  <c- b>readonly</c-> <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-maplike" id="ref-for-dfn-maplike"><c- b>maplike</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-short" id="ref-for-idl-unsigned-short"><c- b>unsigned</c-> <c- b>short</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter"><c- n>BluetoothDataFilter</c-></a>>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed②"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext③"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bluetoothservicedatafilter"><code><c- g>BluetoothServiceDataFilter</c-></code></dfn> {
   <a class="idl-code" data-link-type="constructor" href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter" id="ref-for-dom-bluetoothservicedatafilter-bluetoothservicedatafilter"><c- g>constructor</c-></a>(<c- b>optional</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-object" id="ref-for-idl-object①"><c- b>object</c-></a> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothServiceDataFilter/BluetoothServiceDataFilter(init), BluetoothServiceDataFilter/constructor(init), BluetoothServiceDataFilter/BluetoothServiceDataFilter(), BluetoothServiceDataFilter/constructor()" data-dfn-type="argument" data-export id="dom-bluetoothservicedatafilter-bluetoothservicedatafilter-init-init"><code><c- g>init</c-></code></dfn>);
-  <c- b>readonly</c-> <c- b>maplike</c->&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid" id="ref-for-typedefdef-uuid"><c- n>UUID</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter①"><c- n>BluetoothDataFilter</c-></a>>;
+  <c- b>readonly</c-> <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-maplike" id="ref-for-dfn-maplike①"><c- b>maplike</c-></a>&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid" id="ref-for-typedefdef-uuid"><c- n>UUID</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter" id="ref-for-bluetoothdatafilter①"><c- n>BluetoothDataFilter</c-></a>>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed③"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext④"><c- g>SecureContext</c-></a>]
@@ -1179,7 +1210,7 @@ navigator<c- p>.</c->bluetooth<c- p>.</c-><a data-link-type="idl" href="#dom-blu
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-undefined" id="ref-for-idl-undefined"><c- b>undefined</c-></a> <a class="idl-code" data-link-type="method" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop"><c- g>stop</c-></a>();
 };
 </pre>
-     <div class="note no-marker" role="note">
+     <div class="no-marker note" role="note">
       <div class="marker">NOTE: <code class="idl"><a data-link-type="idl" href="#bluetoothlescan" id="ref-for-bluetoothlescan③">BluetoothLEScan</a></code> members</div>
       <p>
         <code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop①">BluetoothLEScan.stop()</a></code>
@@ -1354,7 +1385,7 @@ steps:</p>
      <dl>
       <dt><a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-permission-descriptor-type" id="ref-for-dfn-permission-descriptor-type">permission descriptor type</a>
       <dd>
-<pre class="idl highlight def"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-bluetoothlescanpermissiondescriptor"><code><c- g>BluetoothLEScanPermissionDescriptor</c-></code></dfn> : <a data-link-type="idl-name" href="https://w3c.github.io/permissions/#dom-permissiondescriptor" id="ref-for-dom-permissiondescriptor"><c- n>PermissionDescriptor</c-></a> {
+<pre class="def highlight idl"><c- b>dictionary</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="dictionary" data-export id="dictdef-bluetoothlescanpermissiondescriptor"><code><c- g>BluetoothLEScanPermissionDescriptor</c-></code></dfn> : <a data-link-type="idl-name" href="https://w3c.github.io/permissions/#dom-permissiondescriptor" id="ref-for-dom-permissiondescriptor"><c- n>PermissionDescriptor</c-></a> {
   // These match BluetoothLEScanOptions.
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#idl-sequence" id="ref-for-idl-sequence①"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit" id="ref-for-dictdef-bluetoothlescanfilterinit②"><c- n>BluetoothLEScanFilterInit</c-></a>> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="sequence<BluetoothLEScanFilterInit>" id="dom-bluetoothlescanpermissiondescriptor-filters"><code><c- g>filters</c-></code></dfn>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean" id="ref-for-idl-boolean⑤"><c- b>boolean</c-></a> <dfn class="dfn-paneled idl-code" data-default="false" data-dfn-for="BluetoothLEScanPermissionDescriptor" data-dfn-type="dict-member" data-export data-type="boolean" id="dom-bluetoothlescanpermissiondescriptor-keeprepeateddevices"><code><c- g>keepRepeatedDevices</c-></code></dfn> = <c- b>false</c->;
@@ -1363,7 +1394,7 @@ steps:</p>
 </pre>
       <dt><a data-link-type="dfn" href="https://w3c.github.io/permissions/#dfn-permission-result-type" id="ref-for-dfn-permission-result-type">permission result type</a>
       <dd>
-<pre class="idl highlight def">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext⑥"><c- g>SecureContext</c-></a>]
+<pre class="def highlight idl">[<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed" id="ref-for-Exposed⑤"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext" id="ref-for-SecureContext⑥"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <dfn class="dfn-paneled idl-code" data-dfn-type="interface" data-export id="bluetoothlescanpermissionresult"><code><c- g>BluetoothLEScanPermissionResult</c-></code></dfn> : <a data-link-type="idl-name" href="https://w3c.github.io/permissions/#dom-permissionstatus" id="ref-for-dom-permissionstatus"><c- n>PermissionStatus</c-></a> {
   <c- b>attribute</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-frozen-array" id="ref-for-idl-frozen-array④"><c- b>FrozenArray</c-></a>&lt;<a data-link-type="idl-name" href="#bluetoothlescan" id="ref-for-bluetoothlescan④"><c- n>BluetoothLEScan</c-></a>> <dfn class="dfn-paneled idl-code" data-dfn-for="BluetoothLEScanPermissionResult" data-dfn-type="attribute" data-export data-type="FrozenArray<BluetoothLEScan>" id="dom-bluetoothlescanpermissionresult-scans"><code><c- g>scans</c-></code></dfn>;
 };
@@ -1416,8 +1447,10 @@ steps:</p>
   keepRepeatedDevices<c- o>:</c-> <var>activeScan</var><c- p>.</c->keepRepeatedDevices
 <c- p>}</c->
 </pre>
-           <p>is not "<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-granted" id="ref-for-dom-permissionstate-granted">granted</a></code>",
-                call <code><var>activeScan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop③">stop()</a></code></code>.</p>
+           
+                is not "<code class="idl"><a data-link-type="idl" href="https://w3c.github.io/permissions/#dom-permissionstate-granted" id="ref-for-dom-permissionstate-granted">granted</a></code>",
+                call <code><var>activeScan</var>.<code class="idl"><a data-link-type="idl" href="#dom-bluetoothlescan-stop" id="ref-for-dom-bluetoothlescan-stop③">stop()</a></code></code>.
+              
          </ol>
        </ol>
      </dl>
@@ -1735,8 +1768,8 @@ steps:</p>
    </section>
   </main>
   <div data-fill-with="conformance">
-   <h2 class="no-ref no-num heading settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
-   <h3 class="no-ref no-num heading settled" id="w3c-conventions"><span class="content">Document conventions</span><a class="self-link" href="#w3c-conventions"></a></h3>
+   <h2 class="heading no-num no-ref settled" id="w3c-conformance"><span class="content">Conformance</span><a class="self-link" href="#w3c-conformance"></a></h2>
+   <h3 class="heading no-num no-ref settled" id="w3c-conventions"><span class="content">Document conventions</span><a class="self-link" href="#w3c-conventions"></a></h3>
    <p>Conformance requirements are expressed
     with a combination of descriptive assertions
     and RFC 2119 terminology.
@@ -1772,8 +1805,8 @@ steps:</p>
    <p class="note" role="note">Note, this is an informative note.</p>
   </div>
   <script src="https://www.w3.org/scripts/TR/2021/fixup.js"></script>
-  <h2 class="no-num no-ref heading settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
-  <h3 class="no-num no-ref heading settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
+  <h2 class="heading no-num no-ref settled" id="index"><span class="content">Index</span><a class="self-link" href="#index"></a></h2>
+  <h3 class="heading no-num no-ref settled" id="index-defined-here"><span class="content">Terms defined by this specification</span><a class="self-link" href="#index-defined-here"></a></h3>
   <ul class="index">
    <li>
     acceptAllAdvertisements
@@ -1863,7 +1896,7 @@ steps:</p>
    <li><a href="#shortened-local-name">Shortened Local Name</a><span>, in § 7</span>
    <li><a href="#dom-bluetoothlescan-stop">stop()</a><span>, in § 4.1</span>
   </ul>
-  <h3 class="no-num no-ref heading settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
+  <h3 class="heading no-num no-ref settled" id="index-defined-elsewhere"><span class="content">Terms defined by reference</span><a class="self-link" href="#index-defined-elsewhere"></a></h3>
   <ul class="index">
    <li>
     <a data-link-type="biblio">[DOM]</a> defines the following terms:
@@ -1967,6 +2000,7 @@ steps:</p>
      <li><span class="dfn-paneled" id="d0b4a948">a promise rejected with</span>
      <li><span class="dfn-paneled" id="5372cca8">boolean</span>
      <li><span class="dfn-paneled" id="a1ecf8d3">map entries</span>
+     <li><span class="dfn-paneled" id="77996ab1">maplike</span>
      <li><span class="dfn-paneled" id="56f81a8e">new</span>
      <li><span class="dfn-paneled" id="efd1ec5d">object</span>
      <li><span class="dfn-paneled" id="b262501e">reject</span>
@@ -1977,8 +2011,8 @@ steps:</p>
      <li><span class="dfn-paneled" id="450958f7">unsigned short</span>
     </ul>
   </ul>
-  <h2 class="no-num no-ref heading settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
-  <h3 class="no-num no-ref heading settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
+  <h2 class="heading no-num no-ref settled" id="references"><span class="content">References</span><a class="self-link" href="#references"></a></h2>
+  <h3 class="heading no-num no-ref settled" id="normative"><span class="content">Normative References</span><a class="self-link" href="#normative"></a></h3>
   <dl>
    <dt id="biblio-bluetooth-supplement6">[BLUETOOTH-SUPPLEMENT6]
    <dd><a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735"><cite>Supplement to the Bluetooth Core Specification Version 6</cite></a>. 14 July 2015. URL: <a href="https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735">https://www.bluetooth.org/DocMan/handlers/DownloadDoc.ashx?doc_id=302735</a>
@@ -2003,13 +2037,13 @@ steps:</p>
    <dt id="biblio-webidl">[WEBIDL]
    <dd>Edgar Chen; Timothy Gu. <a href="https://webidl.spec.whatwg.org/"><cite>Web IDL Standard</cite></a>. Living Standard. URL: <a href="https://webidl.spec.whatwg.org/">https://webidl.spec.whatwg.org/</a>
   </dl>
-  <h3 class="no-num no-ref heading settled" id="informative"><span class="content">Informative References</span><a class="self-link" href="#informative"></a></h3>
+  <h3 class="heading no-num no-ref settled" id="informative"><span class="content">Non-Normative References</span><a class="self-link" href="#informative"></a></h3>
   <dl>
    <dt id="biblio-geolocation">[GEOLOCATION]
    <dd>Marcos Caceres; Reilly Grant. <a href="https://w3c.github.io/geolocation/"><cite>Geolocation</cite></a>. URL: <a href="https://w3c.github.io/geolocation/">https://w3c.github.io/geolocation/</a>
   </dl>
-  <h2 class="no-num no-ref heading settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
-<pre class="idl highlight def"><c- b>dictionary</c-> <a href="#dictdef-bluetoothlescanoptions"><code><c- g>BluetoothLEScanOptions</c-></code></a> {
+  <h2 class="heading no-num no-ref settled" id="idl-index"><span class="content">IDL Index</span><a class="self-link" href="#idl-index"></a></h2>
+<pre class="def highlight idl"><c- b>dictionary</c-> <a href="#dictdef-bluetoothlescanoptions"><code><c- g>BluetoothLEScanOptions</c-></code></a> {
   <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#idl-sequence"><c- b>sequence</c-></a>&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#dictdef-bluetoothlescanfilterinit"><c- n>BluetoothLEScanFilterInit</c-></a>> <a data-type="sequence<BluetoothLEScanFilterInit>" href="#dom-bluetoothlescanoptions-filters"><code><c- g>filters</c-></code></a>;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean" href="#dom-bluetoothlescanoptions-keeprepeateddevices"><c- g>keepRepeatedDevices</c-></a> = <c- b>false</c->;
   <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-boolean"><c- b>boolean</c-></a> <a class="idl-code" data-default="false" data-link-type="dict-member" data-type="boolean" href="#dom-bluetoothlescanoptions-acceptalladvertisements"><c- g>acceptAllAdvertisements</c-></a> = <c- b>false</c->;
@@ -2030,13 +2064,13 @@ steps:</p>
 [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <a href="#bluetoothmanufacturerdatafilter"><code><c- g>BluetoothManufacturerDataFilter</c-></code></a> {
   <a class="idl-code" data-link-type="constructor" href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter"><c- g>constructor</c-></a>(<c- b>optional</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-object"><c- b>object</c-></a> <a href="#dom-bluetoothmanufacturerdatafilter-bluetoothmanufacturerdatafilter-init-init"><code><c- g>init</c-></code></a>);
-  <c- b>readonly</c-> <c- b>maplike</c->&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-short"><c- b>unsigned</c-> <c- b>short</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter"><c- n>BluetoothDataFilter</c-></a>>;
+  <c- b>readonly</c-> <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-maplike"><c- b>maplike</c-></a>&lt;<a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-unsigned-short"><c- b>unsigned</c-> <c- b>short</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter"><c- n>BluetoothDataFilter</c-></a>>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext"><c- g>SecureContext</c-></a>]
 <c- b>interface</c-> <a href="#bluetoothservicedatafilter"><code><c- g>BluetoothServiceDataFilter</c-></code></a> {
   <a class="idl-code" data-link-type="constructor" href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter"><c- g>constructor</c-></a>(<c- b>optional</c-> <a class="idl-code" data-link-type="interface" href="https://webidl.spec.whatwg.org/#idl-object"><c- b>object</c-></a> <a href="#dom-bluetoothservicedatafilter-bluetoothservicedatafilter-init-init"><code><c- g>init</c-></code></a>);
-  <c- b>readonly</c-> <c- b>maplike</c->&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid"><c- n>UUID</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter"><c- n>BluetoothDataFilter</c-></a>>;
+  <c- b>readonly</c-> <a data-link-type="dfn" href="https://webidl.spec.whatwg.org/#dfn-maplike"><c- b>maplike</c-></a>&lt;<a data-link-type="idl-name" href="https://webbluetoothcg.github.io/web-bluetooth/#typedefdef-uuid"><c- n>UUID</c-></a>, <a data-link-type="idl-name" href="#bluetoothdatafilter"><c- n>BluetoothDataFilter</c-></a>>;
 };
 
 [<a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#Exposed"><c- g>Exposed</c-></a>=<c- n>Window</c->, <a class="idl-code" data-link-type="extended-attribute" href="https://webidl.spec.whatwg.org/#SecureContext"><c- g>SecureContext</c-></a>]
@@ -2073,7 +2107,7 @@ steps:</p>
 };
 
 </pre>
-  <h2 class="no-num no-ref heading settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
+  <h2 class="heading no-num no-ref settled" id="issues-index"><span class="content">Issues Index</span><a class="self-link" href="#issues-index"></a></h2>
   <div style="counter-reset:issue">
    <div class="issue">
               Find wording that allows the UA to limit its scan to only certain periods of time,
@@ -2316,6 +2350,7 @@ let dfnPanelData = {
 "65181da8": {"dfnID":"65181da8","dfnText":"secure context","external":true,"refSections":[{"refs":[{"id":"ref-for-secure-context"}],"title":"4. Scanning for BLE advertisements"}],"url":"https://html.spec.whatwg.org/multipage/webappapis.html#secure-context"},
 "686db08f": {"dfnID":"686db08f","dfnText":"fire an advertisementreceived event","external":true,"refSections":[{"refs":[{"id":"ref-for-fire-an-advertisementreceived-event"}],"title":"5.1. Responding to advertising events"}],"url":"https://webbluetoothcg.github.io/web-bluetooth/#fire-an-advertisementreceived-event"},
 "6c2d7879": {"dfnID":"6c2d7879","dfnText":"powerful feature","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-powerful-feature"}],"title":"4.3. Permission to scan"}],"url":"https://w3c.github.io/permissions/#dfn-powerful-feature"},
+"77996ab1": {"dfnID":"77996ab1","dfnText":"maplike","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-maplike"},{"id":"ref-for-dfn-maplike\u2460"}],"title":"4.1. Controlling a BLE scan"}],"url":"https://webidl.spec.whatwg.org/#dfn-maplike"},
 "794f44f2": {"dfnID":"794f44f2","dfnText":"\"bluetooth\"","external":true,"refSections":[{"refs":[{"id":"ref-for-permissiondef-bluetooth"}],"title":"5.1. Responding to advertising events"}],"url":"https://webbluetoothcg.github.io/web-bluetooth/#permissiondef-bluetooth"},
 "797018a7": {"dfnID":"797018a7","dfnText":"InvalidStateError","external":true,"refSections":[{"refs":[{"id":"ref-for-invalidstateerror"}],"title":"4. Scanning for BLE advertisements"}],"url":"https://webidl.spec.whatwg.org/#invalidstateerror"},
 "7ee1f942": {"dfnID":"7ee1f942","dfnText":"permission query algorithm","external":true,"refSections":[{"refs":[{"id":"ref-for-dfn-permission-query-algorithm"}],"title":"4.3. Permission to scan"}],"url":"https://w3c.github.io/permissions/#dfn-permission-query-algorithm"},
@@ -2909,6 +2944,7 @@ let refsData = {
 "https://webidl.spec.whatwg.org/#a-new-promise": {"displayText":"a new promise","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"a new promise","type":"dfn","url":"https://webidl.spec.whatwg.org/#a-new-promise"},
 "https://webidl.spec.whatwg.org/#a-promise-rejected-with": {"displayText":"a promise rejected with","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"a promise rejected with","type":"dfn","url":"https://webidl.spec.whatwg.org/#a-promise-rejected-with"},
 "https://webidl.spec.whatwg.org/#dfn-map-entries": {"displayText":"map entries","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"map entries","type":"dfn","url":"https://webidl.spec.whatwg.org/#dfn-map-entries"},
+"https://webidl.spec.whatwg.org/#dfn-maplike": {"displayText":"maplike","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"maplike","type":"dfn","url":"https://webidl.spec.whatwg.org/#dfn-maplike"},
 "https://webidl.spec.whatwg.org/#idl-ArrayBuffer": {"displayText":"ArrayBuffer","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"ArrayBuffer","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-ArrayBuffer"},
 "https://webidl.spec.whatwg.org/#idl-DOMException": {"displayText":"DOMException","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"DOMException","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-DOMException"},
 "https://webidl.spec.whatwg.org/#idl-DOMString": {"displayText":"DOMString","export":true,"for_":[],"level":"1","normative":true,"shortname":"webidl","spec":"webidl","status":"current","text":"DOMString","type":"interface","url":"https://webidl.spec.whatwg.org/#idl-DOMString"},
