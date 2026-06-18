@@ -3479,6 +3479,7 @@ peripheral's service.
     Promise<BluetoothRemoteGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
     Promise<sequence<BluetoothRemoteGATTDescriptor>>
       getDescriptors(optional BluetoothDescriptorUUID descriptor);
+    Promise<unsigned short> getMTU();
     Promise<DataView> readValue();
     Promise<undefined> writeValue(BufferSource value);
     Promise<undefined> writeValueWithResponse(BufferSource value);
@@ -3622,6 +3623,38 @@ getDescriptors(<var>descriptor</var>)</dfn></code> method retrieves a list of
 >   <i>uuid</i>=<code><var>descriptor</var></code>,<br>
 >   <i>allowedUuids</i>=<code>undefined</code>,<br>
 >   <i>child type</i>="GATT Descriptor")</span>
+</div>
+
+<div algorithm="BluetoothRemoteGATTCharacteristic getMTU()">
+The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getMTU()</dfn>
+</code> method exposes the ATT_MTU that bounds the payload of outgoing PDUs
+to the peer on the connection containing this characteristic. When invoked, it
+MUST run the following steps:
+
+1. Let |global| be [=this=]'s [=relevant global object=].
+1. Let |gatt| be [=this=].{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
+1. If |gatt|.{{BluetoothRemoteGATTServer/connected}}
+    is `false`, return [=a promise rejected with=] a "{{NetworkError}}"
+    {{DOMException}} and abort these steps.
+1. Let |characteristic| be [=this=].{{[[representedCharacteristic]]}}.
+1. If |characteristic| is `null`, return [=a promise rejected with=] an
+    "{{InvalidStateError}}" {{DOMException}} and abort these steps.
+1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
+    |promise| and run the following steps [=in parallel=]:
+    1. Let |mtu| be the ATT_MTU negotiated for the [=ATT Bearer=] that
+        carries |characteristic|, as established by the [=Exchange MTU=]
+        procedure. This is the smaller of the local Host's transmit ATT_MTU
+        and the peer's receive ATT_MTU.
+
+        Note: When no MTU exchange has occurred, |mtu| is the default
+        ATT_MTU of 23 octets.
+    1. [=Queue a global task=] on the [=Bluetooth task source=] given
+        |global| to perform the following steps:
+        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
+            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
+            these steps.
+        1. [=Resolve=] |promise| with |mtu|.
+
 </div>
 
 <div algorithm="BluetoothRemoteGATTCharacteristic readValue()">
