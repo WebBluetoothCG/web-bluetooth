@@ -3476,10 +3476,10 @@ peripheral's service.
     readonly attribute UUID uuid;
     readonly attribute BluetoothCharacteristicProperties properties;
     readonly attribute DataView? value;
+    readonly attribute unsigned short maxWriteWithoutResponseSize;
     Promise<BluetoothRemoteGATTDescriptor> getDescriptor(BluetoothDescriptorUUID descriptor);
     Promise<sequence<BluetoothRemoteGATTDescriptor>>
       getDescriptors(optional BluetoothDescriptorUUID descriptor);
-    Promise<unsigned short> getMTU();
     Promise<DataView> readValue();
     Promise<undefined> writeValue(BufferSource value);
     Promise<undefined> writeValueWithResponse(BufferSource value);
@@ -3504,6 +3504,19 @@ Heart Rate Measurement</a> characteristic.
 <dfn>value</dfn> is the currently cached characteristic value. This value gets
 updated when the value of the characteristic is read or updated via a
 notification or indication.
+
+<dfn>maxWriteWithoutResponseSize</dfn> is the largest [=byte sequence=], in
+octets, that {{BluetoothRemoteGATTCharacteristic/writeValueWithoutResponse()}}
+can send to the peer in a single ATT PDU without it being fragmented or
+rejected. It is derived from the ATT_MTU negotiated for the connection that
+carries this characteristic.
+
+Note: This value can change while the device is connected, for example because
+an [=Exchange MTU=] procedure completes after [=service discovery=]. On some
+platforms an updated value can arrive late, after services are resolved.
+Applications SHOULD read
+{{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} each time it
+is needed rather than caching it.
 </div>
 
 Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
@@ -3625,36 +3638,23 @@ getDescriptors(<var>descriptor</var>)</dfn></code> method retrieves a list of
 >   <i>child type</i>="GATT Descriptor")</span>
 </div>
 
-<div algorithm="BluetoothRemoteGATTCharacteristic getMTU()">
-The <code><dfn method for="BluetoothRemoteGATTCharacteristic">getMTU()</dfn>
-</code> method exposes the ATT_MTU that bounds the payload of outgoing PDUs
-to the peer on the connection containing this characteristic. When invoked, it
-MUST run the following steps:
+<div algorithm="BluetoothRemoteGATTCharacteristic maxWriteWithoutResponseSize">
+The <dfn attribute
+for="BluetoothRemoteGATTCharacteristic">maxWriteWithoutResponseSize</dfn>
+getter steps are:
 
-1. Let |global| be [=this=]'s [=relevant global object=].
-1. Let |gatt| be [=this=].{{BluetoothRemoteGATTCharacteristic/service}}.{{BluetoothRemoteGATTService/device}}.{{BluetoothDevice/gatt}}.
-1. If |gatt|.{{BluetoothRemoteGATTServer/connected}}
-    is `false`, return [=a promise rejected with=] a "{{NetworkError}}"
-    {{DOMException}} and abort these steps.
-1. Let |characteristic| be [=this=].{{[[representedCharacteristic]]}}.
-1. If |characteristic| is `null`, return [=a promise rejected with=] an
-    "{{InvalidStateError}}" {{DOMException}} and abort these steps.
-1. Return a |gatt|-[=connection-checking wrapper=] around [=a new promise=]
-    |promise| and run the following steps [=in parallel=]:
-    1. Let |mtu| be the ATT_MTU negotiated for the [=ATT Bearer=] that
-        carries |characteristic|, as established by the [=Exchange MTU=]
-        procedure. This is the smaller of the local Host's transmit ATT_MTU
-        and the peer's receive ATT_MTU.
+1. Let |mtu| be the ATT_MTU negotiated for the [=ATT Bearer=] that carries
+    [=this=].{{[[representedCharacteristic]]}}, as established by the
+    [=Exchange MTU=] procedure. This is the smaller of the local Host's
+    transmit ATT_MTU and the peer's receive ATT_MTU.
 
-        Note: When no MTU exchange has occurred, |mtu| is the default
-        ATT_MTU of 23 octets.
-    1. [=Queue a global task=] on the [=Bluetooth task source=] given
-        |global| to perform the following steps:
-        1. If |promise| is not in |gatt|.{{[[activeAlgorithms]]}}, [=reject=]
-            |promise| with a "{{NetworkError}}" {{DOMException}} and abort
-            these steps.
-        1. [=Resolve=] |promise| with |mtu|.
+    Note: When no MTU exchange has occurred, |mtu| is the default ATT_MTU of
+    23 octets.
+1. Return |mtu| &minus; 3.
 
+    Note: 3 octets are subtracted to account for the ATT Write Command header
+    (1 octet opcode and 2 octet attribute handle), leaving the space available
+    for the attribute value in a single PDU.
 </div>
 
 <div algorithm="BluetoothRemoteGATTCharacteristic readValue()">
