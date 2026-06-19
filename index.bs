@@ -3516,7 +3516,8 @@ an [=Exchange MTU=] procedure completes after [=service discovery=]. On some
 platforms an updated value can arrive late, after services are resolved.
 Applications SHOULD read
 {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} each time it
-is needed rather than caching it.
+is needed rather than caching it. To be notified when it changes, listen for
+the {{maxwritewithoutresponsesizechanged}} event.
 </div>
 
 Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
@@ -4396,6 +4397,18 @@ interface <a>participate in a tree</a>.
   </dd>
 
   <dt>
+    <dfn event for="BluetoothRemoteGATTCharacteristic">
+      <code>maxwritewithoutresponsesizechanged</code>
+    </dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothRemoteGATTCharacteristic}} when its
+    {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}}
+    <a href="#mtu-change-events">changes</a>, for example after an
+    [=Exchange MTU=] procedure renegotiates the ATT_MTU for the connection.
+  </dd>
+
+  <dt>
     <dfn event for="BluetoothRemoteGATTService"><code>serviceadded</code></dfn>
   </dt>
   <dd>
@@ -4513,6 +4526,36 @@ it must perform the following steps:
     1. <a>Fire an event</a> named {{characteristicvaluechanged}} with its
         <code>bubbles</code> attribute initialized to <code>true</code> at
         <var>characteristicObject</var>.
+
+</div>
+
+### Responding to MTU Changes ### {#mtu-change-events}
+
+<div algorithm="mtu changes">
+When the ATT_MTU negotiated for an [=ATT Bearer=] changes, for example because
+the UA receives the result of an [=Exchange MTU=] procedure, the UA must
+perform the following steps for each <a>Characteristic</a> carried by that
+[=ATT Bearer=]:
+
+1. For each |bluetoothGlobal| whose [=Bluetooth tree=] contains a
+    {{BluetoothRemoteGATTCharacteristic}} representing the <a>Characteristic</a>,
+    [=queue a global task=] on the [=Bluetooth task source=] given
+    |bluetoothGlobal|'s [=relevant global object=] to do the following
+    sub-steps:
+    1. Let <var>characteristicObject</var> be the
+        {{BluetoothRemoteGATTCharacteristic}} in the <a>Bluetooth tree</a>
+        rooted at <var>bluetoothGlobal</var> that represents the
+        <a>Characteristic</a>.
+    1. If <code><var>characteristicObject</var>
+        .service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
+        is `false`, abort these sub-steps.
+    1. <a>Fire an event</a> named {{maxwritewithoutresponsesizechanged}} with
+        its <code>bubbles</code> attribute initialized to <code>true</code> at
+        <var>characteristicObject</var>.
+
+        Note: The new value is not carried on the event. Listeners read
+        <var>characteristicObject</var>.{{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}}
+        to obtain the current value.
 
 </div>
 
@@ -4706,12 +4749,17 @@ Changed characteristic, it MUST perform the following steps.
   [SecureContext]
   interface mixin CharacteristicEventHandlers {
     attribute EventHandler oncharacteristicvaluechanged;
+    attribute EventHandler onmaxwritewithoutresponsesizechanged;
   };
 </xmp>
 
 <dfn attribute for="CharacteristicEventHandlers">
 oncharacteristicvaluechanged</dfn> is an <a>Event handler IDL attribute</a> for
 the {{characteristicvaluechanged}} event type.
+
+<dfn attribute for="CharacteristicEventHandlers">
+onmaxwritewithoutresponsesizechanged</dfn> is an <a>Event handler IDL
+attribute</a> for the {{maxwritewithoutresponsesizechanged}} event type.
 
 <xmp class="idl">
   [SecureContext]
