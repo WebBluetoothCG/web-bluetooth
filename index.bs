@@ -3516,8 +3516,12 @@ an [=Exchange MTU=] procedure completes after service discovery. On some
 platforms an updated value can arrive late, after services are resolved.
 Applications SHOULD read
 {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} each time it
-is needed rather than caching it. To be notified when it changes, listen for
-the {{maxwritewithoutresponsesizechanged}} event.
+is needed rather than caching it. The {{maxwritewithoutresponsesizechanged}}
+event is provided as a best-effort notification, but it is not guaranteed to
+fire on every platform: some operating systems do not expose a notification
+when the ATT_MTU changes. Applications MUST NOT rely on the event as the only
+way to observe the current value, and SHOULD treat it purely as a hint to
+re-read the attribute.
 </div>
 
 Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
@@ -4405,6 +4409,8 @@ interface <a>participate in a tree</a>.
     {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}}
     <a href="#mtu-change-events">changes</a>, for example after an
     [=Exchange MTU=] procedure renegotiates the ATT_MTU for the connection.
+    This event is best-effort: it is not guaranteed to fire on platforms
+    that do not surface ATT_MTU changes to the UA.
   </dd>
 
   <dt>
@@ -4535,6 +4541,13 @@ When the ATT_MTU negotiated for an [=ATT Bearer=] changes, for example because
 the UA receives the result of an [=Exchange MTU=] procedure, the UA must
 perform the following steps for each <a>Characteristic</a>
 <var>characteristic</var> carried by that [=ATT Bearer=]:
+
+Note: These steps fire the {{maxwritewithoutresponsesizechanged}} event on a
+best-effort basis. Some platforms do not notify the UA when the ATT_MTU
+changes, in which case the event does not fire even though
+{{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} may return a
+different value on a subsequent read. The event is therefore a hint to
+re-read the attribute, not an authoritative signal.
 
 1. For each |bluetoothGlobal| whose [=Bluetooth tree=] contains a
     {{BluetoothRemoteGATTCharacteristic}} representing <var>characteristic</var>,
