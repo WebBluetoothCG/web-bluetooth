@@ -3514,15 +3514,14 @@ carries this characteristic.
 Note: This value can change while the device is connected, for example because
 an [=Exchange MTU=] procedure completes after service discovery. On some
 platforms an updated value can arrive late, after services are resolved.
-Reading
-{{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} always
-returns the current value, so applications SHOULD read it each time it is
-needed rather than caching it in a variable. As a convenience, the UA also
-[=fires an event=] named {{maxwritewithoutresponsesizechanged}} when it
-observes a change, so applications that batch large transfers can react to an
-increase instead of polling. Not every platform surfaces ATT_MTU changes, so
-the event is not guaranteed to fire; the attribute remains the authoritative
-source and a fresh read returns the current value regardless.
+Whenever the UA observes that the ATT_MTU has changed it updates this value and
+[=fires an event=] named {{maxwritewithoutresponsesizechanged}}, so the two stay
+in sync: the value never changes without the event firing. Some platforms do
+not surface ATT_MTU changes to the UA at all; on those platforms the value
+stays constant after it is first established and the event never fires.
+Applications that batch large transfers can listen for
+{{maxwritewithoutresponsesizechanged}} to react to an increase instead of
+re-reading the attribute on every write.
 </div>
 
 Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
@@ -3540,6 +3539,20 @@ Instances of {{BluetoothRemoteGATTCharacteristic}} are created with the
     <td>
       The <a>Characteristic</a> this object represents, or `null` if the
       Characteristic has been removed or otherwise invalidated.
+    </td>
+  </tr>
+  <tr>
+    <td><dfn>\[[maxWriteWithoutResponseSize]]</dfn></td>
+    <td><code>20</code></td>
+    <td>
+      The value, in octets, exposed by
+      {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}}. It is
+      established when the {{[[representedCharacteristic]]}} is discovered and
+      updated only when the UA learns of an ATT_MTU change for the
+      [=ATT Bearer=] that carries it, at which point the
+      {{maxwritewithoutresponsesizechanged}} event is fired. The initial value
+      of <code>20</code> corresponds to the default ATT_MTU of 23 octets minus
+      the 3-octet ATT Write Command header.
     </td>
   </tr>
   <tr>
@@ -3648,20 +3661,15 @@ getDescriptors(<var>descriptor</var>)</dfn></code> method retrieves a list of
 The {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} getter
 steps are:
 
-1. Let |mtu| be the ATT_MTU currently negotiated for the [=ATT Bearer=] that
-    carries [=this=].{{[[representedCharacteristic]]}}, as established by the
-    [=Exchange MTU=] procedure. This is the smaller of the local Host's
-    transmit ATT_MTU and the peer's receive ATT_MTU. When no MTU exchange has
-    occurred, |mtu| is the default ATT_MTU of 23 octets.
-1. Return |mtu| &minus; 3.
+1. Return [=this=].{{[[maxWriteWithoutResponseSize]]}}.
 
 <div class="note">
-Note: The getter reflects the ATT_MTU at the time it is read, so a fresh read
-always returns the current value even on platforms that do not surface
-ATT_MTU changes via the {{maxwritewithoutresponsesizechanged}} event.
-3 octets are subtracted to account for the ATT Write Command header (1 octet
-opcode and 2 octet attribute handle), leaving the space available for the
-attribute value in a single PDU.
+Note: The stored value is the ATT_MTU negotiated for the [=ATT Bearer=] that
+carries the characteristic, minus 3 octets. The 3 octets account for the ATT
+Write Command header (1 octet opcode and 2 octet attribute handle), leaving the
+space available for the attribute value in a single PDU. The value is
+established when the characteristic is discovered and only changes when the UA
+observes an ATT_MTU change; see [[#mtu-change-events]].
 </div>
 </div>
 
@@ -4413,9 +4421,9 @@ interface <a>participate in a tree</a>.
     {{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}}
     <a href="#mtu-change-events">changes</a>, for example after an
     [=Exchange MTU=] procedure renegotiates the ATT_MTU for the connection.
-    The UA fires this event when it observes such a change. Platforms that do
-    not surface ATT_MTU changes do not fire this event, but reading the
-    attribute still returns the current value.
+    The UA fires this event whenever it updates the value, so platforms that
+    never surface ATT_MTU changes (and therefore never change the value) also
+    never fire this event.
   </dd>
 
   <dt>
@@ -4547,13 +4555,17 @@ the UA receives the result of an [=Exchange MTU=] procedure, the UA must
 perform the following steps for each <a>Characteristic</a>
 <var>characteristic</var> carried by that [=ATT Bearer=]:
 
-Note: This event is a convenience notification. The
-{{BluetoothRemoteGATTCharacteristic/maxWriteWithoutResponseSize}} getter always
-reflects the current ATT_MTU when read, so reading it after a change returns the
-new value whether or not this event fires. Platforms that do not surface
-ATT_MTU changes to the UA never run these steps and so never fire the event,
-but a fresh read of the attribute still returns the current value.
+Note: The UA only runs these steps when it observes an ATT_MTU change. Updating
+the stored value and firing the {{maxwritewithoutresponsesizechanged}} event
+happen together, so the value never changes without the event firing. Platforms
+that do not surface ATT_MTU changes to the UA never run these steps, so on those
+platforms the value stays constant after it is first established and the event
+never fires.
 
+1. Let <var>newSize</var> be the ATT_MTU now negotiated for that
+    [=ATT Bearer=] &minus; 3. This is the smaller of the local Host's transmit
+    ATT_MTU and the peer's receive ATT_MTU, less the 3-octet ATT Write Command
+    header.
 1. For each |bluetoothGlobal| whose [=Bluetooth tree=] contains a
     {{BluetoothRemoteGATTCharacteristic}} representing <var>characteristic</var>,
     [=queue a global task=] on the [=Bluetooth task source=] given
@@ -4566,6 +4578,10 @@ but a fresh read of the attribute still returns the current value.
     1. If <code><var>characteristicObject</var>
         .service.device.gatt.{{BluetoothRemoteGATTServer/connected}}</code>
         is `false`, abort these sub-steps.
+    1. If <var>characteristicObject</var>.{{[[maxWriteWithoutResponseSize]]}}
+        equals <var>newSize</var>, abort these sub-steps.
+    1. Set <var>characteristicObject</var>.{{[[maxWriteWithoutResponseSize]]}}
+        to <var>newSize</var>.
     1. <a>Fire an event</a> named {{maxwritewithoutresponsesizechanged}} with
         its <code>bubbles</code> attribute initialized to <code>true</code> at
         <var>characteristicObject</var>.
