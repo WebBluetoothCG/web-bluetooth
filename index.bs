@@ -3059,10 +3059,12 @@ creates and caches new objects.
 
 <xmp class="idl">
 [Exposed=Window, SecureContext]
-interface BluetoothRemoteGATTServer {
+interface BluetoothRemoteGATTServer : EventTarget {
   [SameObject]
   readonly attribute BluetoothDevice device;
   readonly attribute boolean connected;
+  readonly attribute unsigned short maxWriteWithoutResponseSize;
+  attribute EventHandler onmaxwritewithoutresponsesizechanged;
   Promise<BluetoothRemoteGATTServer> connect();
   undefined disconnect();
   Promise<BluetoothRemoteGATTService> getPrimaryService(BluetoothServiceUUID service);
@@ -3079,6 +3081,24 @@ interface BluetoothRemoteGATTServer {
 <code>this.device</code>. It can be false while the UA is physically connected,
 for example when there are other connected {{BluetoothRemoteGATTServer}}
 instances for other <a>global object</a>s.
+
+<dfn>maxWriteWithoutResponseSize</dfn> is the largest [=byte sequence=], in
+octets, that {{BluetoothRemoteGATTCharacteristic/writeValueWithoutResponse()}}
+can send to the peer in a single ATT PDU without it being fragmented or
+rejected. It is derived from the ATT_MTU negotiated for the connection to
+<code>this.device</code>.
+
+Note: This value can change while the device is connected, for example because
+an [=Exchange MTU=] procedure completes after service discovery. On some
+platforms an updated value can arrive late, after services are resolved.
+Whenever the UA observes that the ATT_MTU has changed it updates this value and
+[=fires an event=] named {{maxwritewithoutresponsesizechanged}} at
+<code>this</code>, so the two stay in sync: the value never changes without the
+event firing. Some platforms do not surface ATT_MTU changes to the UA at all;
+on those platforms the value stays constant after it is first established and
+the event never fires. Applications that batch large transfers can listen for
+{{maxwritewithoutresponsesizechanged}} to react to an increase instead of
+re-reading the attribute on every write.
 </div>
 
 When no ECMAScript code can
@@ -3122,7 +3142,36 @@ slots</a> described in the following table:
       The simulated GATT connection response code for a GATT connection attempt.
     </td>
   </tr>
+  <tr>
+    <td><dfn>\[[maxWriteWithoutResponseSize]]</dfn></td>
+    <td><code>20</code></td>
+    <td>
+      The value, in octets, exposed by
+      {{BluetoothRemoteGATTServer/maxWriteWithoutResponseSize}}. It is
+      established when a connection to
+      {{BluetoothRemoteGATTServer/device}}.{{[[representedDevice]]}} is made and
+      updated only when the UA learns of an ATT_MTU change for that connection,
+      at which point the {{maxwritewithoutresponsesizechanged}} event is fired.
+      The initial value of <code>20</code> corresponds to the default ATT_MTU of
+      23 octets minus the 3-octet ATT Write Command header.
+    </td>
+  </tr>
 </table>
+
+<div algorithm="BluetoothRemoteGATTServer maxWriteWithoutResponseSize">
+The {{BluetoothRemoteGATTServer/maxWriteWithoutResponseSize}} getter steps are:
+
+1. Return [=this=].{{[[maxWriteWithoutResponseSize]]}}.
+
+<div class="note">
+Note: The stored value is the ATT_MTU negotiated for the connection to the
+remote device, minus 3 octets. The 3 octets account for the ATT Write Command
+header (1 octet opcode and 2 octet attribute handle), leaving the space
+available for the attribute value in a single PDU. The value is established
+when the connection is made and only changes when the UA observes an ATT_MTU
+change; see [[#mtu-change-events]].
+</div>
+</div>
 
 <div algorithm="BluetoothRemoteGATTServer connect">
 The <code><dfn method for="BluetoothRemoteGATTServer">connect()</dfn></code>
@@ -4363,6 +4412,21 @@ interface <a>participate in a tree</a>.
   </dd>
 
   <dt>
+    <dfn event for="BluetoothRemoteGATTServer">
+      <code>maxwritewithoutresponsesizechanged</code>
+    </dfn>
+  </dt>
+  <dd>
+    Fired on a {{BluetoothRemoteGATTServer}} when its
+    {{BluetoothRemoteGATTServer/maxWriteWithoutResponseSize}}
+    <a href="#mtu-change-events">changes</a>, for example after an
+    [=Exchange MTU=] procedure renegotiates the ATT_MTU for the connection.
+    The UA fires this event whenever it updates the value, so platforms that
+    never surface ATT_MTU changes (and therefore never change the value) also
+    never fire this event.
+  </dd>
+
+  <dt>
     <dfn event for="BluetoothRemoteGATTService"><code>serviceadded</code></dfn>
   </dt>
   <dd>
@@ -4480,6 +4544,49 @@ it must perform the following steps:
     1. <a>Fire an event</a> named {{characteristicvaluechanged}} with its
         <code>bubbles</code> attribute initialized to <code>true</code> at
         <var>characteristicObject</var>.
+
+</div>
+
+### Responding to MTU Changes ### {#mtu-change-events}
+
+<div algorithm="mtu changes">
+When the ATT_MTU negotiated for the connection to a remote device changes, for
+example because the UA receives the result of an [=Exchange MTU=] procedure,
+the UA must perform the following steps:
+
+Note: The UA only runs these steps when it observes an ATT_MTU change. Updating
+the stored value and firing the {{maxwritewithoutresponsesizechanged}} event
+happen together, so the value never changes without the event firing. Platforms
+that do not surface ATT_MTU changes to the UA never run these steps, so on those
+platforms the value stays constant after it is first established and the event
+never fires.
+
+1. Let <var>newSize</var> be the ATT_MTU now negotiated for the connection
+    &minus; 3. This is the smaller of the local Host's transmit ATT_MTU and the
+    peer's receive ATT_MTU, less the 3-octet ATT Write Command header.
+1. For each |bluetoothGlobal| whose [=Bluetooth tree=] contains a
+    {{BluetoothDevice}} representing the remote device,
+    [=queue a global task=] on the [=Bluetooth task source=] given
+    |bluetoothGlobal|'s [=relevant global object=] to do the following
+    sub-steps:
+    1. Let <var>deviceObj</var> be the {{BluetoothDevice}} in the
+        <a>Bluetooth tree</a> rooted at <var>bluetoothGlobal</var> that
+        represents the remote device.
+    1. Let <var>serverObj</var> be <code><var>deviceObj</var>.gatt</code>.
+    1. If <code><var>serverObj</var>
+        .{{BluetoothRemoteGATTServer/connected}}</code> is `false`, abort these
+        sub-steps.
+    1. If <code><var>serverObj</var>
+        .{{[[maxWriteWithoutResponseSize]]}}</code> equals <var>newSize</var>,
+        abort these sub-steps.
+    1. Set <code><var>serverObj</var>
+        .{{[[maxWriteWithoutResponseSize]]}}</code> to <var>newSize</var>.
+    1. <a>Fire an event</a> named {{maxwritewithoutresponsesizechanged}} at
+        <var>serverObj</var>.
+
+        Note: The new value is not carried on the event. Listeners read
+        <code><var>serverObj</var>.{{BluetoothRemoteGATTServer/maxWriteWithoutResponseSize}}</code>
+        to obtain the current value.
 
 </div>
 
@@ -4695,6 +4802,10 @@ type.
 <dfn attribute for="BluetoothDeviceEventHandlers">ongattserverdisconnected</dfn>
 is an <a>Event handler IDL attribute</a> for the {{gattserverdisconnected}}
 event type.
+
+<dfn attribute for="BluetoothRemoteGATTServer">
+onmaxwritewithoutresponsesizechanged</dfn> is an <a>Event handler IDL
+attribute</a> for the {{maxwritewithoutresponsesizechanged}} event type.
 
 <xmp class="idl">
   [SecureContext]
